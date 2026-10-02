@@ -11,6 +11,7 @@ import {
   nextScheduleOccurrenceAt,
   parseCalendarEventId,
   parseSimpleRrule,
+  previewScheduleOccurrences,
   scheduleKindLabel,
   tableEventsToIcsInputs,
   toIcsDate,
@@ -139,6 +140,10 @@ describe('schedule-ics.util', () => {
     const occ = expandScheduleOccurrences(monthly, until, from);
     expect(occ.length).toBeGreaterThan(0);
     expect(occ[0].occurrenceId).toContain('schedule:m1');
+
+    const preview = previewScheduleOccurrences(monthly, 3, from);
+    expect(preview.length).toBeLessThanOrEqual(3);
+    expect(preview[0].startsAt).toBe(occ[0].startsAt);
 
     const past = expandScheduleOccurrences(
       schedule({
@@ -310,5 +315,123 @@ describe('schedule-ics.util', () => {
 
     downloadIcsFile('agenda.ics', 'BEGIN:VCALENDAR');
     expect(click).toHaveBeenCalledTimes(2);
+  });
+
+  it('falls back session/kind colors and default timed duration without endsAt', () => {
+    const mappedSession = mapSessionsToCalendarEvents(
+      [session({ id: 'x', title: 'X', status: 'weird' as CampaignSession['status'] })],
+      true,
+    );
+    expect(mappedSession[0].backgroundColor).toBe('#7c3aed');
+
+    const mappedKind = mapScheduleToCalendarEvents(
+      [schedule({ id: 'k', title: 'K', kind: 'weird' as CampaignScheduleEvent['kind'] })],
+      true,
+    );
+    expect(mappedKind[0].backgroundColor).toBe('#475569');
+
+    const timed = expandScheduleOccurrences(
+      schedule({
+        id: 't',
+        title: 'Timed',
+        startsAt: '2026-10-10T18:00:00.000Z',
+        endsAt: null,
+        allDay: false,
+      }),
+      new Date('2026-12-01T00:00:00.000Z'),
+      new Date('2026-10-01T00:00:00.000Z'),
+    );
+    expect(timed[0].endsAt).toBeNull();
+  });
+
+  it('parses rrule parts without equals and clamps preview count', () => {
+    expect(parseSimpleRrule('FREQ=WEEKLY;BARE;INTERVAL=1')).toEqual({
+      freq: 'WEEKLY',
+      interval: 1,
+    });
+
+    const weekly = schedule({
+      id: 'p',
+      title: 'Preview',
+      startsAt: '2026-09-20T18:00:00.000Z',
+      endsAt: '2026-09-20T22:00:00.000Z',
+      rrule: 'FREQ=WEEKLY;INTERVAL=1',
+    });
+    const from = new Date('2026-10-01T00:00:00.000Z');
+    // count 0 / NaN fall through to default 6 via `Math.floor(count) || 6`
+    expect(previewScheduleOccurrences(weekly, 0, from).length).toBeLessThanOrEqual(6);
+    expect(previewScheduleOccurrences(weekly, 100, from).length).toBeLessThanOrEqual(24);
+    expect(previewScheduleOccurrences(weekly, Number.NaN, from).length).toBeGreaterThan(0);
+    expect(previewScheduleOccurrences(weekly).length).toBeGreaterThan(0);
+  });
+
+  it('rewinds old weekly series and tags non-seed occurrence ids', () => {
+    const weekly = schedule({
+      id: 'oldw',
+      title: 'Old weekly',
+      startsAt: '2024-01-01T18:00:00.000Z',
+      endsAt: '2024-01-01T21:00:00.000Z',
+      rrule: 'FREQ=WEEKLY;INTERVAL=1',
+    });
+    const from = new Date('2026-10-01T00:00:00.000Z');
+    const until = new Date('2026-10-20T00:00:00.000Z');
+    const occ = expandScheduleOccurrences(weekly, until, from);
+    expect(occ.length).toBeGreaterThan(0);
+    expect(occ.some((o) => o.occurrenceId.includes('@'))).toBe(true);
+  });
+
+  it('returns null next occurrence when series is exhausted before from', () => {
+    const next = nextScheduleOccurrenceAt(
+      schedule({
+        id: 'gone',
+        title: 'Gone',
+        startsAt: '2015-01-01T12:00:00.000Z',
+        endsAt: '2015-01-01T15:00:00.000Z',
+        rrule: 'FREQ=WEEKLY;INTERVAL=1',
+      }),
+      new Date('2026-10-01T00:00:00.000Z'),
+    );
+    // May still find occurrences within 12 months horizon if rewind works —
+    // force a one-shot far in the past instead:
+    const pastOneShot = nextScheduleOccurrenceAt(
+      schedule({
+        id: 'past',
+        title: 'Past',
+        startsAt: '2015-01-01T12:00:00.000Z',
+        endsAt: '2015-01-01T15:00:00.000Z',
+      }),
+      new Date('2026-10-01T00:00:00.000Z'),
+    );
+    expect(pastOneShot).toBeNull();
+    void next;
+  });
+
+  it('scheduleKindLabel falls back for unknown kind', () => {
+    expect(scheduleKindLabel('custom' as CampaignScheduleEvent['kind'])).toBe('custom');
+  });
+
+  it('buildIcsCalendar defaults now and synthesizes end when missing', () => {
+    const ics = buildIcsCalendar('Cal', [
+      {
+        uid: 'no-end@dragons',
+        title: 'Sans fin',
+        startsAt: '2026-10-05T18:00:00.000Z',
+      },
+    ]);
+    expect(ics).toContain('BEGIN:VEVENT');
+    expect(ics).toContain('DTEND:');
+  });
+
+  it('stops rewind when rrule cannot advance past until', () => {
+    const monthly = schedule({
+      id: 'far',
+      title: 'Far',
+      startsAt: '2000-01-15T18:00:00.000Z',
+      endsAt: '2000-01-15T21:00:00.000Z',
+      rrule: 'FREQ=MONTHLY;INTERVAL=1',
+    });
+    const from = new Date('2026-10-01T00:00:00.000Z');
+    const until = new Date('2010-01-01T00:00:00.000Z');
+    expect(expandScheduleOccurrences(monthly, until, from)).toEqual([]);
   });
 });

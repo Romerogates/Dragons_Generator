@@ -84,7 +84,7 @@ describe('CampaignSessionDockService', () => {
     expect(dock.rememberedCampaignId()).toBe('c1');
   });
 
-  it('persists campaign id in sessionStorage for Codex navigation', () => {
+  it('forgets sessionStorage on Terminer even without live campaignId', () => {
     sessionStorage.clear();
     dock.bindCampaign(
       detail({
@@ -101,15 +101,13 @@ describe('CampaignSessionDockService', () => {
       }),
     );
     expect(sessionStorage.getItem('dg-active-table-campaign')).toBe('c1');
-    expect(dock.rememberedCampaignId()).toBe('c1');
 
-    // Simule navigation hors /play : signal live vidé, storage conservé.
-    dock.campaignId.set(null);
-    expect(dock.rememberedCampaignId()).toBe('c1');
-
-    dock.campaignId.set('c1');
-    dock.clear();
+    dock.forgetAfterSessionEnd('c1');
     expect(sessionStorage.getItem('dg-active-table-campaign')).toBeNull();
     expect(dock.rememberedCampaignId()).toBeNull();
+
+    // Re-bind sans session après Terminer : ne pas réécrire le storage.
+    dock.bindCampaign(detail({ activeSessionId: null, sessions: [] }));
+    expect(sessionStorage.getItem('dg-active-table-campaign')).toBeNull();
   });
 });

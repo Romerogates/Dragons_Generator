@@ -3,6 +3,8 @@
   backLink="/species"
   backLabel="Registre"
   accent="amber"
+  [breadcrumbs]="breadcrumbs()"
+  [nextEntry]="nextEntry()"
 >
     @if (isLoading()) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">

@@ -52,6 +52,7 @@ import type {
 } from '../../../../core/models/Character/character';
 import { MulticlassPanel } from './multiclass-panel/multiclass-panel';
 import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 // ============================================================================
 // TYPES
@@ -295,7 +296,7 @@ function isConcreteCombatStyleId(id: string): boolean {
 @Component({
   selector: 'app-class-step',
   standalone: true,
-  imports: [CommonModule, MulticlassPanel],
+  imports: [CommonModule, MulticlassPanel, ConfirmDialog],
   templateUrl: './class-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -307,6 +308,10 @@ export class ClassStep implements OnInit {
   private dataService = inject(DataService);
   private readonly injector = inject(Injector);
   readonly builder = inject(CharacterBuilderService);
+
+  readonly showDownstreamResetConfirm = signal(false);
+  private pendingClassPickId: string | null = null;
+  private pendingClearSelection = false;
 
   private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
   private scrollRaf = 0;
@@ -903,6 +908,15 @@ export class ClassStep implements OnInit {
 
     switch (phaseBeforeClick) {
       case 'class':
+        if (
+          this.selectedClassId() !== cardId &&
+          this.hasDownstreamAfterClass()
+        ) {
+          this.pendingClassPickId = cardId;
+          this.pendingClearSelection = false;
+          this.showDownstreamResetConfirm.set(true);
+          return;
+        }
         if (this.selectedClassId() !== cardId) {
           this.selectedSubclassId.set(null);
           this.selectedCombatStyleIds.set([]);
@@ -1004,6 +1018,52 @@ export class ClassStep implements OnInit {
   }
 
   clearSelection(): void {
+    if (this.hasDownstreamAfterClass()) {
+      this.pendingClearSelection = true;
+      this.pendingClassPickId = null;
+      this.showDownstreamResetConfirm.set(true);
+      return;
+    }
+    this.doClearSelection();
+  }
+
+  private hasDownstreamAfterClass(): boolean {
+    const c = this.builder.creation();
+    return (
+      (c.selectedSkills?.length ?? 0) > 0 ||
+      (c.selectedEquipment?.length ?? 0) > 0 ||
+      !!(c.name && c.name.trim()) ||
+      (c.asiChoices?.length ?? 0) > 0
+    );
+  }
+
+  confirmDownstreamReset(): void {
+    this.showDownstreamResetConfirm.set(false);
+    if (this.pendingClearSelection) {
+      this.pendingClearSelection = false;
+      this.doClearSelection();
+      return;
+    }
+    const id = this.pendingClassPickId;
+    this.pendingClassPickId = null;
+    if (!id) return;
+    this.selectedSubclassId.set(null);
+    this.selectedCombatStyleIds.set([]);
+    this.subChoiceAnswers.set(new Map());
+    this.progChoiceAnswers.set(new Map());
+    this.builder.clearClass();
+    this.lastAppliedLevel = null;
+    this.holdPhase.set(null);
+    this.selectedClassId.set(id);
+  }
+
+  cancelDownstreamReset(): void {
+    this.showDownstreamResetConfirm.set(false);
+    this.pendingClassPickId = null;
+    this.pendingClearSelection = false;
+  }
+
+  private doClearSelection(): void {
     this.holdPhase.set(null);
     this.focusedProgChoiceId.set(null);
     this.selectedClassId.set(null);

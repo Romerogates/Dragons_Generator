@@ -236,3 +236,14 @@
     </nav>
   }
 </div>
+
+@if (showDownstreamResetConfirm()) {
+  <app-confirm-dialog
+    title="Changer d’espèce ?"
+    body="Les étapes suivantes (civilisation, historique, classe…) seront à refaire. Continuer ?"
+    confirmLabel="Changer quand même"
+    [danger]="true"
+    (cancelled)="cancelDownstreamReset()"
+    (confirmed)="confirmDownstreamReset()"
+  />
+}

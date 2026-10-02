@@ -23,6 +23,8 @@ import type { InitiativeBoard } from '@core/services/campaign-cloud.service';
 import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
+import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
 import type { Creature } from '@core/models/Creatures/creature';
@@ -89,6 +91,7 @@ import {
 } from '@core/utils/combat-roll.util';
 import { mergeRemoteLiveTable, stripTableChatForPersist } from '@core/utils/campaign-persist.util';
 import { softTablePulse } from '@core/utils/table-feedback.util';
+import { applyTablePin, clearTablePinState } from '@core/utils/table-pin.util';
 import {
   resolvePlayNextAction,
   type PlayNextAction,
@@ -169,6 +172,8 @@ export class CampaignPlayPanel implements OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly handoff = inject(CharacterHandoffService);
   private readonly playStore = inject(CampaignPlaySessionStore);
+  private readonly sessionDock = inject(CampaignSessionDockService);
+  private readonly connectivity = inject(ConnectivityService);
   private readonly playTableChat = viewChild(PlayTableChat);
   private readonly playBattleMap = viewChild(PlayBattleMap);
   private storeSub: Subscription | null = null;
@@ -796,7 +801,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   openHandoutsOverlay(): void {
-    this.selectedHandoutId.set(null);
+    const pinned = this.campaign().data.pinnedHandoutId;
+    this.selectedHandoutId.set(
+      pinned && this.publishedHandouts().some((h) => h.id === pinned) ? pinned : null,
+    );
     this.playerOverlay.set('handouts');
   }
 
@@ -1063,6 +1071,7 @@ export class CampaignPlayPanel implements OnDestroy {
       };
     });
     this.saveData({ sessions, activeSessionId: null }, () => {
+      this.sessionDock.forgetAfterSessionEnd(c.id);
       if (this.fullscreen()) {
         this.router.navigate(['/campaigns', c.id]);
       }
@@ -1371,6 +1380,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   toggleSessionRoomReveal(roomId: string): void {
+    if (!this.connectivity.isOnline()) {
+      this.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     if (!map?.fogOfWarEnabled) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
@@ -1382,6 +1395,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   revealAllSessionRooms(): void {
+    if (!this.connectivity.isOnline()) {
+      this.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     if (!map) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
@@ -1392,6 +1409,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   hideAllSessionRooms(): void {
+    if (!this.connectivity.isOnline()) {
+      this.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     const prev = {
       revealedRoomIds: [...(map?.revealedRoomIds ?? [])],
@@ -1405,6 +1426,10 @@ export class CampaignPlayPanel implements OnDestroy {
 
   sendTableChat(): void {
     if (this.isSpectator()) return;
+    if (!this.connectivity.isOnline()) {
+      this.setFeedback('err', 'Échec chat — vérifiez la connexion.');
+      return;
+    }
     const session = this.activeSession();
     const body = this.tableChatDraft().trim();
     if (!session || !body || this.tableChatSending()) return;
@@ -1416,7 +1441,7 @@ export class CampaignPlayPanel implements OnDestroy {
       },
       error: () => {
         this.tableChatSending.set(false);
-        this.setFeedback('err', 'Impossible d’envoyer le message.');
+        this.setFeedback('err', 'Échec chat — vérifiez la connexion.');
       },
     });
   }
@@ -2486,6 +2511,17 @@ export class CampaignPlayPanel implements OnDestroy {
       this.setFeedback('ok', `Tour de ${next.name}`, { ttlMs: 2200 });
       softTablePulse('turn');
     }
+    queueMicrotask(() => this.focusNextTurnControl());
+  }
+
+  /** Focus tour suivant après avance (Space / bouton) — a11y. */
+  focusNextTurnControl(): void {
+    if (typeof document === 'undefined') return;
+    this.scrollToTurnBanner();
+    const btn = document.querySelector(
+      '[data-testid="play-next-turn"]',
+    ) as HTMLElement | null;
+    btn?.focus({ preventScroll: true });
   }
 
   prevTurn(): void {
@@ -3069,15 +3105,23 @@ export class CampaignPlayPanel implements OnDestroy {
 
   pinTableMessage(body: string): void {
     if (!this.isDm()) return;
-    const text = body.trim().slice(0, 280);
-    if (!text) return;
-    this.patchSession({ tablePin: text }, { immediate: true });
+    const session = this.activeSession();
+    if (!session) return;
+    const patch = applyTablePin(session, body);
+    if (!patch.tablePin) return;
+    this.patchSession(patch, { immediate: true });
     this.setFeedback('ok', 'Message épinglé en haut du fil.');
   }
 
   clearTablePin(): void {
     if (!this.isDm()) return;
-    this.patchSession({ tablePin: '' }, { immediate: true });
+    const session = this.activeSession();
+    if (!session) return;
+    this.patchSession(clearTablePinState(session), { immediate: true });
+  }
+
+  restoreTablePin(body: string): void {
+    this.pinTableMessage(body);
   }
 
   startSceneTimer(minutes: number, label = 'Scène'): void {

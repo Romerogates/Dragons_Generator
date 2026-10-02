@@ -6,7 +6,7 @@ export const EQUIPMENTS_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('@features/data/equipments/equipments-list.ts/equipments-list.ts').then(
+      import('@features/data/equipments/equipments-list/equipments-list').then(
         (m) => m.EquipmentsList,
       ),
   },
@@ -36,7 +36,7 @@ export const EQUIPMENTS_ROUTES: Routes = [
   {
     path: ':id',
     loadComponent: () =>
-      import('@features/data/equipments/equipment-detail.ts/equipment-detail.ts').then(
+      import('@features/data/equipments/equipment-detail/equipment-detail').then(
         (m) => m.EquipmentDetail,
       ),
   },

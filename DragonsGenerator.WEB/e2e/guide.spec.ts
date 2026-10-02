@@ -39,4 +39,28 @@ test.describe('Guide wiki', () => {
     await expect(page.getByRole('heading', { name: 'Commentaires' })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('button', { name: /Télécharger le PDF/i })).toBeVisible();
   });
+
+  test('livrets en ligne + post commentaire (smoke)', async ({ page }) => {
+    test.setTimeout(90_000);
+    await loginViaUi(page, '/guide/mj-en-ligne');
+
+    await expect(page.getByRole('heading', { name: /MJ|En ligne/i }).first()).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole('button', { name: /Télécharger le PDF/i })).toBeVisible();
+
+    await page.goto('/guide/joueur-en-ligne');
+    await expect(page.getByRole('heading', { name: /Joueur|En ligne/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+
+    await page.goto('/guide/faq');
+    await expect(page.getByRole('heading', { name: 'Commentaires' })).toBeVisible({ timeout: 15_000 });
+    const box = page.getByPlaceholder(/Écrire un commentaire/i);
+    await expect(box).toBeVisible({ timeout: 10_000 });
+    const body = `E2E smoke ${Date.now()}`;
+    await box.fill(body);
+    await page.getByRole('button', { name: /^Publier$/i }).click();
+    await expect(page.getByText(body).first()).toBeVisible({ timeout: 20_000 });
+  });
 });

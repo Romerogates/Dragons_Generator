@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { catchError, combineLatest, map, of, switchMap } from 'rxjs';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { DataService } from '@core/services/data.service';
@@ -23,7 +23,7 @@ import { CreatureBookPage } from '@shared/components/creature-book-page/creature
 @Component({
   selector: 'app-campaign-bestiary-book',
   standalone: true,
-  imports: [BookReaderShell, CreatureBookPage],
+  imports: [BookReaderShell, CreatureBookPage, RouterLink],
   templateUrl: './campaign-bestiary-book.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -90,8 +90,8 @@ export const DUNGEON_MARKER_LABELS: Record<DungeonMarkerKind, string> = {
 
 export function createEmptyDungeonMap(name = 'Nouveau donjon'): CampaignDungeonMap {
   const now = new Date().toISOString();
-  const w = 48;
-  const h = 48;
+  const w = 32;
+  const h = 32;
   return {
     id: crypto.randomUUID?.() ?? `map-${Date.now()}`,
     name,

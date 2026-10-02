@@ -26,6 +26,10 @@
       >
         {{ creating() ? 'Gravure…' : 'Nouveau donjon' }}
       </button>
+    } @else if (isLoggedIn() && !canCreateMore()) {
+      <p class="text-xs text-amber-400/90 max-w-xs text-right" role="status" data-testid="dungeon-limit-msg">
+        Limite atteinte : {{ maxDungeons }} donjons maximum. Supprimez-en un pour en créer un autre.
+      </p>
     }
   </header>
 

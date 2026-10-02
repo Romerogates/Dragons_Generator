@@ -209,6 +209,20 @@ function advanceByRrule(from: Date, rule: SimpleRrule): Date {
   return d;
 }
 
+/**
+ * Aperçu des N prochaines occurrences (calendrier / warn convert one-shot).
+ */
+export function previewScheduleOccurrences(
+  event: CampaignScheduleEvent,
+  count = 6,
+  from = new Date(),
+): ScheduleOccurrence[] {
+  const n = Math.max(1, Math.min(24, Math.floor(count) || 6));
+  const until = new Date(from);
+  until.setMonth(until.getMonth() + 18);
+  return expandScheduleOccurrences(event, until, from).slice(0, n);
+}
+
 /** Prochaine occurrence future (rappels / hub). */
 export function nextScheduleOccurrenceAt(
   event: CampaignScheduleEvent,

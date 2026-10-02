@@ -25,6 +25,7 @@ import {
   extractProgressionChoices,
   multiclassPrerequisiteLabel,
   multiclassPrerequisitesMet,
+  multiclassPrerequisitesPossibleAtMaxBuy,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import { getClassIcon } from '@core/utils/class-icons';
@@ -37,6 +38,8 @@ interface SecondaryClassRow {
   subclassLevelUnlocked: number;
   prerequisiteLabel: string | null;
   prerequisitesMet: boolean;
+  /** false si même au max buy les prérequis sont hors d’atteinte. */
+  prerequisitesPossible: boolean;
   maxLevel: number;
   progChoices: ProgressionChoiceDef[];
 }
@@ -95,8 +98,24 @@ export class MulticlassPanel implements OnInit {
       .sort((a, b) => a.name.localeCompare(b.name));
   });
 
+  readonly selectedAddBlockedReason = computed(() => {
+    const id = this.selectedClassIdToAdd();
+    if (!id) return null;
+    const cls = this.classesById().get(id);
+    if (!cls) return null;
+    const racial = this.builder.creation().racialBonuses ?? {};
+    if (!multiclassPrerequisitesPossibleAtMaxBuy(cls, racial)) {
+      const label = multiclassPrerequisiteLabel(cls);
+      return label
+        ? `Prérequis impossibles même au max buy (${label}).`
+        : 'Prérequis impossibles même au max buy.';
+    }
+    return null;
+  });
+
   readonly secondaryRows = computed<SecondaryClassRow[]>(() => {
     const map = this.classesById();
+    const racial = this.builder.creation().racialBonuses ?? {};
     return this.builder.secondaryClasses().map((entry, index) => {
       const cls = map.get(entry.classId) ?? null;
       const subclassBlock = cls ? this.subclassBlockFor(cls) : null;
@@ -115,6 +134,7 @@ export class MulticlassPanel implements OnInit {
         subclassLevelUnlocked: subclassBlock?.levelUnlocked ?? 3,
         prerequisiteLabel: cls ? multiclassPrerequisiteLabel(cls) : null,
         prerequisitesMet: cls ? multiclassPrerequisitesMet(cls, this.builder.finalAbilities()) : true,
+        prerequisitesPossible: cls ? multiclassPrerequisitesPossibleAtMaxBuy(cls, racial) : true,
         maxLevel: Math.max(1, 20 - otherLevels),
         progChoices,
       };
@@ -144,6 +164,8 @@ export class MulticlassPanel implements OnInit {
     const id = this.selectedClassIdToAdd();
     const cls = this.classesById().get(id);
     if (!cls) return;
+    const racial = this.builder.creation().racialBonuses ?? {};
+    if (!multiclassPrerequisitesPossibleAtMaxBuy(cls, racial)) return;
     const level = Math.min(1, this.remainingLevels()) || 1;
     this.builder.addSecondaryClass(this.buildSelectionFor(cls, level, null, null));
     this.selectedClassIdToAdd.set('');

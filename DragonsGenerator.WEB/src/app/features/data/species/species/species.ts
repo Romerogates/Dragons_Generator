@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
+import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { Species } from '@core/models/Species/species';
 import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
@@ -24,10 +25,12 @@ import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empt
 })
 export class SpeciesList implements OnInit {
   private dataService = inject(DataService);
+  private offlineCodex = inject(OfflineCodexService);
 
   species = signal<Species[]>([]);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+  readonly offlineBanner = signal(false);
   readonly search = signal('');
 
   readonly filtered = computed(() => {
@@ -49,6 +52,7 @@ export class SpeciesList implements OnInit {
   loadSpecies(): void {
     this.isLoading.set(true);
     this.error.set(null);
+    this.offlineBanner.set(false);
 
     this.dataService.getSpecies().subscribe({
       next: (donnees: Species[]) => {
@@ -57,7 +61,14 @@ export class SpeciesList implements OnInit {
       },
       error: (erreur) => {
         console.error('Erreur lors du chargement des espèces', erreur);
-        this.error.set('Les parchemins sont illisibles. Impossible de charger les espèces.');
+        const cached = this.offlineCodex.getSnapshot<Species[]>('species');
+        if (cached?.length) {
+          this.species.set(cached);
+          this.offlineBanner.set(true);
+          this.error.set(null);
+        } else {
+          this.error.set('Les parchemins sont illisibles. Impossible de charger les espèces.');
+        }
         this.isLoading.set(false);
       },
     });

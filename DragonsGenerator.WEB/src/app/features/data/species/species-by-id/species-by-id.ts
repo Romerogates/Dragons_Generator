@@ -36,13 +36,38 @@ export class SpeciesById implements OnInit {
   error = signal<string | null>(null);
   /** Catalogue langues : id → nom affichable. */
   private readonly languageIdToName = signal<Map<string, string>>(new Map());
+  private readonly speciesIds = signal<string[]>([]);
 
   readonly nativeLanguageLabels = computed(() => {
     const fixed = this.species()?.languages?.fixed ?? [];
     return fixed.map((id) => this.languageLabel(id));
   });
 
+  readonly breadcrumbs = computed(() => {
+    const sp = this.species();
+    return [
+      { label: 'Codex', path: '/codex' },
+      { label: 'Espèces', path: '/species' },
+      { label: sp?.name ?? 'Fiche' },
+    ];
+  });
+
+  readonly nextEntry = computed(() => {
+    const sp = this.species();
+    const ids = this.speciesIds();
+    if (!sp || ids.length < 2) return null;
+    const idx = ids.indexOf(sp.id);
+    if (idx < 0) return null;
+    const nextId = ids[(idx + 1) % ids.length];
+    if (!nextId || nextId === sp.id) return null;
+    return { label: 'Suivante', path: `/species/${nextId}` };
+  });
+
   ngOnInit(): void {
+    this.dataService.getSpecies().subscribe({
+      next: (list) => this.speciesIds.set(list.map((s) => s.id)),
+      error: () => this.speciesIds.set([]),
+    });
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.error.set("Identifiant d'espèce manquant.");

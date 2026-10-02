@@ -142,13 +142,16 @@
         </select>
         <button
           type="button"
-          [disabled]="!selectedClassIdToAdd()"
+          [disabled]="!selectedClassIdToAdd() || !!selectedAddBlockedReason()"
           (click)="addSelectedClass()"
           class="bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 disabled:text-slate-500 text-[11px] font-bold px-3 py-1.5 rounded"
         >
           + Ajouter cette classe
         </button>
       </div>
+      @if (selectedAddBlockedReason(); as reason) {
+        <p class="text-red-400 text-[11px]" data-testid="multiclass-prereq-impossible">{{ reason }}</p>
+      }
     } @else if (remainingLevels() === 0) {
       <p class="text-slate-500 text-[11px] italic">
         Niveau total (20) déjà atteint : aucune classe supplémentaire possible.

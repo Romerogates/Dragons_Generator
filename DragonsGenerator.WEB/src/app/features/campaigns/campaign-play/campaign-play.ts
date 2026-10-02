@@ -83,6 +83,16 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     ) {
       return;
     }
+    // Évite double-avance Space quand focus sur Suiv. / bouton combat.
+    if (
+      target instanceof HTMLButtonElement ||
+      target?.closest?.('button, [role="button"]')
+    ) {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (key === ' ' || key === 'Spacebar' || key === 'n' || key === 'd' || key === 'f' || key === 's' || key === 'z') {
+        return;
+      }
+    }
     if (
       typeof document !== 'undefined' &&
       (document.querySelector('.dungeon-shell--fullscreen') ||

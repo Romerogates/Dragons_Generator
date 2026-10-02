@@ -1,4 +1,4 @@
-import { CharacterHandoffService } from './character-handoff.service';
+import { CharacterHandoffService, CHARACTER_HANDOFF_TTL_MS } from './character-handoff.service';
 import type { Character } from '@core/models/Character/character';
 
 describe('CharacterHandoffService', () => {
@@ -61,5 +61,22 @@ describe('CharacterHandoffService', () => {
     expect(service.peekSourceLabel()).toBeNull();
     expect(service.peekReturnUrl()).toBeNull();
     expect(service.peekProposalReview()).toBeNull();
+  });
+
+  it('expires handoff after TTL', () => {
+    service.setCurrent({ name: 'Old' } as Character);
+    const metaRaw = sessionStorage.getItem('dragons-current-character-meta');
+    expect(metaRaw).toBeTruthy();
+    const meta = JSON.parse(metaRaw!);
+    meta.savedAt = Date.now() - CHARACTER_HANDOFF_TTL_MS - 1000;
+    sessionStorage.setItem('dragons-current-character-meta', JSON.stringify(meta));
+    expect(service.isHandoffFresh()).toBeFalse();
+    expect(service.peekCurrent()).toBeNull();
+  });
+
+  it('keeps fresh handoff within TTL', () => {
+    service.setCurrent({ name: 'Fresh' } as Character);
+    expect(service.isHandoffFresh()).toBeTrue();
+    expect(service.peekCurrent()?.name).toBe('Fresh');
   });
 });

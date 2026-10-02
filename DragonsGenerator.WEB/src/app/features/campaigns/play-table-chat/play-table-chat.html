@@ -1,30 +1,17 @@
 @if (isDm() && showMacros()) {
   <div class="flex flex-wrap items-center gap-2" data-testid="mj-table-macros">
     <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mr-1">Macros</span>
-    <button
-      type="button"
-      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-amber-600/50"
-      (click)="runTableMacro('perception')"
-      data-testid="macro-perception"
-    >
-      Perception
-    </button>
-    <button
-      type="button"
-      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-amber-600/50"
-      (click)="runTableMacro('next_turn')"
-      data-testid="macro-next-turn"
-    >
-      Tour +
-    </button>
-    <button
-      type="button"
-      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-red-700/50"
-      (click)="runTableMacro('end_combat')"
-      data-testid="macro-end-combat"
-    >
-      Fin combat
-    </button>
+    @for (m of tableMacros(); track m.id) {
+      <button
+        type="button"
+        class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-amber-600/50"
+        [class.hover:border-red-700/50]="m.kind === 'end_combat'"
+        (click)="runTableMacro(m.kind)"
+        [attr.data-testid]="'macro-' + m.kind.replace('_', '-')"
+      >
+        {{ m.label }}
+      </button>
+    }
   </div>
 }
 
@@ -62,12 +49,39 @@
                 type="button"
                 class="shrink-0 text-[9px] font-black uppercase text-slate-500 hover:text-slate-300"
                 (click)="clearTablePin()"
+                data-testid="table-pin-clear"
               >
                 Retirer
               </button>
             }
           </div>
         </div>
+      }
+      @if (isDm() && pinHistory().length) {
+        <details
+          class="rounded-lg border border-slate-800 bg-[#0a0d13]/60 px-2 py-1.5"
+          [open]="pinHistoryOpen()"
+          (toggle)="pinHistoryOpen.set($any($event.target).open)"
+          data-testid="table-pin-history"
+        >
+          <summary class="cursor-pointer text-[9px] font-black uppercase tracking-widest text-slate-500 list-none [&::-webkit-details-marker]:hidden">
+            Pins précédents ({{ pinHistory().length }})
+          </summary>
+          <ul class="mt-1.5 space-y-1 max-h-28 overflow-y-auto">
+            @for (h of pinHistory(); track h.at + h.body) {
+              <li class="flex items-start justify-between gap-2 text-[11px] text-slate-400">
+                <span class="whitespace-pre-wrap break-words flex-1">{{ h.body }}</span>
+                <button
+                  type="button"
+                  class="shrink-0 text-[9px] font-black uppercase text-amber-500/80 hover:text-amber-300"
+                  (click)="restorePin(h.body)"
+                >
+                  Ré-épingler
+                </button>
+              </li>
+            }
+          </ul>
+        </details>
       }
       <div
         class="max-h-40 overflow-y-auto space-y-1.5 rounded-lg border border-slate-800 bg-[#0a0d13]/80 p-2 custom-scrollbar"
@@ -84,7 +98,7 @@
                 <button
                   type="button"
                   class="text-[9px] font-black uppercase text-slate-600 hover:text-amber-300 opacity-0 group-hover/msg:opacity-100"
-                  (click)="pinTableMessage(msg.body)"
+                  (click)="pinTableMessage(msg.body, msg.id)"
                   title="Épingler en haut du fil"
                 >
                   Pin

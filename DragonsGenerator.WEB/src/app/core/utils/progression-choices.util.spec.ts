@@ -6,6 +6,7 @@ import {
   extractSubclassSkillProficiencyChoices,
   multiclassPrerequisitesMet,
   multiclassPrerequisiteLabel,
+  multiclassPrerequisitesPossibleAtMaxBuy,
   multiclassProficiencies,
   combinedCasterLevel,
   multiclassSpellSlotsForCasterLevel,
@@ -643,6 +644,18 @@ describe('multiclassPrerequisiteLabel', () => {
     expect(multiclassPrerequisiteLabel(makeMulticlassCls('cls-guerrier', { any: ['str', 'dex'] }))).toBe(
       'Force 13 ou Dextérité 13',
     );
+  });
+});
+
+describe('multiclassPrerequisitesPossibleAtMaxBuy', () => {
+  it('allows typical single-stat prereqs at max buy', () => {
+    const cls = makeMulticlassCls('cls-roublard', { any: ['dex'] });
+    expect(multiclassPrerequisitesPossibleAtMaxBuy(cls, {})).toBeTrue();
+  });
+
+  it('rejects impossible dual-stat prereqs when max buy cannot reach 13', () => {
+    const cls = makeMulticlassCls('cls-impossible', { all: ['str', 'cha'] });
+    expect(multiclassPrerequisitesPossibleAtMaxBuy(cls, {}, 10)).toBeFalse();
   });
 });
 

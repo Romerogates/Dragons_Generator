@@ -6,6 +6,14 @@ import {
   getGuideClassPlaybook,
 } from './guide-class-playbooks';
 import {
+  GUIDE_SUBCLASS_PLAYBOOKS,
+  getGuideSubclassPlaybook,
+} from './guide-subclass-playbooks';
+import {
+  GUIDE_SPECIES_PLAYBOOKS,
+  getGuideSpeciesPlaybook,
+} from './guide-species-playbooks';
+import {
   GUIDE_BLOG_POSTS,
   GUIDE_FAQ_ITEMS,
   GUIDE_FEATURE_INDEX,
@@ -72,6 +80,18 @@ describe('guide-topics', () => {
     const searched = guideTopicsByGroup('all', 'faq', 'all');
     expect(searched.some((s) => s.topics.some((t) => t.id === 'faq'))).toBe(true);
   });
+  it('index wiki steps point to real Codex / app URLs when href is set', () => {
+    const index = getGuideTopic('index');
+    expect(index?.steps.some((s) => s.link === '/creatures')).toBe(true);
+    expect(index?.steps.some((s) => s.link === '/species')).toBe(true);
+    expect(index?.links.some((l) => l.path === '/spells')).toBe(true);
+  });
+
+  it('schemas topic uses structured steps (not concatenated role→label strings)', () => {
+    const schemas = getGuideTopic('schemas');
+    expect(schemas?.steps.length).toBeGreaterThan(2);
+    expect(schemas?.steps.every((s) => !s.body.includes(' → '))).toBe(true);
+  });
 });
 
 describe('guide blog isNew TTL', () => {
@@ -118,7 +138,7 @@ describe('guide-rulebooks', () => {
       expect(book?.chapters.some((c) => c.id === 'glossaire')).toBe(true);
       const combat = book?.chapters.find((c) => c.id === 'combat');
       expect(combat?.sections.some((s) => s.id === 'init-vs-toucher')).toBe(true);
-      expect(combat?.sections.some((s) => s.id === 'schema-initiative' && !!s.diagram?.length)).toBe(
+      expect(combat?.sections.some((s) => s.id === 'schema-initiative' && (!!s.diagram?.length || !!s.flowSteps?.length))).toBe(
         true,
       );
     }
@@ -135,6 +155,15 @@ describe('guide-rulebooks', () => {
     expect(zones).toContain('Bonus de maîtrise');
     expect(zones).toContain('Pv');
     expect(zones).toContain('Perception passive');
+  });
+
+  it('links combat-actions from table rulebooks', () => {
+    expect(getGuideRulebook('mj-table')?.related.some((r) => r.path === '/combat-actions')).toBe(
+      true,
+    );
+    expect(getGuideRulebook('joueur-table')?.related.some((r) => r.path === '/combat-actions')).toBe(
+      true,
+    );
   });
 });
 
@@ -158,5 +187,24 @@ describe('guide-class-playbooks', () => {
     expect(classBeginnerPackFilename('cls-barbare')).toBe('dragons-pack-debutant-barbare.pdf');
     expect(getGuideClassPlaybook(null)).toBeNull();
     expect(getGuideClassPlaybook('cls-inexistant')).toBeNull();
+  });
+
+  it('links subclass tips from parent class playbooks', () => {
+    const barb = getGuideClassPlaybook('cls-barbare');
+    expect(barb?.related.some((r) => r.path.includes('/guide/sous-classe/'))).toBe(true);
+  });
+});
+
+describe('guide subclass + species playbooks', () => {
+  it('ships a few subclass tips (template pattern)', () => {
+    expect(GUIDE_SUBCLASS_PLAYBOOKS.length).toBeGreaterThanOrEqual(3);
+    expect(getGuideSubclassPlaybook('subcls-berserker')?.classId).toBe('cls-barbare');
+    expect(getGuideSubclassPlaybook('subcls-inconnu')).toBeNull();
+  });
+
+  it('ships a few species tips', () => {
+    expect(GUIDE_SPECIES_PLAYBOOKS.length).toBeGreaterThanOrEqual(2);
+    expect(getGuideSpeciesPlaybook('sp-humain')?.speciesName).toBe('Humain');
+    expect(getGuideSpeciesPlaybook('sp-inconnu')).toBeNull();
   });
 });

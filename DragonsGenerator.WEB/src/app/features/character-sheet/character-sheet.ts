@@ -145,9 +145,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
       this.consultSourceLabel.set(this.handoff.peekSourceLabel());
       this.consultReturnUrl.set(this.handoff.peekReturnUrl());
       this.proposalReview.set(this.handoff.peekProposalReview());
-      if (this.isConsult()) {
-        this.viewMode.set('illustrated');
-      }
+      // Consult : conserver le mode de vue préféré (Compacte autorisée).
 
       try {
         const url = await this.pdfService.generatePdfBlob(character);

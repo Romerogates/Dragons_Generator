@@ -122,7 +122,33 @@
                       }
                     </ol>
                   }
-                  @if (sec.diagram; as diagram) {
+                  @if (sec.flowSteps?.length) {
+                    <ol
+                      class="guide-flow mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch"
+                      aria-label="Schéma"
+                    >
+                      @for (step of sec.flowSteps; track step.label; let last = $last) {
+                        <li
+                          class="flex-1 min-w-[8.5rem] rounded-xl border border-amber-800/40 bg-amber-950/20 px-3 py-2.5"
+                        >
+                          <p class="text-xs font-black uppercase tracking-widest text-amber-300/90">
+                            {{ step.label }}
+                          </p>
+                          @if (step.detail) {
+                            <p class="mt-1 text-sm text-slate-300 leading-snug">{{ step.detail }}</p>
+                          }
+                        </li>
+                        @if (!last) {
+                          <li
+                            class="hidden sm:flex items-center text-amber-700/80 text-lg px-0.5"
+                            aria-hidden="true"
+                          >
+                            →
+                          </li>
+                        }
+                      }
+                    </ol>
+                  } @else if (sec.diagram; as diagram) {
                     @if (diagram.length) {
                       <pre
                         class="overflow-x-auto rounded-xl border border-slate-800 bg-[#0a0c10] px-3 py-3 text-[10px] sm:text-xs leading-snug text-amber-100/80 font-mono whitespace-pre"

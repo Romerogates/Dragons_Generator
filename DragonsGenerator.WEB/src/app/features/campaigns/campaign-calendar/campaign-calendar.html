@@ -147,6 +147,22 @@
                 <option [value]="p.value">{{ p.label }}</option>
               }
             </select>
+            @if (rrulePreview().length) {
+              <ul
+                class="mt-2 space-y-0.5 text-[11px] text-slate-400"
+                data-testid="calendar-rrule-preview"
+              >
+                <li class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Prochaines occurrences
+                </li>
+                @for (label of rrulePreview(); track label) {
+                  <li>{{ label }}</li>
+                }
+              </ul>
+              <p class="mt-1.5 text-[10px] text-amber-400/90">
+                Convertir en session crée une soirée one-shot (la série reste au calendrier).
+              </p>
+            }
           </label>
 
           <label class="inline-flex items-center gap-2 text-xs text-slate-300">

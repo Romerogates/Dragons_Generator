@@ -34,4 +34,14 @@ describe('clear-local-app-data.util', () => {
     clearLocalAppData();
     expect(localStorage.getItem('dragons-keep-scan')).toBe('1');
   });
+
+  it('skips null keys returned by sessionStorage.key', () => {
+    sessionStorage.setItem('dragons-session-keep', '1');
+    const orig = sessionStorage.key.bind(sessionStorage);
+    spyOn(sessionStorage, 'key').and.callFake((index: number) =>
+      index === 0 ? null : orig(index),
+    );
+    clearLocalAppData();
+    expect(sessionStorage.getItem('dragons-session-keep')).toBe('1');
+  });
 });

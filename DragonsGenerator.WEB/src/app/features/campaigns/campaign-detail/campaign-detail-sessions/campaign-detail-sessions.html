@@ -370,21 +370,12 @@
             Aucune session pour l’instant.
           }
         </p>
-        @if (isOwner()) {
-          <a
-            routerLink="/guide/mj-table"
-            class="text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline underline-offset-4"
-          >
-            Guide sessions →
-          </a>
-        } @else {
-          <a
-            routerLink="/guide/joueur-table"
-            class="text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline underline-offset-4"
-          >
-            Comment ça marche →
-          </a>
-        }
+        <a
+          routerLink="/guide/scenario"
+          class="text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline underline-offset-4"
+        >
+          Guide — campagnes →
+        </a>
         @if (isOwner() && filter() !== 'past') {
           <button
             type="button"

@@ -32,7 +32,7 @@ export function gridLine(
   return points;
 }
 
-/** Clone uniquement la ligne touchée (évite un deep-clone 48×48 à chaque case). */
+/** Clone uniquement la ligne touchée (évite un deep-clone grille entière à chaque case). */
 export function setTileAt(
   tiles: DungeonTileKind[][],
   x: number,

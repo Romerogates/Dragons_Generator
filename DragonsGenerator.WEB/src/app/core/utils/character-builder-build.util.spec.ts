@@ -93,12 +93,42 @@ describe('character-combat.util', () => {
     expect(ac).toBe(14 + Math.min(mods.dexterite, 2) + 2);
   });
 
+  it('computeCharacterArmorClass drops monk UD when a shield is equipped', () => {
+    const shield: EquipmentInstance = {
+      instanceId: 's1',
+      refId: 'ar-bouclier',
+      name: 'Bouclier',
+      qty: 1,
+      equipped: true,
+      location: 'equipped',
+      wKg: 3,
+      customData: { isShield: true, ac: 2 },
+    };
+    const ac = computeCharacterArmorClass([shield], mods, {
+      classId: 'cls-moine',
+      classFeatures: [{ refId: 'feat-defense-sans-armure-moine', name: 'Défense sans armure' } as never],
+    });
+    // Bouclier → pas d’UD (10+Dex+Sag) ; bouclier aussi bloqué côté moine sans armure.
+    expect(ac).toBe(10 + mods.dexterite);
+  });
+
   it('buildCharacterAttacks includes monk unarmed strike', () => {
     const attacks = buildCharacterAttacks([], mods, 2, [], {
       classId: 'cls-moine',
       resources: { martial_arts_die: '1d6', extra_attacks: 1 },
     });
     expect(attacks.some((a) => a.name === 'Mains nues')).toBeTrue();
+  });
+
+  it('buildCharacterAttacks marks double attack from extra_attacks resource', () => {
+    const dagger = weapon('wp-dague', 'Dague', {
+      customData: { isWeapon: true, damage: '1d4', damageType: 'perforant', properties: ['Finesse'] },
+    });
+    const attacks = buildCharacterAttacks([dagger], mods, 3, [], {
+      classId: 'cls-guerrier',
+      resources: { extra_attacks: 1 },
+    });
+    expect(attacks.find((a) => a.refId === 'wp-dague')?.properties).toContain('Attaques ×2');
   });
 
   it('isMonkWeapon accepts short sword ids', () => {
@@ -176,9 +206,39 @@ describe('character-spellcasting.util', () => {
     expect(detectSpellcastingFocus(c)).toBe('Baguette arcanique');
   });
 
+  it('detectSpellcastingFocus finds holy symbol keyword', () => {
+    const c = {
+      selectedEquipment: [{ refId: 'eq-sym', name: 'Symbole sacré en argent', qty: 1 }],
+      backgroundEquipment: [],
+    } as unknown as CharacterCreation;
+    expect(detectSpellcastingFocus(c)).toBe('Symbole sacré en argent');
+  });
+
   it('spellSlotsForCharacterLevel returns warlock pact slots', () => {
     const slots = spellSlotsForCharacterLevel('warlock', 5);
     expect(slots).toEqual([{ level: 3, max: 2 }]);
+  });
+
+  it('buildCharacterSpellcasting attaches pact slots for multiclass warlock secondary', () => {
+    const c = {
+      hasSpellcasting: true,
+      spellcastingKind: 'wizard',
+      spellcastingAbility: 'Intelligence',
+      targetLevel: 5,
+      selectedEquipment: [],
+      backgroundEquipment: [],
+      spellcastingDetails: { cantrips: [{ refId: 'spl-light', name: 'Lumière' }] },
+      classProgressionResources: {},
+      classSpellSlots: [
+        { level: 1, max: 4 },
+        { level: 2, max: 2 },
+      ],
+    } as unknown as CharacterCreation;
+    const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 7, warlockLevel: 2 });
+    expect(sc?.kind).toBe('wizard');
+    expect(sc?.spellSlots?.length).toBeGreaterThan(0);
+    expect(sc?.pactSlots?.length).toBeGreaterThan(0);
+    expect(sc?.pactSlots?.[0]?.level).toBe(1);
   });
 
   it('spellSlotsForCharacterLevel uses json override when provided', () => {

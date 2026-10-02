@@ -168,6 +168,9 @@
           <div
             class="sticky z-30 space-y-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
             data-testid="play-turn-banner"
+            tabindex="-1"
+            role="status"
+            aria-live="polite"
             [class.top-0]="!h.fullscreen()"
             [class.top-[var(--dg-sticky-below-play-tabs)]]="h.fullscreen() && h.isDm() && !h.zenMode()"
             [class.top-[var(--dg-sticky-below-play)]]="h.fullscreen() && (!h.isDm() || h.zenMode())"
@@ -196,6 +199,8 @@
                     type="button"
                     class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-amber-900/40 border border-amber-700/50 text-amber-200"
                     aria-label="Tour suivant"
+                    aria-keyshortcuts="Space"
+                    data-testid="play-next-turn"
                     (click)="h.nextTurn()"
                   >
                     Suiv. ▶
@@ -203,7 +208,7 @@
                 </div>
               }
             </div>
-            @if (!h.isDm() && h.combatFlowPhase() === 'fight' && h.isMyTurn() && h.fightStep() === 'menu') {
+            @if (!h.isDm() && !h.isSpectator() && h.combatFlowPhase() === 'fight' && h.isMyTurn() && h.fightStep() === 'menu') {
               <div class="grid grid-cols-2 gap-2 lg:hidden">
                 <button
                   type="button"
@@ -425,26 +430,33 @@
                 [queryParams]="{ code: h.activeCombat()!.initiativeCode, display: '1' }"
                 class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-[#1b2028] border border-amber-700/50 text-amber-300"
                 data-testid="initiative-tv-display"
+                title="Affichage TV / tablette MJ (lecture seule)"
               >
                 Écran TV
               </a>
               <button
                 type="button"
                 class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-                aria-label="Copier le lien d’initiative"
+                aria-label="Copier le lien joueur d’initiative (/init)"
                 (click)="h.copyInitiativeLink()"
+                data-testid="initiative-copy-player-link"
               >
-                Copier le lien
+                Lien joueurs
               </button>
               @if (h.initiativeQrUrl(); as qr) {
-                <img
-                  [src]="qr"
-                  width="120"
-                  height="120"
-                  alt="QR code initiative"
-                  class="rounded-lg border border-slate-700 bg-white p-1"
-                  data-testid="initiative-qr"
-                />
+                <div class="space-y-1" data-testid="initiative-qr-block">
+                  <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">
+                    QR joueurs → /init
+                  </p>
+                  <img
+                    [src]="qr"
+                    width="120"
+                    height="120"
+                    alt="QR code initiative joueurs (saisie du jet)"
+                    class="rounded-lg border border-slate-700 bg-white p-1"
+                    data-testid="initiative-qr"
+                  />
+                </div>
               }
             </div>
           </div>

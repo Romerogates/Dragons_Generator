@@ -372,6 +372,7 @@
               @for (sk of skillList(); track sk.id) {
                 <li
                   class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300"
+                  data-testid="compact-skill"
                 >
                   <a
                     class="text-amber-400/95 hover:text-amber-300 hover:underline underline-offset-2"
@@ -380,6 +381,7 @@
                     rel="noopener noreferrer"
                     >{{ sk.label }}</a
                   >
+                  <span class="text-slate-400 ml-1 tabular-nums">{{ sk.modifier }}</span>
                   @if (sk.expertise) {
                     <span class="text-amber-400"> ×2</span>
                   }

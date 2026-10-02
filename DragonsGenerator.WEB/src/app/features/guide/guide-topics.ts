@@ -398,15 +398,18 @@ function contentFor(id: string): Pick<
       };
     case 'index':
       return {
-        paragraphs: ['Index des fonctionnalités : chaque entrée mène à la fiche concernée.'],
+        paragraphs: ['Index des fonctionnalités : chaque entrée mène à la fiche concernée ou à l’outil Codex.'],
         steps: GUIDE_FEATURE_INDEX.map((i) => ({
           title: i.label,
           body: i.description,
           badge: i.audience === 'dm' ? 'MJ' : i.audience === 'player' ? 'Joueur' : 'Tous',
-          link: `/guide/${i.sectionId}`,
-          linkLabel: 'Ouvrir',
+          link: i.href ?? `/guide/${i.sectionId}`,
+          linkLabel: i.href ? 'Ouvrir' : 'Guide',
         })),
-        links: GUIDE_QUICK_CARDS.map((c) => ({ label: c.title, path: c.link, hint: c.description })),
+        links: [
+          ...CODEX_NAV_LINKS.map((l) => ({ label: l.label, path: l.path, hint: l.blurb })),
+          ...GUIDE_QUICK_CARDS.map((c) => ({ label: c.title, path: c.link, hint: c.description })),
+        ],
         flow: [],
       };
     case 'support':
@@ -458,21 +461,30 @@ function contentFor(id: string): Pick<
     case 'schemas':
       return {
         paragraphs: [
-          'Schémas de flux utiles pour visualiser qui fait quoi (MJ vs joueur).',
+          'Schémas de flux utiles pour visualiser qui fait quoi (MJ vs joueur). Chaque étape ci-dessous est une case du parcours — pas une phrase concaténée.',
         ],
         steps: [
-          {
-            title: 'Proposition de perso',
-            body: GUIDE_PROPOSAL_FLOW.map((s) => `${s.role} → ${s.label}`).join(' · '),
-          },
-          {
-            title: 'Combat',
-            body: GUIDE_COMBAT_FLOW.map((s) => `${s.role} → ${s.label}`).join(' · '),
-          },
+          ...GUIDE_PROPOSAL_FLOW.map((s, i) => ({
+            title: `Proposition · ${i + 1}. ${s.label}`,
+            body: `Rôle : ${s.role}`,
+            badge: (s.role === 'MJ' ? 'MJ' : s.role.toLowerCase().includes('joueur') ? 'Joueur' : 'Tous') as
+              | 'MJ'
+              | 'Joueur'
+              | 'Tous',
+          })),
+          ...GUIDE_COMBAT_FLOW.map((s, i) => ({
+            title: `Combat · ${i + 1}. ${s.label}`,
+            body: `Rôle : ${s.role}`,
+            badge: (s.role === 'MJ' ? 'MJ' : s.role.toLowerCase().includes('joueur') ? 'Joueur' : 'Tous') as
+              | 'MJ'
+              | 'Joueur'
+              | 'Tous',
+          })),
         ],
         links: [
           { label: 'Campagnes', path: '/guide/scenario' },
           { label: 'Combat', path: '/guide/initiative' },
+          { label: 'Actions de combat', path: '/combat-actions' },
         ],
         flow: GUIDE_PROPOSAL_FLOW.map((s) => s.label),
       };

@@ -152,6 +152,28 @@ export interface TableChatMessage {
   body: string;
 }
 
+/** Entrée d’historique des pins du fil de table. */
+export interface TablePinHistoryEntry {
+  at: string;
+  body: string;
+  messageId?: string;
+}
+
+/** Macro MJ partageable sur la session (sync blob). */
+export type TableMacroKind = 'perception' | 'next_turn' | 'end_combat';
+
+export interface TableMacroDef {
+  id: string;
+  label: string;
+  kind: TableMacroKind;
+}
+
+export const DEFAULT_TABLE_MACROS: TableMacroDef[] = [
+  { id: 'macro-perception', label: 'Perception', kind: 'perception' },
+  { id: 'macro-next-turn', label: 'Tour +', kind: 'next_turn' },
+  { id: 'macro-end-combat', label: 'Fin combat', kind: 'end_combat' },
+];
+
 export interface CampaignSession {
   id: string;
   title: string;
@@ -183,7 +205,11 @@ export interface CampaignSession {
   /** Fil de table minimal (MJ + joueurs) — sync live via blob campagne. */
   tableChat?: TableChatMessage[];
   /** Message épinglé en haut du fil (objectif de scène / indice). */
-  tablePin?: string;
+  tablePin?: string | null;
+  /** Historique des pins retirés / remplacés (MJ, cap ~10). */
+  tablePinHistory?: TablePinHistoryEntry[];
+  /** Macros MJ partagées (sinon défauts client). */
+  tableMacros?: TableMacroDef[];
   /** Run sheet MJ — objectifs de la soirée. */
   objectives?: string;
   /** Run sheet MJ — scènes / actes prévus. */

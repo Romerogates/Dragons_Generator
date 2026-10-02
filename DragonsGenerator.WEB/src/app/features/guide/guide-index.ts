@@ -15,6 +15,8 @@ import { GUIDE_QUICK_CARDS } from './guide-content';
 import { GUIDE_TOPICS, guideTopicsByGroup } from './guide-topics';
 import { GuideSidebar } from './guide-sidebar/guide-sidebar';
 import { GUIDE_CLASS_PLAYBOOKS } from './guide-class-playbooks';
+import { GUIDE_SUBCLASS_PLAYBOOKS } from './guide-subclass-playbooks';
+import { GUIDE_SPECIES_PLAYBOOKS } from './guide-species-playbooks';
 
 /** Chapitres secondaires du hub — rôle via audience (donjons / table = MJ). */
 const FEATURED_TOPIC_IDS = [
@@ -43,6 +45,8 @@ export class GuideIndexPage implements OnInit {
   readonly audience = signal<GuideAudience | 'all'>('all');
   readonly quickCards = GUIDE_QUICK_CARDS;
   readonly classPlaybooks = GUIDE_CLASS_PLAYBOOKS;
+  readonly subclassPlaybooks = GUIDE_SUBCLASS_PLAYBOOKS;
+  readonly speciesPlaybooks = GUIDE_SPECIES_PLAYBOOKS;
 
   readonly featured = computed(() => {
     const aud = this.audience();

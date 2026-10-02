@@ -15,6 +15,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
 import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
 import { isCombatantDefeated } from '@core/utils/combat-tracker.util';
 import {
@@ -61,6 +62,7 @@ export type PlayBattleSessionView =
 export class PlayBattleMap implements OnDestroy {
   readonly store = inject(CampaignPlaySessionStore);
   private readonly auth = inject(AuthService);
+  private readonly connectivity = inject(ConnectivityService);
 
   /** Vue table du shell (combat / autres) — pour afficher la carte MJ. */
   readonly sessionView = input<PlayBattleSessionView>('resume');
@@ -265,6 +267,10 @@ export class PlayBattleMap implements OnDestroy {
   }
 
   toggleSessionRoomReveal(roomId: string): void {
+    if (!this.connectivity.isOnline()) {
+      this.store.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     if (!map?.fogOfWarEnabled) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
@@ -276,6 +282,10 @@ export class PlayBattleMap implements OnDestroy {
   }
 
   revealAllSessionRooms(): void {
+    if (!this.connectivity.isOnline()) {
+      this.store.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     if (!map) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
@@ -286,6 +296,10 @@ export class PlayBattleMap implements OnDestroy {
   }
 
   hideAllSessionRooms(): void {
+    if (!this.connectivity.isOnline()) {
+      this.store.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     const map = this.activeSessionMap();
     const prev = {
       revealedRoomIds: [...(map?.revealedRoomIds ?? [])],
@@ -298,6 +312,10 @@ export class PlayBattleMap implements OnDestroy {
   }
 
   private tryToggleCorridorFog(map: CampaignDungeonMap, x: number, y: number): void {
+    if (!this.connectivity.isOnline()) {
+      this.store.setFeedback('err', 'Échec fog — vérifiez la connexion.');
+      return;
+    }
     if (!map.fogOfWarEnabled) return;
     if (roomAt(map, x, y)) return;
     const kind = tileAt(map, x, y);

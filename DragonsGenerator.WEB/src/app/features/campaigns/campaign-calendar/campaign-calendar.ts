@@ -46,6 +46,7 @@ import {
   fromDatetimeLocalValue,
   googleCalendarTemplateUrl,
   parseCalendarEventId,
+  previewScheduleOccurrences,
   scheduleKindLabel,
   tableEventsToIcsInputs,
   type CalendarHeroOption,
@@ -316,6 +317,21 @@ export class CampaignCalendar {
   rsvpSummary(): string {
     return formatRsvpSummary(this.draft()?.rsvps);
   }
+
+  /** Aperçu des prochaines occurrences RRULE (max 6). */
+  readonly rrulePreview = computed(() => {
+    const d = this.draft();
+    if (!d?.rrule?.trim()) return [];
+    return previewScheduleOccurrences(d, 6).map((o) =>
+      new Date(o.startsAt).toLocaleString('fr-FR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: d.allDay ? undefined : '2-digit',
+        minute: d.allDay ? undefined : '2-digit',
+      }),
+    );
+  });
 
   async copyRsvpLink(): Promise<void> {
     const d = this.draft();

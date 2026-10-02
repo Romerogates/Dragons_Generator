@@ -21,6 +21,12 @@ export class CampaignSessionDockService {
   /** Detail vivant fourni par campaign-detail / play page (évite double fetch). */
   readonly liveCampaign = signal<CampaignDetail | null>(null);
 
+  /**
+   * Après « Terminer session » : ne pas réécrire `sessionStorage` tant qu’une
+   * nouvelle session live n’est pas ouverte (évite FAB/Codex fantôme).
+   */
+  private suppressRemember = false;
+
   readonly isVisible = computed(() => {
     const detail = this.liveCampaign();
     const id = detail?.data.activeSessionId;
@@ -44,18 +50,21 @@ export class CampaignSessionDockService {
       this.clear();
       return;
     }
-    // Toujours mémoriser la dernière campagne visitée (Codex → rencontre sans session live).
-    this.persistRememberedId(detail.id);
 
     if (!detail.data.activeSessionId) {
       if (this.campaignId() === detail.id) this.clearLiveState();
+      // Codex prep : mémoriser sauf juste après Terminer session.
+      if (!this.suppressRemember) this.persistRememberedId(detail.id);
       return;
     }
     const session = detail.data.sessions.find((s) => s.id === detail.data.activeSessionId);
     if (!session) {
       if (this.campaignId() === detail.id) this.clearLiveState();
+      if (!this.suppressRemember) this.persistRememberedId(detail.id);
       return;
     }
+    this.suppressRemember = false;
+    this.persistRememberedId(detail.id);
     this.campaignId.set(detail.id);
     this.campaignTitle.set(detail.title);
     this.sessionTitle.set(session.title ?? 'Session');
@@ -63,6 +72,23 @@ export class CampaignSessionDockService {
     this.combatRound.set(session.activeCombat?.round ?? null);
     this.recentLog.set((session.combatLog ?? []).slice(-8).reverse());
     this.liveCampaign.set(detail);
+  }
+
+  /**
+   * Terminer / supprimer la session active — vide le dock + sessionStorage
+   * même si l’on n’est plus sur `/play`.
+   */
+  forgetAfterSessionEnd(campaignId?: string | null): void {
+    this.suppressRemember = true;
+    this.clearLiveState();
+    try {
+      const key = sessionStorage.getItem(ACTIVE_TABLE_CAMPAIGN_KEY);
+      if (!campaignId || key === campaignId || !key) {
+        sessionStorage.removeItem(ACTIVE_TABLE_CAMPAIGN_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
   }
 
   clear(): void {

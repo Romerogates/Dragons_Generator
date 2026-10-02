@@ -1,4 +1,6 @@
 import type { DungeonRandomEncounter, DungeonTheme } from '@core/models/Campaign/dungeon-map';
+import { DUNGEON_THEME_LABELS } from '@core/models/Campaign/dungeon-map';
+import type { EncounterGroup } from '@core/models/Campaign/campaign';
 
 type PoolEntry = { name: string; cr: string; weight: number };
 
@@ -104,4 +106,53 @@ export function rollRandomEncounter(theme: DungeonTheme, isBossRoom = false): Du
     }
   }
   return { creatures };
+}
+
+/** XP approximatif DMG par FP (pool thème — pas de fiche Codex). */
+const CR_XP: Record<string, number> = {
+  '0': 10,
+  '1/8': 25,
+  '1/4': 50,
+  '1/2': 100,
+  '1': 200,
+  '2': 450,
+  '3': 700,
+  '4': 1100,
+  '5': 1800,
+  '6': 2300,
+  '7': 2900,
+  '8': 3900,
+  '9': 5000,
+};
+
+export function xpForChallengeRating(cr: string | undefined | null): number {
+  if (!cr) return 0;
+  return CR_XP[cr.trim()] ?? 0;
+}
+
+export function encounterGroupFromRandomRoll(
+  roll: DungeonRandomEncounter,
+  opts: {
+    roomLabel: string;
+    mapName: string;
+    theme: DungeonTheme;
+    dungeonMapId?: string;
+  },
+): EncounterGroup {
+  const themeLabel = DUNGEON_THEME_LABELS[opts.theme] ?? opts.theme;
+  const summary = roll.creatures.map((c) => `${c.quantity}× ${c.name}`).join(', ');
+  return {
+    id: crypto.randomUUID?.() ?? `enc-${Date.now()}`,
+    name: `${opts.roomLabel} — ${opts.mapName}`,
+    description: `Tirage ${themeLabel} : ${summary}`,
+    dungeonMapId: opts.dungeonMapId,
+    creatures: roll.creatures.map((c) => ({
+      creatureId: `theme:${(c.name || 'creature').toLowerCase().replace(/\s+/g, '-')}`,
+      creatureName: c.name,
+      challengeRating: c.cr ?? '',
+      xp: xpForChallengeRating(c.cr),
+      quantity: Math.max(1, c.quantity),
+      defeated: 0,
+    })),
+  };
 }

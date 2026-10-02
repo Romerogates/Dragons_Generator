@@ -1163,11 +1163,18 @@
               <button
                 type="button"
                 class="w-full text-left px-4 py-3 rounded-xl border border-slate-700 hover:border-emerald-600/50 bg-[#171b22]"
+                [class.border-amber-700/50]="h.id === campaign().data.pinnedHandoutId"
                 (click)="selectHandout(h.id)"
+                [attr.data-testid]="
+                  h.id === campaign().data.pinnedHandoutId ? 'play-handout-pinned' : null
+                "
               >
                 <span class="font-serif text-slate-100 block">{{ h.title }}</span>
                 <span class="text-[10px] text-slate-500 uppercase tracking-widest">
                   {{ handoutKindLabels[h.kind] }}
+                  @if (h.id === campaign().data.pinnedHandoutId) {
+                    <span class="text-amber-400"> · Épinglé</span>
+                  }
                 </span>
               </button>
             }

@@ -22,6 +22,16 @@ import {
   getGuideClassPlaybook,
   type GuideClassPlaybook,
 } from './guide-class-playbooks';
+import {
+  getGuideSubclassPlaybook,
+  type GuideSubclassPlaybook,
+} from './guide-subclass-playbooks';
+import {
+  getGuideSpeciesPlaybook,
+  type GuideSpeciesPlaybook,
+} from './guide-species-playbooks';
+
+type GuideExtraBook = GuideClassPlaybook | GuideSubclassPlaybook | GuideSpeciesPlaybook;
 
 @Component({
   selector: 'app-guide-rulebook',
@@ -37,22 +47,29 @@ export class GuideRulebookPage implements OnInit {
 
   readonly book = signal<GuideRulebook | null>(null);
   readonly classBook = signal<GuideClassPlaybook | null>(null);
+  readonly subclassBook = signal<GuideSubclassPlaybook | null>(null);
+  readonly speciesBook = signal<GuideSpeciesPlaybook | null>(null);
   readonly exporting = signal(false);
   readonly exportError = signal<string | null>(null);
   readonly navQuery = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
 
+  private readonly extraBook = computed(
+    (): GuideExtraBook | null =>
+      this.classBook() ?? this.subclassBook() ?? this.speciesBook() ?? null,
+  );
+
   readonly displayTitle = computed(
-    () => this.classBook()?.title ?? this.book()?.title ?? '',
+    () => this.extraBook()?.title ?? this.book()?.title ?? '',
   );
   readonly displaySubtitle = computed(
-    () => this.classBook()?.subtitle ?? this.book()?.subtitle ?? '',
+    () => this.extraBook()?.subtitle ?? this.book()?.subtitle ?? '',
   );
   readonly displayChapters = computed(
-    () => this.classBook()?.chapters ?? this.book()?.chapters ?? [],
+    () => this.extraBook()?.chapters ?? this.book()?.chapters ?? [],
   );
   readonly related = computed(
-    () => this.classBook()?.related ?? this.book()?.related ?? [],
+    () => this.extraBook()?.related ?? this.book()?.related ?? [],
   );
   readonly showBeginnerPack = computed(() => this.classBook() != null);
 
@@ -73,8 +90,29 @@ export class GuideRulebookPage implements OnInit {
     this.route.paramMap.subscribe((params) => {
       const classId = params.get('classId');
       if (classId) {
-        const cb = getGuideClassPlaybook(classId);
-        this.classBook.set(cb);
+        this.classBook.set(getGuideClassPlaybook(classId));
+        this.subclassBook.set(null);
+        this.speciesBook.set(null);
+        this.book.set(null);
+        this.audience.set('player');
+        return;
+      }
+
+      const subclassId = params.get('subclassId');
+      if (subclassId) {
+        this.subclassBook.set(getGuideSubclassPlaybook(subclassId));
+        this.classBook.set(null);
+        this.speciesBook.set(null);
+        this.book.set(null);
+        this.audience.set('player');
+        return;
+      }
+
+      const speciesId = params.get('speciesId');
+      if (speciesId) {
+        this.speciesBook.set(getGuideSpeciesPlaybook(speciesId));
+        this.classBook.set(null);
+        this.subclassBook.set(null);
         this.book.set(null);
         this.audience.set('player');
         return;
@@ -86,6 +124,8 @@ export class GuideRulebookPage implements OnInit {
       const b = getGuideRulebook(id);
       this.book.set(b);
       this.classBook.set(null);
+      this.subclassBook.set(null);
+      this.speciesBook.set(null);
       if (b?.role === 'mj') {
         this.prefs.setAudience('dm');
         this.audience.set('dm');

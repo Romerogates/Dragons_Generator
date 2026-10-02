@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { Spell } from '@core/models/Spells/spell';
 import { spellSchoolLabel } from '@core/utils/spell-display.util';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
@@ -26,10 +27,12 @@ import { labelForGameId } from '@core/utils/game-id-labels';
 })
 export class Spells {
   private dataService = inject(DataService);
+  private offlineCodex = inject(OfflineCodexService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   protected error = signal<string | null>(null);
+  protected offlineBanner = signal(false);
   protected readonly schoolLabel = spellSchoolLabel;
 
   readonly search = signal('');
@@ -38,6 +41,12 @@ export class Spells {
   protected spells = toSignal(
     this.dataService.getSpells().pipe(
       catchError(() => {
+        const cached = this.offlineCodex.getSnapshot<Spell[]>('spells');
+        if (cached?.length) {
+          this.offlineBanner.set(true);
+          this.error.set(null);
+          return of(cached);
+        }
         this.error.set('Les pages de ce grimoire sont indéchiffrables (Erreur de chargement).');
         return of([] as Spell[]);
       }),

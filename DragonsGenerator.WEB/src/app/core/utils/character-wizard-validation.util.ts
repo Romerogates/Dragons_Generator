@@ -6,6 +6,7 @@ import {
   isTalentSpendComplete,
   talentSpendsTotalCost,
 } from './feat-benefits.util';
+import { isBaseLanguageName, isExoticLanguageName } from './character-languages.util';
 import { resolveSpellQuota, spellPickCount } from './spell-quota.util';
 
 /** Points flexibles du don Talent (aligné sur abilities-step / JSON feat). */
@@ -70,8 +71,20 @@ function languagesStepComplete(c: CharacterCreation): boolean {
   ]);
   if (c.classId === 'cls-druide') locked.add('Langue des druides');
   if (c.classId === 'cls-roublard') locked.add('Argot des voleurs');
-  const bonusPicked = c.languages.filter((l) => !locked.has(l)).length;
-  return bonusPicked >= bonusNeeded;
+  const bonusPicked = c.languages.filter((l) => !locked.has(l));
+  if (bonusPicked.length < bonusNeeded) return false;
+
+  const exoticNeed = c.requiredExoticLanguageCount ?? 0;
+  const baseNeed = c.requiredBaseLanguageCount ?? 0;
+  if (exoticNeed > 0) {
+    const exoticCount = bonusPicked.filter((l) => isExoticLanguageName(l)).length;
+    if (exoticCount < exoticNeed) return false;
+  }
+  if (baseNeed > 0) {
+    const baseCount = bonusPicked.filter((l) => isBaseLanguageName(l)).length;
+    if (baseCount < baseNeed) return false;
+  }
+  return true;
 }
 
 function secondaryProgressionComplete(c: CharacterCreation): boolean {

@@ -207,14 +207,13 @@
           </div>
         </div>
 
-        @if (!mapFullscreen()) {
+        @if (mapFullscreen()) {
+          <!-- plein écran : pas de nav sticky -->
+        } @else {
           <nav class="wizard-step-nav px-2 sm:px-4 lg:px-6">
             <p class="wizard-nav-hint">Choisissez une civilisation sur la carte</p>
             <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
               ← Étape précédente
-            </button>
-            <button type="button" class="wizard-nav-primary" disabled>
-              Continuer →
             </button>
           </nav>
         }

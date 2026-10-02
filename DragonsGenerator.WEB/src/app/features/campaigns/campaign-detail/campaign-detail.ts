@@ -2067,17 +2067,44 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!next) return;
     const ev = (this.campaign()?.data.scheduleEvents ?? []).find((e) => e.id === next.id);
     if (!ev) return;
-    this.convertScheduleEventToSession(ev);
+    this.convertScheduleEventToSession(ev, next.startsAt);
   }
 
-  convertScheduleEventToSession(ev: CampaignScheduleEvent): void {
+  convertScheduleEventToSession(ev: CampaignScheduleEvent, occurrenceStartsAt?: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+
+    const scheduledAt = occurrenceStartsAt || ev.startsAt || new Date().toISOString();
+    const run = () => this.doConvertScheduleEventToSession(ev, scheduledAt);
+
+    if (ev.rrule?.trim()) {
+      const when = new Date(scheduledAt).toLocaleString('fr-FR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      this.askConfirm(
+        'Série récurrente → une session',
+        `Cette date est récurrente. Créer une session one-shot le ${when} ? Le calendrier reste récurrent.`,
+        run,
+        'Créer la session',
+        false,
+      );
+      return;
+    }
+    run();
+  }
+
+  private doConvertScheduleEventToSession(ev: CampaignScheduleEvent, scheduledAt: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
     this.flushSessionSave();
     const session: CampaignSession = {
       id: crypto.randomUUID?.() ?? `session-${Date.now()}`,
       title: ev.title?.trim() || 'Session',
-      scheduledAt: ev.startsAt || new Date().toISOString(),
+      scheduledAt,
       status: 'planned',
       mode: 'online',
       location: ev.location || undefined,
@@ -2212,10 +2239,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         ...(clearingActive ? { activeSessionId: null } : {}),
       });
       if (clearingActive) {
-        this.sessionDock.bindCampaign({
-          ...c,
-          data: { ...c.data, sessions, activeSessionId: null },
-        });
+        this.sessionDock.forgetAfterSessionEnd(c.id);
       }
     });
   }
@@ -2894,7 +2918,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   openCampaignBestiaryBook(index = 0): void {
     const c = this.campaign();
-    if (!c?.data.creatures.length) return;
+    if (!c) return;
     void this.router.navigate(['/campaigns', c.id, 'bestiary'], {
       queryParams: { i: index },
     });
@@ -3269,6 +3293,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readyPregensForPlayers(): CampaignPregen[] {
     const c = this.campaign();
     if (!c || c.isOwner) return [];
+    const me = c.members.find((m) => m.userId === this.auth.user()?.id);
+    // Une seule voie : fiche proposée / approuvée XOR claim pré-tiré.
+    if (
+      me &&
+      (me.proposalStatus === 'pending' ||
+        me.proposalStatus === 'approved' ||
+        me.approvedCharacterId ||
+        me.proposedCharacterId)
+    ) {
+      return [];
+    }
     return (c.data.pregenCharacters ?? []).filter((p) => p.status === 'ready');
   }
 

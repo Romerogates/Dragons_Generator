@@ -63,6 +63,8 @@ export interface GuideIndexItem {
   description: string;
   sectionId: string;
   audience: GuideAudience;
+  /** Lien app réel (Codex / outil) — prioritaire sur `/guide/{sectionId}` dans l’index wiki. */
+  href?: string;
 }
 
 export interface GuideFlashCard {

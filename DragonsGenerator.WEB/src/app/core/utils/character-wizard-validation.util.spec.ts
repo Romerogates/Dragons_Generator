@@ -461,6 +461,41 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
   });
 
+  it('languagesStepComplete requires exotic and base remaining among bonus picks', () => {
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          languages: ['Commun', 'Elfique'],
+          bonusLanguageCount: 2,
+          requiredExoticLanguageCount: 1,
+          requiredBaseLanguageCount: 1,
+          speciesLanguages: [],
+          civilizationLanguages: [],
+          backgroundLanguages: [],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          languages: ['Commun', 'Draconique'],
+          bonusLanguageCount: 2,
+          requiredExoticLanguageCount: 1,
+          requiredBaseLanguageCount: 1,
+          speciesLanguages: [],
+          civilizationLanguages: [],
+          backgroundLanguages: [],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
   it('isWizardStepValid blocks the magic step when a racial spell grant is still unresolved', () => {
     expect(
       isWizardStepValid(

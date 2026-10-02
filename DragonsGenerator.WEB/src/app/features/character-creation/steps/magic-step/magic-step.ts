@@ -140,6 +140,8 @@ export class MagicStep implements OnInit {
     string,
     { cantrips: string[]; spells: string[]; deityId: string | null }
   > = {};
+  /** Tick pour rendre les quotas multi-sources réactifs dans l’UI. */
+  private readonly picksVersion = signal(0);
 
   readonly selectedCantrips = signal<Set<string>>(new Set());
   readonly selectedSpells = signal<Set<string>>(new Set());
@@ -188,6 +190,34 @@ export class MagicStep implements OnInit {
     const sources = this.casterSources();
     if (!sources.length) return null;
     return sources[this.activeCasterIndex()] ?? sources[0] ?? null;
+  });
+
+  /** Libellés onglets multi-sources : « Magicien 5 · 3/3 · 6/6 ». */
+  readonly casterTabLabels = computed(() => {
+    this.picksVersion();
+    const activeId = this.activeCaster()?.classId;
+    const loaded = this.loadedClasses();
+    return this.casterSources().map((src) => {
+      const cls = loaded.get(src.classId) ?? null;
+      const q = resolveSpellQuota({
+        cls,
+        kind: src.kind,
+        classLevel: src.level,
+        abilityModifiers: this.builder.abilityModifiers(),
+        bonusCantrips: src.subclassId === 'subcls-cercle-de-la-terre' ? 1 : 0,
+      });
+      const picks =
+        src.classId === activeId
+          ? { cantrips: [...this.selectedCantrips()], spells: [...this.selectedSpells()] }
+          : this.picksByClass[src.classId];
+      const cantripHave = picks?.cantrips?.length ?? 0;
+      const spellHave = picks?.spells?.length ?? 0;
+      const spellNeed = q ? spellPickCount(q) : 0;
+      const parts = [`${src.className} ${src.level}`];
+      if (q && q.cantrips > 0) parts.push(`${cantripHave}/${q.cantrips}`);
+      if (spellNeed > 0) parts.push(`${spellHave}/${spellNeed}`);
+      return parts.join(' · ');
+    });
   });
 
   readonly spellcastingKind = computed<SpellcastingKind | null>(
@@ -664,6 +694,7 @@ export class MagicStep implements OnInit {
       spells: [...this.selectedSpells()],
       deityId: this.selectedDeityId(),
     };
+    this.picksVersion.update((n) => n + 1);
   }
 
   private restorePicksFor(classId: string): void {

@@ -327,6 +327,17 @@
         <button type="button" class="editor-action" [disabled]="!canUndo()" (click)="undo()">Annuler</button>
         <button type="button" class="editor-action" [disabled]="!canRedo()" (click)="redo()">Rétablir</button>
         @if (!libraryMode()) {
+          @if (mapSaveState() === 'pending' || mapSaveState() === 'saving') {
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 animate-pulse" data-testid="map-autosave">
+              Enregistrement…
+            </span>
+          } @else if (mapSaveState() === 'saved') {
+            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400" data-testid="map-autosave">
+              Enregistré
+            </span>
+          }
+        }
+        @if (!libraryMode()) {
           <button
             type="button"
             class="editor-action"
@@ -674,6 +685,16 @@
                 <button type="button" class="text-[10px] font-bold uppercase text-amber-400/90 mt-2" (click)="rerollRoomEncounter(room.id); $event.stopPropagation()">
                   Relancer aléatoire
                 </button>
+                @if (!libraryMode() && !readOnly() && room.randomEncounter?.creatures?.length) {
+                  <button
+                    type="button"
+                    class="block text-[10px] font-bold uppercase text-emerald-400/90 mt-1.5"
+                    (click)="promoteRoomEncounter(room.id); $event.stopPropagation()"
+                    data-testid="promote-theme-encounter"
+                  >
+                    Créer rencontre campagne
+                  </button>
+                }
 
                 <textarea
                   rows="2"

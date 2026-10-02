@@ -71,10 +71,10 @@ export class LibraryDungeons implements OnInit {
     this.error.set(null);
     const map = generateDungeonMap(
       {
-        gridWidth: 48,
-        gridHeight: 48,
-        roomCount: 10,
-        corridorDensity: 50,
+        gridWidth: 32,
+        gridHeight: 32,
+        roomCount: 6,
+        corridorDensity: 45,
         theme: 'generic',
       },
       { name: 'Nouveau donjon' },
@@ -86,7 +86,9 @@ export class LibraryDungeons implements OnInit {
       },
       error: () => {
         this.creating.set(false);
-        this.error.set('Création impossible (limite ou réseau).');
+        this.error.set(
+          `Limite atteinte : maximum ${MAX_DUNGEONS_PER_USER} donjons. Supprimez-en un pour en créer un autre.`,
+        );
       },
     });
   }

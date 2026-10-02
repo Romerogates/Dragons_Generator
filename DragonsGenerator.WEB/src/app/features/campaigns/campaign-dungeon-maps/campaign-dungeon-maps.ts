@@ -54,7 +54,12 @@ import {
   normalizeGridRect,
   type GridRect,
 } from '@core/utils/dungeon-room-edit.util';
-import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
+import {
+  encounterGroupFromRandomRoll,
+  rollRandomEncounter,
+  suggestThemeFromRegion,
+} from '@core/utils/dungeon-theme-pools';
+import { DungeonUndoStack } from '@core/utils/dungeon-undo.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import {
@@ -87,6 +92,7 @@ type EditorTool =
   | 'stairs';
 type BrushSize = 1 | 2 | 3;
 type SizePresetId = 'compact' | 'standard' | 'large' | 'custom';
+type MapSaveState = 'idle' | 'pending' | 'saving' | 'saved';
 
 interface UndoSnapshot {
   tiles: DungeonTileKind[][];
@@ -118,28 +124,28 @@ const SIZE_PRESETS: SizePreset[] = [
   {
     id: 'compact',
     label: 'Compact',
-    hint: '36×36 · ~6 salles',
-    gridWidth: 36,
-    gridHeight: 36,
+    hint: '32×32 · ~6 salles',
+    gridWidth: 32,
+    gridHeight: 32,
     roomCount: 6,
     corridorDensity: 45,
   },
   {
     id: 'standard',
     label: 'Standard',
-    hint: '48×48 · ~10 salles',
-    gridWidth: 48,
-    gridHeight: 48,
-    roomCount: 10,
+    hint: '40×40 · ~8 salles',
+    gridWidth: 40,
+    gridHeight: 40,
+    roomCount: 8,
     corridorDensity: 50,
   },
   {
     id: 'large',
     label: 'Large',
-    hint: '64×64 · ~14 salles',
-    gridWidth: 64,
-    gridHeight: 64,
-    roomCount: 14,
+    hint: '56×56 · ~12 salles',
+    gridWidth: 56,
+    gridHeight: 56,
+    roomCount: 12,
     corridorDensity: 55,
   },
 ];
@@ -189,7 +195,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   /** Lien vers l’onglet Documents après création / publication d’un handout carte. */
   readonly lastHandoutNav = signal<{ handoutId: string } | null>(null);
   readonly thumbUrls = signal<Record<string, string>>({});
-  readonly sizePreset = signal<SizePresetId>('standard');
+  readonly sizePreset = signal<SizePresetId>('compact');
   readonly showAdvanced = signal(false);
   readonly previewSeed = signal(1);
   readonly exportMenuOpen = signal(false);
@@ -197,6 +203,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly libraryPickerOpen = signal(false);
   readonly libraryList = signal<CloudDungeonSummary[]>([]);
   readonly libraryBusy = signal(false);
+  /** Indicateur autosave local (prépa campagne) — miroir du hub Mes Donjons. */
+  readonly mapSaveState = signal<MapSaveState>('idle');
 
   private previousBodyOverflow = '';
   private editorBodyLocked = false;
@@ -221,10 +229,10 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly roomDragRect = signal<GridRect | null>(null);
 
   readonly genName = signal('Donjon');
-  readonly genGridW = signal(48);
-  readonly genGridH = signal(48);
-  readonly genRoomCount = signal(10);
-  readonly genCorridorDensity = signal(50);
+  readonly genGridW = signal(32);
+  readonly genGridH = signal(32);
+  readonly genRoomCount = signal(6);
+  readonly genCorridorDensity = signal(45);
   readonly genTheme = signal<DungeonTheme>('generic');
 
   readonly sizePresets = SIZE_PRESETS;
@@ -305,12 +313,16 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly canUndo = computed(() => this.undoDepth() > 0);
   readonly canRedo = computed(() => this.redoDepth() > 0);
 
-  private undoStack: UndoSnapshot[] = [];
-  private redoStack: UndoSnapshot[] = [];
+  private readonly history = new DungeonUndoStack<
+    DungeonTileKind[][],
+    CampaignDungeonMap['markers'],
+    CampaignDungeonMap['rooms']
+  >(MAX_UNDO);
   private previewTimer: ReturnType<typeof setTimeout> | null = null;
   private messageTimer: ReturnType<typeof setTimeout> | null = null;
   private messageIsCoaching = false;
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private saveStateTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingMaps: CampaignDungeonMap[] | null = null;
   private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
   private touchPointers = new Map<number, { x: number; y: number }>();
@@ -415,7 +427,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     const c = this.campaign();
     this.genName.set(`Donjon — ${c.title}`);
     this.genTheme.set(suggestThemeFromRegion(c.data.regionName));
-    this.applySizePreset('standard', false);
+    this.applySizePreset('compact', false);
     this.showAdvanced.set(false);
     this.previewSeed.set((Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0 || 1);
     this.showGenerator.set(true);
@@ -487,7 +499,9 @@ export class CampaignDungeonMaps implements OnDestroy {
       },
       error: () => {
         this.libraryBusy.set(false);
-        this.setEditorMessage('Enregistrement bibliothèque impossible (quota ?).');
+        this.setEditorMessage(
+          `Limite atteinte : maximum ${MAX_DUNGEONS_PER_USER} donjons dans Mes Donjons. Supprimez-en un ou synchronisez une carte déjà liée.`,
+        );
       },
     });
   }
@@ -527,7 +541,9 @@ export class CampaignDungeonMaps implements OnDestroy {
       },
       error: () => {
         this.libraryBusy.set(false);
-        this.setEditorMessage(`Dupliquer impossible (max ${MAX_DUNGEONS_PER_USER} donjons).`);
+        this.setEditorMessage(
+          `Limite atteinte : maximum ${MAX_DUNGEONS_PER_USER} donjons dans Mes Donjons. Impossible de dupliquer.`,
+        );
       },
     });
   }
@@ -642,7 +658,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       error: () => {
         this.generating.set(false);
         this.setEditorMessage(
-          `Impossible de créer dans Mes Donjons (max ${MAX_DUNGEONS_PER_USER}). Génération annulée.`,
+          `Limite atteinte : maximum ${MAX_DUNGEONS_PER_USER} donjons dans Mes Donjons. Génération annulée.`,
         );
       },
     });
@@ -944,6 +960,28 @@ export class CampaignDungeonMaps implements OnDestroy {
     });
   }
 
+  /** Transforme le tirage thème en EncounterGroup campagne + lie la salle. */
+  promoteRoomEncounter(roomId: string): void {
+    if (this.libraryMode() || this.readOnly()) return;
+    const map = this.editingMap();
+    if (!map) return;
+    const room = map.rooms.find((r) => r.id === roomId);
+    if (!room?.randomEncounter?.creatures.length) {
+      this.setEditorMessage('Aucune rencontre aléatoire à transformer.');
+      return;
+    }
+    const group = encounterGroupFromRandomRoll(room.randomEncounter, {
+      roomLabel: room.label,
+      mapName: map.name,
+      theme: map.theme,
+      dungeonMapId: map.id,
+    });
+    const encounters = [...(this.campaign().data.encounters ?? []), group];
+    this.dataChange.emit({ encounters });
+    this.patchRoom(roomId, { encounterId: group.id, randomEncounter: null });
+    this.setEditorMessage(`Rencontre « ${group.name} » ajoutée à la campagne.`);
+  }
+
   focusRoom(roomId: string): void {
     const map = this.editingMap();
     if (!map) return;
@@ -979,12 +1017,12 @@ export class CampaignDungeonMaps implements OnDestroy {
       const key = `fill:${x},${y}:${this.fillKind()}`;
       if (this.lastPaintKey === key) return;
       this.lastPaintKey = key;
+      const tiles = floodFillTiles(map.tiles, x, y, this.fillKind());
+      if (tiles === map.tiles) return;
       if (recordUndo && !this.strokeStarted) {
         this.pushUndo(map);
         this.strokeStarted = true;
       }
-      const tiles = floodFillTiles(map.tiles, x, y, this.fillKind());
-      if (tiles === map.tiles) return;
       this.updateMap({ ...map, tiles }, false, false);
       return;
     }
@@ -993,15 +1031,14 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (this.lastPaintKey === key) return;
     this.lastPaintKey = key;
 
-    if (recordUndo && !this.strokeStarted) {
-      this.pushUndo(map);
-      this.strokeStarted = true;
-    }
-
     if (tool === 'floor' || tool === 'wall') {
       const radius = this.brushSize() - 1;
       const tiles = paintBrushDisk(map.tiles, x, y, radius, tool);
       if (tiles === map.tiles) return;
+      if (recordUndo && !this.strokeStarted) {
+        this.pushUndo(map);
+        this.strokeStarted = true;
+      }
       this.updateMap({ ...map, tiles }, false, false);
       return;
     }
@@ -1010,6 +1047,10 @@ export class CampaignDungeonMaps implements OnDestroy {
       if (map.tiles[y]?.[x] === tool) return;
       const tiles = setTileAt(map.tiles, x, y, tool);
       if (tiles === map.tiles) return;
+      if (recordUndo && !this.strokeStarted) {
+        this.pushUndo(map);
+        this.strokeStarted = true;
+      }
       this.updateMap({ ...map, tiles }, false, false);
       return;
     }
@@ -1018,17 +1059,20 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (markerKind === 'trap' || markerKind === 'chest' || markerKind === 'stairs') {
       const existing = map.markers.findIndex((m) => m.x === x && m.y === y);
       const markers = [...map.markers];
+      let changed = false;
       if (existing >= 0) {
         if (markers[existing].kind === markerKind) {
           // Toggle suppression seulement au clic initial, pas pendant un glissé.
           if (fromStrokeMove || this.strokeDragged) return;
           markers.splice(existing, 1);
+          changed = true;
         } else {
           markers[existing] = {
             ...markers[existing],
             kind: markerKind,
             label: DUNGEON_MARKER_LABELS[markerKind],
           };
+          changed = true;
         }
       } else {
         markers.push({
@@ -1039,6 +1083,12 @@ export class CampaignDungeonMaps implements OnDestroy {
           label: DUNGEON_MARKER_LABELS[markerKind],
           linkedRoomId: roomAt(map, x, y),
         });
+        changed = true;
+      }
+      if (!changed) return;
+      if (recordUndo && !this.strokeStarted) {
+        this.pushUndo(map);
+        this.strokeStarted = true;
       }
       this.updateMap({ ...map, markers }, false, false);
     }
@@ -1254,12 +1304,10 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   undo(): void {
     const map = this.editingMap();
-    const snap = this.undoStack.pop();
-    if (!map || !snap) return;
-    this.redoStack.push(this.snapshotOf(map));
-    if (this.redoStack.length > MAX_UNDO) this.redoStack.shift();
-    this.undoDepth.set(this.undoStack.length);
-    this.redoDepth.set(this.redoStack.length);
+    if (!map) return;
+    const snap = this.history.undoOnce(this.snapshotOf(map));
+    if (!snap) return;
+    this.syncHistoryDepth();
     this.updateMap(
       { ...map, tiles: snap.tiles, markers: snap.markers, rooms: snap.rooms },
       false,
@@ -1270,12 +1318,10 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   redo(): void {
     const map = this.editingMap();
-    const snap = this.redoStack.pop();
-    if (!map || !snap) return;
-    this.undoStack.push(this.snapshotOf(map));
-    if (this.undoStack.length > MAX_UNDO) this.undoStack.shift();
-    this.undoDepth.set(this.undoStack.length);
-    this.redoDepth.set(this.redoStack.length);
+    if (!map) return;
+    const snap = this.history.redoOnce(this.snapshotOf(map));
+    if (!snap) return;
+    this.syncHistoryDepth();
     this.updateMap(
       { ...map, tiles: snap.tiles, markers: snap.markers, rooms: snap.rooms },
       false,
@@ -1597,10 +1643,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   private clearHistory(): void {
-    this.undoStack = [];
-    this.redoStack = [];
-    this.undoDepth.set(0);
-    this.redoDepth.set(0);
+    this.history.clear();
+    this.syncHistoryDepth();
   }
 
   private snapshotOf(map: CampaignDungeonMap): UndoSnapshot {
@@ -1612,11 +1656,13 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   private pushUndo(map: CampaignDungeonMap): void {
-    this.undoStack.push(this.snapshotOf(map));
-    if (this.undoStack.length > MAX_UNDO) this.undoStack.shift();
-    this.undoDepth.set(this.undoStack.length);
-    this.redoStack = [];
-    this.redoDepth.set(0);
+    this.history.push(this.snapshotOf(map));
+    this.syncHistoryDepth();
+  }
+
+  private syncHistoryDepth(): void {
+    this.undoDepth.set(this.history.undoDepth);
+    this.redoDepth.set(this.history.redoDepth);
   }
 
   private fitMapInView(map: CampaignDungeonMap): void {
@@ -1662,6 +1708,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.unlockEditorBody();
     this.flushPendingSave();
     this.draftMap.set(null);
+    if (this.saveStateTimer) clearTimeout(this.saveStateTimer);
   }
 
   /** Force l'émission d'un save debounce (changement d'onglet / navigation). */
@@ -1690,6 +1737,9 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   private persistMaps(maps: CampaignDungeonMap[], immediate = false): void {
     this.pendingMaps = maps;
+    if (!this.libraryMode()) {
+      this.mapSaveState.set(immediate ? 'saving' : 'pending');
+    }
     if (immediate) {
       if (this.saveTimer) {
         clearTimeout(this.saveTimer);
@@ -1716,6 +1766,10 @@ export class CampaignDungeonMaps implements OnDestroy {
       this.draftMap.set({ ...draft, updatedAt: now });
     }
 
+    if (!this.libraryMode()) {
+      this.mapSaveState.set('saving');
+    }
+
     // Sync géométrie live vers la bibliothèque pour les cartes liées.
     for (const m of maps) {
       if (!m.libraryDungeonId || !hasEmbeddedGeometry(m) || this.libraryMode()) continue;
@@ -1737,6 +1791,14 @@ export class CampaignDungeonMaps implements OnDestroy {
     });
 
     this.dataChange.emit({ dungeonMaps: mapsForCampaignPersist(migrated) });
+
+    if (!this.libraryMode()) {
+      if (this.saveStateTimer) clearTimeout(this.saveStateTimer);
+      this.saveStateTimer = setTimeout(() => {
+        this.saveStateTimer = null;
+        this.mapSaveState.set('saved');
+      }, 400);
+    }
   }
 
   private migratingIds = new Set<string>();

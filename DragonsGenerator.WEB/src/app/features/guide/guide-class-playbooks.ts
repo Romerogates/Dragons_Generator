@@ -1,6 +1,10 @@
 /** Guides « comment jouer ce perso » — un par classe. */
 
 import type { GuideRulebookChapter, GuideRulebookSection } from './guide-rulebooks';
+import {
+  GUIDE_SUBCLASS_PLAYBOOKS,
+  subclassPlaybookPath,
+} from './guide-subclass-playbooks';
 
 export interface GuideClassPlaybook {
   classId: string;
@@ -35,6 +39,7 @@ function playbook(
   combat: string[],
   spellExtra?: string[],
 ): GuideClassPlaybook {
+  const subclassLinks = GUIDE_SUBCLASS_PLAYBOOKS.filter((s) => s.classId === classId);
   const chapters: GuideRulebookChapter[] = [
     {
       id: 'role',
@@ -95,6 +100,11 @@ function playbook(
       sec('suite', 'Pour aller plus loin', [
         'Relisez le livret Joueur à la table (fiche annotée + glossaire) si un chiffre de la fiche vous échappe.',
         'Ouvrez la fiche Codex de la classe (lien en haut de page) pour les capacités et sous-classes Eana.',
+        ...(subclassLinks.length
+          ? [
+              `Sous-classes tip : ${subclassLinks.map((s) => s.subclassName).join(', ')} — liens en haut de page.`,
+            ]
+          : []),
       ]),
     ],
   });
@@ -108,6 +118,10 @@ function playbook(
     related: [
       { label: 'Fiche Codex', path: `/classes/${classId}` },
       { label: 'Joueur à la table', path: '/guide/joueur-table' },
+      ...subclassLinks.map((s) => ({
+        label: s.subclassName,
+        path: subclassPlaybookPath(s.subclassId),
+      })),
     ],
     chapters,
   };

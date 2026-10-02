@@ -15,6 +15,8 @@ export interface GuideRulebookSection {
   numbered?: string[];
   /** Schéma monospacé (écran + PDF). */
   diagram?: string[];
+  /** Schéma structuré HTML (écrans) — prioritaire sur `diagram` à l’affichage. */
+  flowSteps?: { label: string; detail?: string }[];
 }
 
 export interface GuideRulebookChapter {
@@ -181,6 +183,13 @@ const SCHEMA_INITIATIVE: GuideRulebookSection = {
   title: 'Schéma — ordre du combat',
   paragraphs: [
     'Un seul flux. Ne mélangez pas les cases.',
+  ],
+  flowSteps: [
+    { label: '1. Initiative', detail: '1d20 + DEX = ordre seul' },
+    { label: '2. Tour', detail: 'Ordre décroissant' },
+    { label: '3. Action', detail: 'Attaque / sort' },
+    { label: '4. Toucher ?', detail: '1d20 + Bonus d’attaque ≥ CA' },
+    { label: '5. Dégâts', detail: 'Dés + mod (pas maîtrise)' },
   ],
   diagram: [
     '┌──────────────┐     ┌──────────────┐     ┌────────────────┐',
@@ -389,6 +398,7 @@ export const GUIDE_RULEBOOK_MJ_TABLE: GuideRulebook = {
     { label: 'MJ en ligne', path: '/guide/mj-en-ligne' },
     { label: 'Joueur à la table', path: '/guide/joueur-table' },
     { label: 'One-shot 1 feuille', path: '/guide/oneshot' },
+    { label: 'Actions de combat', path: '/combat-actions' },
   ],
   chapters: [
     {
@@ -559,6 +569,7 @@ export const GUIDE_RULEBOOK_JOUEUR_TABLE: GuideRulebook = {
     { label: 'Joueur en ligne', path: '/guide/joueur-en-ligne' },
     { label: 'MJ à la table', path: '/guide/mj-table' },
     { label: 'One-shot 1 feuille', path: '/guide/oneshot' },
+    { label: 'Actions de combat', path: '/combat-actions' },
   ],
   chapters: [
     {

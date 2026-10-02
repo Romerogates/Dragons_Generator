@@ -33,6 +33,7 @@ import {
 } from '@core/utils/species-proficiencies.util';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import { resistanceLabel } from '@core/utils/equipment-display.util';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 const BREATH_SHAPE_FR: Record<string, string> = {
   cone: 'Cône',
@@ -68,7 +69,7 @@ interface ChoiceOptionView {
 @Component({
   selector: 'app-species-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmDialog],
   templateUrl: './species-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -80,6 +81,10 @@ export class SpeciesStep implements OnInit {
   private dataService = inject(DataService);
   private readonly injector = inject(Injector);
   readonly builder = inject(CharacterBuilderService);
+
+  readonly showDownstreamResetConfirm = signal(false);
+  private pendingSpeciesPickId: string | null = null;
+  private pendingClearSelection = false;
 
   private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
   private scrollRaf = 0;
@@ -635,7 +640,41 @@ export class SpeciesStep implements OnInit {
       return;
     }
 
-    // Center card then (re)select — always re-run subspecies / lineage picks.
+    const phaseBefore = this.currentPhase();
+    if (phaseBefore === 'species' && this.hasDownstreamAfterSpecies()) {
+      this.pendingSpeciesPickId = cardId;
+      this.pendingClearSelection = false;
+      this.showDownstreamResetConfirm.set(true);
+      return;
+    }
+
+    this.applySpeciesPick(cardId);
+  }
+
+  private hasDownstreamAfterSpecies(): boolean {
+    const c = this.builder.creation();
+    return !!(c.civilizationId || c.backgroundId || c.classId || (c.selectedSkills?.length ?? 0));
+  }
+
+  confirmDownstreamReset(): void {
+    this.showDownstreamResetConfirm.set(false);
+    if (this.pendingClearSelection) {
+      this.pendingClearSelection = false;
+      this.doClearSelection();
+      return;
+    }
+    const id = this.pendingSpeciesPickId;
+    this.pendingSpeciesPickId = null;
+    if (id) this.applySpeciesPick(id);
+  }
+
+  cancelDownstreamReset(): void {
+    this.showDownstreamResetConfirm.set(false);
+    this.pendingSpeciesPickId = null;
+    this.pendingClearSelection = false;
+  }
+
+  private applySpeciesPick(cardId: string): void {
     const phaseBefore = this.currentPhase();
 
     this.transitioning.set(true);
@@ -707,6 +746,16 @@ export class SpeciesStep implements OnInit {
   }
 
   clearSelection(): void {
+    if (this.hasDownstreamAfterSpecies()) {
+      this.pendingClearSelection = true;
+      this.pendingSpeciesPickId = null;
+      this.showDownstreamResetConfirm.set(true);
+      return;
+    }
+    this.doClearSelection();
+  }
+
+  private doClearSelection(): void {
     this.transitioning.set(true);
     setTimeout(() => {
       this.holdPhase.set(null);

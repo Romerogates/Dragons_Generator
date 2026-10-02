@@ -123,6 +123,49 @@
         </section>
 
         <section class="space-y-3">
+          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">
+            Sous-classes (tips)
+          </h2>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Compléments courts pour quelques voies populaires — pas un livret par option.
+          </p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+            @for (pb of subclassPlaybooks; track pb.subclassId) {
+              <li>
+                <a
+                  [routerLink]="['/guide/sous-classe', pb.subclassId]"
+                  class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5 sm:gap-3 rounded-lg px-3 py-3 sm:py-2.5 min-h-11 hover:bg-slate-800/50"
+                >
+                  <span class="font-serif text-slate-100">{{ pb.subclassName }}</span>
+                  <span class="text-xs text-slate-500">{{ pb.className }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">
+            Peuples (tips)
+          </h2>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Quelques conseils d’espèce pour démarrer — le reste est dans le Codex.
+          </p>
+          <ul class="grid grid-cols-2 sm:grid-cols-3 gap-1">
+            @for (pb of speciesPlaybooks; track pb.speciesId) {
+              <li>
+                <a
+                  [routerLink]="['/guide/espece', pb.speciesId]"
+                  class="flex items-center rounded-lg px-3 py-3 sm:py-2.5 min-h-11 hover:bg-slate-800/50 font-serif text-slate-100"
+                >
+                  {{ pb.speciesName }}
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="space-y-3">
           <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Outils du site</h2>
           <ul class="divide-y divide-slate-800/80 border border-slate-800 rounded-xl overflow-hidden">
             @for (card of quickCards; track card.link) {

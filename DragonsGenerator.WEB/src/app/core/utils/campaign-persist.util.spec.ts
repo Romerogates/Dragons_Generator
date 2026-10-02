@@ -424,6 +424,72 @@ describe('mergeRemoteLiveTable', () => {
     expect(merged.data.sessions!.find((s) => s.id === 's1')?.combatLog).toEqual(['local']);
     expect(merged.data.sessions!.find((s) => s.id === 's1')?.activeCombat?.round).toBe(3);
   });
+
+  it('merges flowPhase, fogOfWarEnabled, ready and tablePin', () => {
+    const local = baseCampaign({
+      dungeonMaps: [
+        {
+          id: 'm1',
+          name: 'Cave',
+          theme: 'cave',
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+          fogOfWarEnabled: true,
+          revealedRoomIds: ['a'],
+          rooms: [],
+          markers: [],
+          tiles: [],
+          gridWidth: 10,
+          gridHeight: 10,
+        },
+      ],
+    });
+    local.data.sessions![0].activeCombat!.flowPhase = 'initiative';
+    local.data.sessions![0].tableReadyUserIds = ['local-u'];
+    local.data.sessions![0].tablePin = 'pin local';
+
+    const remote = baseCampaign({
+      dungeonMaps: [
+        {
+          id: 'm1',
+          name: 'Cave',
+          theme: 'cave',
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:02:00Z',
+          fogOfWarEnabled: false,
+          revealedRoomIds: ['a', 'b'],
+          rooms: [],
+          markers: [],
+          tiles: [],
+          gridWidth: 10,
+          gridHeight: 10,
+        },
+      ],
+    });
+    remote.data.sessions![0].activeCombat!.flowPhase = 'fight';
+    remote.data.sessions![0].tableReadyUserIds = ['u1', 'u2'];
+    remote.data.sessions![0].tablePin = '';
+    remote.data.sessions![0].tablePinHistory = [
+      { at: '2026-01-01T00:01:00Z', body: 'ancien pin' },
+    ];
+
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions![0].activeCombat!.flowPhase).toBe('fight');
+    expect(merged.data.dungeonMaps![0].fogOfWarEnabled).toBe(false);
+    expect(merged.data.dungeonMaps![0].revealedRoomIds).toEqual(['a', 'b']);
+    expect(merged.data.sessions![0].tableReadyUserIds).toEqual(['u1', 'u2']);
+    expect(merged.data.sessions![0].tablePin).toBe('');
+    expect(merged.data.sessions![0].tablePinHistory?.[0].body).toBe('ancien pin');
+
+    const omitRemote = baseCampaign();
+    omitRemote.data.sessions![0].activeCombat!.flowPhase = undefined;
+    const localFight = baseCampaign();
+    localFight.data.sessions![0].activeCombat!.flowPhase = 'fight';
+    localFight.data.sessions![0].tableReadyUserIds = ['keep'];
+    const mergedOmit = mergeRemoteLiveTable(localFight, omitRemote);
+    expect(mergedOmit.data.sessions![0].activeCombat!.flowPhase).toBe('fight');
+    expect(mergedOmit.data.sessions![0].tableReadyUserIds).toEqual(['keep']);
+  });
 });
 
 describe('stripTableChatForPersist', () => {

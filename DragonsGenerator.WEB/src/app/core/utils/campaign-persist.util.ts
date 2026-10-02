@@ -90,6 +90,12 @@ export function mergeRemoteLiveTable(
             ...ls,
             activeCombat: remoteSession.activeCombat ?? ls.activeCombat,
             status: remoteSession.status ?? ls.status,
+            tableReadyUserIds:
+              remoteSession.tableReadyUserIds ?? ls.tableReadyUserIds,
+            tablePin:
+              remoteSession.tablePin !== undefined ? remoteSession.tablePin : ls.tablePin,
+            tablePinHistory: remoteSession.tablePinHistory ?? ls.tablePinHistory,
+            tableMacros: remoteSession.tableMacros ?? ls.tableMacros,
           }
         : ls;
     }
@@ -135,6 +141,14 @@ export function mergeRemoteLiveTable(
         ? remoteSession.combatLog
         : ls.combatLog,
       status: remoteSession?.status ?? ls.status,
+      tableReadyUserIds:
+        remoteSession?.tableReadyUserIds ?? ls.tableReadyUserIds,
+      // Pin : distant gagne si défini ('' / null = unpin sync joueurs).
+      tablePin:
+        remoteSession?.tablePin !== undefined ? remoteSession.tablePin : ls.tablePin,
+      tablePinHistory:
+        remoteSession?.tablePinHistory ?? ls.tablePinHistory,
+      tableMacros: remoteSession?.tableMacros ?? ls.tableMacros,
     };
   });
 

@@ -311,3 +311,14 @@
     </nav>
   }
 </div>
+
+@if (showDownstreamResetConfirm()) {
+  <app-confirm-dialog
+    title="Changer de classe ?"
+    body="Les étapes suivantes (caractéristiques, savoirs, équipement…) seront à refaire. Continuer ?"
+    confirmLabel="Changer quand même"
+    [danger]="true"
+    (cancelled)="cancelDownstreamReset()"
+    (confirmed)="confirmDownstreamReset()"
+  />
+}

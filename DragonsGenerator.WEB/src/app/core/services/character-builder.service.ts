@@ -101,7 +101,8 @@ export class CharacterBuilderService {
     effect(() => {
       const creation = this.creation();
       const step = this.currentStep();
-      if (this.editingRef()) return;
+      // Persiste aussi en mode édition (#15) — clé séparée pour ne pas écraser le brouillon forge.
+      void this.editingRef();
       this.persistDraft(creation, step);
     });
   }
@@ -235,9 +236,9 @@ export class CharacterBuilderService {
     return this.isStepValid(this.currentStep());
   });
 
-  readonly hasPendingDraft = computed<boolean>(() => {
-    return this.creation().speciesId !== null;
-  });
+  readonly hasPendingDraft = computed<boolean>(() =>
+    this.isMeaningfulDraft(this.creation(), this.currentStep()),
+  );
 
   readonly draftSummary = computed<string>(() => {
     const c = this.creation();
@@ -246,6 +247,9 @@ export class CharacterBuilderService {
     if (c.speciesName) parts.push(c.speciesName);
     if (c.backgroundName) parts.push(c.backgroundName);
     if (c.className) parts.push(c.className);
+    if (!parts.length && (c.targetLevel ?? 1) > 1) {
+      parts.push(`Niveau ${c.targetLevel}`);
+    }
     return parts.length > 0 ? parts.join(' · ') : 'Brouillon en cours';
   });
 
@@ -1029,6 +1033,24 @@ export class CharacterBuilderService {
     localStorage.removeItem('dragon_character_builder_v4');
   }
 
+  /** Brouillon utile : niveau > 1, étape > 1, ou tout champ identité/build. */
+  private isMeaningfulDraft(creation: ExtendedCharacterCreation, step: number): boolean {
+    return (
+      step > 1 ||
+      (creation.targetLevel ?? 1) > 1 ||
+      !!creation.speciesId ||
+      !!creation.classId ||
+      !!creation.civilizationId ||
+      !!creation.backgroundId ||
+      !!(creation.name && creation.name.trim())
+    );
+  }
+
+  private draftStorageKey(): string {
+    const id = this.editingRef()?.id;
+    return id ? `${STORAGE_KEY}_edit_${id}` : STORAGE_KEY;
+  }
+
   private restoreDraftFromStorage(): void {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1036,17 +1058,26 @@ export class CharacterBuilderService {
       const parsed = JSON.parse(raw) as {
         creation?: ExtendedCharacterCreation;
         currentStep?: number;
+        editing?: CharacterBuildEditingRef | null;
       };
-      if (!parsed?.creation?.speciesId) {
+      if (!parsed?.creation) {
         this.clearStorage();
         return;
       }
-      this.creation.set({
+      const step = Number(parsed.currentStep) || 1;
+      const creation = {
         ...structuredClone(INITIAL_CREATION_STATE),
         ...parsed.creation,
-      });
-      const step = Number(parsed.currentStep) || 1;
+      };
+      if (!this.isMeaningfulDraft(creation, step)) {
+        this.clearStorage();
+        return;
+      }
+      this.creation.set(creation);
       this.currentStep.set(Math.max(1, Math.min(step, 20)));
+      if (parsed.editing?.id) {
+        this.editingRef.set(parsed.editing);
+      }
     } catch {
       this.clearStorage();
     }
@@ -1054,16 +1085,18 @@ export class CharacterBuilderService {
 
   private persistDraft(creation: ExtendedCharacterCreation, step: number): void {
     try {
-      if (!creation.speciesId) {
-        this.clearStorage();
+      const key = this.draftStorageKey();
+      if (!this.isMeaningfulDraft(creation, step)) {
+        localStorage.removeItem(key);
         return;
       }
       localStorage.setItem(
-        STORAGE_KEY,
+        key,
         JSON.stringify({
           creation,
           currentStep: step,
           savedAt: Date.now(),
+          editing: this.editingRef(),
         }),
       );
     } catch {
@@ -1073,5 +1106,7 @@ export class CharacterBuilderService {
 
   private clearStorage(): void {
     localStorage.removeItem(STORAGE_KEY);
+    const id = this.editingRef()?.id;
+    if (id) localStorage.removeItem(`${STORAGE_KEY}_edit_${id}`);
   }
 }

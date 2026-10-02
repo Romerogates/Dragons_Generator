@@ -1,4 +1,5 @@
 import type { Skill } from '@core/models/Skills/skill';
+import type { AbilityKey } from '@core/models/Character/character';
 
 export interface SkillInfo {
   id: string;
@@ -74,6 +75,47 @@ export function prettifySkillId(id: string, map: Record<string, SkillInfo>): str
   );
 }
 
-export function resolveSkillInfo(id: string, map: Record<string, SkillInfo>): SkillInfo | undefined {
+/** Résout une compétence (ski-* ou skill-*) depuis le catalogue chargé. */
+export function resolveSkillInfo(
+  id: string,
+  map: Record<string, SkillInfo>,
+): SkillInfo | undefined {
   return map[normalizeSkillId(id)];
+}
+
+export function formatSkillModifier(
+  abilityMod: number,
+  proficient: boolean,
+  expertise: boolean,
+  proficiencyBonus: number,
+): string {
+  const total =
+    abilityMod + (proficient ? proficiencyBonus : 0) + (expertise ? proficiencyBonus : 0);
+  return total >= 0 ? `+${total}` : `${total}`;
+}
+
+/** Caractéristique liée à une compétence (id normalisé skill-*). */
+const SKILL_ABILITY_KEY: Record<string, AbilityKey> = {
+  'skill-acrobaties': 'dexterite',
+  'skill-arcanes': 'intelligence',
+  'skill-athletisme': 'force',
+  'skill-discretion': 'dexterite',
+  'skill-dressage': 'sagesse',
+  'skill-escamotage': 'dexterite',
+  'skill-histoire': 'intelligence',
+  'skill-intimidation': 'charisme',
+  'skill-intuition': 'sagesse',
+  'skill-investigation': 'intelligence',
+  'skill-medecine': 'sagesse',
+  'skill-nature': 'intelligence',
+  'skill-perception': 'sagesse',
+  'skill-persuasion': 'charisme',
+  'skill-religion': 'intelligence',
+  'skill-representation': 'charisme',
+  'skill-survie': 'sagesse',
+  'skill-tromperie': 'charisme',
+};
+
+export function abilityKeyForSkillId(skillId: string): AbilityKey | null {
+  return SKILL_ABILITY_KEY[normalizeSkillId(skillId)] ?? null;
 }

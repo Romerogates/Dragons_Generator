@@ -26,4 +26,9 @@ describe('pregen-random.util', () => {
     expect(typeof name).toBe('string');
     expect(name.length).toBeGreaterThan(0);
   });
+
+  it('randomHeroName falls back when pick yields null', () => {
+    spyOn(Math, 'random').and.returnValue(Number.NaN);
+    expect(randomHeroName()).toBe('Aventurier');
+  });
 });

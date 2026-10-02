@@ -34,4 +34,13 @@ describe('campaign-initiative.util', () => {
     };
     expect(shouldShowPlayerInitiativePrompt(board, 'player-x')).toBeFalse();
   });
+
+  it('hides when combatants is missing or empty', () => {
+    expect(
+      shouldShowPlayerInitiativePrompt({ open: true, code: 'AB', combatants: undefined }, 'u1'),
+    ).toBeFalse();
+    expect(
+      shouldShowPlayerInitiativePrompt({ open: true, code: 'AB', combatants: [] }, 'u1'),
+    ).toBeFalse();
+  });
 });

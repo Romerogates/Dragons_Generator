@@ -1449,6 +1449,26 @@ export function multiclassPrerequisitesMet(
   return true;
 }
 
+/**
+ * Prérequis atteignables avec le plafond d’achat de points (15) + bonus raciaux.
+ * Sert à bloquer l’ajout multiclasse quand c’est impossible même au max buy.
+ */
+export function multiclassPrerequisitesPossibleAtMaxBuy(
+  cls: CharacterClass,
+  racialBonuses: Partial<AbilityScores> = {},
+  maxBuyScore = 15,
+): boolean {
+  const maxScores: AbilityScores = {
+    force: maxBuyScore + (racialBonuses.force ?? 0),
+    dexterite: maxBuyScore + (racialBonuses.dexterite ?? 0),
+    constitution: maxBuyScore + (racialBonuses.constitution ?? 0),
+    intelligence: maxBuyScore + (racialBonuses.intelligence ?? 0),
+    sagesse: maxBuyScore + (racialBonuses.sagesse ?? 0),
+    charisme: maxBuyScore + (racialBonuses.charisme ?? 0),
+  };
+  return multiclassPrerequisitesMet(cls, maxScores);
+}
+
 /** Libellé humain des prérequis de multiclassage (ex. "Force 13" ou "Force 13 ou Dextérité 13"). */
 export function multiclassPrerequisiteLabel(cls: CharacterClass): string | null {
   const raw = (cls.data as Record<string, unknown>)['multiclass_prerequisites'] as

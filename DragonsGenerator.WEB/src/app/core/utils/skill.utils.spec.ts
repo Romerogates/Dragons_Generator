@@ -1,5 +1,7 @@
 import {
+  abilityKeyForSkillId,
   buildSkillMap,
+  formatSkillModifier,
   normalizeSkillId,
   prettifySkillId,
   resolveSkillInfo,
@@ -26,5 +28,18 @@ describe('skill.utils', () => {
     expect(resolveSkillInfo('ski-athletisme', map)?.label).toBe('Athlétisme');
     expect(prettifySkillId('skill-survie', map)).toBe('Survie');
     expect(prettifySkillId('skill-unknown', {})).toContain('Unknown');
+  });
+
+  it('formatSkillModifier covers proficiency, expertise, and negatives', () => {
+    expect(formatSkillModifier(2, false, false, 3)).toBe('+2');
+    expect(formatSkillModifier(2, true, false, 3)).toBe('+5');
+    expect(formatSkillModifier(2, true, true, 3)).toBe('+8');
+    expect(formatSkillModifier(-1, false, false, 2)).toBe('-1');
+    expect(formatSkillModifier(-2, true, false, 2)).toBe('+0');
+  });
+
+  it('abilityKeyForSkillId maps known skills', () => {
+    expect(abilityKeyForSkillId('skill-athletisme')).toBe('force');
+    expect(abilityKeyForSkillId('skill-unknown')).toBeNull();
   });
 });

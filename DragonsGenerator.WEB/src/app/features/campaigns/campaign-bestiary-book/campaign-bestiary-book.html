@@ -23,9 +23,21 @@
     [backLink]="backLink()"
     backLabel="Campagne"
   >
-    <p class="text-center text-sm text-slate-500 py-16">
-      Aucune créature dans cette campagne pour l’instant.
-    </p>
+    <div class="text-center py-16 space-y-4 px-4">
+      <p class="text-sm text-slate-500">
+        Aucune créature dans cette campagne pour l’instant.
+      </p>
+      @if (campaignId(); as id) {
+        <a
+          [routerLink]="['/campaigns', id]"
+          [queryParams]="{ tab: 'prep', sub: 'creatures' }"
+          class="inline-flex min-h-11 items-center px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white hover:bg-amber-500"
+          data-testid="bestiary-empty-cta"
+        >
+          Préparer des créatures
+        </a>
+      }
+    </div>
   </app-book-reader-shell>
 } @else {
   <app-book-reader-shell

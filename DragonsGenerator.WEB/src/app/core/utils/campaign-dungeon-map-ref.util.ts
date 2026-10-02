@@ -20,7 +20,7 @@ export function needsLibraryHydration(map: CampaignDungeonMap | null | undefined
 
 /**
  * Overlay-only fields kept in the campaign blob for linked maps.
- * Linked maps persist with empty tiles (no 48×48 grid in the campaign JSON).
+ * Linked maps persist with empty tiles (no full grid in the campaign JSON).
  */
 export function stripGeometryForPersist(map: CampaignDungeonMap): CampaignDungeonMap {
   if (!map.libraryDungeonId) return map;

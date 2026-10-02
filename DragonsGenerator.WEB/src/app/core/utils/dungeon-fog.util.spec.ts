@@ -122,4 +122,18 @@ describe('dungeon-fog.util', () => {
     expect(undef.revealedRoomIds).toEqual([]);
     expect(undef.revealedCorridorCells).toEqual([]);
   });
+
+  it('idempotent reveal when already revealed / hidden', () => {
+    const already = withRoomRevealed(map({ revealedRoomIds: ['r1'] }), 'r1', true);
+    expect(already.revealedRoomIds).toEqual(['r1']);
+    const stillGone = withRoomRevealed(map({ revealedRoomIds: [] }), 'r1', false);
+    expect(stillGone.revealedRoomIds).toEqual([]);
+    const cellAgain = withCorridorCellRevealed(
+      map({ revealedCorridorCells: ['2,2'] }),
+      2,
+      2,
+      true,
+    );
+    expect(cellAgain.revealedCorridorCells).toEqual(['2,2']);
+  });
 });

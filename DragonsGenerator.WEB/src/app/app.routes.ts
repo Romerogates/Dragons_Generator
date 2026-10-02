@@ -87,6 +87,16 @@ export const routes: Routes = [
           import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
       },
       {
+        path: 'sous-classe/:subclassId',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+      },
+      {
+        path: 'espece/:speciesId',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+      },
+      {
         path: ':topicId',
         loadComponent: () => import('./features/guide/guide-topic').then((m) => m.GuideTopicPage),
       },

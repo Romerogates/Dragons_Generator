@@ -10,6 +10,16 @@ import {
 import { Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
+export interface CodexBreadcrumb {
+  label: string;
+  path?: string;
+}
+
+export interface CodexNextEntry {
+  label: string;
+  path: string;
+}
+
 /**
  * Coquille plein écran pour les fiches Codex (bestiaire, sorts, …).
  * Sortie = Escape (ou lien catalogue). Pas de bouton Fermer texte.
@@ -38,8 +48,35 @@ import { Router, RouterLink } from '@angular/router';
         <div class="min-w-0 flex-1 text-center px-2">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Codex · Échap</p>
           <p class="text-sm font-serif truncate" [class]="accentTextClass()">{{ title() }}</p>
+          @if (breadcrumbs().length) {
+            <nav
+              class="mt-1 flex flex-wrap items-center justify-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-600"
+              aria-label="Fil d’Ariane"
+            >
+              @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
+                @if (crumb.path && !last) {
+                  <a [routerLink]="crumb.path" class="hover:text-slate-300">{{ crumb.label }}</a>
+                } @else {
+                  <span [class.text-slate-400]="last">{{ crumb.label }}</span>
+                }
+                @if (!last) {
+                  <span aria-hidden="true">/</span>
+                }
+              }
+            </nav>
+          }
         </div>
-        <span class="min-w-11 w-11" aria-hidden="true"></span>
+        @if (nextEntry(); as next) {
+          <a
+            [routerLink]="next.path"
+            class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-200 max-w-[9rem] truncate"
+            [attr.title]="next.label"
+          >
+            Suivant →
+          </a>
+        } @else {
+          <span class="min-w-11 w-11" aria-hidden="true"></span>
+        }
       </header>
 
       <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
@@ -60,6 +97,8 @@ export class CodexDetailShell implements OnInit, OnDestroy {
   /** Route de secours / lien catalogue (ex. /creatures). */
   readonly backLink = input('/creatures');
   readonly backLabel = input('Catalogue');
+  readonly breadcrumbs = input<CodexBreadcrumb[]>([]);
+  readonly nextEntry = input<CodexNextEntry | null>(null);
   /** Accent Tailwind text color token: red | fuchsia | sky | amber | emerald | violet | orange */
   readonly accent = input<
     'red' | 'fuchsia' | 'sky' | 'amber' | 'emerald' | 'violet' | 'orange' | 'slate'

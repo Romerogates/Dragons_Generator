@@ -2,7 +2,12 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@env/environment';
-import { GUIDE_ALL_NAV, GUIDE_BLOG_POSTS, isGuideBlogPostNew } from '@features/guide/guide-content';
+import {
+  GUIDE_ALL_NAV,
+  GUIDE_BLOG_POSTS,
+  isGuideBlogPostNew,
+  parseGuideBlogDate,
+} from '@features/guide/guide-content';
 import { AuthService } from './auth.service';
 
 export type GuideAudiencePref = 'all' | 'dm' | 'player';
@@ -14,6 +19,7 @@ interface GuidePreferencesDto {
 }
 
 const VETERAN_MS = 86_400_000;
+const LAST_SEEN_KEY = 'dragons-guide-news-last-seen';
 
 /** Compte assez ancien pour ne pas tout re-marquer « new » si le serveur n’a encore aucune lecture. */
 export function shouldAcknowledgeEmptyGuideCatalog(
@@ -39,13 +45,23 @@ export class GuidePreferencesService {
   readonly needsRoleOnboarding = signal(false);
   /** false tant que le GET n’a pas abouti — évite un badge +9 fantôme au login. */
   readonly hydrated = signal(false);
+  /** Epoch ms — news plus anciennes que lastSeen ne comptent plus au badge (login / journal). */
+  readonly newsLastSeenAt = signal<number | null>(null);
   private persistTimer: ReturnType<typeof setTimeout> | null = null;
   private loadGen = 0;
 
   readonly unreadNewsCount = computed(() => {
     if (!this.hydrated()) return 0;
     const read = this.readNewsIds();
-    return GUIDE_BLOG_POSTS.filter((p) => isGuideBlogPostNew(p) && !read[p.id]).length;
+    const lastSeen = this.newsLastSeenAt();
+    return GUIDE_BLOG_POSTS.filter((p) => {
+      if (read[p.id] || !isGuideBlogPostNew(p)) return false;
+      if (lastSeen != null) {
+        const t = parseGuideBlogDate(p.date);
+        if (t != null && t <= lastSeen) return false;
+      }
+      return true;
+    }).length;
   });
 
   readonly unreadSectionCount = computed(() => {
@@ -99,6 +115,9 @@ export class GuidePreferencesService {
       this.audience.set(remote.audience ?? 'all');
       this.needsRoleOnboarding.set(remote.audience == null);
 
+      const storedLastSeen = this.readLastSeenFromStorage();
+      this.newsLastSeenAt.set(storedLastSeen);
+
       if (
         remote.audience != null &&
         newsIds.length === 0 &&
@@ -107,6 +126,7 @@ export class GuidePreferencesService {
       ) {
         this.readNewsIds.set(this.toRecord(GUIDE_BLOG_POSTS.map((p) => p.id)));
         this.readSectionIds.set(this.toRecord(GUIDE_ALL_NAV.map((s) => s.id)));
+        this.touchNewsLastSeen(Date.now());
         this.hydrated.set(true);
         this.schedulePersist();
         return;
@@ -114,6 +134,10 @@ export class GuidePreferencesService {
 
       this.readNewsIds.set(this.toRecord(newsIds));
       this.readSectionIds.set(this.toRecord(sectionIds));
+      // Premier login sans lastSeen : caler sur maintenant pour ne pas rejouer le badge des vieux posts.
+      if (storedLastSeen == null && newsIds.length > 0) {
+        this.touchNewsLastSeen(Date.now());
+      }
       this.hydrated.set(true);
     } catch {
       if (gen !== this.loadGen) return;
@@ -137,9 +161,11 @@ export class GuidePreferencesService {
   markAllNews(ids: string[]): void {
     const current = this.readNewsIds();
     if (ids.length > 0 && ids.every((id) => current[id]) && Object.keys(current).length >= ids.length) {
+      this.touchNewsLastSeen(Date.now());
       return;
     }
     this.readNewsIds.set(this.toRecord(ids));
+    this.touchNewsLastSeen(Date.now());
     this.schedulePersist();
   }
 
@@ -158,11 +184,32 @@ export class GuidePreferencesService {
     this.schedulePersist();
   }
 
+  private touchNewsLastSeen(at: number): void {
+    this.newsLastSeenAt.set(at);
+    try {
+      localStorage.setItem(LAST_SEEN_KEY, String(at));
+    } catch {
+      /* private mode */
+    }
+  }
+
+  private readLastSeenFromStorage(): number | null {
+    try {
+      const raw = localStorage.getItem(LAST_SEEN_KEY);
+      if (!raw) return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    } catch {
+      return null;
+    }
+  }
+
   private resetAnonymous(): void {
     this.readNewsIds.set({});
     this.readSectionIds.set({});
     this.audience.set('all');
     this.needsRoleOnboarding.set(false);
+    this.newsLastSeenAt.set(null);
     this.hydrated.set(true);
   }
 
