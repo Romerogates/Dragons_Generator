@@ -12,6 +12,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -42,21 +43,22 @@ jobs:
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v2
 
+      - name: Install WEB deps
+        working-directory: DragonsGenerator.WEB
+        run: npm ci
+
       - name: Angular tests
         working-directory: DragonsGenerator.WEB
-        run: |
-          npm ci
-          npm test
+        run: npm test
 
       - name: Angular lint
         working-directory: DragonsGenerator.WEB
-        run: |
-          npm ci
-          npm run lint
+        run: npm run lint
 
+  # Runs in parallel with `test` — deploy still gates on both.
   e2e:
-    needs: test
     runs-on: ubuntu-24.04
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -70,8 +72,8 @@ jobs:
 
       - name: Start local stack
         run: |
-          # Ollama container only (API depends_on) — no model pull; CI smoke does not need LLM.
-          docker compose -f docker-compose.local.yml up -d --build mailhog ollama
+          # Pull-only images: no --build. Ollama container only (no model pull).
+          docker compose -f docker-compose.local.yml up -d mailhog ollama
           docker compose -f docker-compose.local.yml up -d --build dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
@@ -97,6 +99,7 @@ jobs:
         working-directory: DragonsGenerator.WEB
         env:
           E2E_BASE_URL: http://localhost:8081
+          CI: 'true'
         run: |
           npm ci
           # ubuntu-latest ships Google Chrome apt sources that flake with

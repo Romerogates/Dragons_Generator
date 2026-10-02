@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import {
   completeSpeciesCivilizationBackground,
   expectStepHeading,
+  finishClassStep,
   pickCarouselCard,
   startFreshWizard,
 } from './helpers/wizard-paths';
@@ -20,12 +21,14 @@ test.describe('Wizard — smoke classes clés', () => {
     await completeSpeciesCivilizationBackground(page, 'Érudit');
     await pickCarouselCard(page, 'cls-guerrier');
     await pickCarouselCard(page, 'feat-style-duel');
+    await finishClassStep(page);
     await expectStepHeading(page, /Essence & Attributs/i);
   });
 
   test('magicien atteint les caractéristiques', async ({ page }) => {
     await completeSpeciesCivilizationBackground(page, 'Érudit');
     await pickCarouselCard(page, 'cls-magicien');
+    await finishClassStep(page);
     await expectStepHeading(page, /Essence & Attributs/i);
   });
 
@@ -33,6 +36,7 @@ test.describe('Wizard — smoke classes clés', () => {
     await completeSpeciesCivilizationBackground(page, 'Acolyte');
     await pickCarouselCard(page, 'cls-pretre');
     await pickCarouselCard(page, 'subcls-domaine-de-la-vie');
+    await finishClassStep(page);
     await expectStepHeading(page, /Essence & Attributs/i);
   });
 });

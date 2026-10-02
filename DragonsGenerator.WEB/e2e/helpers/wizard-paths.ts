@@ -1,12 +1,19 @@
 import { expect, type Page } from '@playwright/test';
 import {
   expectStepHeading,
+  finishClassStep,
   incrementAbility,
   pickCarouselCard,
   startFreshWizard,
 } from './wizard';
 
-export { startFreshWizard, expectStepHeading, pickCarouselCard, incrementAbility };
+export {
+  startFreshWizard,
+  expectStepHeading,
+  finishClassStep,
+  pickCarouselCard,
+  incrementAbility,
+};
 
 /** Pill Atlas (toujours visible ; évite strict mode pin+pill et le crop cover). */
 export async function pickCivilizationPin(page: Page, civId = 'civ-ajagar'): Promise<void> {

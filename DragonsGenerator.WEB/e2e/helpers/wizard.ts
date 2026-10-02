@@ -13,10 +13,14 @@ const CARD_TITLES: Record<string, string | RegExp> = {
   'feat-style-duel': 'Duel',
   'feat-astuce-audace': 'Audace',
   'feat-astuce-brio': 'Brio',
+  'subcls-champion': 'Champion',
 };
 
 /** Vide le brouillon local et ouvre /create avec une session propre. */
-export async function startFreshWizard(page: Page): Promise<void> {
+export async function startFreshWizard(
+  page: Page,
+  opts: { level?: number } = {},
+): Promise<void> {
   await page.goto('/create');
   await page.evaluate(() => localStorage.removeItem('dragon_character_builder_v6'));
   await page.reload();
@@ -25,9 +29,14 @@ export async function startFreshWizard(page: Page): Promise<void> {
     await restart.click();
     await page.getByRole('button', { name: 'Effacer et recommencer' }).click();
   }
-  // Étape 0 — Niveau : valide le niveau par défaut (1) pour atteindre l'étape Espèce.
+  // Étape 0 — Niveau : optionnel override, sinon défaut 1.
   const levelContinue = page.getByTestId('level-step-continue');
   await expect(levelContinue).toBeVisible({ timeout: 30_000 });
+  const level = opts.level ?? 1;
+  if (level !== 1) {
+    // Role+exact : plus fiable que testid+hasText (évite collisions / builds partiels).
+    await page.getByRole('button', { name: String(level), exact: true }).click();
+  }
   await levelContinue.click();
   await expect(page.getByRole('heading', { name: /Choisissez votre peuple/i })).toBeVisible({
     timeout: 30_000,
@@ -143,4 +152,11 @@ export async function incrementAbility(page: Page, label: string, times: number)
 
 export async function expectStepHeading(page: Page, text: RegExp | string): Promise<void> {
   await expect(page.getByRole('heading', { name: text })).toBeVisible({ timeout: 30_000 });
+}
+
+/** Valide l’étape Classe (bouton Forger) — plus d’auto-avance après le dernier choix carrousel. */
+export async function finishClassStep(page: Page): Promise<void> {
+  const forge = page.getByRole('button', { name: /^Forger cette voie$/ });
+  await expect(forge).toBeVisible({ timeout: 15_000 });
+  await forge.click();
 }

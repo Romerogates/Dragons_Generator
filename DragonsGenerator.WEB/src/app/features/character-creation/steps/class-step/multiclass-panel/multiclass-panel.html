@@ -20,7 +20,11 @@
     </p>
 
     @for (row of secondaryRows(); track row.entry.classId) {
-      <div class="border border-slate-700 rounded-lg p-3 mb-3 bg-slate-900/40">
+      <div
+        class="border border-slate-700 rounded-lg p-3 mb-3 bg-slate-900/40"
+        data-testid="multiclass-secondary-row"
+        [attr.data-class-id]="row.entry.classId"
+      >
         <div class="flex items-center justify-between gap-2 mb-2">
           <strong class="text-slate-100 text-sm">{{ row.entry.className }}</strong>
           @if (row.prerequisiteLabel) {
@@ -131,6 +135,7 @@
     @if (canAddClass()) {
       <div class="flex items-center gap-2">
         <select
+          data-testid="multiclass-add-select"
           [ngModel]="selectedClassIdToAdd()"
           (ngModelChange)="selectedClassIdToAdd.set($event)"
           class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-[11px] text-slate-100"
@@ -142,6 +147,7 @@
         </select>
         <button
           type="button"
+          data-testid="multiclass-add-class"
           [disabled]="!selectedClassIdToAdd() || !!selectedAddBlockedReason()"
           (click)="addSelectedClass()"
           class="bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 disabled:text-slate-500 text-[11px] font-bold px-3 py-1.5 rounded"

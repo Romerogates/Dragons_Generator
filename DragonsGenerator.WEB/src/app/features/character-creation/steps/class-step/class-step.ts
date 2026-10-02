@@ -1011,7 +1011,13 @@ export class ClassStep implements OnInit {
 
     if (this.selectionComplete()) {
       this.holdPhase.set(phaseBeforeClick);
-      this.confirmSelection();
+      // Appliquer sans avancer : laisse le panneau multiclass utilisable ;
+      // l’utilisateur clique « Forger cette voie » pour passer à l’étape suivante.
+      if (!this.applySelectionToBuilder()) {
+        this.holdPhase.set(null);
+        return;
+      }
+      this.lastAppliedLevel = this.targetLevel();
     } else if (phaseBeforeClick !== this.currentPhase()) {
       this.currentIndex.set(0);
     }

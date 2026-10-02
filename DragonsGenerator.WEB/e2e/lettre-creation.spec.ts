@@ -4,6 +4,7 @@ import {
   pickCarouselCard,
   incrementAbility,
   expectStepHeading,
+  finishClassStep,
 } from './helpers/wizard';
 
 /**
@@ -52,6 +53,7 @@ test.describe('Lettré L1 wizard', () => {
     await expect(page.getByText(/Astuces initiales/i)).toBeVisible({ timeout: 15_000 });
     await pickCarouselCard(page, 'feat-astuce-audace', { clickCount: 1 });
     await pickCarouselCard(page, 'feat-astuce-brio', { clickCount: 1 });
+    await finishClassStep(page);
 
     // 5 — Caractéristiques (15 pts : Int 15, Dex 14, Con 13)
     await expectStepHeading(page, /Essence & Attributs/i);

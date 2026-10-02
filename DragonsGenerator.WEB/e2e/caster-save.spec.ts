@@ -5,6 +5,7 @@ import {
   pickCarouselCard,
   incrementAbility,
   expectStepHeading,
+  finishClassStep,
 } from './helpers/wizard';
 import { completeSpeciesCivilizationBackground } from './helpers/wizard-paths';
 
@@ -31,6 +32,7 @@ test.describe('Caster forge — Magie + save', () => {
 
     await completeSpeciesCivilizationBackground(page, 'Érudit');
     await pickCarouselCard(page, 'cls-magicien');
+    await finishClassStep(page);
 
     await expectStepHeading(page, /Essence & Attributs/i);
     await incrementAbility(page, 'Intelligence', 5);
@@ -104,6 +106,7 @@ test.describe('Caster forge — Magie + save', () => {
     await completeSpeciesCivilizationBackground(page, 'Acolyte');
     await pickCarouselCard(page, 'cls-pretre');
     await pickCarouselCard(page, 'subcls-domaine-de-la-vie');
+    await finishClassStep(page);
 
     await expectStepHeading(page, /Essence & Attributs/i);
     await incrementAbility(page, 'Sagesse', 5);
