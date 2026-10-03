@@ -74,7 +74,9 @@ test.describe('Forge quick generate', () => {
     await page.getByTestId('forge-quick-generate').click();
     await expect(page.getByText(/Héros généré/i)).toBeVisible({ timeout: 60_000 });
     // Stepper : étape récap active (dernier numéro / titre)
-    await expect(page.getByText(/Récapitulatif/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('forge-current-step-title')).toHaveText(/Récapitulatif/i, {
+      timeout: 15_000,
+    });
   });
 
   test('Compléter le reste without level shows popup', async ({ page }) => {
