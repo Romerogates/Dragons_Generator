@@ -6,28 +6,35 @@
       Le Destin Scellé
     </h2>
     <p class="text-slate-400 text-xs max-w-xl mx-auto leading-relaxed">
-      Voici l’aperçu de votre fiche. Vérifiez, sauvegardez — la feuille complète s’ouvre ensuite
-      (mode Compacte sur téléphone).
+      Voici l’aperçu de votre fiche. Vérifiez, sauvegardez — la feuille complète s’ouvre ensuite.
+      @if (!showMobilePdf()) {
+        <span class="text-slate-500"> (Compacte sur téléphone — changeable dans Paramètres.)</span>
+      }
     </p>
   </div>
 
-  <!-- === APERÇU : fiche UI mobile, PDF desktop (pleine largeur utile PC) === -->
+  <!-- === APERÇU : PDF desktop ; mobile selon Paramètres → Forge === -->
   <div class="w-full max-w-[96rem] px-3 sm:px-6 lg:px-8 flex flex-col gap-3">
-    <div class="sm:hidden rounded-2xl border border-slate-800 bg-[#0f1117] overflow-hidden">
-      <div
-        class="px-3 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2"
-      >
-        <p class="text-[10px] font-black uppercase tracking-widest text-amber-500/90">
-          Aperçu — feuille
-        </p>
-        <p class="text-[9px] text-slate-600 shrink-0">Faites défiler ↓</p>
+    @if (!showMobilePdf()) {
+      <div class="sm:hidden rounded-2xl border border-slate-800 bg-[#0f1117] overflow-hidden">
+        <div
+          class="px-3 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2"
+        >
+          <p class="text-[10px] font-black uppercase tracking-widest text-amber-500/90">
+            Aperçu — Compacte
+          </p>
+          <p class="text-[9px] text-slate-600 shrink-0">Faites défiler ↓</p>
+        </div>
+        <div class="max-h-[min(68dvh,36rem)] overflow-y-auto overscroll-contain p-3">
+          <app-character-play-view [character]="character()" />
+        </div>
       </div>
-      <div class="max-h-[min(68dvh,36rem)] overflow-y-auto overscroll-contain p-3">
-        <app-character-play-view [character]="character()" />
-      </div>
-    </div>
+    }
 
-    <div class="relative hidden sm:block w-full mx-auto">
+    <div
+      class="relative w-full mx-auto"
+      [ngClass]="showMobilePdf() ? '' : 'hidden sm:block'"
+    >
       @if (isLoadingPreview()) {
         <div class="flex flex-col items-center justify-center gap-4 py-16">
           <div
@@ -76,7 +83,10 @@
     </div>
 
     @if (!isLoadingPreview() && pdfRawUrl()) {
-      <p class="hidden sm:block text-center text-[10px] text-slate-600 italic">
+      <p
+        class="text-center text-[10px] text-slate-600 italic"
+        [ngClass]="showMobilePdf() ? '' : 'hidden sm:block'"
+      >
         Même rendu que le téléchargement — pages avec ← →.
       </p>
     }

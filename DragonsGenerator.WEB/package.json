@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "icons:bundle": "node scripts/build-iconify-bundle.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --no-watch --browsers=ChromeHeadless --code-coverage",
@@ -41,6 +42,7 @@
     "@fullcalendar/angular": "^7.1.0",
     "@microsoft/signalr": "^10.0.11",
     "fullcalendar": "^7.1.0",
+    "iconify-icon": "^3.0.3",
     "jspdf": "^4.2.1",
     "pdfjs-dist": "^4.10.38",
     "rxjs": "~7.8.0",

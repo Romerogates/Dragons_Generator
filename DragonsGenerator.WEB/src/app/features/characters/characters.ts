@@ -196,7 +196,7 @@ export class Characters implements OnInit {
     if (!speciesName) return 'fluent-emoji:bust-in-silhouette';
     const name = String(speciesName).toLowerCase();
 
-    if (name.includes('elfe')) return 'fluent-emoji:elf';
+    if (name.includes('elfe')) return 'fluent-emoji:man-elf';
     if (name.includes('nain')) return 'fluent-emoji:pick';
     if (name.includes('halfelin')) return 'fluent-emoji:four-leaf-clover';
     if (name.includes('gnome')) return 'fluent-emoji:wrench';

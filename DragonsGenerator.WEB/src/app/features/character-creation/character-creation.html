@@ -231,11 +231,14 @@
   }
   <!-- Compact progress — collé en haut (navbar défile hors forge sticky) -->
   <div
-    class="-mx-2 sm:mx-0 mb-2 sm:mb-3 px-2 sm:px-0 py-1.5 sm:py-2 border-b border-slate-800 sticky top-[var(--dg-sticky-top)] z-40 bg-[#171b22]/95 backdrop-blur-md"
+    class="-mx-2 sm:mx-0 mb-1.5 sm:mb-3 px-1.5 sm:px-0 py-1 sm:py-2 border-b border-slate-800 sticky top-[var(--dg-sticky-top)] z-40 bg-[#171b22]/95 backdrop-blur-md"
   >
-    <div class="flex items-center justify-between gap-2 mb-1.5">
-      <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-        Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
+    <div class="flex items-center justify-between gap-2 mb-1 sm:mb-1.5">
+      <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
+        {{ builder.currentStep() }}/{{ builder.totalSteps() }}
+        <span class="text-amber-500/90 font-serif normal-case tracking-normal font-semibold ml-1 sm:hidden">{{
+          builder.steps()[builder.currentStep() - 1]?.title
+        }}</span>
       </p>
       <div class="flex items-center gap-2 min-w-0 justify-end">
         @if (builder.returnToSummary()) {
@@ -244,19 +247,19 @@
             class="shrink-0 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-700/50 text-amber-400 hover:bg-amber-950/40 hover:border-amber-500/60 transition-colors"
             (click)="goToSummary()"
           >
-            Retour au récap
+            Récap
           </button>
         }
-        <p class="text-[10px] sm:text-[11px] font-serif text-amber-500/90 truncate min-w-0 text-right">
+        <p class="hidden sm:block text-[11px] font-serif text-amber-500/90 truncate min-w-0 text-right">
           {{ builder.steps()[builder.currentStep() - 1]?.title }}
         </p>
       </div>
     </div>
     <!-- Flèches + scroll horizontal (titres longs / étape 12) -->
-    <div class="relative flex items-center gap-1">
+    <div class="relative flex items-center gap-0.5 sm:gap-1">
       <button
         type="button"
-        class="shrink-0 w-7 h-7 rounded-lg border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-600/50 flex items-center justify-center text-sm leading-none"
+        class="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-600/50 flex items-center justify-center text-sm leading-none"
         aria-label="Faire défiler les étapes vers la gauche"
         (click)="scrollForgeStepsBy(-160)"
       >
@@ -264,7 +267,7 @@
       </button>
       <div
         #forgeStepper
-        class="flex flex-1 min-w-0 gap-1.5 overflow-x-auto overscroll-x-contain pt-1.5 pb-1.5 px-1 custom-scrollbar"
+        class="flex flex-1 min-w-0 gap-1 sm:gap-1.5 overflow-x-auto overscroll-x-contain py-1 sm:pt-1.5 sm:pb-1.5 px-0.5 sm:px-1 custom-scrollbar"
         role="navigation"
         aria-label="Étapes de la forge"
       >
@@ -273,7 +276,7 @@
           <button
             type="button"
             [attr.data-forge-step]="step.number"
-            class="shrink-0 min-w-[2.25rem] px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-400 transition-colors cursor-pointer flex flex-col items-center justify-center gap-0.5"
+            class="shrink-0 min-w-[1.85rem] sm:min-w-[2.25rem] px-1.5 sm:px-2.5 py-0.5 sm:py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-400 transition-colors cursor-pointer flex flex-col items-center justify-center gap-0.5"
             [attr.title]="'Revenir à : ' + step.title"
             [attr.aria-label]="'Revenir à l’étape ' + step.title"
             (click)="goToStep(step.number)"
@@ -284,7 +287,7 @@
         } @else if (step.number === builder.currentStep()) {
           <div
             [attr.data-forge-step]="step.number"
-            class="shrink-0 min-w-[2.25rem] px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md bg-amber-400 border-2 border-white flex flex-col items-center justify-center gap-0.5"
+            class="shrink-0 min-w-[1.85rem] sm:min-w-[2.25rem] px-1.5 sm:px-2.5 py-0.5 sm:py-1.5 rounded-md bg-amber-400 border-2 border-white flex flex-col items-center justify-center gap-0.5"
             [attr.title]="step.title"
             [attr.aria-current]="'step'"
             [attr.aria-label]="'Étape en cours : ' + step.title"
@@ -295,7 +298,7 @@
         } @else {
           <div
             [attr.data-forge-step]="step.number"
-            class="shrink-0 min-w-[2.25rem] px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md bg-slate-700 flex flex-col items-center justify-center gap-0.5"
+            class="shrink-0 min-w-[1.85rem] sm:min-w-[2.25rem] px-1.5 sm:px-2.5 py-0.5 sm:py-1.5 rounded-md bg-slate-700 flex flex-col items-center justify-center gap-0.5"
             [attr.title]="step.title"
             [attr.aria-label]="'Étape à venir : ' + step.title"
           >
@@ -307,7 +310,7 @@
       </div>
       <button
         type="button"
-        class="shrink-0 w-7 h-7 rounded-lg border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-600/50 flex items-center justify-center text-sm leading-none"
+        class="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-600/50 flex items-center justify-center text-sm leading-none"
         aria-label="Faire défiler les étapes vers la droite"
         (click)="scrollForgeStepsBy(160)"
       >
@@ -321,7 +324,7 @@
     }
     @if (builder.currentStep() < builder.summaryStep()) {
       <div
-        class="mt-1.5 flex flex-wrap items-center gap-1.5"
+        class="mt-1 sm:mt-1.5 flex flex-wrap items-center gap-1 sm:gap-1.5"
         data-testid="forge-shortcuts"
         aria-label="Raccourcis de forge"
       >

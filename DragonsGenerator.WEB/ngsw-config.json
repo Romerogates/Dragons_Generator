@@ -13,7 +13,8 @@
           "/manifest.webmanifest",
           "/*.css",
           "/*.js",
-          "/ngsw-worker.js"
+          "/ngsw-worker.js",
+          "/assets/iconify/**"
         ]
       }
     },

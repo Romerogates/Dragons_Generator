@@ -14,9 +14,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="dragon_32x32.png" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <link rel="dns-prefetch" href="//code.iconify.design" />
-    <link rel="preconnect" href="https://code.iconify.design" crossorigin />
-    <script defer src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <!-- Smileys offline : un seul JSON cacheable (pas de flash CDN page par page). -->
+    <link rel="preload" href="/assets/iconify/dg-icons.json" as="fetch" crossorigin />
   </head>
   <body>
     <app-root></app-root>

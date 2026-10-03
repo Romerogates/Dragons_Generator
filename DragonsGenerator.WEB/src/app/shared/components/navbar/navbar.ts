@@ -125,7 +125,6 @@ export class Navbar implements OnInit, OnDestroy {
   readonly forgeRoute = signal(false);
 
   ngOnInit(): void {
-    this.preloadNavbarIcons();
     this.syncForgeRoute(this.router.url);
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
@@ -215,60 +214,6 @@ export class Navbar implements OnInit, OnDestroy {
 
   isCodexActive(): boolean {
     return this.codexLinks.some((l) => this.router.url.startsWith(l.path));
-  }
-
-  private preloadNavbarIcons(): void {
-    if (typeof customElements === 'undefined' || typeof document === 'undefined') return;
-
-    const icons = [
-      'mdi:bell-outline',
-      'mdi:cog-outline',
-      'fluent-emoji:hammer-and-pick',
-      'fluent-emoji:busts-in-silhouette',
-      'fluent-emoji:bust-in-silhouette',
-      'fluent-emoji:world-map',
-      'fluent-emoji:scroll',
-      'fluent-emoji:japanese-castle',
-      'fluent-emoji:crossed-swords',
-      'fluent-emoji:spiral-calendar',
-      'fluent-emoji:open-book',
-      'fluent-emoji:handshake',
-      'fluent-emoji:envelope',
-      'fluent-emoji:shield',
-      ...this.creationLinks.map((l) => l.icon),
-      ...this.codexLinks.map((l) => l.icon),
-    ];
-    const unique = [...new Set(icons)];
-
-    customElements.whenDefined('iconify-icon').then(() => {
-      const IconifyIcon = customElements.get('iconify-icon') as
-        | { loadIcons?: (names: string[]) => void }
-        | undefined;
-      IconifyIcon?.loadIcons?.(unique);
-
-      // Chauffe le cache Iconify via un hôte hors écran (fiable avec le CDN).
-      // Les icônes restent en mémoire → réouverture burger sans flash réseau.
-      let host = document.getElementById('dg-iconify-preload');
-      if (!host) {
-        host = document.createElement('div');
-        host.id = 'dg-iconify-preload';
-        host.setAttribute('aria-hidden', 'true');
-        host.style.cssText =
-          'position:fixed;left:-9999px;top:0;width:0;height:0;overflow:hidden;pointer-events:none;opacity:0';
-        document.body.appendChild(host);
-      }
-      for (const name of unique) {
-        const already = Array.from(host.children).some(
-          (el) => el.getAttribute('data-dg-icon') === name,
-        );
-        if (already) continue;
-        const ic = document.createElement('iconify-icon');
-        ic.setAttribute('icon', name);
-        ic.setAttribute('noobserver', '');
-        ic.setAttribute('data-dg-icon', name);
-        host.appendChild(ic);
-      }
-    });
   }
 
   private syncBodyScrollLock(): void {

@@ -1,7 +1,9 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import 'iconify-icon';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 import { environment } from '@env/environment';
+import { registerAppIcons } from './app/core/iconify/register-icons';
 
 /** Dev mobile (ng serve :4200) : l'API locale est sur le port 5117 du même hôte. */
 function patchApiUrlForLan(): void {
@@ -15,5 +17,6 @@ function patchApiUrlForLan(): void {
 
 patchApiUrlForLan();
 
-bootstrapApplication(App, appConfig)
+void registerAppIcons()
+  .then(() => bootstrapApplication(App, appConfig))
   .catch((err) => console.error(err));

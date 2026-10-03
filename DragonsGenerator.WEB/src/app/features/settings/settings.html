@@ -419,6 +419,45 @@
             >
           </span>
         </label>
+
+        <div class="settings-row ml-1 flex-col !items-stretch gap-2" data-testid="settings-forge-mobile-recap">
+          <div class="min-w-0">
+            <p class="text-sm text-slate-100 font-medium">Aperçu récap sur téléphone</p>
+            <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+              Appliqué à la dernière étape de la forge. Pas de bascule sur la page — changez ici.
+            </p>
+          </div>
+          <div
+            class="inline-flex self-start rounded-lg border border-slate-700/80 bg-[#12151b] p-0.5"
+            role="group"
+            aria-label="Aperçu récap téléphone"
+          >
+            <button
+              type="button"
+              class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
+              [class]="
+                forgeMobileRecapMode() === 'pdf'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-amber-300'
+              "
+              (click)="setForgeMobileRecapMode('pdf')"
+            >
+              PDF
+            </button>
+            <button
+              type="button"
+              class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
+              [class]="
+                forgeMobileRecapMode() === 'compact'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-amber-300'
+              "
+              (click)="setForgeMobileRecapMode('compact')"
+            >
+              Compacte
+            </button>
+          </div>
+        </div>
       </section>
 
       <section class="settings-panel">

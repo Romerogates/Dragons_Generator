@@ -68,6 +68,7 @@ export class SettingsPage implements OnInit {
   readonly notifPreferences = this.notifPrefs.prefs;
   readonly hideAllBanners = this.banners.hideAllBanners;
   readonly skipForgeModePrompt = this.forgePrefs.skipModePrompt;
+  readonly forgeMobileRecapMode = this.forgePrefs.mobileRecapMode;
 
   aiEnabled = false;
   aiProvider = 'openai';
@@ -298,6 +299,10 @@ export class SettingsPage implements OnInit {
   setSkipForgeModePrompt(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this.forgePrefs.setSkipModePrompt(checked);
+  }
+
+  setForgeMobileRecapMode(mode: 'pdf' | 'compact'): void {
+    this.forgePrefs.setMobileRecapMode(mode);
   }
 
   async installPwa(): Promise<void> {

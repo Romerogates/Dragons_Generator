@@ -874,7 +874,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', this.onWindowFocus);
-      this.preloadCampaignTabIcons();
     }
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
@@ -1079,29 +1078,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       window.removeEventListener('focus', this.onWindowFocus);
     }
     this.revokePreviewUrl();
-  }
-
-  /** Précharge les smileys d’onglets (évite le pop au scroll — même idée que `noobserver` navbar). */
-  private preloadCampaignTabIcons(): void {
-    const icons = [
-      'fluent-emoji:clipboard',
-      'fluent-emoji:calendar',
-      'fluent-emoji:spiral-calendar',
-      'fluent-emoji:page-facing-up',
-      'fluent-emoji:hammer-and-wrench',
-      'fluent-emoji:busts-in-silhouette',
-      'fluent-emoji:scroll',
-      'fluent-emoji:dragon',
-      'fluent-emoji:world-map',
-      'fluent-emoji:memo',
-      'fluent-emoji:performing-arts',
-      'fluent-emoji:crossed-swords',
-      'fluent-emoji:bell',
-    ];
-    const api = (
-      window as unknown as { Iconify?: { preloadIcons?: (names: string[]) => void } }
-    ).Iconify;
-    api?.preloadIcons?.(icons);
   }
 
   private readonly onWindowFocus = (): void => {

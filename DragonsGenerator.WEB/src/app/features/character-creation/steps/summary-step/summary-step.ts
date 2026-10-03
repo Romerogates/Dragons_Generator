@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { CharacterBuilderService } from '@core/services/character-builder.service';
+import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
@@ -55,6 +56,7 @@ import { GuideRulebookPdfService } from '@core/services/guide-rulebook-pdf.servi
 })
 export class SummaryStep implements OnInit, OnDestroy {
   readonly builder = inject(CharacterBuilderService);
+  private readonly forgePrefs = inject(ForgePreferencesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private pdfService = inject(PdfGeneratorService);
@@ -99,6 +101,8 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfJsFailed = signal(false);
   readonly useNativePdfFallback = prefersNativePdfFallback();
+  /** Téléphone : PDF (défaut) ou Compacte — réglé dans Paramètres → Forge. */
+  readonly showMobilePdf = computed(() => this.forgePrefs.mobileRecapMode() === 'pdf');
   readonly showAuthGate = signal(false);
   readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);

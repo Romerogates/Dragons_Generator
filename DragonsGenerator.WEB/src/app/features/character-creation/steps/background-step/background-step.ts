@@ -467,7 +467,7 @@ export class BackgroundStep implements OnInit {
       'bg-larron': 'fluent-emoji:dagger',
       'bg-notable': 'fluent-emoji:crown',
       'bg-reclus': 'fluent-emoji:mountain',
-      'bg-survivant': 'fluent-emoji:campfire',
+      'bg-survivant': 'fluent-emoji:camping',
       'bg-custom': 'fluent-emoji:wrench',
     };
     return icons[bgId] ?? 'fluent-emoji:scroll';

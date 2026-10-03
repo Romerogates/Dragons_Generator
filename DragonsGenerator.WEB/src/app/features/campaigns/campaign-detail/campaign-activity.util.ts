@@ -39,7 +39,7 @@ export function activityIcon(kind: string): string {
     session_updated: 'fluent-emoji:spiral-calendar',
     pregen_assigned: 'fluent-emoji:bust-in-silhouette',
     handout_published: 'fluent-emoji:scroll',
-    initiative_collection_opened: 'fluent-emoji:dart',
+    initiative_collection_opened: 'fluent-emoji:bullseye',
     schedule_rsvp: 'fluent-emoji:raising-hands',
     combat_ended: 'fluent-emoji:crossed-swords',
   };

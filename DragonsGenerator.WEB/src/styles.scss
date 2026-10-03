@@ -24,11 +24,18 @@
 
   /* Forge : navbar non-sticky → étapes collées en haut d’écran (+ flèches + raccourcis). */
   .forge-route {
-    --dg-wizard-chrome-height: 7.25rem;
+    /* Mobile : chrome plus bas pour laisser de la place au contenu. */
+    --dg-wizard-chrome-height: 5.5rem;
     --dg-sticky-top: env(safe-area-inset-top, 0px);
     --dg-sticky-below-wizard: calc(
       env(safe-area-inset-top, 0px) + var(--dg-wizard-chrome-height)
     );
+  }
+
+  @media (min-width: 640px) {
+    .forge-route {
+      --dg-wizard-chrome-height: 7.25rem;
+    }
   }
 
   html,
@@ -47,6 +54,13 @@
   input[type='number'] {
     -moz-appearance: textfield;
     appearance: textfield;
+  }
+
+  /* Iconify : réserve l’espace et évite le “pop” layout pendant le rendu SVG. */
+  iconify-icon {
+    display: inline-block;
+    vertical-align: -0.125em;
+    line-height: 1;
   }
 
   /* Cheaper paints: avoid animating layout properties site-wide when user prefers less motion */

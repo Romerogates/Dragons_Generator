@@ -269,7 +269,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       title: 'Collecte côté joueurs',
       summary:
         'Bandeau + notification quand le MJ ouvre la collecte. Les joueurs saisissent leur jet depuis le lien fourni.',
-      icon: 'fluent-emoji:dice',
+      icon: 'fluent-emoji:game-die',
       border: 'border-sky-500/30',
       tagColor: 'text-sky-400 bg-sky-950/40',
     },
@@ -345,7 +345,7 @@ export const GUIDE_FLASH_CARDS: GuideFlashCard[] = [
       title: 'Collecter l’init',
       bullets: ['Tracker → Collecter', 'Joueurs reçoivent bandeau', 'Importer les jets'],
       audience: 'dm',
-      icon: 'fluent-emoji:dice',
+      icon: 'fluent-emoji:game-die',
       sectionId: 'initiative',
     },
     {

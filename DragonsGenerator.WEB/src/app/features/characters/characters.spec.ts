@@ -345,7 +345,7 @@ describe('Characters', () => {
       expect(component.getClassIcon('Guerrier')).toBe('fluent-emoji:crossed-swords');
 
       expect(component.getSpeciesIcon('')).toBe('fluent-emoji:bust-in-silhouette');
-      expect(component.getSpeciesIcon('Elfe')).toBe('fluent-emoji:elf');
+      expect(component.getSpeciesIcon('Elfe')).toBe('fluent-emoji:man-elf');
       expect(component.getSpeciesIcon('Nain')).toBe('fluent-emoji:pick');
       expect(component.getSpeciesIcon('Halfelin')).toBe('fluent-emoji:four-leaf-clover');
       expect(component.getSpeciesIcon('Gnome')).toBe('fluent-emoji:wrench');
