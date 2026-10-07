@@ -132,6 +132,8 @@ jobs:
           command_timeout: 30m
           script: |
             set -euo pipefail
+            touch /tmp/dragons-deploy.lock
+            trap 'rm -f /tmp/dragons-deploy.lock' EXIT
             cd ~/Dragons_Generator
             git fetch origin main
             git reset --hard origin/main
@@ -204,8 +206,10 @@ jobs:
               echo "WARN: Ollama model unavailable — API will fall back to Groq for short generations"
             fi
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
-            chmod +x scripts/renew-letsencrypt.sh
+            chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh
             ./scripts/renew-letsencrypt.sh docker-compose.prod.yml || echo "WARN: Let’s Encrypt renew skipped"
+            ./scripts/install-vps-cron.sh || echo "WARN: cron watchdog non installé"
+            docker image prune -f >/dev/null 2>&1 || true
             compose_up dragons-api dragons-web autoheal
 
             for i in $(seq 1 60); do

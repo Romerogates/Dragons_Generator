@@ -1,3 +1,9 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "12m"
+    max-file: "3"
+
 services:
   ollama:
     container_name: dragons-ollama
@@ -17,6 +23,7 @@ services:
     memswap_limit: 2800m
     cpus: "2.0"
     oom_score_adj: 400
+    logging: *default-logging
     labels:
       autoheal: "true"
     healthcheck:
@@ -56,6 +63,7 @@ services:
     memswap_limit: 1536m
     cpus: "1.5"
     oom_score_adj: -300
+    logging: *default-logging
     labels:
       autoheal: "true"
     healthcheck:
@@ -83,6 +91,7 @@ services:
     memswap_limit: 256m
     cpus: "0.5"
     oom_score_adj: -200
+    logging: *default-logging
     labels:
       autoheal: "true"
     depends_on:
@@ -109,6 +118,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     mem_limit: 64m
     memswap_limit: 64m
+    logging: *default-logging
     networks:
       - dragons-network
 

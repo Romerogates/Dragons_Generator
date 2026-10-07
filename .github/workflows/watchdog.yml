@@ -1,0 +1,58 @@
+name: Production watchdog
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: production-watchdog
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Probe public health (3 tries)
+        id: probe
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if curl -sfS --max-time 20 https://dragons-generator.top/api/health >/dev/null; then
+              echo "Health OK (attempt $i)"
+              exit 0
+            fi
+            echo "Health miss $i/3"
+            sleep 25
+          done
+          exit 1
+
+      - name: Restart API + web over SSH
+        if: steps.probe.outcome == 'failure'
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 5m
+          script: |
+            set -euo pipefail
+            if [ -f /tmp/dragons-deploy.lock ]; then
+              echo "Deploy lock present — skip restart"
+              exit 0
+            fi
+            cd ~/Dragons_Generator
+            echo "Watchdog: restarting dragons-api + dragons-web"
+            docker compose -f docker-compose.prod.yml restart dragons-api dragons-web
+            for i in $(seq 1 24); do
+              if docker compose -f docker-compose.prod.yml exec -T dragons-api curl -sf http://localhost:8080/health >/dev/null; then
+                echo "API back after $i attempt(s)"
+                exit 0
+              fi
+              sleep 5
+            done
+            echo "API still unhealthy after restart"
+            docker compose -f docker-compose.prod.yml logs dragons-api --tail 40
+            exit 1

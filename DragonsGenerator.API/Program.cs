@@ -195,12 +195,24 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 builder.WebHost.ConfigureKestrel(o =>
 {
     o.Limits.MaxRequestBodySize = 25 * 1024 * 1024; // 25 MB (PDF tickets)
+    o.Limits.MaxConcurrentConnections = 256;
+    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+    o.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
 });
 
 var app = builder.Build();
 
 await DbSeeder.SeedAsync(app.Services);
 
+app.UseExceptionHandler(errApp =>
+{
+    errApp.Run(async ctx =>
+    {
+        ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        ctx.Response.ContentType = "application/json";
+        await ctx.Response.WriteAsync("""{"status":"error"}""", ctx.RequestAborted);
+    });
+});
 app.UseForwardedHeaders();
 app.UseCors("AllowAngular");
 app.UseAuthentication();
