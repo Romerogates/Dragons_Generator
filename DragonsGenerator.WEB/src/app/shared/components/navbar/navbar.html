@@ -164,19 +164,24 @@
             @if (codexOpen()) {
               <div class="absolute top-full right-0 pt-2 z-50" role="menu">
                 <div
-                  class="w-80 rounded-2xl border border-slate-700/80 bg-[var(--dg-bg)] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
+                  class="w-80 max-h-[min(28rem,70vh)] overflow-y-auto rounded-2xl border border-slate-700/80 bg-[var(--dg-bg)] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
                 >
                   <div class="px-1 pb-1.5">
                     <input
                       type="search"
-                      placeholder="Filtrer le grimoire…"
+                      placeholder="Chercher dans le Codex…"
                       class="w-full min-h-9 rounded-lg bg-[var(--dg-surface)] border border-slate-700 px-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-amber-600/50 outline-none"
                       [value]="codexFilter()"
-                      (input)="codexFilter.set($any($event.target).value)"
+                      (input)="onCodexFilter($any($event.target).value)"
                       (click)="$event.stopPropagation()"
                       data-testid="codex-filter"
                     />
                   </div>
+                  @if (searchingCodex() && filteredCodexLinks().length) {
+                    <p class="px-3 pt-1 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                      Rubriques
+                    </p>
+                  }
                   @for (link of filteredCodexLinks(); track link.path) {
                     <a
                       [routerLink]="link.path"
@@ -190,8 +195,37 @@
                       ></span>
                       <span class="font-medium tracking-wide">{{ link.label }}</span>
                     </a>
-                  } @empty {
-                    <p class="px-3 py-2 text-xs text-slate-500">Aucun résultat.</p>
+                  }
+                  @if (searchingCodex()) {
+                    @if (codexSearchLoading() && !codexEntryHits().length) {
+                      <p class="px-3 py-2 text-xs text-slate-500">Recherche…</p>
+                    }
+                    @if (codexEntryHits().length) {
+                      <p class="px-3 pt-2 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                        Entrées
+                      </p>
+                    }
+                    @for (hit of codexEntryHits(); track hit.path) {
+                      <a
+                        [routerLink]="hit.path"
+                        class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-slate-800/80 hover:text-amber-300 border border-transparent transition-colors"
+                        role="menuitem"
+                        (click)="closeMenus()"
+                      >
+                        <span class="text-lg leading-none w-6 text-center shrink-0"
+                          ><iconify-icon noobserver [icon]="hit.icon"></iconify-icon
+                        ></span>
+                        <span class="min-w-0">
+                          <span class="block font-medium tracking-wide truncate">{{ hit.label }}</span>
+                          @if (hit.category) {
+                            <span class="block text-[10px] text-slate-500 truncate">{{ hit.category }}</span>
+                          }
+                        </span>
+                      </a>
+                    }
+                    @if (!filteredCodexLinks().length && !codexEntryHits().length && !codexSearchLoading()) {
+                      <p class="px-3 py-2 text-xs text-slate-500">Aucun résultat.</p>
+                    }
                   }
                 </div>
               </div>
@@ -489,12 +523,17 @@
         <div class="px-4 pb-2">
           <input
             type="search"
-            placeholder="Filtrer le grimoire…"
+            placeholder="Chercher dans le Codex…"
             class="w-full min-h-9 rounded-lg bg-[var(--dg-bg)] border border-slate-700 px-3 text-sm text-slate-200 placeholder:text-slate-500 outline-none"
             [value]="codexFilter()"
-            (input)="codexFilter.set($any($event.target).value)"
+            (input)="onCodexFilter($any($event.target).value)"
           />
         </div>
+        @if (searchingCodex() && filteredCodexLinks().length) {
+          <p class="px-4 pt-1 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
+            Rubriques
+          </p>
+        }
         @for (link of filteredCodexLinks(); track link.path) {
           <a
             [routerLink]="link.path"
@@ -506,8 +545,36 @@
             ></span>
             <span class="text-sm tracking-wide">{{ link.label }}</span>
           </a>
-        } @empty {
-          <p class="px-4 py-2 text-xs text-slate-500">Aucun résultat.</p>
+        }
+        @if (searchingCodex()) {
+          @if (codexSearchLoading() && !codexEntryHits().length) {
+            <p class="px-4 py-2 text-xs text-slate-500">Recherche…</p>
+          }
+          @if (codexEntryHits().length) {
+            <p class="px-4 pt-2 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
+              Entrées
+            </p>
+          }
+          @for (hit of codexEntryHits(); track hit.path) {
+            <a
+              [routerLink]="hit.path"
+              class="flex items-center gap-3 px-4 py-2 rounded-xl border border-transparent text-slate-300 hover:bg-slate-800/70 transition-colors"
+              (click)="closeMenus()"
+            >
+              <span class="text-lg w-6 text-center"
+                ><iconify-icon noobserver [icon]="hit.icon"></iconify-icon
+              ></span>
+              <span class="min-w-0">
+                <span class="block text-sm tracking-wide truncate">{{ hit.label }}</span>
+                @if (hit.category) {
+                  <span class="block text-[10px] text-slate-500 truncate">{{ hit.category }}</span>
+                }
+              </span>
+            </a>
+          }
+          @if (!filteredCodexLinks().length && !codexEntryHits().length && !codexSearchLoading()) {
+            <p class="px-4 py-2 text-xs text-slate-500">Aucun résultat.</p>
+          }
         }
 
         @if (auth.isLoggedIn()) {

@@ -17,6 +17,8 @@ services:
     memswap_limit: 2800m
     cpus: "2.0"
     oom_score_adj: 400
+    labels:
+      autoheal: "true"
     healthcheck:
       test: ["CMD-SHELL", "ollama list || exit 1"]
       interval: 30s
@@ -54,6 +56,8 @@ services:
     memswap_limit: 1536m
     cpus: "1.5"
     oom_score_adj: -300
+    labels:
+      autoheal: "true"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 20s
@@ -79,8 +83,32 @@ services:
     memswap_limit: 256m
     cpus: "0.5"
     oom_score_adj: -200
+    labels:
+      autoheal: "true"
     depends_on:
       - dragons-api
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - dragons-network
+
+  autoheal:
+    container_name: dragons-autoheal
+    image: willfarrell/autoheal:latest
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_INTERVAL: "20"
+      AUTOHEAL_START_PERIOD: "90"
+      AUTOHEAL_DEFAULT_STOP_TIMEOUT: "10"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    mem_limit: 64m
+    memswap_limit: 64m
     networks:
       - dragons-network
 

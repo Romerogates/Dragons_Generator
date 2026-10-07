@@ -6,7 +6,9 @@ import { AuthService } from '@core/services/auth.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
+import { of } from 'rxjs';
 import { Navbar } from './navbar';
+import { DataService } from '@core/services/data.service';
 
 describe('Navbar', () => {
   let component: Navbar;
@@ -42,12 +44,33 @@ describe('Navbar', () => {
           provide: GuidePreferencesService,
           useValue: { unreadNewsCount: signal(0) },
         },
+        {
+          provide: DataService,
+          useValue: {
+            getSpeciesSummary: () => of([]),
+            getClassesSummary: () => of([]),
+            getCivilisationsSummary: () => of([]),
+            getEquipmentsSummary: () => of([]),
+            getSpellsSummary: () => of([]),
+            getCreaturesSummary: () => of([]),
+            getSkillsSummary: () => of([]),
+            getFeatsSummary: () => of([]),
+            getBackgroundsSummary: () => of([]),
+            getCombatActionsSummary: () => of([]),
+            getDeitiesSummary: () => of([]),
+          },
+        },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Navbar);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('does not list Accueil Codex in the dropdown', () => {
+    expect(component.codexLinks.some((l) => l.path === '/codex')).toBeFalse();
+    expect(component.codexLinks.some((l) => /accueil/i.test(l.label))).toBeFalse();
   });
 
   it('keeps the mobile menu mounted after first open so icons are not recreated', () => {

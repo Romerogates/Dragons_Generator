@@ -3,11 +3,13 @@ import {
   Component,
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CODEX_NAV_LINKS, filterCodexNavLinks } from '@core/config/codex-nav';
+import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
+import { CodexSearchService } from '@core/services/codex-search.service';
 
 @Component({
   selector: 'app-codex-hub',
@@ -32,12 +34,29 @@ import { CODEX_NAV_LINKS, filterCodexNavLinks } from '@core/config/codex-nav';
             type="search"
             class="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm
                    text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50"
-            placeholder="Rechercher (ex. monstre, magie, peuples…)"
+            placeholder="Rechercher une entrée (ex. gobelin, boule de feu…)"
             [ngModel]="query()"
-            (ngModelChange)="query.set($event)"
+            (ngModelChange)="onQuery($event)"
             data-testid="codex-hub-search"
           />
         </label>
+
+        @if (entryHits().length) {
+          <div class="mb-8">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-2">Entrées</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              @for (hit of entryHits(); track hit.path) {
+                <a
+                  [routerLink]="hit.path"
+                  class="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-3 hover:border-emerald-500/40 transition-colors"
+                >
+                  <span class="block text-sm font-bold text-slate-100">{{ hit.label }}</span>
+                  <span class="block text-xs text-slate-500 mt-0.5">{{ hit.category }}</span>
+                </a>
+              }
+            </div>
+          </div>
+        }
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           @for (link of filtered(); track link.path) {
@@ -63,7 +82,18 @@ import { CODEX_NAV_LINKS, filterCodexNavLinks } from '@core/config/codex-nav';
   `,
 })
 export class CodexHubPage {
+  private readonly search = inject(CodexSearchService);
   readonly query = signal('');
-  readonly filtered = computed(() => filterCodexNavLinks(this.query()));
+  readonly filtered = computed(() => this.search.sections(this.query()));
+  readonly entryHits = computed(() => this.search.entries(this.query()));
   readonly all = CODEX_NAV_LINKS;
+
+  constructor() {
+    this.search.ensureIndex();
+  }
+
+  onQuery(value: string): void {
+    this.query.set(value);
+    if (value.trim()) this.search.ensureIndex();
+  }
 }

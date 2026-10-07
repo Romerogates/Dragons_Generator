@@ -18,7 +18,8 @@ import { NotificationPreferencesService } from '@core/services/notification-pref
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import type { NotificationType } from '@core/models/notification.model';
-import { CODEX_NAV_LINKS, filterCodexNavLinks } from '@core/config/codex-nav';
+import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
+import { CodexSearchService } from '@core/services/codex-search.service';
 
 export interface NavLink {
   label: string;
@@ -44,6 +45,7 @@ const CAMPAIGN_ACTION_KINDS: NotificationType[] = [
 })
 export class Navbar implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
+  private readonly codexSearch = inject(CodexSearchService);
   private readonly notifications = inject(NotificationService);
   private readonly notifPrefs = inject(NotificationPreferencesService);
   readonly guidePrefs = inject(GuidePreferencesService);
@@ -100,24 +102,17 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Donjons', path: '/dungeons', icon: 'fluent-emoji:japanese-castle' },
   ];
 
-  readonly codexLinks: NavLink[] = [
-    { label: 'Accueil Codex', path: '/codex', icon: 'fluent-emoji:books' },
-    ...CODEX_NAV_LINKS.map((l) => ({ label: l.label, path: l.path, icon: l.icon })),
-  ];
+  readonly codexLinks: NavLink[] = CODEX_NAV_LINKS.map((l) => ({
+    label: l.label,
+    path: l.path,
+    icon: l.icon,
+  }));
 
   readonly codexFilter = signal('');
-  readonly filteredCodexLinks = computed(() => {
-    const q = this.codexFilter().trim().toLowerCase();
-    if (!q) return this.codexLinks;
-    const matched = new Set(filterCodexNavLinks(q).map((l) => l.path));
-    return this.codexLinks.filter(
-      (l) =>
-        l.path === '/codex' ||
-        matched.has(l.path) ||
-        l.label.toLowerCase().includes(q) ||
-        l.path.toLowerCase().includes(q),
-    );
-  });
+  readonly searchingCodex = computed(() => this.codexFilter().trim().length > 0);
+  readonly filteredCodexLinks = computed(() => this.codexSearch.sections(this.codexFilter()));
+  readonly codexEntryHits = computed(() => this.codexSearch.entries(this.codexFilter()));
+  readonly codexSearchLoading = this.codexSearch.loading;
 
   private readonly router = inject(Router);
 
@@ -171,8 +166,14 @@ export class Navbar implements OnInit, OnDestroy {
   toggleCodex(event: Event): void {
     event.stopPropagation();
     this.codexOpen.update((v) => !v);
+    if (this.codexOpen()) this.codexSearch.ensureIndex();
     this.creationOpen.set(false);
     this.accountOpen.set(false);
+  }
+
+  onCodexFilter(value: string): void {
+    this.codexFilter.set(value);
+    if (value.trim()) this.codexSearch.ensureIndex();
   }
 
   toggleAccount(event: Event): void {
@@ -185,7 +186,10 @@ export class Navbar implements OnInit, OnDestroy {
   toggleMobile(): void {
     const opening = !this.mobileOpen();
     this.mobileOpen.set(opening);
-    if (opening) this.mobileMenuMounted.set(true);
+    if (opening) {
+      this.mobileMenuMounted.set(true);
+      this.codexSearch.ensureIndex();
+    }
     this.syncBodyScrollLock();
     if (!opening) {
       this.creationOpen.set(false);
@@ -213,7 +217,9 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   isCodexActive(): boolean {
-    return this.codexLinks.some((l) => this.router.url.startsWith(l.path));
+    const url = this.router.url.split('?')[0] ?? this.router.url;
+    if (url === '/codex' || url.startsWith('/codex/')) return true;
+    return this.codexLinks.some((l) => url === l.path || url.startsWith(`${l.path}/`));
   }
 
   private syncBodyScrollLock(): void {

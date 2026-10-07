@@ -206,7 +206,7 @@ jobs:
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
             chmod +x scripts/renew-letsencrypt.sh
             ./scripts/renew-letsencrypt.sh docker-compose.prod.yml || echo "WARN: Let’s Encrypt renew skipped"
-            compose_up dragons-api dragons-web
+            compose_up dragons-api dragons-web autoheal
 
             for i in $(seq 1 60); do
               if docker compose -f docker-compose.prod.yml exec -T dragons-api curl -sf http://localhost:8080/health >/dev/null \
