@@ -5,6 +5,7 @@ export type HubNextActionKind =
   | 'wait_approval'
   | 'rejected_hero'
   | 'enter_play'
+  | 'rsvp'
   | 'wait_session'
   | 'spectator'
   | 'idle';
@@ -15,8 +16,15 @@ export interface HubNextAction {
   detail: string;
   ctaLabel?: string;
   /** Navigation / action hub. */
-  cta?: 'players' | 'play' | 'sessions' | 'create_hero';
+  cta?: 'players' | 'play' | 'sessions' | 'create_hero' | 'rsvp';
   tone: 'sky' | 'amber' | 'emerald' | 'rose' | 'slate';
+  eventId?: string;
+}
+
+export interface HubPendingRsvp {
+  eventId: string;
+  title: string;
+  whenLabel: string;
 }
 
 export interface HubNextActionInput {
@@ -25,6 +33,7 @@ export interface HubNextActionInput {
   heroStatus: 'none' | 'pending' | 'rejected' | 'approved';
   hasActiveSession: boolean;
   hasPlannedSession: boolean;
+  pendingRsvp?: HubPendingRsvp | null;
 }
 
 export function resolveHubNextAction(input: HubNextActionInput): HubNextAction | null {
@@ -75,6 +84,18 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
       ctaLabel: 'Entrer à la table',
       cta: 'play',
       tone: 'emerald',
+    };
+  }
+
+  if (input.pendingRsvp) {
+    return {
+      kind: 'rsvp',
+      title: `Vous venez ? ${input.pendingRsvp.title}`,
+      detail: `${input.pendingRsvp.whenLabel} — répondez pour que le MJ sache qui sera à table.`,
+      ctaLabel: 'Répondre',
+      cta: 'rsvp',
+      tone: 'amber',
+      eventId: input.pendingRsvp.eventId,
     };
   }
 

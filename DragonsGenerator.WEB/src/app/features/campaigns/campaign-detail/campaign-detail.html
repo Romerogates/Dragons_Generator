@@ -103,7 +103,34 @@
               <p class="text-sm font-serif text-slate-100 mt-0.5">{{ hub.title }}</p>
               <p class="text-xs text-slate-400 mt-0.5">{{ hub.detail }}</p>
             </div>
-            @if (hub.ctaLabel && hub.cta) {
+            @if (hub.cta === 'rsvp' && hub.eventId) {
+              <div class="flex flex-wrap gap-2 shrink-0">
+                <button
+                  type="button"
+                  class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'yes' })"
+                  data-testid="hub-rsvp-yes"
+                >
+                  Oui
+                </button>
+                <button
+                  type="button"
+                  class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-700 text-slate-100 hover:bg-slate-600"
+                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'maybe' })"
+                  data-testid="hub-rsvp-maybe"
+                >
+                  Peut-être
+                </button>
+                <button
+                  type="button"
+                  class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-rose-900/80 text-rose-100 hover:bg-rose-800"
+                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'no' })"
+                  data-testid="hub-rsvp-no"
+                >
+                  Non
+                </button>
+              </div>
+            } @else if (hub.ctaLabel && hub.cta) {
               <button
                 type="button"
                 class="shrink-0 min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"

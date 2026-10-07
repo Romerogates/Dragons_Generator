@@ -51,6 +51,15 @@ public static class AuthEmailTemplates
             link
         );
 
+    public static string SessionReminder(string displayName, string title, string details, string link) =>
+        WrapParchment(
+            title,
+            $"Salutations, {Escape(displayName)}.",
+            $"<p>{Escape(details)}</p><p>Répondez <strong>Oui / Peut-être / Non</strong> sur le calendrier si ce n’est pas déjà fait.</p>",
+            "Ouvrir le calendrier",
+            link
+        );
+
     private static string Escape(string value) =>
         System.Net.WebUtility.HtmlEncode(value ?? "");
 }

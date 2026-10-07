@@ -62,6 +62,11 @@ main() {
 
   if [ ! -s "$db_backup" ]; then
     log "ERROR: Backup DB vide ou absent"
+    if [ -x "$COMPOSE_DIR/scripts/send-alert-email.sh" ]; then
+      "$COMPOSE_DIR/scripts/send-alert-email.sh" backup \
+        "Dragons Generator — backup SQLite échoué" \
+        "Le backup quotidien a produit un fichier vide. Vérifie ~/backups/dragons/ et docker volume dragons-api-data." || true
+    fi
     exit 1
   fi
 
@@ -84,6 +89,14 @@ main() {
   db_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'dragons-*.db' | wc -l | tr -d ' ')"
   uploads_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'uploads-*.tar.gz' | wc -l | tr -d ' ')"
   log "OK — ${db_count} backup(s) DB, ${uploads_count} archive(s) uploads conservés"
+
+  local mailer="$COMPOSE_DIR/scripts/send-backup-email.sh"
+  if [ -x "$mailer" ]; then
+    log "Envoi du backup par mail"
+    "$mailer" "$db_backup" "$uploads_backup" || log "WARN: envoi mail backup échoué"
+  else
+    log "WARN: send-backup-email.sh absent ou non exécutable"
+  fi
 }
 
 main "$@"

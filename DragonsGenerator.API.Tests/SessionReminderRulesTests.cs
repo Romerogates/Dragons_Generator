@@ -85,4 +85,17 @@ public class SessionReminderRulesTests
         Assert.NotNull(next);
         Assert.True(next!.Value < now.AddDays(3));
     }
+
+    [Fact]
+    public void SessionReminder_email_contains_calendar_link()
+    {
+        var html = AuthEmailTemplates.SessionReminder(
+            "Alice",
+            "Table demain",
+            "Soirée · vendredi 20:00",
+            "https://dragons-generator.top/campaigns/c1?tab=calendar");
+        Assert.Contains("Ouvrir le calendrier", html, StringComparison.Ordinal);
+        Assert.Contains("Oui / Peut-être / Non", html, StringComparison.Ordinal);
+        Assert.Contains("tab=calendar", html, StringComparison.Ordinal);
+    }
 }

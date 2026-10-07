@@ -66,15 +66,18 @@ export class CodexSearchService {
   entries(query: string): CodexSearchHit[] {
     const q = fold(query);
     if (!q) return [];
-    const idx = this.index() ?? [];
-    const hits: CodexSearchHit[] = [];
-    for (const item of idx) {
-      if (fold(item.label).includes(q) || fold(item.category ?? '').includes(q)) {
-        hits.push(item);
-        if (hits.length >= MAX_ENTRY_HITS) break;
-      }
+    const scored: { item: CodexSearchHit; score: number }[] = [];
+    for (const item of this.index() ?? []) {
+      const label = fold(item.label);
+      let score = -1;
+      if (label === q) score = 0;
+      else if (label.startsWith(q)) score = 1;
+      else if (label.split(/[\s/'’-]+/).some((w) => w.startsWith(q))) score = 2;
+      else if (label.includes(q)) score = 3;
+      if (score >= 0) scored.push({ item, score });
     }
-    return hits;
+    scored.sort((a, b) => a.score - b.score || a.item.label.localeCompare(b.item.label, 'fr'));
+    return scored.slice(0, MAX_ENTRY_HITS).map((s) => s.item);
   }
 }
 

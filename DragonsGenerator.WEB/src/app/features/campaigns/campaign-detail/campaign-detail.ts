@@ -507,7 +507,34 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       heroStatus,
       hasActiveSession: !!c.data.activeSessionId,
       hasPlannedSession: !!this.nextPlannedSession(),
+      pendingRsvp: this.pendingHubRsvp(),
     });
+  });
+
+  /** Prochaine date de table sans réponse RSVP du joueur connecté. */
+  readonly pendingHubRsvp = computed(() => {
+    const c = this.campaign();
+    const uid = this.currentUserId();
+    if (!c || !uid || c.isOwner || c.role === 'spectator') return null;
+    const now = Date.now();
+    let best: { eventId: string; title: string; whenLabel: string; at: number } | null = null;
+    for (const e of c.data.scheduleEvents ?? []) {
+      if (e.kind && e.kind !== 'game') continue;
+      const at = nextScheduleOccurrenceAt(e);
+      if (!at) continue;
+      const t = new Date(at).getTime();
+      if (t < now) continue;
+      if ((e.rsvps ?? []).some((r) => r.userId === uid)) continue;
+      if (!best || t < best.at) {
+        best = {
+          eventId: e.id,
+          title: e.title || 'Soirée de table',
+          whenLabel: formatSessionDate(at),
+          at: t,
+        };
+      }
+    }
+    return best ? { eventId: best.eventId, title: best.title, whenLabel: best.whenLabel } : null;
   });
 
   /** Prochaine date libre « game » (calendrier), hors sessions de play. */

@@ -63,7 +63,7 @@ export const NOTIFICATION_PREF_OPTIONS: NotificationPrefOption[] = [
   {
     id: 'sessionReminders',
     label: 'Rappels de session',
-    hint: 'Push 24 h et 1 h avant une session planifiée.',
+    hint: 'Mail et push 24 h et 1 h avant une session planifiée.',
     group: 'push',
   },
   {

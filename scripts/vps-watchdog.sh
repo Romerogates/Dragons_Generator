@@ -51,3 +51,13 @@ if [ "$web_ok" -eq 0 ]; then
   send_alert web "Dragons Generator — nginx relancé" \
     "Le watchdog VPS a trouvé la passerelle HTTPS unhealthy et a redémarré dragons-web. Site : https://dragons-generator.top"
 fi
+
+BACKUP_DIR="${BACKUP_DIR:-$HOME/backups/dragons}"
+latest=$(ls -1t "$BACKUP_DIR"/dragons-*.db 2>/dev/null | head -1 || true)
+if [ -n "$latest" ]; then
+  age=$(( $(date +%s) - $(stat -c %Y "$latest") ))
+  if [ "$age" -gt $((36 * 3600)) ]; then
+    send_alert backup "Dragons Generator — backup trop vieux" \
+      "Le dernier backup SQLite ($latest) a plus de 36 h. Vérifie le cron 3h et /var/log/dragons-backup.log."
+  fi
+fi

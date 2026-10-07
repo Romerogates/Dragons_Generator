@@ -32,4 +32,17 @@ describe('hub-next-action.util', () => {
   it('marks spectators', () => {
     expect(resolveHubNextAction(base({ isSpectator: true }))?.kind).toBe('spectator');
   });
+
+  it('asks approved players to RSVP before waiting for a session', () => {
+    const action = resolveHubNextAction(
+      base({
+        heroStatus: 'approved',
+        hasPlannedSession: true,
+        pendingRsvp: { eventId: 'ev1', title: 'Vendredi', whenLabel: 'ven. 10 oct. 20:00' },
+      }),
+    );
+    expect(action?.kind).toBe('rsvp');
+    expect(action?.eventId).toBe('ev1');
+    expect(action?.cta).toBe('rsvp');
+  });
 });

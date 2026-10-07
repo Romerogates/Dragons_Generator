@@ -4,7 +4,8 @@ Guide de secours si la base SQLite, le volume Docker ou le serveur est endommag�
 
 **Serveur :** VPS Debian (`~/Dragons_Generator`)  
 **Site :** https://dragons-generator.top  
-**Backups automatiques :** tous les jours à **3h** → `~/backups/dragons/`
+**Backups automatiques :** tous les jours à **3h** → `~/backups/dragons/`  
+**Copie hors VPS :** zip envoyé par mail à `Alert__Email` (défaut `Anthony.martinr@hotmail.be`). Si le zip dépasse ~18 Mo, le mail part sans pièce jointe et le fichier reste sur le VPS.
 
 ---
 

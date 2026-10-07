@@ -1,9 +1,10 @@
 using DragonsGenerator.API.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DragonsGenerator.API.Services;
 
-/// <summary>Rappels push 24 h et 1 h avant sessions planifiées et dates de calendrier.</summary>
+/// <summary>Rappels push + email 24 h et 1 h avant sessions planifiées et dates de calendrier.</summary>
 public sealed class SessionReminderWorker(
     IServiceScopeFactory scopeFactory,
     ILogger<SessionReminderWorker> logger) : BackgroundService
@@ -32,7 +33,9 @@ public sealed class SessionReminderWorker(
         using var scope = scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var push = scope.ServiceProvider.GetRequiredService<PushNotificationService>();
-        if (!push.IsConfigured) return;
+        var email = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+        var publicWeb = scope.ServiceProvider.GetRequiredService<IOptions<AppUrlOptions>>()
+            .Value.PublicWebUrl.TrimEnd('/');
 
         var now = DateTimeOffset.UtcNow;
         var campaigns = await db.Campaigns.AsNoTracking()
@@ -68,6 +71,18 @@ public sealed class SessionReminderWorker(
                 .GroupBy(m => m.CampaignId)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.UserId).Distinct().ToList());
 
+        var allMemberIds = membersByCampaign.Values.SelectMany(x => x)
+            .Concat(due.Select(c => c.OwnerUserId))
+            .Distinct()
+            .ToList();
+        var usersById = allMemberIds.Count == 0
+            ? new Dictionary<Guid, (string Email, string DisplayName)>()
+            : (await db.Users.AsNoTracking()
+                    .Where(u => allMemberIds.Contains(u.Id) && u.EmailConfirmed)
+                    .Select(u => new { u.Id, u.Email, u.DisplayName })
+                    .ToListAsync(ct))
+                .ToDictionary(u => u.Id, u => (u.Email, u.DisplayName));
+
         var pendingLogs = new List<SessionReminderLog>();
 
         foreach (var campaign in due)
@@ -90,10 +105,47 @@ public sealed class SessionReminderWorker(
                         if (alreadySent) continue;
 
                         var (title, body) = SessionReminderRules.BuildMessage(item, kind, isSchedule);
-                        var url = isSchedule
+                        var urlPath = isSchedule
                             ? $"/campaigns/{campaign.Id}?tab=calendar"
                             : $"/campaigns/{campaign.Id}?tab=sessions";
-                        await push.NotifyUserAsync(userId, title, body, url, ct);
+                        var link = $"{publicWeb}{urlPath}";
+
+                        var emailed = false;
+                        if (usersById.TryGetValue(userId, out var profile)
+                            && !string.IsNullOrWhiteSpace(profile.Email))
+                        {
+                            try
+                            {
+                                var html = AuthEmailTemplates.SessionReminder(
+                                    string.IsNullOrWhiteSpace(profile.DisplayName) ? "aventurier" : profile.DisplayName,
+                                    title,
+                                    body,
+                                    link);
+                                await email.SendAsync(profile.Email, title, html, ct);
+                                emailed = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogWarning(ex, "Session reminder email failed for {UserId}", userId);
+                            }
+                        }
+
+                        var pushed = false;
+                        if (push.IsConfigured)
+                        {
+                            try
+                            {
+                                await push.NotifyUserAsync(userId, title, body, urlPath, ct);
+                                pushed = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogWarning(ex, "Session reminder push failed for {UserId}", userId);
+                            }
+                        }
+
+                        if (!emailed && !pushed && usersById.ContainsKey(userId))
+                            continue;
 
                         pendingLogs.Add(new SessionReminderLog
                         {
@@ -113,6 +165,6 @@ public sealed class SessionReminderWorker(
 
         db.SessionReminderLogs.AddRange(pendingLogs);
         await db.SaveChangesAsync(ct);
-        logger.LogInformation("Sent {Count} session reminder push(es)", pendingLogs.Count);
+        logger.LogInformation("Sent {Count} session reminder(s)", pendingLogs.Count);
     }
 }

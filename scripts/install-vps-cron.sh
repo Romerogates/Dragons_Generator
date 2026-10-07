@@ -4,10 +4,11 @@ set -euo pipefail
 ROOT="${DRAGONS_ROOT:-$HOME/Dragons_Generator}"
 WATCH="$ROOT/scripts/vps-watchdog.sh"
 RENEW="$ROOT/scripts/renew-letsencrypt.sh"
+BACKUP="$ROOT/scripts/backup-sqlite.sh"
 BEGIN="# BEGIN DRAGONS-WATCHDOG"
 END="# END DRAGONS-WATCHDOG"
 
-chmod +x "$WATCH" "$RENEW" 2>/dev/null || true
+chmod +x "$WATCH" "$RENEW" "$BACKUP" "$ROOT/scripts/send-backup-email.sh" "$ROOT/scripts/send-alert-email.sh" 2>/dev/null || true
 
 existing=$(crontab -l 2>/dev/null || true)
 filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d")
@@ -17,7 +18,8 @@ filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d")
   echo "$BEGIN"
   echo "*/5 * * * * $WATCH $ROOT/docker-compose.prod.yml >> /tmp/dragons-watchdog.log 2>&1"
   echo "0 4 * * 1 $RENEW $ROOT/docker-compose.prod.yml >> /tmp/dragons-certbot.log 2>&1"
+  echo "0 3 * * * $BACKUP >> /var/log/dragons-backup.log 2>&1"
   echo "$END"
 } | crontab -
 
-echo "Cron Dragons installé (watchdog */5, certbot lundi 04:00)"
+echo "Cron Dragons installé (watchdog */5, certbot lundi 04:00, backup 03:00)"
