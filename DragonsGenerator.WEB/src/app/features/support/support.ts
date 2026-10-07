@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   inject,
   signal,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -64,6 +65,7 @@ export class SupportPage implements OnInit {
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
   readonly tickets = signal<Ticket[]>([]);
   readonly thread = signal<TicketThread | null>(null);
+  readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
@@ -94,7 +96,7 @@ export class SupportPage implements OnInit {
     this.http.get<Ticket[]>(`${this.api}/support/tickets`).subscribe({
       next: (list) => {
         this.tickets.set(list);
-        const id = openId || this.thread()?.ticket.id;
+        const id = openId || this.selectedId();
         if (id) this.openTicket(id);
       },
       error: () => this.tickets.set([]),

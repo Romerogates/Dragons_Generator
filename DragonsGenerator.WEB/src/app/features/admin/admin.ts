@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   inject,
   signal,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -101,6 +102,7 @@ export class AdminPage implements OnInit {
   readonly tickets = signal<AdminTicket[]>([]);
   readonly overview = signal<Overview | null>(null);
   readonly thread = signal<TicketThread | null>(null);
+  readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
   readonly diagnostic = signal<string>('');
   readonly message = signal<string | null>(null);
   readonly error = signal<string | null>(null);
@@ -156,7 +158,7 @@ export class AdminPage implements OnInit {
     this.http.get<AdminTicket[]>(`${this.api}/admin/support/tickets`).subscribe({
       next: (list) => {
         this.tickets.set(list);
-        const id = openId || this.thread()?.ticket.id;
+        const id = openId || this.selectedId();
         if (id) this.openTicket(id);
       },
       error: () => {},

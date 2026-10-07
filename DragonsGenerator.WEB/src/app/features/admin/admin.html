@@ -99,9 +99,9 @@
                 <td class="px-3 py-2 font-mono text-slate-400">{{ c.schedule }}</td>
                 <td class="px-3 py-2">
                   @if (c.lastKind === 'backup') {
-                    {{ o.lastBackup?.createdAt ? (o.lastBackup!.createdAt | date: 'short') : '—' }}
+                    {{ (o.lastBackup?.createdAt | date: 'short') || '—' }}
                   } @else if (c.lastKind === 'alert') {
-                    {{ o.lastAlert?.createdAt ? (o.lastAlert!.createdAt | date: 'short') : '—' }}
+                    {{ (o.lastAlert?.createdAt | date: 'short') || '—' }}
                   } @else {
                     —
                   }
@@ -148,8 +148,8 @@
           <button
             type="button"
             class="text-left bg-[#1b2028] border rounded-xl p-3"
-            [class.border-amber-600]="thread()?.ticket.id === t.id"
-            [class.border-slate-800]="thread()?.ticket.id !== t.id"
+            [class.border-amber-600]="selectedId() === t.id"
+            [class.border-slate-800]="selectedId() !== t.id"
             (click)="openTicket(t.id)"
           >
             <div class="flex justify-between gap-2">
