@@ -10,7 +10,7 @@ public sealed class SessionReminderWorker(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await Task.Delay(TimeSpan.FromSeconds(45), stoppingToken);
+        await Task.Delay(TimeSpan.FromSeconds(90), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -36,11 +36,20 @@ public sealed class SessionReminderWorker(
 
         var now = DateTimeOffset.UtcNow;
         var campaigns = await db.Campaigns.AsNoTracking()
-            .Include(c => c.Members)
-            .AsSplitQuery()
+            .Select(c => new { c.Id, c.OwnerUserId, c.JsonData })
             .ToListAsync(ct);
 
-        var campaignIds = campaigns.Select(c => c.Id).ToList();
+        var due = new List<(Guid Id, Guid OwnerUserId, List<PlannedSessionInfo> Upcoming)>();
+        foreach (var campaign in campaigns)
+        {
+            var upcoming = CampaignJsonHelpers.ListUpcomingPlannedSessions(campaign.JsonData, now)
+                .Concat(CampaignJsonHelpers.ListUpcomingScheduleEvents(campaign.JsonData, now))
+                .ToList();
+            if (upcoming.Count == 0) continue;
+            due.Add((campaign.Id, campaign.OwnerUserId, upcoming));
+        }
+
+        var campaignIds = due.Select(c => c.Id).ToList();
         var sentKeys = campaignIds.Count == 0
             ? new HashSet<string>(StringComparer.Ordinal)
             : (await db.SessionReminderLogs.AsNoTracking()
@@ -50,18 +59,23 @@ public sealed class SessionReminderWorker(
                 .Select(l => $"{l.CampaignId}|{l.SessionId}|{l.UserId}|{l.ReminderKind}")
                 .ToHashSet(StringComparer.Ordinal);
 
+        var membersByCampaign = campaignIds.Count == 0
+            ? new Dictionary<Guid, List<Guid>>()
+            : (await db.CampaignMembers.AsNoTracking()
+                    .Where(m => campaignIds.Contains(m.CampaignId))
+                    .Select(m => new { m.CampaignId, m.UserId })
+                    .ToListAsync(ct))
+                .GroupBy(m => m.CampaignId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.UserId).Distinct().ToList());
+
         var pendingLogs = new List<SessionReminderLog>();
 
-        foreach (var campaign in campaigns)
+        foreach (var campaign in due)
         {
-            var upcoming = CampaignJsonHelpers.ListUpcomingPlannedSessions(campaign.JsonData, now)
-                .Concat(CampaignJsonHelpers.ListUpcomingScheduleEvents(campaign.JsonData, now))
-                .ToList();
-            if (upcoming.Count == 0) continue;
-
-            var memberIds = campaign.Members.Select(m => m.UserId).Distinct().ToList();
+            var upcoming = campaign.Upcoming;
+            var memberIds = membersByCampaign.GetValueOrDefault(campaign.Id, []);
             if (!memberIds.Contains(campaign.OwnerUserId))
-                memberIds.Add(campaign.OwnerUserId);
+                memberIds = [.. memberIds, campaign.OwnerUserId];
 
             foreach (var item in upcoming)
             {

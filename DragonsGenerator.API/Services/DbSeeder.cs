@@ -16,6 +16,9 @@ public static class DbSeeder
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
         var logger = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("DbSeeder");
         await db.Database.EnsureCreatedAsync();
+        await db.Database.ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;");
+        await db.Database.ExecuteSqlRawAsync("PRAGMA busy_timeout=5000;");
+        await db.Database.ExecuteSqlRawAsync("PRAGMA synchronous=NORMAL;");
         await DbMigrationRunner.ApplyAllAsync(db);
 
         var adminOpt = scope.ServiceProvider.GetRequiredService<IOptions<AdminSeedOptions>>().Value;

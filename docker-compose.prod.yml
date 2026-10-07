@@ -3,20 +3,26 @@ services:
     container_name: dragons-ollama
     image: ollama/ollama:latest
     restart: unless-stopped
+    environment:
+      # Un seul modèle, une inférence à la fois, décharge après 5 min d’inactivité.
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_KEEP_ALIVE: "5m"
     volumes:
       - ollama-data:/root/.ollama
     networks:
       - dragons-network
-    deploy:
-      resources:
-        limits:
-          memory: 3500M
+    # Limite cgroup réelle (deploy.resources est ignoré hors Swarm).
+    mem_limit: 2800m
+    memswap_limit: 2800m
+    cpus: "2.0"
+    oom_score_adj: 400
     healthcheck:
       test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 15s
+      interval: 30s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 5
+      start_period: 60s
 
   dragons-api:
     container_name: dragons-api
@@ -34,24 +40,26 @@ services:
       Groq__FallbackModel: llama-3.3-70b-versatile
       Groq__MaxAttempts: "3"
       Groq__MaxRetryWindowMs: "60000"
-      # Ollama d’abord (budget court), puis Groq — évite 504 tout en économisant Groq.
+      # Ollama d’abord (budget court), puis Groq — l’API ne dépend pas du process Ollama.
       LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
+      LocalLlm__MaxRetryWindowMs: "25000"
     volumes:
       - dragons-api-data:/app/data
     env_file:
       - path: .env
         required: false
-    depends_on:
-      ollama:
-        condition: service_started
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    cpus: "1.5"
+    oom_score_adj: -300
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
-      interval: 30s
+      interval: 20s
       timeout: 5s
-      retries: 3
-      start_period: 25s
+      retries: 5
+      start_period: 40s
     networks:
       - dragons-network
 
@@ -67,6 +75,10 @@ services:
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: "0.5"
+    oom_score_adj: -200
     depends_on:
       - dragons-api
     networks:

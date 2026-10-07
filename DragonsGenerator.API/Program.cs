@@ -53,9 +53,16 @@ var dbPath = builder.Configuration["ConnectionStrings:Default"]
 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "data"));
 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "data", "uploads", "tickets"));
 
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlite(dbPath.StartsWith("Data Source=")
+var sqliteCs = dbPath.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase)
     ? dbPath
-    : $"Data Source={dbPath}"));
+    : $"Data Source={dbPath}";
+var sqliteBuilder = new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(sqliteCs)
+{
+    Cache = Microsoft.Data.Sqlite.SqliteCacheMode.Shared,
+    DefaultTimeout = 5,
+};
+builder.Services.AddDbContext<AppDbContext>(o =>
+    o.UseSqlite(sqliteBuilder.ConnectionString, sqlite => sqlite.CommandTimeout(15)));
 
 // --- Email ---
 if (string.Equals(smtpHost, "log", StringComparison.OrdinalIgnoreCase))
@@ -138,7 +145,7 @@ builder.Services.AddHttpClient("Groq", client =>
 });
 builder.Services.AddHttpClient("LocalLlm", client =>
 {
-    client.Timeout = TimeSpan.FromMinutes(5);
+    client.Timeout = TimeSpan.FromSeconds(50);
 });
 builder.Services.AddHttpClient("UserLlm", client =>
 {
