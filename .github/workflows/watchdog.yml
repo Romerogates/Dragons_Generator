@@ -44,15 +44,23 @@ jobs:
               exit 0
             fi
             cd ~/Dragons_Generator
+            chmod +x scripts/send-alert-email.sh 2>/dev/null || true
             echo "Watchdog: restarting dragons-api + dragons-web"
             docker compose -f docker-compose.prod.yml restart dragons-api dragons-web
             for i in $(seq 1 24); do
               if docker compose -f docker-compose.prod.yml exec -T dragons-api curl -sf http://localhost:8080/health >/dev/null; then
                 echo "API back after $i attempt(s)"
+                ./scripts/send-alert-email.sh github \
+                  "Dragons Generator — site down, relancé" \
+                  "Le watchdog GitHub a vu https://dragons-generator.top/api/health KO (3 essais). API + web ont été redémarrés et l’API répond à nouveau."
                 exit 0
               fi
               sleep 5
             done
             echo "API still unhealthy after restart"
+            ./scripts/send-alert-email.sh github-down \
+              "Dragons Generator — TOUJOURS down" \
+              "Le watchdog GitHub a relancé API + web mais /api/health ne répond toujours pas. Vérifie le VPS 37.59.110.227." \
+              || true
             docker compose -f docker-compose.prod.yml logs dragons-api --tail 40
             exit 1

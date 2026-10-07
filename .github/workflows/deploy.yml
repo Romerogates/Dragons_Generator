@@ -206,7 +206,7 @@ jobs:
               echo "WARN: Ollama model unavailable — API will fall back to Groq for short generations"
             fi
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
-            chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh
+            chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh scripts/send-alert-email.sh
             ./scripts/renew-letsencrypt.sh docker-compose.prod.yml || echo "WARN: Let’s Encrypt renew skipped"
             ./scripts/install-vps-cron.sh || echo "WARN: cron watchdog non installé"
             docker image prune -f >/dev/null 2>&1 || true
@@ -220,6 +220,11 @@ jobs:
               fi
               if [ "$i" -eq 60 ]; then
                 echo "ERROR: Production health check failed"
+                chmod +x scripts/send-alert-email.sh 2>/dev/null || true
+                ./scripts/send-alert-email.sh deploy \
+                  "Dragons Generator — deploy health KO" \
+                  "Le deploy production a fini mais /api/health ne répondait pas après 5 min. Logs API/web à vérifier sur le VPS." \
+                  || true
                 docker compose -f docker-compose.prod.yml logs dragons-api --tail 80
                 docker compose -f docker-compose.prod.yml logs dragons-web --tail 40
                 exit 1

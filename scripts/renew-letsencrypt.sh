@@ -67,6 +67,10 @@ docker compose -f "$COMPOSE_FILE" up -d dragons-web
 
 if [ "$renew_rc" -ne 0 ]; then
   echo "WARN: certbot renew a échoué (code $renew_rc)"
+  "$(dirname "$0")/send-alert-email.sh" cert \
+    "Dragons Generator — renouvellement HTTPS échoué" \
+    "certbot renew a échoué (code ${renew_rc}). Le certificat HTTPS peut expirer. Vérifie Let’s Encrypt sur le VPS." \
+    || true
   exit 0
 fi
 
