@@ -20,8 +20,16 @@ import {
 import type { CampaignScheduleEvent, CampaignSession } from '@core/models/Campaign/campaign';
 
 describe('schedule-ics.util', () => {
+  /** Dates relatives : mapSchedule filtre les événements trop anciens par rapport à `new Date()`. */
+  const utcDaysFromNow = (days: number, hour = 18, minute = 0): string => {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + days);
+    d.setUTCHours(hour, minute, 0, 0);
+    return d.toISOString();
+  };
+
   const session = (partial: Partial<CampaignSession> & Pick<CampaignSession, 'id' | 'title'>): CampaignSession => ({
-    scheduledAt: '2026-10-01T18:00:00.000Z',
+    scheduledAt: utcDaysFromNow(14),
     status: 'planned',
     mode: 'online',
     ...partial,
@@ -30,8 +38,8 @@ describe('schedule-ics.util', () => {
   const schedule = (
     partial: Partial<CampaignScheduleEvent> & Pick<CampaignScheduleEvent, 'id' | 'title'>,
   ): CampaignScheduleEvent => ({
-    startsAt: '2026-10-05T19:00:00.000Z',
-    endsAt: '2026-10-05T22:00:00.000Z',
+    startsAt: utcDaysFromNow(21, 19),
+    endsAt: utcDaysFromNow(21, 22),
     kind: 'game',
     ...partial,
   });
@@ -199,11 +207,12 @@ describe('schedule-ics.util', () => {
   });
 
   it('builds a minimal ICS with VEVENT blocks', () => {
+    const sess = session({ id: 's1', title: 'Soirée 1' });
     const ics = buildIcsCalendar(
       'Ma Campagne',
       tableEventsToIcsInputs(
         'Ma Campagne',
-        [session({ id: 's1', title: 'Soirée 1' })],
+        [sess],
         [schedule({ id: 'e1', title: 'Briefing', location: 'Discord' })],
       ),
       new Date('2026-09-27T10:00:00.000Z'),
@@ -214,7 +223,7 @@ describe('schedule-ics.util', () => {
     expect(ics).toContain('SUMMARY:[Ma Campagne] Briefing');
     expect(ics).toContain('LOCATION:Discord');
     expect(ics).toContain('END:VCALENDAR');
-    expect(ics).toContain(`DTSTART:${toIcsUtc('2026-10-01T18:00:00.000Z')}`);
+    expect(ics).toContain(`DTSTART:${toIcsUtc(sess.scheduledAt)}`);
   });
 
   it('builds all-day ICS with folded long lines and escaped text', () => {
