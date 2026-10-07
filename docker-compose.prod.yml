@@ -81,6 +81,8 @@ services:
     build:
       context: ./DragonsGenerator.WEB
       dockerfile: Dockerfile
+      args:
+        APP_BUILD_COUNT: ${APP_BUILD_COUNT:-0}
     ports:
       - "80:80"
       - "443:443"
