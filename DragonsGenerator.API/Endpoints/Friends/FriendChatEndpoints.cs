@@ -305,27 +305,44 @@ public class ListFriendChatSummariesEndpoint(AppDbContext db)
             .Where(r => r.UserId == userId)
             .ToDictionaryAsync(r => r.FriendUserId, r => r.LastReadAt, ct);
 
+        var friendIds = friendships
+            .Select(f => f.RequesterId == userId ? f.AddresseeId : f.RequesterId)
+            .Distinct()
+            .ToList();
+        var messages = await db.FriendMessages.AsNoTracking()
+            .Where(m =>
+                (m.RecipientId == userId && friendIds.Contains(m.SenderId))
+                || (m.SenderId == userId && friendIds.Contains(m.RecipientId)))
+            .Select(m => new
+            {
+                m.SenderId,
+                m.RecipientId,
+                m.Body,
+                m.AttachmentKind,
+                m.AttachmentPayload,
+                m.CreatedAt,
+            })
+            .ToListAsync(ct);
+
         var summaries = new List<FriendChatSummaryDto>();
         foreach (var f in friendships)
         {
             var friend = f.RequesterId == userId ? f.Addressee : f.Requester;
-            var last = (await FriendAccess
-                .ConversationQuery(db, userId.Value, friend.Id)
-                .ToListAsync(ct))
-                .OrderByDescending(m => m.CreatedAt)
-                .FirstOrDefault();
-
+            var conv = messages.Where(m =>
+                (m.SenderId == userId && m.RecipientId == friend.Id)
+                || (m.SenderId == friend.Id && m.RecipientId == userId));
+            var last = conv.OrderByDescending(m => m.CreatedAt).FirstOrDefault();
             var lastRead = readMarkers.GetValueOrDefault(friend.Id, DateTimeOffset.MinValue);
-            var unread = (await FriendAccess
-                .ConversationQuery(db, userId.Value, friend.Id)
-                .ToListAsync(ct))
-                .Count(m => m.RecipientId == userId && m.SenderId == friend.Id && m.CreatedAt > lastRead);
+            var unread = conv.Count(m =>
+                m.RecipientId == userId && m.SenderId == friend.Id && m.CreatedAt > lastRead);
 
             summaries.Add(
                 new FriendChatSummaryDto(
                     friend.Id,
                     friend.DisplayName,
-                    last is null ? null : FriendChatAttachmentHelper.Preview(last.Body, last.AttachmentKind, last.AttachmentPayload),
+                    last is null
+                        ? null
+                        : FriendChatAttachmentHelper.Preview(last.Body, last.AttachmentKind, last.AttachmentPayload),
                     last?.CreatedAt,
                     unread
                 )

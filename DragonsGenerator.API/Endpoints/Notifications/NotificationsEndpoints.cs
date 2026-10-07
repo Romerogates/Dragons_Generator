@@ -1,5 +1,4 @@
 using System.Text.Json;
-using DragonsGenerator.API.Endpoints.Friends;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
@@ -202,15 +201,21 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .Where(m => m.UserId == userId)
             .Select(m => m.CampaignId)
             .ToListAsync(ct);
-        var memberCampaignSet = memberCampaignIds.ToHashSet();
 
-        var approvedActs = (await db.CampaignActivities.AsNoTracking()
-                .Where(a => a.Kind == CampaignActivityKinds.CharacterApproved)
-                .ToListAsync(ct))
-            .Where(a => a.CreatedAt >= approvedSince && memberCampaignSet.Contains(a.CampaignId))
-            .OrderByDescending(a => a.CreatedAt)
-            .Take(100)
-            .ToList();
+        var approvedActs = await LoadScopedActivitiesAsync(
+            db, memberCampaignIds, CampaignActivityKinds.CharacterApproved, approvedSince, 100, ct);
+        var xpActs = await LoadScopedActivitiesAsync(
+            db, memberCampaignIds, CampaignActivityKinds.XpAwarded, approvedSince, 100, ct);
+        var rsvpSince = DateTimeOffset.UtcNow - TimeSpan.FromDays(14);
+        var rsvpActs = await LoadScopedActivitiesAsync(
+            db, ownedCampaignIds, CampaignActivityKinds.ScheduleRsvp, rsvpSince, 40, ct);
+
+        var titles = await CampaignTitlesAsync(
+            db,
+            approvedActs.Select(a => a.CampaignId)
+                .Concat(xpActs.Select(a => a.CampaignId))
+                .Concat(rsvpActs.Select(a => a.CampaignId)),
+            ct);
 
         foreach (var act in approvedActs)
         {
@@ -218,10 +223,7 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                 continue;
 
             var characterName = TryGetString(act.PayloadJson, "characterName") ?? "votre personnage";
-            var campaignTitle = await db.Campaigns.AsNoTracking()
-                .Where(c => c.Id == act.CampaignId)
-                .Select(c => c.Title)
-                .FirstOrDefaultAsync(ct) ?? "campagne";
+            var campaignTitle = titles.GetValueOrDefault(act.CampaignId, "campagne");
 
             items.Add(
                 new NotificationItemDto(
@@ -235,24 +237,13 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
-        var xpActs = (await db.CampaignActivities.AsNoTracking()
-                .Where(a => a.Kind == CampaignActivityKinds.XpAwarded)
-                .ToListAsync(ct))
-            .Where(a => a.CreatedAt >= approvedSince && memberCampaignSet.Contains(a.CampaignId))
-            .OrderByDescending(a => a.CreatedAt)
-            .Take(100)
-            .ToList();
-
         foreach (var act in xpActs)
         {
             if (!TryGetMemberUserId(act.PayloadJson, out var memberUserId) || memberUserId != userId)
                 continue;
 
             var xpLabel = TryGetString(act.PayloadJson, "message") ?? "+XP";
-            var campaignTitle = await db.Campaigns.AsNoTracking()
-                .Where(c => c.Id == act.CampaignId)
-                .Select(c => c.Title)
-                .FirstOrDefaultAsync(ct) ?? "campagne";
+            var campaignTitle = titles.GetValueOrDefault(act.CampaignId, "campagne");
 
             items.Add(
                 new NotificationItemDto(
@@ -266,27 +257,10 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
-        var ownedIdsForRsvp = await db.Campaigns.AsNoTracking()
-            .Where(c => c.OwnerUserId == userId)
-            .Select(c => c.Id)
-            .ToListAsync(ct);
-        var ownedSet = ownedIdsForRsvp.ToHashSet();
-        var rsvpSince = DateTimeOffset.UtcNow - TimeSpan.FromDays(14);
-        var rsvpActs = (await db.CampaignActivities.AsNoTracking()
-                .Where(a => a.Kind == CampaignActivityKinds.ScheduleRsvp)
-                .ToListAsync(ct))
-            .Where(a => a.CreatedAt >= rsvpSince && ownedSet.Contains(a.CampaignId))
-            .OrderByDescending(a => a.CreatedAt)
-            .Take(40)
-            .ToList();
-
         foreach (var act in rsvpActs)
         {
             var msg = TryGetString(act.PayloadJson, "message") ?? "Nouvelle réponse RSVP";
-            var campaignTitle = await db.Campaigns.AsNoTracking()
-                .Where(c => c.Id == act.CampaignId)
-                .Select(c => c.Title)
-                .FirstOrDefaultAsync(ct) ?? "campagne";
+            var campaignTitle = titles.GetValueOrDefault(act.CampaignId, "campagne");
 
             items.Add(
                 new NotificationItemDto(
@@ -312,15 +286,21 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .Where(r => r.UserId == userId)
             .ToDictionaryAsync(r => r.FriendUserId, r => r.LastReadAt, ct);
 
+        var friendIds = acceptedFriendships
+            .Select(f => f.RequesterId == userId ? f.AddresseeId : f.RequesterId)
+            .Distinct()
+            .ToList();
+        var inboundMessages = await db.FriendMessages.AsNoTracking()
+            .Where(m => m.RecipientId == userId && friendIds.Contains(m.SenderId))
+            .Select(m => new { m.Id, m.SenderId, m.Body, m.CreatedAt })
+            .ToListAsync(ct);
+
         foreach (var f in acceptedFriendships)
         {
             var friend = f.RequesterId == userId ? f.Addressee : f.Requester;
             var lastRead = readMarkers.GetValueOrDefault(friend.Id, DateTimeOffset.MinValue);
-            var unreadMsg = (await FriendAccess
-                    .ConversationQuery(db, userId.Value, friend.Id)
-                    .Include(m => m.Sender)
-                    .ToListAsync(ct))
-                .Where(m => m.RecipientId == userId && m.CreatedAt > lastRead)
+            var unreadMsg = inboundMessages
+                .Where(m => m.SenderId == friend.Id && m.CreatedAt > lastRead)
                 .OrderByDescending(m => m.CreatedAt)
                 .FirstOrDefault();
             if (unreadMsg is null)
@@ -357,6 +337,42 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             new NotificationsSummaryDto(friendsCount, campaignsCount, totalCount, items),
             ct
         );
+    }
+
+    private static async Task<List<CampaignActivity>> LoadScopedActivitiesAsync(
+        AppDbContext db,
+        IReadOnlyCollection<Guid> campaignIds,
+        string kind,
+        DateTimeOffset since,
+        int take,
+        CancellationToken ct)
+    {
+        if (campaignIds.Count == 0)
+            return [];
+
+        var acts = await db.CampaignActivities.AsNoTracking()
+            .Where(a => a.Kind == kind && campaignIds.Contains(a.CampaignId))
+            .ToListAsync(ct);
+
+        return acts
+            .Where(a => a.CreatedAt >= since)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(take)
+            .ToList();
+    }
+
+    private static async Task<Dictionary<Guid, string>> CampaignTitlesAsync(
+        AppDbContext db,
+        IEnumerable<Guid> campaignIds,
+        CancellationToken ct)
+    {
+        var ids = campaignIds.Distinct().ToList();
+        if (ids.Count == 0)
+            return new Dictionary<Guid, string>();
+
+        return await db.Campaigns.AsNoTracking()
+            .Where(c => ids.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, c => c.Title, ct);
     }
 
     private static async Task<Dictionary<(Guid CampaignId, Guid MemberUserId), DateTimeOffset>> LatestActivityTimesAsync(

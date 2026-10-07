@@ -10,6 +10,7 @@ public static class CampaignAccess
     {
         var campaign = await db.Campaigns
             .Include(c => c.Members).ThenInclude(m => m.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == campaignId, ct);
         if (campaign is null) return (null, null, false);
 

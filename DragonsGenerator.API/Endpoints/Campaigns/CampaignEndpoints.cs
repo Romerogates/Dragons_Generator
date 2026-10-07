@@ -843,6 +843,7 @@ public class AcceptCampaignInviteEndpoint(AppDbContext db) : EndpointWithoutRequ
         var invite = await db.CampaignInvites
             .Include(i => i.Campaign)
             .ThenInclude(c => c.Members)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(i => i.Id == id && i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending, ct);
         if (invite is null)
         {
@@ -1150,6 +1151,7 @@ public class RequestCharacterPickEndpoint(AppDbContext db, PushNotificationServi
         var campaign = await db.Campaigns
             .Include(c => c.Members)
             .ThenInclude(m => m.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == campaignId && c.OwnerUserId == userId, ct);
         if (campaign is null)
         {
@@ -1216,6 +1218,7 @@ public class RemoveCampaignMemberEndpoint(AppDbContext db) : EndpointWithoutRequ
         var campaign = await db.Campaigns
             .Include(c => c.Members)
             .ThenInclude(m => m.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == campaignId && c.OwnerUserId == userId, ct);
         if (campaign is null)
         {
@@ -1288,6 +1291,7 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
         var campaign = await db.Campaigns
             .Include(c => c.Members)
             .ThenInclude(m => m.User)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == campaignId, ct);
         if (campaign is null)
         {

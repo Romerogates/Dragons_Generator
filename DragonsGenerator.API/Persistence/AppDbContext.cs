@@ -165,6 +165,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<CampaignActivity>(e =>
         {
             e.HasIndex(x => new { x.CampaignId, x.CreatedAt });
+            e.HasIndex(x => new { x.Kind, x.CampaignId });
             e.Property(x => x.Kind).HasMaxLength(64);
             e.HasOne(x => x.Campaign)
                 .WithMany(c => c.Activities)

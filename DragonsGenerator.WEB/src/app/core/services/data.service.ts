@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 import { ConnectivityService } from './connectivity.service';
 import { OfflineCodexService } from './offline-codex.service';
 import { Civilisation } from '@core/models/Civilisations/civilisations';
@@ -82,7 +82,15 @@ export class DataService {
     if (offline !== null) return of(offline);
 
     if (!this.cache.has(key)) {
-      this.cache.set(key, factory().pipe(shareReplay(1)));
+      this.cache.set(
+        key,
+        factory().pipe(
+          tap({
+            error: () => this.cache.delete(key),
+          }),
+          shareReplay({ bufferSize: 1, refCount: false }),
+        ),
+      );
     }
     return this.cache.get(key) as Observable<T>;
   }

@@ -96,6 +96,7 @@ public class ListGuideCommentsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .Where(c => c.TopicId == topicId)
             .Include(c => c.User)
             .Include(c => c.Likes)
+            .AsSplitQuery()
             .ToListAsync(ct);
 
         var dtos = rows

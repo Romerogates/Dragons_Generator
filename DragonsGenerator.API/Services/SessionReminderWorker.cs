@@ -37,7 +37,18 @@ public sealed class SessionReminderWorker(
         var now = DateTimeOffset.UtcNow;
         var campaigns = await db.Campaigns.AsNoTracking()
             .Include(c => c.Members)
+            .AsSplitQuery()
             .ToListAsync(ct);
+
+        var campaignIds = campaigns.Select(c => c.Id).ToList();
+        var sentKeys = campaignIds.Count == 0
+            ? new HashSet<string>(StringComparer.Ordinal)
+            : (await db.SessionReminderLogs.AsNoTracking()
+                    .Where(l => campaignIds.Contains(l.CampaignId))
+                    .Select(l => new { l.CampaignId, l.SessionId, l.UserId, l.ReminderKind })
+                    .ToListAsync(ct))
+                .Select(l => $"{l.CampaignId}|{l.SessionId}|{l.UserId}|{l.ReminderKind}")
+                .ToHashSet(StringComparer.Ordinal);
 
         var pendingLogs = new List<SessionReminderLog>();
 
@@ -61,13 +72,7 @@ public sealed class SessionReminderWorker(
 
                     foreach (var userId in memberIds)
                     {
-                        var alreadySent = await db.SessionReminderLogs.AsNoTracking()
-                            .AnyAsync(
-                                l => l.CampaignId == campaign.Id
-                                    && l.SessionId == item.Id
-                                    && l.UserId == userId
-                                    && l.ReminderKind == kind,
-                                ct);
+                        var alreadySent = sentKeys.Contains($"{campaign.Id}|{item.Id}|{userId}|{kind}");
                         if (alreadySent) continue;
 
                         var (title, body) = SessionReminderRules.BuildMessage(item, kind, isSchedule);
@@ -84,6 +89,7 @@ public sealed class SessionReminderWorker(
                             ReminderKind = kind,
                             SentAt = now,
                         });
+                        sentKeys.Add($"{campaign.Id}|{item.Id}|{userId}|{kind}");
                     }
                 }
             }
