@@ -82,6 +82,28 @@ public class SupportTicket
     public string Status { get; set; } = "open"; // open | in_progress | closed
     public string? AdminNotes { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public List<SupportTicketMessage> Messages { get; set; } = [];
+}
+
+public class SupportTicketMessage
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TicketId { get; set; }
+    public SupportTicket Ticket { get; set; } = null!;
+    public Guid AuthorUserId { get; set; }
+    public bool FromStaff { get; set; }
+    public string Body { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class OpsEvent
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Kind { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Detail { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
 public static class FriendStatuses

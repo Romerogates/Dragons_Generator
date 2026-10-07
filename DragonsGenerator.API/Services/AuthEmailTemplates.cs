@@ -51,6 +51,33 @@ public static class AuthEmailTemplates
             link
         );
 
+    public static string SupportTaken(string displayName, string subject, string link) =>
+        WrapParchment(
+            "Nous consultons votre demande",
+            $"Salutations, {Escape(displayName)}.",
+            $"<p>Le support a ouvert votre ticket <strong>{Escape(subject)}</strong> et consulte la situation.</p><p>Vous pouvez répondre dans le fil sur le site si vous avez des précisions.</p>",
+            "Ouvrir le ticket",
+            link
+        );
+
+    public static string SupportReply(string displayName, string subject, string excerpt, string link) =>
+        WrapParchment(
+            "Réponse du support",
+            $"Salutations, {Escape(displayName)}.",
+            $"<p>Une réponse a été ajoutée à <strong>{Escape(subject)}</strong>.</p><p style=\"white-space:pre-wrap\">{Escape(excerpt)}</p>",
+            "Lire et répondre",
+            link
+        );
+
+    public static string SupportNewTicket(string subject, string fromEmail, string excerpt, string link) =>
+        WrapParchment(
+            "Nouveau ticket support",
+            "Desk Dragons Generator",
+            $"<p>Ticket de <strong>{Escape(fromEmail)}</strong> : <strong>{Escape(subject)}</strong>.</p><p style=\"white-space:pre-wrap\">{Escape(excerpt)}</p>",
+            "Ouvrir le desk",
+            link
+        );
+
     public static string SessionReminder(string displayName, string title, string details, string link) =>
         WrapParchment(
             title,

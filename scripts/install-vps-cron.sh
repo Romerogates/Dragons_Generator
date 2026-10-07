@@ -8,7 +8,7 @@ BACKUP="$ROOT/scripts/backup-sqlite.sh"
 BEGIN="# BEGIN DRAGONS-WATCHDOG"
 END="# END DRAGONS-WATCHDOG"
 
-chmod +x "$WATCH" "$RENEW" "$BACKUP" "$ROOT/scripts/send-backup-email.sh" "$ROOT/scripts/send-alert-email.sh" 2>/dev/null || true
+chmod +x "$WATCH" "$RENEW" "$BACKUP" "$ROOT/scripts/send-backup-email.sh" "$ROOT/scripts/send-alert-email.sh" "$ROOT/scripts/log-ops-event.sh" 2>/dev/null || true
 
 existing=$(crontab -l 2>/dev/null || true)
 filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d")
@@ -23,3 +23,4 @@ filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d")
 } | crontab -
 
 echo "Cron Dragons installé (watchdog */5, certbot lundi 04:00, backup 03:00)"
+"$ROOT/scripts/log-ops-event.sh" cron "Crons VPS installés" "watchdog */5, certbot lundi 04:00, backup 03:00" || true

@@ -15,11 +15,24 @@ public record TicketDto(
     Guid? CharacterId,
     string? CharacterName,
     DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt,
     string? UserEmail,
-    string? AdminNotes
+    string? AdminNotes,
+    int MessageCount
 );
 
-public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint> logger)
+public record TicketMessageDto(
+    Guid Id,
+    bool FromStaff,
+    string Body,
+    DateTimeOffset CreatedAt
+);
+
+public record TicketThreadDto(TicketDto Ticket, List<TicketMessageDto> Messages);
+
+public record PostTicketMessageRequest(string Body);
+
+public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILogger<CreateTicketEndpoint> logger)
     : EndpointWithoutRequest<TicketDto>
 {
     public override void Configure()
@@ -106,10 +119,14 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
         db.SupportTickets.Add(ticket);
         await db.SaveChangesAsync(ct);
 
-        await Send.OkAsync(ToDto(ticket, null), ct);
+        var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId.Value, ct);
+        if (user is not null)
+            await desk.NotifyNewTicketAsync(ticket, user.Email, ct);
+
+        await Send.OkAsync(ToDto(ticket, user?.Email, 0), ct);
     }
 
-    internal static TicketDto ToDto(SupportTicket t, string? email) =>
+    internal static TicketDto ToDto(SupportTicket t, string? email, int messageCount) =>
         new(
             t.Id,
             t.Subject,
@@ -120,8 +137,10 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
             t.CharacterId,
             t.CharacterName,
             t.CreatedAt,
+            t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt,
             email,
-            t.AdminNotes
+            t.AdminNotes,
+            messageCount
         );
 }
 
@@ -206,10 +225,19 @@ public class ListMyTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<Lis
         var list = await db.SupportTickets.AsNoTracking()
             .Where(t => t.UserId == userId)
             .ToListAsync(ct);
+        var ids = list.Select(t => t.Id).ToList();
+        var counts = ids.Count == 0
+            ? new Dictionary<Guid, int>()
+            : (await db.SupportTicketMessages.AsNoTracking()
+                    .Where(m => ids.Contains(m.TicketId))
+                    .GroupBy(m => m.TicketId)
+                    .Select(g => new { g.Key, Count = g.Count() })
+                    .ToListAsync(ct))
+                .ToDictionary(x => x.Key, x => x.Count);
 
         await Send.OkAsync(
-            list.OrderByDescending(t => t.CreatedAt)
-                .Select(t => CreateTicketEndpoint.ToDto(t, null))
+            list.OrderByDescending(t => t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt)
+                .Select(t => CreateTicketEndpoint.ToDto(t, null, counts.GetValueOrDefault(t.Id)))
                 .ToList(),
             ct
         );
@@ -234,11 +262,23 @@ public class AdminListTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<
             .Select(u => new { u.Id, u.Email })
             .ToListAsync(ct);
         var emailById = emails.ToDictionary(x => x.Id, x => x.Email);
+        var ids = tickets.Select(t => t.Id).ToList();
+        var counts = ids.Count == 0
+            ? new Dictionary<Guid, int>()
+            : (await db.SupportTicketMessages.AsNoTracking()
+                    .Where(m => ids.Contains(m.TicketId))
+                    .GroupBy(m => m.TicketId)
+                    .Select(g => new { g.Key, Count = g.Count() })
+                    .ToListAsync(ct))
+                .ToDictionary(x => x.Key, x => x.Count);
 
         await Send.OkAsync(
             tickets
-                .OrderByDescending(t => t.CreatedAt)
-                .Select(t => CreateTicketEndpoint.ToDto(t, emailById.GetValueOrDefault(t.UserId)))
+                .OrderByDescending(t => t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt)
+                .Select(t => CreateTicketEndpoint.ToDto(
+                    t,
+                    emailById.GetValueOrDefault(t.UserId),
+                    counts.GetValueOrDefault(t.Id)))
                 .ToList(),
             ct
         );
@@ -247,7 +287,8 @@ public class AdminListTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<
 
 public record UpdateTicketRequest(string? Status, string? AdminNotes);
 
-public class AdminUpdateTicketEndpoint(AppDbContext db) : Endpoint<UpdateTicketRequest, TicketDto>
+public class AdminUpdateTicketEndpoint(AppDbContext db, SupportDeskService desk)
+    : Endpoint<UpdateTicketRequest, TicketDto>
 {
     public override void Configure()
     {
@@ -264,12 +305,19 @@ public class AdminUpdateTicketEndpoint(AppDbContext db) : Endpoint<UpdateTicketR
             await Send.NotFoundAsync(ct);
             return;
         }
+        var previous = ticket.Status;
         if (!string.IsNullOrWhiteSpace(req.Status))
             ticket.Status = req.Status.Trim();
         if (req.AdminNotes is not null)
             ticket.AdminNotes = req.AdminNotes;
+        ticket.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(CreateTicketEndpoint.ToDto(ticket, ticket.User.Email), ct);
+
+        if (previous != "in_progress" && ticket.Status == "in_progress")
+            await desk.NotifyTakenAsync(ticket, ticket.User.Email, ticket.User.DisplayName, ct);
+
+        var count = await db.SupportTicketMessages.CountAsync(m => m.TicketId == ticket.Id, ct);
+        await Send.OkAsync(CreateTicketEndpoint.ToDto(ticket, ticket.User.Email, count), ct);
     }
 }
 
@@ -325,5 +373,116 @@ public class DownloadTicketCharacterJsonEndpoint(AppDbContext db) : EndpointWith
             (name ?? "personnage").Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)
         ).Trim();
         return string.IsNullOrWhiteSpace(cleaned) ? "personnage" : cleaned;
+    }
+}
+
+public class GetTicketThreadEndpoint(AppDbContext db) : EndpointWithoutRequest<TicketThreadDto>
+{
+    public override void Configure() => Get("/support/tickets/{id}");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var ticket = await db.SupportTickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, ct);
+        if (ticket is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var isAdmin = AuthHelpers.IsAdmin(User);
+        if (ticket.UserId != userId && !isAdmin)
+        {
+            await Send.ForbiddenAsync(ct);
+            return;
+        }
+
+        var email = await db.Users.AsNoTracking()
+            .Where(u => u.Id == ticket.UserId)
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync(ct);
+        var messages = (await db.SupportTicketMessages.AsNoTracking()
+                .Where(m => m.TicketId == id)
+                .ToListAsync(ct))
+            .OrderBy(m => m.CreatedAt)
+            .Select(m => new TicketMessageDto(m.Id, m.FromStaff, m.Body, m.CreatedAt))
+            .ToList();
+
+        await Send.OkAsync(
+            new TicketThreadDto(CreateTicketEndpoint.ToDto(ticket, email, messages.Count), messages),
+            ct);
+    }
+}
+
+public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk)
+    : Endpoint<PostTicketMessageRequest, TicketMessageDto>
+{
+    public override void Configure() => Post("/support/tickets/{id}/messages");
+
+    public override async Task HandleAsync(PostTicketMessageRequest req, CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var body = (req.Body ?? "").Trim();
+        if (body.Length < 2)
+        {
+            AddError("Message trop court.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var ticket = await db.SupportTickets.Include(t => t.User).FirstOrDefaultAsync(t => t.Id == id, ct);
+        if (ticket is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var isAdmin = AuthHelpers.IsAdmin(User);
+        if (ticket.UserId != userId && !isAdmin)
+        {
+            await Send.ForbiddenAsync(ct);
+            return;
+        }
+
+        if (ticket.Status == "closed" && !isAdmin)
+        {
+            AddError("Ticket fermé.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var msg = new SupportTicketMessage
+        {
+            TicketId = ticket.Id,
+            AuthorUserId = userId.Value,
+            FromStaff = isAdmin,
+            Body = body.Length > 8000 ? body[..8000] : body,
+        };
+        db.SupportTicketMessages.Add(msg);
+        ticket.UpdatedAt = DateTimeOffset.UtcNow;
+        if (isAdmin && ticket.Status == "open")
+            ticket.Status = "in_progress";
+        await db.SaveChangesAsync(ct);
+
+        if (isAdmin)
+            await desk.NotifyReplyAsync(ticket, ticket.User.Email, ticket.User.DisplayName, msg.Body, ct);
+        else
+            await desk.NotifyNewTicketAsync(ticket, ticket.User.Email, ct, msg.Body);
+
+        await Send.OkAsync(new TicketMessageDto(msg.Id, msg.FromStaff, msg.Body, msg.CreatedAt), ct);
     }
 }

@@ -89,6 +89,10 @@ main() {
   db_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'dragons-*.db' | wc -l | tr -d ' ')"
   uploads_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'uploads-*.tar.gz' | wc -l | tr -d ' ')"
   log "OK — ${db_count} backup(s) DB, ${uploads_count} archive(s) uploads conservés"
+  if [ -x "$COMPOSE_DIR/scripts/log-ops-event.sh" ]; then
+    "$COMPOSE_DIR/scripts/log-ops-event.sh" backup "Backup SQLite OK" \
+      "${db_backup} (${db_count} conservés)" || true
+  fi
 
   local mailer="$COMPOSE_DIR/scripts/send-backup-email.sh"
   if [ -x "$mailer" ]; then

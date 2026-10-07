@@ -272,6 +272,59 @@ public class FriendSupportIntegrationTests
     }
 
     [Fact]
+    public async Task Support_thread_player_and_admin_can_exchange()
+    {
+        var (_, playerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "deskplayer");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        using var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/support/tickets", playerToken);
+        createReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Table bloquée"), "subject" },
+            { new StringContent("Le combat ne s'ouvre plus."), "message" },
+        };
+        var created = await _client.SendAsync(createReq);
+        created.EnsureSuccessStatusCode();
+        var ticketId = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+
+        using var takeReq = ApiTestAuth.Authed(HttpMethod.Patch, $"/admin/support/tickets/{ticketId}", adminToken);
+        takeReq.Content = JsonContent.Create(new { status = "in_progress" });
+        Assert.Equal(HttpStatusCode.OK, (await _client.SendAsync(takeReq)).StatusCode);
+
+        using var staffReq = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", adminToken);
+        staffReq.Content = JsonContent.Create(new { body = "On regarde le journal de session." });
+        (await _client.SendAsync(staffReq)).EnsureSuccessStatusCode();
+
+        using var playerMsg = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", playerToken);
+        playerMsg.Content = JsonContent.Create(new { body = "Ça arrive après Lancer le combat." });
+        (await _client.SendAsync(playerMsg)).EnsureSuccessStatusCode();
+
+        using var threadReq = ApiTestAuth.Authed(HttpMethod.Get, $"/support/tickets/{ticketId}", playerToken);
+        var threadRes = await _client.SendAsync(threadReq);
+        threadRes.EnsureSuccessStatusCode();
+        var thread = await threadRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(2, thread.GetProperty("messages").GetArrayLength());
+
+        var overviewReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/ops/overview", adminToken);
+        var overviewRes = await _client.SendAsync(overviewReq);
+        overviewRes.EnsureSuccessStatusCode();
+        var overview = await overviewRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.True(overview.GetProperty("ticketsInProgress").GetInt32() >= 1);
+
+        using var ingest = new HttpRequestMessage(HttpMethod.Post, "/internal/ops-events")
+        {
+            Content = JsonContent.Create(new { kind = "backup", title = "Backup test", detail = "ok" }),
+        };
+        Assert.Equal(HttpStatusCode.NoContent, (await _client.SendAsync(ingest)).StatusCode);
+
+        using var diagReq = ApiTestAuth.Authed(HttpMethod.Get, $"/admin/ops/diagnostic?ticketId={ticketId}", adminToken);
+        var diagRes = await _client.SendAsync(diagReq);
+        diagRes.EnsureSuccessStatusCode();
+        var diag = await diagRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Contains("Ticket à corriger", diag.GetProperty("markdown").GetString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Support_admin_list_requires_admin_role()
     {
         var (_, userToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "notadmin");

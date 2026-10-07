@@ -39,6 +39,7 @@ public static class DbMigrationRunner
         new("015_campaign_history", Apply015CampaignHistoryAsync),
         new("016_dungeon_share_link", Apply016DungeonShareLinkAsync),
         new("017_activity_kind_index", Apply017ActivityKindIndexAsync),
+        new("018_support_desk", Apply018SupportDeskAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -364,6 +365,40 @@ public static class DbMigrationRunner
             """
             CREATE INDEX IF NOT EXISTS "IX_CampaignActivities_Kind_CampaignId"
                 ON "CampaignActivities" ("Kind", "CampaignId");
+            """,
+            ct);
+    }
+
+    private static async Task Apply018SupportDeskAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "SupportTickets", "UpdatedAt", "TEXT NULL", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE "SupportTickets"
+            SET "UpdatedAt" = "CreatedAt"
+            WHERE "UpdatedAt" IS NULL OR TRIM("UpdatedAt") = '';
+
+            CREATE TABLE IF NOT EXISTS "SupportTicketMessages" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_SupportTicketMessages" PRIMARY KEY,
+                "TicketId" TEXT NOT NULL,
+                "AuthorUserId" TEXT NOT NULL,
+                "FromStaff" INTEGER NOT NULL,
+                "Body" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_SupportTicketMessages_SupportTickets_TicketId"
+                    FOREIGN KEY ("TicketId") REFERENCES "SupportTickets" ("Id") ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS "IX_SupportTicketMessages_TicketId_CreatedAt"
+                ON "SupportTicketMessages" ("TicketId", "CreatedAt");
+
+            CREATE TABLE IF NOT EXISTS "OpsEvents" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_OpsEvents" PRIMARY KEY,
+                "Kind" TEXT NOT NULL,
+                "Title" TEXT NOT NULL,
+                "Detail" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS "IX_OpsEvents_CreatedAt" ON "OpsEvents" ("CreatedAt");
             """,
             ct);
     }

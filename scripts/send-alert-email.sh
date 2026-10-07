@@ -83,4 +83,8 @@ print(f"alert mailed to {to_addr}")
 PY
 then
   echo "$now" > "$STAMP"
+  ROOT="${DRAGONS_ROOT:-$HOME/Dragons_Generator}"
+  if [ -x "$ROOT/scripts/log-ops-event.sh" ]; then
+    "$ROOT/scripts/log-ops-event.sh" alert "$SUBJECT" "$BODY" || true
+  fi
 fi

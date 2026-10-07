@@ -8,6 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<CharacterRecord> Characters => Set<CharacterRecord>();
     public DbSet<DungeonRecord> Dungeons => Set<DungeonRecord>();
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+    public DbSet<SupportTicketMessage> SupportTicketMessages => Set<SupportTicketMessage>();
+    public DbSet<OpsEvent> OpsEvents => Set<OpsEvent>();
     public DbSet<Friendship> Friendships => Set<Friendship>();
     public DbSet<CampaignRecord> Campaigns => Set<CampaignRecord>();
     public DbSet<CampaignMember> CampaignMembers => Set<CampaignMember>();
@@ -62,6 +64,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Subject).HasMaxLength(200);
             e.Property(x => x.Status).HasMaxLength(32);
             e.Property(x => x.CharacterName).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<SupportTicketMessage>(e =>
+        {
+            e.HasIndex(x => new { x.TicketId, x.CreatedAt });
+            e.Property(x => x.Body).HasMaxLength(8000);
+            e.HasOne(x => x.Ticket)
+                .WithMany(t => t.Messages)
+                .HasForeignKey(x => x.TicketId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OpsEvent>(e =>
+        {
+            e.HasIndex(x => x.CreatedAt);
+            e.Property(x => x.Kind).HasMaxLength(64);
+            e.Property(x => x.Title).HasMaxLength(240);
+            e.Property(x => x.Detail).HasMaxLength(4000);
         });
 
         modelBuilder.Entity<Friendship>(e =>

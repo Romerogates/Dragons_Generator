@@ -22,6 +22,12 @@ public class AppUrlOptions
     public string PublicWebUrl { get; set; } = "http://localhost:8081";
 }
 
+public class AlertOptions
+{
+    /// <summary>Boîte du desk (alertes panne, nouveaux tickets).</summary>
+    public string Email { get; set; } = "Anthony.martinr@hotmail.be";
+}
+
 public class AdminSeedOptions
 {
     public string Email { get; set; } = "";

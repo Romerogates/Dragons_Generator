@@ -1,8 +1,8 @@
 <div class="max-w-6xl mx-auto px-4 py-10">
-  <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Administration</h1>
+  <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Support & exploitation</h1>
   <p class="text-xs text-slate-400 mb-6">
-    Les mots de passe ne sont jamais visibles (hashés). Vous pouvez en définir un nouveau ou envoyer
-    un mail de réinitialisation.
+    Tableau de bord : tickets, backups, crons, mails. Copie le pack diagnostic pour le coller dans
+    Cursor.
   </p>
 
   @if (message()) {
@@ -12,28 +12,229 @@
     <p class="text-sm text-red-400 mb-3">{{ error() }}</p>
   }
 
-  <div class="flex gap-2 mb-6">
-    <button
-      type="button"
-      class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border"
-      [class.border-amber-500]="tab() === 'users'"
-      [class.text-amber-400]="tab() === 'users'"
-      [class.border-slate-700]="tab() !== 'users'"
-      (click)="tab.set('users')"
-    >
-      Comptes
-    </button>
-    <button
-      type="button"
-      class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border"
-      [class.border-amber-500]="tab() === 'tickets'"
-      [class.text-amber-400]="tab() === 'tickets'"
-      [class.border-slate-700]="tab() !== 'tickets'"
-      (click)="tab.set('tickets')"
-    >
-      Support
-    </button>
+  <div class="flex flex-wrap gap-2 mb-6">
+    @for (t of [
+      { id: 'overview', label: 'Vue d’ensemble' },
+      { id: 'tickets', label: 'Tickets' },
+      { id: 'ops', label: 'Backups / crons / mails' },
+      { id: 'users', label: 'Comptes' },
+    ]; track t.id) {
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border"
+        [class.border-amber-500]="tab() === t.id"
+        [class.text-amber-400]="tab() === t.id"
+        [class.border-slate-700]="tab() !== t.id"
+        (click)="setTab($any(t.id))"
+      >
+        {{ t.label }}
+      </button>
+    }
   </div>
+
+  @if (tab() === 'overview') {
+    @if (overview(); as o) {
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Comptes</p>
+          <p class="text-2xl font-serif text-amber-400">{{ o.users }}</p>
+          <p class="text-[10px] text-slate-500">{{ o.confirmedUsers }} confirmés</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Campagnes</p>
+          <p class="text-2xl font-serif text-amber-400">{{ o.campaigns }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Tickets</p>
+          <p class="text-2xl font-serif text-amber-400">{{ o.ticketsOpen }}</p>
+          <p class="text-[10px] text-slate-500">{{ o.ticketsInProgress }} en cours · {{ o.ticketsClosed }} fermés</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Rappels 24 h</p>
+          <p class="text-2xl font-serif text-amber-400">{{ o.remindersLast24h }}</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Dernier backup</p>
+          @if (o.lastBackup) {
+            <p>{{ o.lastBackup.title }}</p>
+            <p class="text-slate-500">{{ o.lastBackup.createdAt | date: 'short' }} · {{ o.lastBackup.detail }}</p>
+          } @else {
+            <p class="text-slate-500">Pas encore journalisé (après le prochain backup 3 h).</p>
+          }
+        </div>
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Dernière alerte mail</p>
+          @if (o.lastAlert) {
+            <p>{{ o.lastAlert.title }}</p>
+            <p class="text-slate-500">{{ o.lastAlert.createdAt | date: 'short' }}</p>
+          } @else {
+            <p class="text-slate-500">Aucune alerte récente.</p>
+          }
+        </div>
+      </div>
+      <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5" (click)="copyDiagnostic()">
+        Copier le pack diagnostic
+      </button>
+    }
+  }
+
+  @if (tab() === 'ops') {
+    @if (overview(); as o) {
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Crons VPS</h2>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Tâche</th>
+              <th class="px-3 py-2">Planning</th>
+              <th class="px-3 py-2">Dernier événement lié</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of o.crons; track c.name) {
+              <tr class="border-t border-slate-800">
+                <td class="px-3 py-2">{{ c.name }}</td>
+                <td class="px-3 py-2 font-mono text-slate-400">{{ c.schedule }}</td>
+                <td class="px-3 py-2">
+                  @if (c.lastKind === 'backup') {
+                    {{ o.lastBackup?.createdAt ? (o.lastBackup!.createdAt | date: 'short') : '—' }}
+                  } @else if (c.lastKind === 'alert') {
+                    {{ o.lastAlert?.createdAt ? (o.lastAlert!.createdAt | date: 'short') : '—' }}
+                  } @else {
+                    —
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Journal (backups, alertes, mails)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Quand</th>
+              <th class="px-3 py-2">Type</th>
+              <th class="px-3 py-2">Titre</th>
+              <th class="px-3 py-2">Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of o.recentOps; track e.id) {
+              <tr class="border-t border-slate-800 align-top">
+                <td class="px-3 py-2 whitespace-nowrap text-slate-500">{{ e.createdAt | date: 'short' }}</td>
+                <td class="px-3 py-2 font-mono text-amber-400/80">{{ e.kind }}</td>
+                <td class="px-3 py-2">{{ e.title }}</td>
+                <td class="px-3 py-2 text-slate-400">{{ e.detail }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="px-3 py-4 text-slate-500">Aucun événement encore.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (tab() === 'tickets') {
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        @for (t of tickets(); track t.id) {
+          <button
+            type="button"
+            class="text-left bg-[#1b2028] border rounded-xl p-3"
+            [class.border-amber-600]="thread()?.ticket.id === t.id"
+            [class.border-slate-800]="thread()?.ticket.id !== t.id"
+            (click)="openTicket(t.id)"
+          >
+            <div class="flex justify-between gap-2">
+              <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
+              <span class="text-[10px] text-slate-500">{{ statusLabel(t.status) }}</span>
+            </div>
+            <p class="text-[10px] text-slate-500">{{ t.userEmail }} · {{ t.createdAt | date: 'short' }}</p>
+          </button>
+        } @empty {
+          <p class="text-xs text-slate-500">Aucun ticket.</p>
+        }
+      </div>
+      @if (thread(); as th) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4" data-testid="admin-ticket-thread">
+          <div class="flex justify-between gap-2 mb-2">
+            <h3 class="font-serif text-lg text-amber-400">{{ th.ticket.subject }}</h3>
+            <span class="text-[10px] text-slate-500">{{ th.ticket.userEmail }}</span>
+          </div>
+          <p class="text-xs text-slate-400 whitespace-pre-wrap mb-3">{{ th.ticket.message }}</p>
+          @if (th.ticket.characterName) {
+            <p class="text-xs text-violet-300 mb-2">
+              Personnage : {{ th.ticket.characterName }}
+              <button type="button" class="ml-2 text-sky-400 hover:underline" (click)="downloadCharacterJson(th.ticket)">
+                JSON
+              </button>
+            </p>
+          }
+          @if (th.ticket.attachmentOriginalName) {
+            <button type="button" class="text-xs text-sky-400 hover:underline mb-3 block" (click)="openAttachment(th.ticket)">
+              {{ th.ticket.attachmentOriginalName }}
+            </button>
+          }
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button type="button" class="text-[10px] uppercase border border-emerald-700 text-emerald-300 px-2 py-1 rounded" (click)="takeTicket(th.ticket.id)">
+              Je consulte (mail joueur)
+            </button>
+            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(th.ticket.id, 'open')">Open</button>
+            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(th.ticket.id, 'closed')">Fermé</button>
+            <button type="button" class="text-[10px] uppercase border border-sky-700 text-sky-300 px-2 py-1 rounded" (click)="copyDiagnostic(th.ticket.id)">
+              Pack Cursor
+            </button>
+          </div>
+          <div class="flex flex-col gap-2 mb-3">
+            @for (m of th.messages; track m.id) {
+              <div
+                class="rounded-lg px-3 py-2 text-xs whitespace-pre-wrap"
+                [class.bg-amber-950/30]="m.fromStaff"
+                [class.bg-slate-900]="!m.fromStaff"
+              >
+                <p class="text-[10px] uppercase tracking-wider mb-1 text-slate-500">
+                  {{ m.fromStaff ? 'Support' : 'Joueur' }} · {{ m.createdAt | date: 'short' }}
+                </p>
+                {{ m.body }}
+              </div>
+            }
+          </div>
+          <textarea
+            rows="3"
+            [(ngModel)]="replyBody"
+            name="adminReply"
+            placeholder="Réponse au joueur…"
+            class="w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm text-slate-100 outline-none mb-2"
+          ></textarea>
+          <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5 mb-4" (click)="sendReply()">
+            Envoyer au joueur
+          </button>
+          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
+            Notes internes (pas visibles du joueur)
+            <textarea
+              rows="2"
+              [(ngModel)]="adminNotesDraft"
+              name="adminNotes"
+              class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm text-slate-100"
+            ></textarea>
+          </label>
+          <button type="button" class="text-xs mt-2 px-3 py-1.5 rounded-lg border border-slate-600" (click)="saveNotes(th.ticket.id)">
+            Enregistrer les notes
+          </button>
+        </div>
+      }
+    </div>
+    @if (diagnostic()) {
+      <pre class="mt-4 text-[10px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{{ diagnostic() }}</pre>
+    }
+  }
 
   @if (tab() === 'users') {
     <div class="flex flex-col gap-4">
@@ -106,47 +307,6 @@
             </button>
           </div>
         </div>
-      }
-    </div>
-  } @else {
-    <div class="flex flex-col gap-3">
-      @for (t of tickets(); track t.id) {
-        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
-          <div class="flex justify-between gap-2">
-            <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
-            <span class="text-[10px] text-slate-500">{{ t.userEmail }}</span>
-          </div>
-          <p class="text-xs text-slate-400 mt-2 whitespace-pre-wrap">{{ t.message }}</p>
-          @if (t.characterName) {
-            <p class="text-xs text-violet-300 mt-2">
-              Personnage : {{ t.characterName }}
-              <button
-                type="button"
-                class="ml-2 text-sky-400 hover:underline"
-                (click)="downloadCharacterJson(t)"
-              >
-                Télécharger JSON
-              </button>
-            </p>
-          }
-          @if (t.attachmentUrl) {
-            <button
-              type="button"
-              class="text-xs text-sky-400 hover:underline mt-2 inline-block"
-              (click)="openAttachment(t)"
-            >
-              {{ t.attachmentOriginalName || 'Pièce jointe' }}
-            </button>
-          }
-          <div class="flex gap-2 mt-3">
-            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'open')">Open</button>
-            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'in_progress')">En cours</button>
-            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'closed')">Fermé</button>
-            <span class="text-[10px] text-slate-500 self-center">{{ t.status }}</span>
-          </div>
-        </div>
-      } @empty {
-        <p class="text-xs text-slate-500">Aucun ticket.</p>
       }
     </div>
   }

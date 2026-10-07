@@ -13,8 +13,9 @@ import { ActivatedRoute } from '@angular/router';
 import { environment } from '@env/environment';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
+import { supportStatusLabel } from '@core/utils/support-status.util';
 
-interface Ticket {
+export interface Ticket {
   id: string;
   subject: string;
   message: string;
@@ -24,6 +25,20 @@ interface Ticket {
   characterId?: string;
   characterName?: string;
   createdAt: string;
+  updatedAt?: string;
+  messageCount?: number;
+}
+
+interface TicketMessage {
+  id: string;
+  fromStaff: boolean;
+  body: string;
+  createdAt: string;
+}
+
+interface TicketThread {
+  ticket: Ticket;
+  messages: TicketMessage[];
 }
 
 @Component({
@@ -44,22 +59,26 @@ export class SupportPage implements OnInit {
   message = '';
   characterId = '';
   file: File | null = null;
+  replyBody = '';
 
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
   readonly tickets = signal<Ticket[]>([]);
+  readonly thread = signal<TicketThread | null>(null);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly sendingReply = signal(false);
 
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
     const subject = q.get('subject')?.trim();
     const message = q.get('message')?.trim();
+    const ticket = q.get('ticket')?.trim();
     if (subject) this.subject = subject.slice(0, 200);
     if (message) this.message = message.slice(0, 4000);
 
     this.characters.list().subscribe((list) => this.myCharacters.set(list));
-    this.reload();
+    this.reload(ticket);
   }
 
   onFile(ev: Event): void {
@@ -67,10 +86,44 @@ export class SupportPage implements OnInit {
     this.file = input.files?.[0] ?? null;
   }
 
-  reload(): void {
+  statusLabel(status: string): string {
+    return supportStatusLabel(status, 'player');
+  }
+
+  reload(openId?: string | null): void {
     this.http.get<Ticket[]>(`${this.api}/support/tickets`).subscribe({
-      next: (list) => this.tickets.set(list),
+      next: (list) => {
+        this.tickets.set(list);
+        const id = openId || this.thread()?.ticket.id;
+        if (id) this.openTicket(id);
+      },
       error: () => this.tickets.set([]),
+    });
+  }
+
+  openTicket(id: string): void {
+    this.error.set(null);
+    this.http.get<TicketThread>(`${this.api}/support/tickets/${id}`).subscribe({
+      next: (t) => this.thread.set(t),
+      error: () => this.error.set('Impossible d’ouvrir ce ticket.'),
+    });
+  }
+
+  sendReply(): void {
+    const t = this.thread()?.ticket;
+    const body = this.replyBody.trim();
+    if (!t || body.length < 2) return;
+    this.sendingReply.set(true);
+    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, { body }).subscribe({
+      next: () => {
+        this.sendingReply.set(false);
+        this.replyBody = '';
+        this.reload(t.id);
+      },
+      error: () => {
+        this.sendingReply.set(false);
+        this.error.set('Réponse non envoyée.');
+      },
     });
   }
 
@@ -85,14 +138,14 @@ export class SupportPage implements OnInit {
     if (this.file) fd.append('file', this.file, this.file.name);
 
     this.http.post<Ticket>(`${this.api}/support/tickets`, fd).subscribe({
-      next: () => {
+      next: (created) => {
         this.loading.set(false);
-        this.success.set('Ticket envoyé. Merci !');
+        this.success.set('Ticket ouvert. Le support a été prévenu par mail.');
         this.subject = '';
         this.message = '';
         this.characterId = '';
         this.file = null;
-        this.reload();
+        this.reload(created.id);
       },
       error: (err) => {
         this.loading.set(false);

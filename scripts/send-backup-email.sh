@@ -110,3 +110,7 @@ else:
 zip_path.unlink(missing_ok=True)
 print(f"backup mailed to {to_addr} attach={attach} bytes={size}")
 PY
+ROOT="${DRAGONS_ROOT:-$HOME/Dragons_Generator}"
+if [ -x "$ROOT/scripts/log-ops-event.sh" ]; then
+  "$ROOT/scripts/log-ops-event.sh" backup_mail "Backup mailé" "$(basename "$DB_FILE")" || true
+fi

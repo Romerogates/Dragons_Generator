@@ -23,6 +23,7 @@ builder.Services.PostConfigure<JwtOptions>(opts =>
         opts.Key = "DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+";
 });
 builder.Services.Configure<AppUrlOptions>(builder.Configuration.GetSection("App"));
+builder.Services.Configure<AlertOptions>(builder.Configuration.GetSection("Alert"));
 builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection("Admin"));
 builder.Services.PostConfigure<AdminSeedOptions>(opts =>
 {
@@ -138,6 +139,7 @@ builder.Services.AddSingleton<HybridAiService>();
 builder.Services.AddSingleton<UserAiSecretProtector>();
 builder.Services.AddScoped<UserAiCredentialResolver>();
 builder.Services.AddScoped<PushNotificationService>();
+builder.Services.AddScoped<SupportDeskService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHttpClient("Groq", client =>
 {
