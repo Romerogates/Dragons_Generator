@@ -415,7 +415,7 @@ public sealed class HybridAiService
     {
         var primary = _config["Groq:ShortModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = "llama-3.1-8b-instant";
+            primary = "openai/gpt-oss-20b";
 
         var fallback = _config["Groq:FallbackModel"];
         return new[] { primary, fallback }
@@ -429,8 +429,11 @@ public sealed class HybridAiService
     {
         var model = _config["Gemini:Model"];
         if (string.IsNullOrWhiteSpace(model))
-            model = "gemini-2.0-flash";
-        return [model];
+            model = "gemini-3.8-flash";
+        return new[] { model, "gemini-3.8-flash", "gemini-2.5-flash" }
+            .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
     }
 
     private IReadOnlyList<string> GetAdventureModelChain()

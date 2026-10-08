@@ -20,6 +20,7 @@ public class UserAiProvidersTests
     {
         Assert.True(UserAiProviders.TryGet("groq", out var groq));
         Assert.Equal(groq.DefaultModel, UserAiProviders.NormalizeModel("  ", groq));
-        Assert.Equal("llama-3.3-70b-versatile", UserAiProviders.NormalizeModel("llama-3.3-70b-versatile", groq));
+        Assert.Equal("qwen/qwen3.6-27b", groq.DefaultModel);
+        Assert.Equal("openai/gpt-oss-20b", UserAiProviders.NormalizeModel("openai/gpt-oss-20b", groq));
     }
 }

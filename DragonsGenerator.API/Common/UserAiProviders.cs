@@ -18,7 +18,7 @@ public static class UserAiProviders
     public static IReadOnlyList<UserAiProviderInfo> All { get; } =
     [
         new(OpenAi, "ChatGPT (OpenAI)", "https://api.openai.com/v1", "gpt-4o-mini"),
-        new(Groq, "Groq", "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile"),
+        new(Groq, "Groq", "https://api.groq.com/openai/v1", "qwen/qwen3.6-27b"),
         new(Xai, "Grok (xAI)", "https://api.x.ai/v1", "grok-2-latest"),
         new(
             OpenRouter,
