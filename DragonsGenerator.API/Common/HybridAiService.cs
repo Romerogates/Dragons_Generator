@@ -442,7 +442,7 @@ public sealed class HybridAiService
     {
         var primary = _config["Groq:ShortModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = "qwen/qwen3.6-27b";
+            primary = "qwen/qwen3.8-27b";
 
         var fallback = _config["Groq:FallbackModel"];
         return new[] { primary, fallback }
@@ -457,7 +457,7 @@ public sealed class HybridAiService
         var model = _config["Gemini:Model"];
         if (string.IsNullOrWhiteSpace(model))
             model = "gemini-3.8-flash";
-        return new[] { model, "gemini-3.8-flash", "gemini-2.5-flash" }
+        return new[] { model, "gemini-3.8-flash" }
             .Where(m => !string.IsNullOrWhiteSpace(m))
             .Distinct(StringComparer.Ordinal)
             .ToList();
@@ -467,7 +467,7 @@ public sealed class HybridAiService
     {
         var primary = _config["Groq:AdventureModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = "groq/compound";
+            primary = "qwen/qwen3.8-27b";
 
         var secondary = _config["Groq:FallbackModel"];
         var tertiary = _config["Groq:Model"] ?? "groq/compound";

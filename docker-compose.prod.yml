@@ -45,14 +45,14 @@ services:
       RateLimit__Enabled: "true"
       ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
       App__PublicWebUrl: https://dragons-generator.top
-      Groq__AdventureModel: groq/compound
-      Groq__ShortModel: qwen/qwen3.6-27b
-      Groq__FallbackModel: qwen/qwen3.6-27b
+      Groq__AdventureModel: qwen/qwen3.8-27b
+      Groq__ShortModel: qwen/qwen3.8-27b
+      Groq__FallbackModel: openai/gpt-oss-20b
       Groq__MaxAttempts: "1"
       Groq__MaxRetryWindowMs: "60000"
       Gemini__BaseUrl: https://generativelanguage.googleapis.com/v1beta/openai
       Gemini__Model: gemini-3.8-flash
-      Gemini__MaxAttempts: "1"
+      Gemini__MaxAttempts: "3"
       # Ollama sur ce VPS fait tomber nginx/API (OOM / connection refused). Groq uniquement en prod.
       LocalLlm__Enabled: "false"
       LocalLlm__BaseUrl: http://ollama:11434/v1
