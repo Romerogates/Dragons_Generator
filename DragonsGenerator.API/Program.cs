@@ -159,9 +159,14 @@ builder.Services.AddSingleton<GoogleIdTokenValidator>();
 builder.Services.AddSingleton<ImapInboxService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHostedService<OllamaWarmupWorker>();
+builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(300);
+});
+builder.Services.AddHttpClient("Gemini", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 builder.Services.AddHttpClient("LocalLlm", client =>
 {

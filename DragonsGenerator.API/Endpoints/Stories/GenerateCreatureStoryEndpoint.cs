@@ -2,6 +2,7 @@ using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Dragons.Api.Endpoints.Stories;
 
@@ -11,6 +12,8 @@ public record GenerateCreatureStoryRequest
     public required string CustomName { get; init; }
     public string? Role { get; init; }
     public string? Setting { get; init; }
+    /// <summary>Ignore le cache (nouveau texte, consomme un crédit).</summary>
+    public bool Force { get; init; }
 }
 
 public record GenerateCreatureStoryResponse(string Backstory);
@@ -18,7 +21,8 @@ public record GenerateCreatureStoryResponse(string Backstory);
 public class GenerateCreatureStoryEndpoint(
     GameDataRepository repo,
     HybridAiService ai,
-    UserAiCredentialResolver userAi
+    UserAiCredentialResolver userAi,
+    IMemoryCache cache
 ) : Endpoint<GenerateCreatureStoryRequest, GenerateCreatureStoryResponse>
 {
     public override void Configure()
@@ -69,11 +73,21 @@ public class GenerateCreatureStoryEndpoint(
             {(actionsSummary.Length > 0 ? $"- Capacités marquantes: {actionsSummary}" : "")}
             """;
 
+        var cacheKey =
+            $"creature-story:{req.CreatureId}:{req.CustomName.Trim()}:{req.Role}:{req.Setting}";
+        if (!req.Force
+            && cache.TryGetValue(cacheKey, out string? cached)
+            && !string.IsNullOrWhiteSpace(cached))
+        {
+            await Send.OkAsync(new GenerateCreatureStoryResponse(cached), ct);
+            return;
+        }
+
         var userCreds = await userAi.ResolveAsync(AuthHelpers.GetUserId(User), ct);
         var result = await ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
-            500,
+            280,
             ct,
             userCredentials: userCreds);
 
@@ -84,6 +98,7 @@ public class GenerateCreatureStoryEndpoint(
             return;
         }
 
+        cache.Set(cacheKey, result.Text!, TimeSpan.FromDays(7));
         await Send.OkAsync(new GenerateCreatureStoryResponse(result.Text!), ct);
     }
 }

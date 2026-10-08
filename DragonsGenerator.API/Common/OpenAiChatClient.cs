@@ -288,7 +288,7 @@ public sealed class OpenAiChatClient
         if (string.IsNullOrWhiteSpace(baseUrl))
             baseUrl = DefaultRemoteBaseUrl;
 
-        var requiresKey = string.Equals(_configSection, "Groq", StringComparison.Ordinal);
+        var requiresKey = _configSection is "Groq" or "Gemini";
         if (requiresKey && string.IsNullOrWhiteSpace(apiKey))
         {
             return new GroqChatResult(

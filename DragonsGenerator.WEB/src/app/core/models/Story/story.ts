@@ -28,6 +28,8 @@ export interface GenerateCreatureStoryRequest {
   customName: string;
   role?: CreatureRole | null;
   setting?: string | null;
+  /** Nouveau texte (consomme un crédit). Sinon le serveur renvoie le cache. */
+  force?: boolean;
 }
 
 export interface GenerateCreatureStoryResponse {

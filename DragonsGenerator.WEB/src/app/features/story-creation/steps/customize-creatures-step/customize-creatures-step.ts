@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of, retry, throwError, timer } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -168,9 +168,7 @@ export class CustomizeCreaturesStep implements OnInit {
         `Vie ${i + 1} / ${pending.length} — ${creature.customName.trim()}…`,
       );
       try {
-        const res = await this.aiProgress.awaitWhileActive(this.storyAttempt$(creature, () => {
-          this.aiProgress.setStageLabel(`On réessaie pour ${creature.customName.trim()}…`);
-        }));
+        const res = await this.aiProgress.awaitWhileActive(this.storyAttempt$(creature));
         if (this.aiProgress.isAborted()) break;
         if (!res?.backstory) {
           this.fallbackNotice.set(this.busyLivesMessage);
@@ -194,24 +192,17 @@ export class CustomizeCreaturesStep implements OnInit {
     this.generatingId.set(null);
   }
 
-  /** Un appel + une relance silencieuse. Jamais d’exception HTTP vers la console app. */
-  private storyAttempt$(creature: StoryCreatureSelection, onRetry?: () => void) {
+  /** Un appel, erreurs HTTP avalées. Le cache serveur évite de reconsommer un crédit. */
+  private storyAttempt$(creature: StoryCreatureSelection) {
     return this.dataService
       .generateCreatureStory({
         creatureId: creature.creatureId,
         customName: creature.customName.trim(),
         role: creature.role,
         setting: this.builder.setting().trim() || null,
+        force: !!creature.backstory.trim(),
       })
       .pipe(
-        retry({
-          count: 1,
-          delay: (err) => {
-            if (isAiRateLimitHttpError(err)) return throwError(() => err);
-            onRetry?.();
-            return timer(2500);
-          },
-        }),
         catchError((err) => {
           if (isAiRateLimitHttpError(err)) return throwError(() => err);
           return of(null);

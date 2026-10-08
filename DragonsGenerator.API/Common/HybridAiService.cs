@@ -7,6 +7,7 @@ public sealed class HybridAiService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly OpenAiChatClient? _local;
+    private readonly OpenAiChatClient? _gemini;
     private readonly OpenAiChatClient _remote;
     private readonly IConfiguration _config;
     private readonly ILogger<HybridAiService> _logger;
@@ -45,6 +46,16 @@ public sealed class HybridAiService
             "Groq",
             "Groq",
             coordinator);
+
+        if (!string.IsNullOrWhiteSpace(config["Gemini:ApiKey"]))
+        {
+            _gemini = new OpenAiChatClient(
+                httpClientFactory,
+                config,
+                loggerFactory.CreateLogger<OpenAiChatClient>(),
+                "Gemini",
+                "Gemini");
+        }
 
         if (config.GetValue("LocalLlm:Enabled", false))
         {
@@ -123,11 +134,35 @@ public sealed class HybridAiService
                         return Done("short", "ollama", local);
                     }
 
-                    _logger.LogWarning("Ollama local réponse rejetée (format) — bascule Groq (Ollama reste dispo)");
+                    _logger.LogWarning("Ollama local réponse rejetée (format) — bascule cloud (Ollama reste dispo)");
                 }
             }
 
-            return Done("short", "groq", await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, budgetCt));
+            if (_gemini is not null)
+            {
+                var gemini = await _gemini.SendChatAsync(
+                    userPrompt,
+                    systemPrompt,
+                    maxTokens,
+                    budgetCt,
+                    GetGeminiModelChain());
+                if (gemini.Ok && !string.IsNullOrWhiteSpace(gemini.Text)
+                    && (acceptText is null || acceptText(gemini.Text)))
+                {
+                    _logger.LogInformation("Génération courte servie par Gemini");
+                    return Done("short", "gemini", gemini);
+                }
+            }
+
+            return Done(
+                "short",
+                "groq",
+                await _remote.SendChatAsync(
+                    userPrompt,
+                    systemPrompt,
+                    maxTokens,
+                    budgetCt,
+                    GetShortModelChain()));
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
@@ -375,6 +410,28 @@ public sealed class HybridAiService
 
     private static GroqChatResult TimeoutResult(string message) =>
         new(false, null, message, true);
+
+    private IReadOnlyList<string> GetShortModelChain()
+    {
+        var primary = _config["Groq:ShortModel"];
+        if (string.IsNullOrWhiteSpace(primary))
+            primary = "llama-3.1-8b-instant";
+
+        var fallback = _config["Groq:FallbackModel"];
+        return new[] { primary, fallback }
+            .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Select(m => m!)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private IReadOnlyList<string> GetGeminiModelChain()
+    {
+        var model = _config["Gemini:Model"];
+        if (string.IsNullOrWhiteSpace(model))
+            model = "gemini-2.0-flash";
+        return [model];
+    }
 
     private IReadOnlyList<string> GetAdventureModelChain()
     {
