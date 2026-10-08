@@ -158,6 +158,7 @@ builder.Services.AddScoped<SupportDeskService>();
 builder.Services.AddSingleton<GoogleIdTokenValidator>();
 builder.Services.AddSingleton<ImapInboxService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
+builder.Services.AddHostedService<OllamaWarmupWorker>();
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(300);

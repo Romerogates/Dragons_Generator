@@ -13,7 +13,7 @@ services:
       # Un seul modèle, une inférence à la fois, décharge après 5 min d’inactivité.
       OLLAMA_MAX_LOADED_MODELS: "1"
       OLLAMA_NUM_PARALLEL: "1"
-      OLLAMA_KEEP_ALIVE: "5m"
+      OLLAMA_KEEP_ALIVE: "60m"
     volumes:
       - ollama-data:/root/.ollama
     networks:
@@ -21,7 +21,7 @@ services:
     # Limite cgroup réelle (deploy.resources est ignoré hors Swarm).
     mem_limit: 2800m
     memswap_limit: 2800m
-    cpus: "2.0"
+    cpus: "1.0"
     oom_score_adj: 400
     logging: *default-logging
     labels:
@@ -55,6 +55,7 @@ services:
       LocalLlm__Model: qwen2.5:3b
       LocalLlm__MaxAttempts: "1"
       LocalLlm__MaxRetryWindowMs: "480000"
+      LocalLlm__FirstTokenSeconds: "40"
     volumes:
       - dragons-api-data:/app/data
       - ${BACKUP_HOST_DIR:-/home/debian/backups/dragons}:/app/host-backups:ro

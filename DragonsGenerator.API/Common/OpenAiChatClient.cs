@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -295,6 +297,9 @@ public sealed class OpenAiChatClient
                 "Clé API Groq manquante. Configurez Groq:ApiKey (appsettings) ou la variable d'environnement Groq__ApiKey.");
         }
 
+        if (string.Equals(_configSection, "LocalLlm", StringComparison.Ordinal))
+            return await SendLocalStreamingOnceAsync(userContent, systemPrompt, maxTokens, model, temperature, ct);
+
         var client = _httpClientFactory.CreateClient(_httpClientName);
         var groqRequest = new
         {
@@ -365,6 +370,140 @@ public sealed class OpenAiChatClient
         }
 
         return new GroqChatResult(true, text, null);
+    }
+
+    /// <summary>
+    /// Ollama en stream : si aucun token n’arrive (modèle coincé / VPS saturé), on lâche pour Groq.
+    /// Une fois le premier token reçu, on laisse finir jusqu’au budget HTTP.
+    /// </summary>
+    private async Task<GroqChatResult> SendLocalStreamingOnceAsync(
+        object userContent,
+        string systemPrompt,
+        int maxTokens,
+        string model,
+        double temperature,
+        CancellationToken ct)
+    {
+        var firstTokenSeconds = Math.Clamp(_config.GetValue("LocalLlm:FirstTokenSeconds", 40), 8, 120);
+        var apiKey = _config["LocalLlm:ApiKey"];
+        var baseUrl = _config["LocalLlm:BaseUrl"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            baseUrl = "http://ollama:11434/v1";
+
+        var client = _httpClientFactory.CreateClient(_httpClientName);
+        var payload = new
+        {
+            model,
+            messages = new object[]
+            {
+                new { role = "system", content = systemPrompt.Trim() + FrenchSystemSuffix },
+                new { role = "user", content = userContent },
+            },
+            temperature,
+            max_tokens = maxTokens,
+            stream = true,
+        };
+
+        var endpoint = baseUrl.TrimEnd('/') + "/chat/completions";
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, endpoint);
+        if (!string.IsNullOrWhiteSpace(apiKey))
+            httpRequest.Headers.Add("Authorization", $"Bearer {apiKey}");
+        httpRequest.Content = JsonContent.Create(payload);
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Échec d'appel Ollama stream ({Endpoint})", endpoint);
+            return new GroqChatResult(false, null, "Impossible de joindre le service de génération IA.");
+        }
+
+        using (response)
+        {
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogWarning("LocalLlm a répondu {Status}: {Body}", (int)response.StatusCode, body);
+            var status = (int)response.StatusCode;
+            return new GroqChatResult(
+                false,
+                null,
+                status is 502 or 503
+                    ? "Service IA temporairement surchargé. Réessayez dans une minute."
+                    : "Impossible de joindre le service de génération IA.",
+                status == 429,
+                status is 429 or 502 or 503);
+        }
+
+        await using var stream = await response.Content.ReadAsStreamAsync(ct);
+        using var reader = new StreamReader(stream);
+        var text = new StringBuilder();
+        var gotToken = false;
+        using var firstTokenCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        firstTokenCts.CancelAfter(TimeSpan.FromSeconds(firstTokenSeconds));
+
+        while (true)
+        {
+            var lineCt = gotToken ? ct : firstTokenCts.Token;
+            string? line;
+            try
+            {
+                line = await reader.ReadLineAsync(lineCt);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested && !gotToken)
+            {
+                _logger.LogWarning(
+                    "Ollama n'a envoyé aucun token en {Seconds}s — bascule Groq",
+                    firstTokenSeconds);
+                return new GroqChatResult(false, null, "Impossible de joindre le service de génération IA.");
+            }
+
+            if (line is null)
+                break;
+            if (!line.StartsWith("data:", StringComparison.Ordinal))
+                continue;
+
+            var data = line[5..].Trim();
+            if (data.Equals("[DONE]", StringComparison.Ordinal))
+                break;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(data);
+                if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+                    continue;
+                var choice = choices[0];
+                if (!choice.TryGetProperty("delta", out var delta))
+                    continue;
+                if (!delta.TryGetProperty("content", out var contentEl))
+                    continue;
+                var chunk = contentEl.GetString();
+                if (string.IsNullOrEmpty(chunk))
+                    continue;
+                gotToken = true;
+                text.Append(chunk);
+            }
+            catch (JsonException)
+            {
+                /* chunk SSE incomplet — on ignore */
+            }
+        }
+
+        var cleaned = GroqChatClient.SanitizeModelOutput(text.ToString().Trim());
+        if (string.IsNullOrWhiteSpace(cleaned))
+        {
+            return new GroqChatResult(
+                false,
+                null,
+                "La génération IA n'a renvoyé aucun texte en français.",
+                Retryable: true);
+        }
+
+        return new GroqChatResult(true, cleaned, null);
+        }
     }
 
     private static string? ExtractMessageText(GroqMessage? message)

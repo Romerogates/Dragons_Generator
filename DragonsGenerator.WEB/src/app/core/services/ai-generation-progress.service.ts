@@ -310,7 +310,7 @@ function buildProfile(kind: AiGenerationKind, status: AiStatusResponse): AiProgr
         ],
       };
     case 'creature-batch':
-      return shortProfile(status, 'Génération des vies (lot)…', 14000);
+      return shortProfile(status, 'Génération des vies (lot)…', 90000);
     case 'creature-backstory':
       return shortProfile(status, 'Génération de la vie…', 10000);
     case 'character-backstory':
