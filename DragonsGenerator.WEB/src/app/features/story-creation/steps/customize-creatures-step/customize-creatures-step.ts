@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
+import { catchError, of, retry, throwError, timer } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -26,7 +26,7 @@ import {
   getCreatureCategoryLabel,
 } from '@core/utils/creature-display.util';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
-import { AI_GENERATION_BUSY } from '@core/models/ai-generation.model';
+import { isAiGenerationAborted } from '@core/models/ai-generation.model';
 
 @Component({
   selector: 'app-customize-creatures-step',
@@ -54,6 +54,9 @@ export class CustomizeCreaturesStep implements OnInit {
   );
 
   readonly roles = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
+
+  private readonly busyLivesMessage =
+    'Pas possible de générer plus de vies pour l’instant — le serveur est trop occupé. Réessaie dans un moment.';
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -128,40 +131,9 @@ export class CustomizeCreaturesStep implements OnInit {
     }
     if (this.aiRateLimit.showIfBlocked()) return;
 
-    this.generatingId.set(creatureId);
     this.generationError.set(null);
-
-    this.aiProgress
-      .run(
-        'creature-backstory',
-        () =>
-          this.dataService.generateCreatureStory({
-            creatureId: creature.creatureId,
-            customName: creature.customName.trim(),
-            role: creature.role,
-            setting: this.builder.setting().trim() || null,
-          }),
-        {
-          onSuccess: (res) => {
-            this.builder.updateCreature(creatureId, { backstory: res.backstory });
-            this.generatingId.set(null);
-          },
-          onError: (err) => {
-            this.generatingId.set(null);
-            if (isAiRateLimitHttpError(err)) return;
-            const busy = err as { code?: string; message?: string };
-            if (busy.code === AI_GENERATION_BUSY) {
-              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
-              return;
-            }
-            this.generationError.set(this.extractError(err));
-          },
-        },
-      )
-      .subscribe({
-        error: () => undefined,
-        complete: () => this.generatingId.set(null),
-      });
+    this.fallbackNotice.set(null);
+    void this.generateBackstoriesSequentially([creature]);
   }
 
   generateAllBackstories(): void {
@@ -183,8 +155,7 @@ export class CustomizeCreaturesStep implements OnInit {
   private async generateBackstoriesSequentially(pending: StoryCreatureSelection[]): Promise<void> {
     this.generatingId.set(pending[0]?.creatureId ?? null);
     this.generationError.set(null);
-    let failed = 0;
-    let ok = 0;
+    this.fallbackNotice.set(null);
 
     await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
 
@@ -193,45 +164,59 @@ export class CustomizeCreaturesStep implements OnInit {
       const creature = pending[i];
       this.generatingId.set(creature.creatureId);
       this.aiProgress.setBatchProgress(i, pending.length);
-      this.aiProgress.setStageLabel(`Vie ${i + 1} / ${pending.length} — ${creature.customName.trim()}…`);
+      this.aiProgress.setStageLabel(
+        `Vie ${i + 1} / ${pending.length} — ${creature.customName.trim()}…`,
+      );
       try {
-        const res = await this.aiProgress.awaitWhileActive(
-          this.dataService.generateCreatureStory({
-            creatureId: creature.creatureId,
-            customName: creature.customName.trim(),
-            role: creature.role,
-            setting: this.builder.setting().trim() || null,
-          }),
-        );
+        const res = await this.aiProgress.awaitWhileActive(this.storyAttempt$(creature, () => {
+          this.aiProgress.setStageLabel(`On réessaie pour ${creature.customName.trim()}…`);
+        }));
         if (this.aiProgress.isAborted()) break;
-        this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
-        ok++;
-      } catch (err) {
-        if (this.aiProgress.isAborted()) break;
-        if (isAiRateLimitHttpError(err)) {
-          failed += pending.length - i;
+        if (!res?.backstory) {
+          this.fallbackNotice.set(this.busyLivesMessage);
           break;
         }
-        failed++;
+        this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
+      } catch (err) {
+        if (this.aiProgress.isAborted() || isAiGenerationAborted(err)) break;
+        if (isAiRateLimitHttpError(err)) break;
+        this.fallbackNotice.set(this.busyLivesMessage);
+        break;
       }
     }
 
     if (this.aiProgress.isAborted()) {
       this.generatingId.set(null);
-      this.fallbackNotice.set(null);
       return;
     }
 
     this.aiProgress.complete();
     this.generatingId.set(null);
-    this.fallbackNotice.set(null);
-    if (failed > 0) {
-      this.generationError.set(
-        failed === pending.length
-          ? "L'inspiration cosmique est momentanément indisponible (délai ou service IA)."
-          : `${ok} vie(s) générée(s), ${failed} échec(s). Réessayez individuellement sur les cartes restantes.`,
+  }
+
+  /** Un appel + une relance silencieuse. Jamais d’exception HTTP vers la console app. */
+  private storyAttempt$(creature: StoryCreatureSelection, onRetry?: () => void) {
+    return this.dataService
+      .generateCreatureStory({
+        creatureId: creature.creatureId,
+        customName: creature.customName.trim(),
+        role: creature.role,
+        setting: this.builder.setting().trim() || null,
+      })
+      .pipe(
+        retry({
+          count: 1,
+          delay: (err) => {
+            if (isAiRateLimitHttpError(err)) return throwError(() => err);
+            onRetry?.();
+            return timer(2500);
+          },
+        }),
+        catchError((err) => {
+          if (isAiRateLimitHttpError(err)) return throwError(() => err);
+          return of(null);
+        }),
       );
-    }
   }
 
   prevStep(): void {
@@ -243,20 +228,4 @@ export class CustomizeCreaturesStep implements OnInit {
   }
 
   protected formatCr = formatChallengeRating;
-
-  private extractError(err: unknown): string {
-    const http = err as {
-      status?: number;
-      error?: Record<string, unknown> | string;
-    };
-    if (typeof http.error === 'string' && http.error.trim()) return http.error.trim();
-    const e = typeof http.error === 'object' ? http.error : undefined;
-    const general = (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0];
-    const detail = e?.['detail'] as string | undefined;
-    const apiMsg = general || detail || (e?.['message'] as string) || null;
-    if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
-    if (http.status === 502 || http.status === 503 || http.status === 504)
-      return 'Le service de génération IA a dépassé le délai (Ollama local lent ou proxy). Réessayez, ou générez carte par carte.';
-    return "L'inspiration cosmique est momentanément indisponible.";
-  }
 }
