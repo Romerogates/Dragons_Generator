@@ -107,8 +107,12 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
   constructor() {
     this.overlay.open.set(true);
     effect(() => {
-      this.thread().messages.length;
-      untracked(() => queueMicrotask(() => this.scrollToBottom()));
+      const messageCount = this.thread().messages.length;
+      untracked(() =>
+        queueMicrotask(() => {
+          if (messageCount > -1) this.scrollToBottom();
+        }),
+      );
     });
   }
 
