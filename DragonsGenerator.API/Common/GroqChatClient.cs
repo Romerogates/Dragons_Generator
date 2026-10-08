@@ -33,7 +33,7 @@ public static class GroqChatClient
         if (string.IsNullOrWhiteSpace(text))
             return null;
 
-        if (Regex.IsMatch(text, @"^\s*We need to\b", RegexOptions.IgnoreCase))
+        if (Regex.IsMatch(text, @"^\s*(We need to|The user wants|Let's (?:write|draft|count))\b", RegexOptions.IgnoreCase))
         {
             var quoted = Regex.Matches(text, "\"([^\"]{40,})\"")
                 .Select(m => m.Groups[1].Value.Trim())

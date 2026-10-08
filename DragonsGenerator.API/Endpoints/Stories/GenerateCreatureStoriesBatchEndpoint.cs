@@ -194,7 +194,7 @@ public class GenerateCreatureStoriesBatchEndpoint
             Génère la VIE et l'HISTOIRE PERSONNELLE (background) d'une créature du bestiaire, sous le nom qu'on lui a donné.
             Maximum 120 mots, un seul paragraphe dense et immersif.
             L'histoire doit expliquer qui il/elle est, son passé, ses motivations, et un hook pour une aventure.
-            Réponds uniquement avec l'histoire, sans introduction ni commentaire.
+            Réponds uniquement avec l'histoire en français. Aucun anglais, aucun plan, aucun brouillon, aucun guillemet autour du texte.
 
             CRÉATURE:
             - Nom dans l'histoire: {item.CustomName.Trim()}

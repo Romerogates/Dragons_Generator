@@ -126,16 +126,15 @@ public sealed class HybridAiService
             if (tryLocal)
             {
                 var local = await TryOllamaAsync(userPrompt, systemPrompt, maxTokens, LocalShortBudgetSeconds, budgetCt);
-                if (local is { Ok: true } && !string.IsNullOrWhiteSpace(local.Text))
+                var localOk = AcceptShort(local, acceptText);
+                if (localOk is not null)
                 {
-                    if (acceptText is null || acceptText(local.Text))
-                    {
-                        _logger.LogInformation("Génération courte servie par Ollama local");
-                        return Done("short", "ollama", local);
-                    }
-
-                    _logger.LogWarning("Ollama local réponse rejetée (format) — bascule cloud (Ollama reste dispo)");
+                    _logger.LogInformation("Génération courte servie par Ollama local");
+                    return Done("short", "ollama", localOk);
                 }
+
+                if (local is { Ok: true })
+                    _logger.LogWarning("Ollama local réponse rejetée (méta / pas du français) — bascule cloud");
             }
 
             if (_gemini is not null)
@@ -146,23 +145,37 @@ public sealed class HybridAiService
                     maxTokens,
                     budgetCt,
                     GetGeminiModelChain());
-                if (gemini.Ok && !string.IsNullOrWhiteSpace(gemini.Text)
-                    && (acceptText is null || acceptText(gemini.Text)))
+                var geminiOk = AcceptShort(gemini, acceptText);
+                if (geminiOk is not null)
                 {
                     _logger.LogInformation("Génération courte servie par Gemini");
-                    return Done("short", "gemini", gemini);
+                    return Done("short", "gemini", geminiOk);
                 }
             }
 
-            return Done(
-                "short",
-                "groq",
-                await _remote.SendChatAsync(
-                    userPrompt,
-                    systemPrompt,
-                    maxTokens,
-                    budgetCt,
-                    GetShortModelChain()));
+            var groq = await _remote.SendChatAsync(
+                userPrompt,
+                systemPrompt,
+                maxTokens,
+                budgetCt,
+                GetShortModelChain());
+            var groqOk = AcceptShort(groq, acceptText);
+            if (groqOk is not null)
+                return Done("short", "groq", groqOk);
+
+            if (groq.Ok)
+            {
+                return Done(
+                    "short",
+                    "groq",
+                    new GroqChatResult(
+                        false,
+                        null,
+                        "La génération IA n'a renvoyé aucun texte en français.",
+                        Retryable: true));
+            }
+
+            return Done("short", "groq", groq);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
@@ -402,6 +415,20 @@ public sealed class HybridAiService
             reason);
     }
 
+    private static GroqChatResult? AcceptShort(GroqChatResult? result, Func<string, bool>? acceptText)
+    {
+        if (result is not { Ok: true } || string.IsNullOrWhiteSpace(result.Text))
+            return null;
+
+        var cleaned = ShortOutputCleaner.Clean(result.Text);
+        if (string.IsNullOrWhiteSpace(cleaned))
+            return null;
+        if (acceptText is not null && !acceptText(cleaned))
+            return null;
+
+        return result with { Text = cleaned };
+    }
+
     private GroqChatResult Done(string kind, string provider, GroqChatResult result)
     {
         _telemetry.Record(kind, result.Ok, provider);
@@ -415,7 +442,7 @@ public sealed class HybridAiService
     {
         var primary = _config["Groq:ShortModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = "openai/gpt-oss-20b";
+            primary = "qwen/qwen3.6-27b";
 
         var fallback = _config["Groq:FallbackModel"];
         return new[] { primary, fallback }

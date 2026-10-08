@@ -10,7 +10,7 @@ public sealed class OpenAiChatClient
 {
     private const string DefaultRemoteBaseUrl = "https://api.groq.com/openai/v1";
     private const string FrenchSystemSuffix =
-        " Tu réponds UNIQUEMENT en français. Pas de commentaire méta, pas de texte en anglais, pas d'explication sur ta tâche.";
+        " Tu réponds UNIQUEMENT en français, avec le texte final demandé. Pas de commentaire méta, pas d'anglais, pas de plan, pas de brouillon, pas d'explication sur ta tâche.";
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;

@@ -58,7 +58,7 @@ public class GenerateCreatureStoryEndpoint(
             Génère la VIE et l'HISTOIRE PERSONNELLE (background) d'une créature du bestiaire, sous le nom qu'on lui a donné.
             Maximum 120 mots, un seul paragraphe dense et immersif.
             L'histoire doit expliquer qui il/elle est, son passé, ses motivations, et un hook pour une aventure.
-            Réponds uniquement avec l'histoire, sans introduction ni commentaire.
+            Réponds uniquement avec l'histoire en français. Aucun anglais, aucun plan, aucun brouillon, aucun guillemet autour du texte.
 
             CRÉATURE DU BESTIAIRE:
             - Nom officiel: {creature.Name}
@@ -87,7 +87,7 @@ public class GenerateCreatureStoryEndpoint(
         var result = await ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
-            280,
+            400,
             ct,
             userCredentials: userCreds);
 

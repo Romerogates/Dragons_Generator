@@ -46,7 +46,7 @@ services:
       ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
       App__PublicWebUrl: https://dragons-generator.top
       Groq__AdventureModel: groq/compound
-      Groq__ShortModel: openai/gpt-oss-20b
+      Groq__ShortModel: qwen/qwen3.6-27b
       Groq__FallbackModel: qwen/qwen3.6-27b
       Groq__MaxAttempts: "1"
       Groq__MaxRetryWindowMs: "60000"

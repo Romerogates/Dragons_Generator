@@ -45,7 +45,7 @@ public class GenerateBackstoryEndpoint(HybridAiService ai, UserAiCredentialResol
         var prompt = $"""
             Génère une histoire de background TRÈS CONCISE (maximum 100 mots, un seul paragraphe dense) pour ce personnage.
             L'histoire doit être complète et immersive, avec une accroche finale pour de futures aventures.
-            Réponds uniquement avec l'histoire, sans introduction ni commentaire.
+            Réponds uniquement avec l'histoire en français. Aucun anglais, aucun plan, aucun brouillon, aucun guillemet autour du texte.
 
             PERSONNAGE:
             - Nom: {req.Name}
