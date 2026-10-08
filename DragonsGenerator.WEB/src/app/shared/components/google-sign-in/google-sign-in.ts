@@ -88,6 +88,8 @@ export class GoogleSignInComponent implements AfterViewInit, OnDestroy {
     if (!el || !window.google?.accounts?.id) return;
     window.google.accounts.id.initialize({
       client_id: clientId,
+      ux_mode: 'popup',
+      use_fedcm_for_prompt: true,
       callback: (res: { credential?: string }) => {
         if (res.credential) this.credential.emit(res.credential);
       },
