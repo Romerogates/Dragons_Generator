@@ -203,13 +203,8 @@ jobs:
               done
             }
 
-            docker compose -f docker-compose.prod.yml up --build -d ollama || echo "WARN: Ollama container failed to start"
-            chmod +x scripts/ensure-ollama-model.sh
-            if ./scripts/ensure-ollama-model.sh docker-compose.prod.yml; then
-              echo "Ollama model ready"
-            else
-              echo "WARN: Ollama model unavailable — API will fall back to Groq for short generations"
-            fi
+            docker compose -f docker-compose.prod.yml stop ollama >/dev/null 2>&1 || true
+            echo "Ollama stopped on this VPS — Groq handles generation so the site stays up"
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
             mkdir -p ~/backups/dragons
             chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh scripts/send-alert-email.sh scripts/backup-sqlite.sh scripts/send-backup-email.sh scripts/log-ops-event.sh

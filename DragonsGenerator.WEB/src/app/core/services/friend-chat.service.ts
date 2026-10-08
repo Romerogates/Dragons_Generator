@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
 
@@ -70,6 +71,8 @@ export class FriendChatService {
 
   listSummaries(): Observable<FriendChatSummary[]> {
     if (!this.auth.isLoggedIn()) return of([]);
-    return this.http.get<FriendChatSummary[]>(`${this.api}/me/friends/messages/summaries`);
+    return this.http
+      .get<FriendChatSummary[]>(`${this.api}/me/friends/messages/summaries`)
+      .pipe(catchError(() => of([])));
   }
 }

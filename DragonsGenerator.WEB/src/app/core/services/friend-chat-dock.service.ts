@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { FriendChatService, FriendChatSummary } from './friend-chat.service';
 import { FriendsService } from './friends.service';
 import { AuthService } from './auth.service';
+import { AiGenerationProgressService } from './ai-generation-progress.service';
 import { FriendUser } from '@core/models/Campaign/campaign';
 
 export interface ChatConversation {
@@ -21,6 +22,7 @@ export class FriendChatDockService {
   private readonly chat = inject(FriendChatService);
   private readonly friends = inject(FriendsService);
   private readonly auth = inject(AuthService);
+  private readonly aiProgress = inject(AiGenerationProgressService);
 
   readonly isOpen = signal(false);
   /** Mode Messenger : quasi plein écran, liste + fil côte à côte (desktop). */
@@ -93,7 +95,7 @@ export class FriendChatDockService {
     }
     this.refreshList();
     this.summaryPollTimer = setInterval(() => {
-      if (this.auth.isLoggedIn()) this.refreshSummaries();
+      if (this.auth.isLoggedIn() && !this.aiProgress.active()) this.refreshSummaries();
     }, 20_000);
   }
 
@@ -205,16 +207,18 @@ export class FriendChatDockService {
       this.summaries.set([]);
       return;
     }
-    this.chat.listSummaries().subscribe((s) => {
-      const active = this.view() === 'thread' ? this.activeFriendId() : null;
-      if (!active) {
-        this.summaries.set(s);
-        return;
-      }
-      // Garde le badge à 0 tant que le fil est ouvert (évite le flash avant markRead).
-      this.summaries.set(
-        s.map((row) => (row.friendUserId === active ? { ...row, unreadCount: 0 } : row)),
-      );
+    this.chat.listSummaries().subscribe({
+      next: (s) => {
+        const active = this.view() === 'thread' ? this.activeFriendId() : null;
+        if (!active) {
+          this.summaries.set(s);
+          return;
+        }
+        this.summaries.set(
+          s.map((row) => (row.friendUserId === active ? { ...row, unreadCount: 0 } : row)),
+        );
+      },
+      error: () => undefined,
     });
   }
 

@@ -13,6 +13,7 @@ import { IdlePreloadStrategy } from './core/routing/idle-preload.strategy';
 import { credentialsInterceptor } from './core/interceptors/credentials.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { aiRateLimitInterceptor } from './core/interceptors/ai-rate-limit.interceptor';
+import { quietPollInterceptor } from './core/interceptors/quiet-poll.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,7 +31,12 @@ export const appConfig: ApplicationConfig = {
 
     provideHttpClient(
       withFetch(),
-      withInterceptors([credentialsInterceptor, authInterceptor, aiRateLimitInterceptor]),
+      withInterceptors([
+        credentialsInterceptor,
+        authInterceptor,
+        quietPollInterceptor,
+        aiRateLimitInterceptor,
+      ]),
     ),
 
     provideServiceWorker('ngsw-worker.js', {

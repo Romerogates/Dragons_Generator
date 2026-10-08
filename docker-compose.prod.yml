@@ -49,8 +49,8 @@ services:
       Groq__FallbackModel: llama-3.3-70b-versatile
       Groq__MaxAttempts: "3"
       Groq__MaxRetryWindowMs: "60000"
-      # Ollama d’abord (budget long). Groq seulement si Ollama est mort / injoignable.
-      LocalLlm__Enabled: "true"
+      # Ollama sur ce VPS fait tomber nginx/API (OOM / connection refused). Groq uniquement en prod.
+      LocalLlm__Enabled: "false"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
       LocalLlm__MaxAttempts: "1"

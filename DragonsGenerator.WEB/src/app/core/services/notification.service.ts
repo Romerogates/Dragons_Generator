@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { environment } from '@env/environment';
 import type { NotificationsSummary } from '@core/models/notification.model';
 import { AuthService } from './auth.service';
+import { AiGenerationProgressService } from './ai-generation-progress.service';
 
 const EMPTY_SUMMARY: NotificationsSummary = {
   friendsActionCount: 0,
@@ -19,6 +20,7 @@ export class NotificationService {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly api = environment.apiUrl;
+  private readonly aiProgress = inject(AiGenerationProgressService);
 
   private readonly summarySignal = signal<NotificationsSummary | null>(null);
   private refreshTimer: ReturnType<typeof setInterval> | null = null;
@@ -49,7 +51,7 @@ export class NotificationService {
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', this.onFocus);
       this.refreshTimer = setInterval(() => {
-        if (this.auth.isLoggedIn()) this.refresh();
+        if (this.auth.isLoggedIn() && !this.aiProgress.active()) this.refresh();
       }, 60_000);
     }
   }
@@ -59,6 +61,7 @@ export class NotificationService {
       this.summarySignal.set(null);
       return;
     }
+    if (this.aiProgress.active()) return;
     this.http.get<NotificationsSummary>(`${this.api}/me/notifications`).subscribe({
       next: (s) => this.summarySignal.set(s),
       error: () => this.summarySignal.set(EMPTY_SUMMARY),
