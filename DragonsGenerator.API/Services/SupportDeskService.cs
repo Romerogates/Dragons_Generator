@@ -96,7 +96,8 @@ public sealed class SupportDeskService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Support reply email failed");
+            logger.LogError(ex, "Support reply email failed");
+            throw;
         }
     }
 

@@ -26,6 +26,7 @@ export interface SupportTicketMessage {
   attachmentOriginalName?: string;
   campaignId?: string;
   campaignName?: string;
+  emailSent?: boolean;
 }
 
 export interface SupportTicketThread {

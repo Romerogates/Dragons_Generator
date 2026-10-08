@@ -268,14 +268,20 @@ export class AdminPage implements OnInit {
     fd.append('body', payload.body);
     fd.append('notifyEmail', payload.notifyEmail ? 'true' : 'false');
     if (payload.file) fd.append('file', payload.file, payload.file.name);
-    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
-      next: () => {
+    this.http.post<{ emailSent?: boolean }>(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
+      next: (res) => {
         this.convo()?.clearReplyUi();
-        this.message.set(
-          payload.notifyEmail
-            ? 'Réponse envoyée (fil + e-mail au joueur).'
-            : 'Réponse enregistrée dans le fil.',
-        );
+        if (payload.notifyEmail && res.emailSent === false) {
+          this.error.set('Message dans le fil, mais l’e-mail SMTP n’est pas parti. Vérifie Smtp__Host.');
+          this.message.set(null);
+        } else {
+          this.error.set(null);
+          this.message.set(
+            payload.notifyEmail
+              ? 'Réponse envoyée (fil + e-mail SMTP au joueur).'
+              : 'Réponse enregistrée dans le fil.',
+          );
+        }
         this.loadTickets(t.id);
       },
       error: () => this.error.set('Réponse non envoyée.'),

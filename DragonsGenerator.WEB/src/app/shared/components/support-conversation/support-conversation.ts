@@ -84,18 +84,6 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
   });
   readonly waitingText = computed(() => supportWaitingLabel(this.waiting(), this.audience()));
   readonly canEmail = computed(() => !!this.thread().canEmailPlayer);
-  readonly mailtoHref = computed(() => {
-    const t = this.ticket();
-    const email = t.userEmail?.trim();
-    if (!email) return '';
-    const shortId = t.id.slice(0, 8);
-    const subject = encodeURIComponent(`[Ticket ${shortId}] ${t.subject}`);
-    const body = encodeURIComponent(
-      this.replyBody.trim() ||
-        `Bonjour,\n\nConcernant votre ticket ${shortId} — ${t.subject}\n\n`,
-    );
-    return `mailto:${email}?subject=${subject}&body=${body}`;
-  });
   readonly campaignQuery = computed(() => (this.isStaff() ? { support: '1' } : {}));
   readonly selectedCharacter = computed(() =>
     this.myCharacters().find((c) => c.id === this.replyCharacterId) ?? null,
@@ -151,13 +139,7 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
   }
 
   replyByMail(): void {
-    const body = this.replyBody.trim();
-    if (this.canEmail() && body.length >= 2) {
-      this.emitSend(true);
-      return;
-    }
-    const href = this.mailtoHref();
-    if (href) window.location.href = href;
+    this.emitSend(true);
   }
 
   clearReplyUi(): void {

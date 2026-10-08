@@ -216,7 +216,7 @@
               <button
                 type="button"
                 class="rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-black uppercase tracking-wide text-zinc-950 hover:bg-amber-300 disabled:opacity-50"
-                [disabled]="sending()"
+                [disabled]="sending() || replyBody.trim().length < 2"
                 (click)="replyByMail()"
               >
                 Répondre par mail
@@ -225,17 +225,13 @@
           </div>
           @if (isStaff()) {
             <p class="text-[11px] text-slate-400">
-              @if (canEmail()) {
-                « Répondre par mail » envoie le texte dans le fil <span class="text-amber-200">et</span> par e-mail au joueur
-                @if (th.ticket.userEmail) {
-                  ({{ th.ticket.userEmail }}).
-                }
-              } @else {
-                SMTP indisponible — le bouton ouvre ta messagerie
-                @if (mailtoHref()) {
-                  (<a class="text-sky-300 underline" [href]="mailtoHref()">mailto</a>).
-                }
-                « Envoyer dans le fil » reste obligatoire pour l’historique.
+              « Répondre par mail » envoie tout de suite via SMTP dans le fil
+              <span class="text-amber-200">et</span> à la boîte du joueur
+              @if (th.ticket.userEmail) {
+                ({{ th.ticket.userEmail }}).
+              }
+              @if (!canEmail()) {
+                <span class="text-red-400"> SMTP non configuré côté serveur — l’envoi peut échouer.</span>
               }
             </p>
             <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500">

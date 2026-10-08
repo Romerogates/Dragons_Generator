@@ -34,7 +34,8 @@ public record TicketMessageDto(
     string? CharacterName = null,
     string? AttachmentOriginalName = null,
     Guid? CampaignId = null,
-    string? CampaignName = null
+    string? CampaignName = null,
+    bool EmailSent = true
 );
 
 public record TicketThreadDto(TicketDto Ticket, List<TicketMessageDto> Messages, bool CanEmailPlayer = false);
@@ -559,7 +560,11 @@ public class GetTicketThreadEndpoint(AppDbContext db, IOptionsMonitor<SmtpOption
     }
 }
 
-public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk, ILogger<PostTicketMessageEndpoint> logger)
+public class PostTicketMessageEndpoint(
+    AppDbContext db,
+    SupportDeskService desk,
+    IOptionsMonitor<SmtpOptions> smtp,
+    ILogger<PostTicketMessageEndpoint> logger)
     : EndpointWithoutRequest<TicketMessageDto>
 {
     public override void Configure()
@@ -717,8 +722,27 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
                 notifyEmail = false;
         }
 
+        var emailSent = true;
         if (isAdmin && notifyEmail)
-            await desk.NotifyReplyAsync(ticket, ticket.User.Email, ticket.User.DisplayName, msg.Body, ct);
+        {
+            if (smtp.CurrentValue.IsSink)
+            {
+                emailSent = false;
+                logger.LogError("SMTP reply skipped: Smtp__Host is a log sink (ticket {TicketId})", ticket.Id);
+            }
+            else
+            {
+                try
+                {
+                    await desk.NotifyReplyAsync(ticket, ticket.User.Email, ticket.User.DisplayName, msg.Body, ct);
+                }
+                catch (Exception ex)
+                {
+                    emailSent = false;
+                    logger.LogError(ex, "SMTP reply failed for ticket {TicketId}", ticket.Id);
+                }
+            }
+        }
         else if (!isAdmin)
             await desk.NotifyNewTicketAsync(ticket, ticket.User.Email, ct, msg.Body);
 
@@ -732,7 +756,8 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
                 msg.CharacterName,
                 msg.AttachmentOriginalName,
                 msg.CampaignId,
-                msg.CampaignName),
+                msg.CampaignName,
+                emailSent),
             ct);
     }
 }
