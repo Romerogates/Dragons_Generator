@@ -292,11 +292,17 @@ public class FriendSupportIntegrationTests
         Assert.Equal(HttpStatusCode.OK, (await _client.SendAsync(takeReq)).StatusCode);
 
         using var staffReq = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", adminToken);
-        staffReq.Content = JsonContent.Create(new { body = "On regarde le journal de session." });
+        staffReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("On regarde le journal de session."), "body" },
+        };
         (await _client.SendAsync(staffReq)).EnsureSuccessStatusCode();
 
         using var playerMsg = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", playerToken);
-        playerMsg.Content = JsonContent.Create(new { body = "Ça arrive après Lancer le combat." });
+        playerMsg.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Ça arrive après Lancer le combat."), "body" },
+        };
         (await _client.SendAsync(playerMsg)).EnsureSuccessStatusCode();
 
         using var threadReq = ApiTestAuth.Authed(HttpMethod.Get, $"/support/tickets/{ticketId}", playerToken);

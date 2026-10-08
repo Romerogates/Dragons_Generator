@@ -527,11 +527,15 @@ public class GetTicketThreadEndpoint(AppDbContext db) : EndpointWithoutRequest<T
 }
 
 public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk, ILogger<PostTicketMessageEndpoint> logger)
-    : Endpoint<PostTicketMessageRequest, TicketMessageDto>
+    : EndpointWithoutRequest<TicketMessageDto>
 {
-    public override void Configure() => Post("/support/tickets/{id}/messages");
+    public override void Configure()
+    {
+        Post("/support/tickets/{id}/messages");
+        AllowFileUploads();
+    }
 
-    public override async Task HandleAsync(PostTicketMessageRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         var userId = AuthHelpers.GetUserId(User);
         if (userId is null)
@@ -540,9 +544,16 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
             return;
         }
 
-        var body = HttpContext.Request.HasFormContentType
-            ? HttpContext.Request.Form["body"].ToString()
-            : (req.Body ?? "");
+        string body;
+        if (HttpContext.Request.HasFormContentType)
+        {
+            body = HttpContext.Request.Form["body"].ToString();
+        }
+        else
+        {
+            var req = await HttpContext.Request.ReadFromJsonAsync<PostTicketMessageRequest>(ct);
+            body = req?.Body ?? "";
+        }
         body = body.Trim();
         if (body.Length < 2)
         {

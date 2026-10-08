@@ -280,7 +280,9 @@ export class AdminPage implements OnInit {
     const t = this.thread()?.ticket;
     const body = this.replyBody.trim();
     if (!t || body.length < 2) return;
-    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, { body }).subscribe({
+    const fd = new FormData();
+    fd.append('body', body);
+    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
       next: () => {
         this.replyBody = '';
         this.message.set('Réponse envoyée au joueur (mail + fil).');
