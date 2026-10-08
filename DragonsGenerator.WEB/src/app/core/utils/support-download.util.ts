@@ -7,8 +7,11 @@ export function downloadTicketCharacterJson(
   ticketId: string,
   characterName: string,
   onError?: () => void,
+  messageId?: string,
 ): void {
-  const url = `${environment.apiUrl}/support/tickets/${ticketId}/character-json`;
+  const url = messageId
+    ? `${environment.apiUrl}/support/tickets/${ticketId}/messages/${messageId}/character-json`
+    : `${environment.apiUrl}/support/tickets/${ticketId}/character-json`;
   http.get(url, { responseType: 'blob' }).subscribe({
     next: (blob) => {
       const safeName = (characterName.trim() || 'personnage').replace(/[^\w\s\-àâäéèêëïîôùûüç]/gi, '').trim() || 'personnage';
@@ -28,8 +31,11 @@ export function openTicketAttachment(
   http: HttpClient,
   ticketId: string,
   onError?: () => void,
+  messageId?: string,
 ): void {
-  const url = `${environment.apiUrl}/support/tickets/${ticketId}/attachment`;
+  const url = messageId
+    ? `${environment.apiUrl}/support/tickets/${ticketId}/messages/${messageId}/attachment`
+    : `${environment.apiUrl}/support/tickets/${ticketId}/attachment`;
   http.get(url, { responseType: 'blob' }).subscribe({
     next: (blob) => {
       const objectUrl = URL.createObjectURL(blob);

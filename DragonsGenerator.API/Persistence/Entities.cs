@@ -25,6 +25,8 @@ public class AppUser
     public DateTimeOffset? AcceptedTermsAt { get; set; }
     /// <summary>JSON préférences UI (guide, etc.).</summary>
     public string PreferencesJson { get; set; } = "{}";
+    /// <summary>Subject Google (sub) si le compte s’est inscrit via Google.</summary>
+    public string? GoogleSubject { get; set; }
 
     public List<CharacterRecord> Characters { get; set; } = [];
     public List<DungeonRecord> Dungeons { get; set; } = [];
@@ -94,6 +96,10 @@ public class SupportTicketMessage
     public Guid AuthorUserId { get; set; }
     public bool FromStaff { get; set; }
     public string Body { get; set; } = "";
+    public Guid? CharacterId { get; set; }
+    public string? CharacterName { get; set; }
+    public string? AttachmentStoredName { get; set; }
+    public string? AttachmentOriginalName { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
@@ -103,6 +109,19 @@ public class OpsEvent
     public string Kind { get; set; } = "";
     public string Title { get; set; } = "";
     public string Detail { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+/// <summary>Copie des mails sortants envoyés par l’app (pas une boîte SMTP OVH).</summary>
+public class OutboundEmail
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string ToEmail { get; set; } = "";
+    public string FromEmail { get; set; } = "";
+    public string Subject { get; set; } = "";
+    public string HtmlBody { get; set; } = "";
+    public string Status { get; set; } = "sent";
+    public string? Error { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 

@@ -338,6 +338,28 @@ public class FriendSupportIntegrationTests
     }
 
     [Fact]
+    public async Task Outbound_emails_are_recorded_and_admin_only()
+    {
+        var (email, userToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "mailog");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        using var listReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/outbound-emails", adminToken);
+        var listRes = await _client.SendAsync(listReq);
+        listRes.EnsureSuccessStatusCode();
+        var list = await listRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.True(list.GetArrayLength() >= 1);
+        Assert.Contains(
+            list.EnumerateArray(),
+            item => string.Equals(item.GetProperty("toEmail").GetString(), email, StringComparison.OrdinalIgnoreCase)
+                && (item.GetProperty("htmlBody").GetString() ?? "").Length > 0
+                && item.GetProperty("status").GetString() == "sent"
+        );
+
+        using var forbidden = ApiTestAuth.Authed(HttpMethod.Get, "/admin/outbound-emails", userToken);
+        Assert.Equal(HttpStatusCode.Forbidden, (await _client.SendAsync(forbidden)).StatusCode);
+    }
+
+    [Fact]
     public async Task Support_rejects_invalid_character_link()
     {
         var (_, token, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "badchar");
@@ -412,5 +434,34 @@ public class FriendSupportIntegrationTests
         );
         var adminResponse = await _client.SendAsync(adminReq);
         adminResponse.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task Auth_google_without_client_id_is_unavailable()
+    {
+        var response = await _client.PostAsJsonAsync("/auth/google", new { idToken = "x", acceptTerms = true });
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Auth_providers_returns_google_client_id_field()
+    {
+        var response = await _client.GetAsync("/auth/providers");
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.True(body.TryGetProperty("googleClientId", out _));
+    }
+
+    [Fact]
+    public async Task Admin_backup_list_requires_admin()
+    {
+        var (_, token, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "nobackup");
+        using var userReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/ops/backups", token);
+        Assert.Equal(HttpStatusCode.Forbidden, (await _client.SendAsync(userReq)).StatusCode);
+
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+        using var adminReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/ops/backups", adminToken);
+        var adminRes = await _client.SendAsync(adminReq);
+        adminRes.EnsureSuccessStatusCode();
     }
 }

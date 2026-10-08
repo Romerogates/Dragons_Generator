@@ -211,6 +211,7 @@ jobs:
               echo "WARN: Ollama model unavailable — API will fall back to Groq for short generations"
             fi
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
+            mkdir -p ~/backups/dragons
             chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh scripts/send-alert-email.sh scripts/backup-sqlite.sh scripts/send-backup-email.sh scripts/log-ops-event.sh
             ./scripts/renew-letsencrypt.sh docker-compose.prod.yml || echo "WARN: Let’s Encrypt renew skipped"
             ./scripts/install-vps-cron.sh || echo "WARN: cron watchdog non installé"

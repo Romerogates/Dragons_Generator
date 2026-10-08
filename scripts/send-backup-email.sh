@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Envoie le backup SQLite (zip) à Alert__Email. Usage : send-backup-email.sh <fichier.db> [uploads.tar.gz]
+# Mail de confirmation backup — SANS zip (Hotmail le vide). Les fichiers restent sur le VPS.
+# Usage : send-backup-email.sh <fichier.db> [uploads.tar.gz]
 set -euo pipefail
 DB_FILE="${1:?fichier db manquant}"
 UPLOADS_FILE="${2:-}"
 ROOT="${DRAGONS_ROOT:-$HOME/Dragons_Generator}"
 ENV_FILE="${ALERT_ENV_FILE:-$ROOT/.env}"
 TO_DEFAULT="Anthony.martinr@hotmail.be"
-MAX_BYTES="${BACKUP_EMAIL_MAX_BYTES:-18000000}"
+PUBLIC_URL="${APP_PUBLIC_WEB_URL:-https://dragons-generator.top}"
 
 if [ ! -s "$DB_FILE" ]; then
   echo "WARN: backup db absent — mail non envoyé"
@@ -14,7 +15,7 @@ if [ ! -s "$DB_FILE" ]; then
 fi
 
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "WARN: python3 absent — impossible d’envoyer le backup"
+  echo "WARN: python3 absent — impossible d’envoyer le mail backup"
   exit 0
 fi
 
@@ -22,10 +23,10 @@ export ALERT_ENV_FILE="$ENV_FILE"
 export ALERT_TO_DEFAULT="$TO_DEFAULT"
 export BACKUP_DB_FILE="$DB_FILE"
 export BACKUP_UPLOADS_FILE="$UPLOADS_FILE"
-export BACKUP_EMAIL_MAX_BYTES="$MAX_BYTES"
+export BACKUP_PUBLIC_URL="$PUBLIC_URL"
 
 python3 - <<'PY'
-import os, smtplib, ssl, zipfile, tempfile
+import os, smtplib, ssl
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -54,44 +55,40 @@ port = int(env.get("Smtp__Port") or "465")
 user = env.get("Smtp__UserName") or ""
 password = env.get("Smtp__Password") or ""
 use_ssl = (env.get("Smtp__UseSsl") or "true").lower() in {"1", "true", "yes"}
-max_bytes = int(os.environ.get("BACKUP_EMAIL_MAX_BYTES") or "18000000")
+web = (os.environ.get("BACKUP_PUBLIC_URL") or env.get("App__PublicWebUrl") or "https://dragons-generator.top").rstrip("/")
 
 db = Path(os.environ["BACKUP_DB_FILE"])
 uploads = Path(os.environ.get("BACKUP_UPLOADS_FILE") or "")
 stamp = db.stem.replace("dragons-", "")
-zip_path = Path(tempfile.gettempdir()) / f"dragons-backup-{stamp}.zip"
+db_size = db.stat().st_size
+up_size = uploads.stat().st_size if uploads.is_file() else 0
+desk = f"{web}/admin?tab=ops"
 
-with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-    zf.write(db, arcname=db.name)
-    if uploads.is_file() and uploads.stat().st_size > 0:
-        zf.write(uploads, arcname=uploads.name)
-
-size = zip_path.stat().st_size
-note = (
-    f"Backup Dragons Generator ({stamp}).\n"
-    f"Fichier joint : {zip_path.name} ({size} octets).\n"
-    f"Garde-le hors du VPS (PC, disque, cloud perso).\n"
-    f"Restauration : docs/restauration.md sur le dépôt.\n"
+text = (
+    f"Backup Dragons Generator OK — {stamp}\n\n"
+    f"Base : {db.name} ({db_size} octets)\n"
+    f"Uploads : {uploads.name if uploads.is_file() else '—'} ({up_size} octets)\n"
+    f"Stockage VPS : ~/backups/dragons/ (14 jours)\n\n"
+    f"Télécharger (connecté admin) : {desk}\n"
+    f"Aucun zip en pièce jointe : Hotmail le vidait. Le fichier reste sur le serveur, gratuit.\n"
 )
-attach = size <= max_bytes
-if not attach:
-    note += (
-        f"\nPièce trop lourde pour Hotmail/OVH (limite {max_bytes} octets). "
-        f"Le fichier reste sur le VPS : ~/backups/dragons/\n"
-    )
+html = f"""<html><body style="font-family:sans-serif;background:#111827;color:#e5e7eb;padding:24px">
+<h1 style="color:#f59e0b;font-size:20px">Backup OK — {stamp}</h1>
+<p>Le snapshot est <strong>sur le VPS</strong> (pas en pièce jointe, Hotmail le coupait).</p>
+<ul>
+<li>Base : <code>{db.name}</code> — {db_size} octets</li>
+<li>Uploads : <code>{uploads.name if uploads.is_file() else '—'}</code> — {up_size} octets</li>
+<li>Dossier : <code>~/backups/dragons/</code> (rétention 14 jours)</li>
+</ul>
+<p><a href="{desk}" style="color:#f59e0b">Télécharger depuis le desk admin → onglet Backups</a></p>
+</body></html>"""
 
 msg = EmailMessage()
 msg["From"] = f"{from_name} <{from_addr}>"
 msg["To"] = to_addr
-msg["Subject"] = f"Backup Dragons Generator — {stamp}"
-msg.set_content(note)
-if attach:
-    msg.add_attachment(
-        zip_path.read_bytes(),
-        maintype="application",
-        subtype="zip",
-        filename=zip_path.name,
-    )
+msg["Subject"] = f"Backup Dragons Generator — {stamp} (sur le VPS)"
+msg.set_content(text)
+msg.add_alternative(html, subtype="html")
 
 ctx = ssl.create_default_context()
 if port == 465 or use_ssl:
@@ -107,10 +104,9 @@ else:
             smtp.login(user, password)
         smtp.send_message(msg)
 
-zip_path.unlink(missing_ok=True)
-print(f"backup mailed to {to_addr} attach={attach} bytes={size}")
+print(f"backup mailed to {to_addr} attach=false bytes={db_size}")
 PY
-ROOT="${DRAGONS_ROOT:-$HOME/Dragons_Generator}"
+
 if [ -x "$ROOT/scripts/log-ops-event.sh" ]; then
-  "$ROOT/scripts/log-ops-event.sh" backup_mail "Backup mailé" "$(basename "$DB_FILE")" || true
+  "$ROOT/scripts/log-ops-event.sh" backup_mail "Backup stocké sur le VPS" "$(basename "$DB_FILE")" || true
 fi

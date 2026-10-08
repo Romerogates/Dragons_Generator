@@ -74,6 +74,7 @@
         <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
           {{ loading() ? 'Connexion…' : 'Se connecter' }}
         </button>
+        <app-google-sign-in (credential)="onGoogle($event)" />
       </form>
 
       <div class="mt-4 flex flex-col gap-2 text-center text-xs text-slate-400">

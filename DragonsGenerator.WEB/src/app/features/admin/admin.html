@@ -16,7 +16,8 @@
     @for (t of [
       { id: 'overview', label: 'Vue d’ensemble' },
       { id: 'tickets', label: 'Tickets' },
-      { id: 'ops', label: 'Backups / crons / mails' },
+      { id: 'ops', label: 'Backups / crons' },
+      { id: 'mails', label: 'Mails' },
       { id: 'users', label: 'Comptes' },
     ]; track t.id) {
       <button
@@ -111,6 +112,34 @@
           </tbody>
         </table>
       </div>
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Fichiers sur le VPS</h2>
+      <p class="text-xs text-slate-500 mb-2">Télécharge ici (gratuit, pas de zip Hotmail). Dossier <code>~/backups/dragons/</code>.</p>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Fichier</th>
+              <th class="px-3 py-2">Taille</th>
+              <th class="px-3 py-2">Date</th>
+              <th class="px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of hostBackups(); track b.name) {
+              <tr class="border-t border-slate-800">
+                <td class="px-3 py-2 font-mono">{{ b.name }}</td>
+                <td class="px-3 py-2 text-slate-400">{{ b.size }} o</td>
+                <td class="px-3 py-2 text-slate-500">{{ b.modified | date: 'short' }}</td>
+                <td class="px-3 py-2">
+                  <button type="button" class="text-amber-400 hover:underline" (click)="downloadBackup(b.name)">Télécharger</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="px-3 py-4 text-slate-500">Aucun fichier monté (volume host-backups).</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
       <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Journal (backups, alertes, mails)</h2>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
@@ -139,6 +168,63 @@
         </table>
       </div>
     }
+  }
+
+  @if (tab() === 'mails') {
+    <p class="text-xs text-slate-400 mb-4">
+      Boîte OVH (IMAP) + mails envoyés par l’app. Pas MailHog.
+    </p>
+    <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Boîte OVH (reçus)</h2>
+    <div class="flex flex-col gap-2 mb-8 max-h-64 overflow-y-auto custom-scrollbar">
+      @for (m of inboxMails(); track m.id) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3">
+          <p class="font-bold text-amber-400 text-sm">{{ m.subject }}</p>
+          <p class="text-[10px] text-slate-500">{{ m.from }} · {{ m.date | date: 'short' }}</p>
+          <p class="text-xs text-slate-400 mt-1">{{ m.snippet }}</p>
+        </div>
+      } @empty {
+        <p class="text-xs text-slate-500">Aucun mail IMAP (identifiants SMTP/IMAP OVH, ou boîte vide).</p>
+      }
+    </div>
+    <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Envoyés par l’app</h2>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        @for (m of outboundEmails(); track m.id) {
+          <button
+            type="button"
+            class="text-left bg-[#1b2028] border rounded-xl p-3"
+            [class.border-amber-600]="selectedMail()?.id === m.id"
+            [class.border-slate-800]="selectedMail()?.id !== m.id"
+            (click)="selectedMail.set(m)"
+          >
+            <div class="flex justify-between gap-2">
+              <span class="font-bold text-amber-400 text-sm">{{ m.subject }}</span>
+              <span class="text-[10px] uppercase" [class.text-emerald-400]="m.status === 'sent'" [class.text-red-400]="m.status !== 'sent'">{{ m.status }}</span>
+            </div>
+            <p class="text-[10px] text-slate-500">{{ m.toEmail }} · {{ m.createdAt | date: 'short' }}</p>
+          </button>
+        } @empty {
+          <p class="text-xs text-slate-500">Aucun mail enregistré pour l’instant (après le prochain envoi SMTP).</p>
+        }
+      </div>
+      @if (selectedMail(); as mail) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4" data-testid="admin-outbound-mail">
+          <h3 class="font-serif text-lg text-amber-400 mb-1">{{ mail.subject }}</h3>
+          <p class="text-[10px] text-slate-500 mb-3">
+            De {{ mail.fromEmail }} → {{ mail.toEmail }} · {{ mail.createdAt | date: 'medium' }}
+          </p>
+          @if (mail.error) {
+            <p class="text-xs text-red-400 mb-2">{{ mail.error }}</p>
+          }
+          <iframe
+            class="w-full min-h-[360px] rounded-lg bg-white"
+            sandbox=""
+            [attr.srcdoc]="mail.htmlBody"
+            title="Aperçu du mail"
+          ></iframe>
+        </div>
+      }
+    </div>
   }
 
   @if (tab() === 'tickets') {
@@ -203,6 +289,12 @@
                   {{ m.fromStaff ? 'Support' : 'Joueur' }} · {{ m.createdAt | date: 'short' }}
                 </p>
                 {{ m.body }}
+                @if (m.characterName) {
+                  <p class="text-[10px] text-violet-300 mt-1">Fiche : {{ m.characterName }}</p>
+                }
+                @if (m.attachmentOriginalName) {
+                  <p class="text-[10px] text-sky-400 mt-1">{{ m.attachmentOriginalName }}</p>
+                }
               </div>
             }
           </div>

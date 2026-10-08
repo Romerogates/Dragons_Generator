@@ -25,6 +25,17 @@ public record CronRowDto(string Name, string Schedule, string LastKind);
 
 public record IngestOpsEventRequest(string Kind, string Title, string Detail);
 
+public record OutboundEmailDto(
+    Guid Id,
+    string ToEmail,
+    string FromEmail,
+    string Subject,
+    string HtmlBody,
+    string Status,
+    string? Error,
+    DateTimeOffset CreatedAt
+);
+
 public class AdminOpsOverviewEndpoint(AppDbContext db) : EndpointWithoutRequest<AdminOverviewDto>
 {
     public override void Configure()
@@ -87,6 +98,33 @@ public class AdminOpsEventsEndpoint(AppDbContext db) : EndpointWithoutRequest<Li
             .OrderByDescending(e => e.CreatedAt)
             .Take(100)
             .Select(e => new OpsEventDto(e.Id, e.Kind, e.Title, e.Detail, e.CreatedAt))
+            .ToList();
+        await Send.OkAsync(list, ct);
+    }
+}
+
+public class AdminOutboundEmailsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<OutboundEmailDto>>
+{
+    public override void Configure()
+    {
+        Get("/admin/outbound-emails");
+        Roles(AppRoles.Admin);
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var list = (await db.OutboundEmails.AsNoTracking().ToListAsync(ct))
+            .OrderByDescending(e => e.CreatedAt)
+            .Take(200)
+            .Select(e => new OutboundEmailDto(
+                e.Id,
+                e.ToEmail,
+                e.FromEmail,
+                e.Subject,
+                e.HtmlBody,
+                e.Status,
+                e.Error,
+                e.CreatedAt))
             .ToList();
         await Send.OkAsync(list, ct);
     }

@@ -56,6 +56,7 @@ services:
       LocalLlm__MaxRetryWindowMs: "25000"
     volumes:
       - dragons-api-data:/app/data
+      - ${BACKUP_HOST_DIR:-/home/debian/backups/dragons}:/app/host-backups:ro
     env_file:
       - path: .env
         required: false

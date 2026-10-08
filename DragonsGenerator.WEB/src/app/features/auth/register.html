@@ -125,6 +125,7 @@
         <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
           {{ loading() ? 'Création…' : "S'inscrire" }}
         </button>
+        <app-google-sign-in (credential)="onGoogle($event)" />
       </form>
       <p class="mt-4 text-center text-xs text-slate-400">
         Déjà un compte ?

@@ -48,6 +48,23 @@ interface TicketMessage {
   fromStaff: boolean;
   body: string;
   createdAt: string;
+  characterName?: string;
+  attachmentOriginalName?: string;
+}
+
+interface HostBackupFile {
+  name: string;
+  size: number;
+  modified: string;
+}
+
+interface InboxMail {
+  id: string;
+  from: string;
+  to: string;
+  subject: string;
+  snippet: string;
+  date: string;
 }
 
 interface TicketThread {
@@ -67,6 +84,17 @@ interface CronRow {
   name: string;
   schedule: string;
   lastKind: string;
+}
+
+interface OutboundEmail {
+  id: string;
+  toEmail: string;
+  fromEmail: string;
+  subject: string;
+  htmlBody: string;
+  status: string;
+  error?: string | null;
+  createdAt: string;
 }
 
 interface Overview {
@@ -97,10 +125,14 @@ export class AdminPage implements OnInit {
   private readonly router = inject(Router);
   private readonly api = environment.apiUrl;
 
-  readonly tab = signal<'overview' | 'tickets' | 'ops' | 'users'>('overview');
+  readonly tab = signal<'overview' | 'tickets' | 'ops' | 'mails' | 'users'>('overview');
   readonly users = signal<AdminUser[]>([]);
   readonly tickets = signal<AdminTicket[]>([]);
   readonly overview = signal<Overview | null>(null);
+  readonly outboundEmails = signal<OutboundEmail[]>([]);
+  readonly selectedMail = signal<OutboundEmail | null>(null);
+  readonly hostBackups = signal<HostBackupFile[]>([]);
+  readonly inboxMails = signal<InboxMail[]>([]);
   readonly thread = signal<TicketThread | null>(null);
   readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
   readonly diagnostic = signal<string>('');
@@ -117,16 +149,64 @@ export class AdminPage implements OnInit {
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
     const tab = q.get('tab');
-    if (tab === 'tickets' || tab === 'ops' || tab === 'users' || tab === 'overview') this.tab.set(tab);
+    if (tab === 'tickets' || tab === 'ops' || tab === 'mails' || tab === 'users' || tab === 'overview')
+      this.tab.set(tab);
     this.loadUsers();
     this.loadTickets(q.get('ticket'));
     this.loadOverview();
+    if (this.tab() === 'mails') this.loadMails();
+    if (this.tab() === 'ops') this.loadHostBackups();
   }
 
-  setTab(tab: 'overview' | 'tickets' | 'ops' | 'users'): void {
+  setTab(tab: 'overview' | 'tickets' | 'ops' | 'mails' | 'users'): void {
     this.tab.set(tab);
     void this.router.navigate([], { queryParams: { tab }, queryParamsHandling: 'merge' });
     if (tab === 'overview' || tab === 'ops') this.loadOverview();
+    if (tab === 'ops') this.loadHostBackups();
+    if (tab === 'mails') this.loadMails();
+  }
+
+  loadMails(): void {
+    this.loadOutboundEmails();
+    this.http.get<InboxMail[]>(`${this.api}/admin/ops/inbox`).subscribe({
+      next: (list) => this.inboxMails.set(list),
+      error: () => this.inboxMails.set([]),
+    });
+  }
+
+  loadHostBackups(): void {
+    this.http.get<HostBackupFile[]>(`${this.api}/admin/ops/backups`).subscribe({
+      next: (list) => this.hostBackups.set(list),
+      error: () => this.hostBackups.set([]),
+    });
+  }
+
+  downloadBackup(name: string): void {
+    this.http.get(`${this.api}/admin/ops/backups/${encodeURIComponent(name)}`, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.error.set('Téléchargement backup impossible.'),
+    });
+  }
+
+  loadOutboundEmails(): void {
+    this.http.get<OutboundEmail[]>(`${this.api}/admin/outbound-emails`).subscribe({
+      next: (list) => {
+        this.outboundEmails.set(list);
+        const current = this.selectedMail();
+        if (current) {
+          const still = list.find((m) => m.id === current.id);
+          this.selectedMail.set(still ?? null);
+        }
+      },
+      error: () => this.error.set('Impossible de charger les mails envoyés.'),
+    });
   }
 
   loadOverview(): void {

@@ -24,14 +24,15 @@ export class FriendChatPage implements OnInit {
     }
     this.friends.listFriends().subscribe((list) => {
       const match = list.find((f) => f.id === id);
-      this.dock.openThread(
-        id,
-        match?.displayName ?? 'Ami',
-        match?.avatarEmoji,
-        match?.accentColor,
-        { expanded: true },
-      );
-      this.router.navigate(['/friends'], { replaceUrl: true });
+      void this.router.navigate(['/friends'], { replaceUrl: true }).then(() => {
+        this.dock.openThread(
+          id,
+          match?.displayName ?? 'Ami',
+          match?.avatarEmoji,
+          match?.accentColor,
+          { expanded: true },
+        );
+      });
     });
   }
 }

@@ -33,8 +33,39 @@ resolve_volume_name() {
   docker volume ls --format '{{.Name}}' | grep 'dragons-api-data$' | head -1
 }
 
+maybe_mail() {
+  local db_backup="$1"
+  local uploads_backup="$2"
+  local mailer="$COMPOSE_DIR/scripts/send-backup-email.sh"
+  if [ ! -x "$mailer" ]; then
+    log "WARN: send-backup-email.sh absent ou non exécutable"
+    return
+  fi
+  local mail_stamp="$BACKUP_DIR/.last-backup-mail"
+  local now epoch
+  now="$(date +%s)"
+  if [ -f "$mail_stamp" ]; then
+    epoch="$(stat -c %Y "$mail_stamp" 2>/dev/null || echo 0)"
+    if [ $((now - epoch)) -lt 72000 ]; then
+      log "Mail backup déjà envoyé il y a moins de 20 h — skip mail"
+      return
+    fi
+  fi
+  log "Mail de confirmation backup (sans zip — fichiers sur le VPS)"
+  if "$mailer" "$db_backup" "$uploads_backup"; then
+    date -Iseconds >"$mail_stamp"
+  else
+    log "WARN: envoi mail backup échoué"
+  fi
+}
+
 main() {
   mkdir -p "$BACKUP_DIR"
+  exec 9>"$BACKUP_DIR/.backup.lock"
+  if ! flock -n 9; then
+    log "Backup déjà en cours — skip"
+    exit 0
+  fi
 
   local volume
   volume="$(resolve_volume_name)"
@@ -94,13 +125,7 @@ main() {
       "${db_backup} (${db_count} conservés)" || true
   fi
 
-  local mailer="$COMPOSE_DIR/scripts/send-backup-email.sh"
-  if [ -x "$mailer" ]; then
-    log "Envoi du backup par mail"
-    "$mailer" "$db_backup" "$uploads_backup" || log "WARN: envoi mail backup échoué"
-  else
-    log "WARN: send-backup-email.sh absent ou non exécutable"
-  fi
+  maybe_mail "$db_backup" "$uploads_backup"
 }
 
 main "$@"

@@ -125,6 +125,12 @@ export class AuthService {
     );
   }
 
+  loginGoogle(idToken: string, acceptTerms = false, displayName?: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.api}/auth/google`, { idToken, acceptTerms, displayName })
+      .pipe(tap((res) => this.persist(res.user)));
+  }
+
   confirmEmail(token: string): Observable<AuthResponse> {
     return this.http
       .get<AuthResponse>(`${this.api}/auth/confirm-email`, { params: { token } })

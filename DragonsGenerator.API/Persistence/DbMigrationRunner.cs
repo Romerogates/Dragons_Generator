@@ -40,6 +40,8 @@ public static class DbMigrationRunner
         new("016_dungeon_share_link", Apply016DungeonShareLinkAsync),
         new("017_activity_kind_index", Apply017ActivityKindIndexAsync),
         new("018_support_desk", Apply018SupportDeskAsync),
+        new("019_outbound_emails", Apply019OutboundEmailsAsync),
+        new("020_google_and_ticket_message_attachments", Apply020GoogleAndTicketMessageAttachmentsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -400,6 +402,37 @@ public static class DbMigrationRunner
             );
             CREATE INDEX IF NOT EXISTS "IX_OpsEvents_CreatedAt" ON "OpsEvents" ("CreatedAt");
             """,
+            ct);
+    }
+
+    private static async Task Apply019OutboundEmailsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "OutboundEmails" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_OutboundEmails" PRIMARY KEY,
+                "ToEmail" TEXT NOT NULL,
+                "FromEmail" TEXT NOT NULL,
+                "Subject" TEXT NOT NULL,
+                "HtmlBody" TEXT NOT NULL,
+                "Status" TEXT NOT NULL,
+                "Error" TEXT NULL,
+                "CreatedAt" TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS "IX_OutboundEmails_CreatedAt" ON "OutboundEmails" ("CreatedAt");
+            """,
+            ct);
+    }
+
+    private static async Task Apply020GoogleAndTicketMessageAttachmentsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Users", "GoogleSubject", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "CharacterId", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "CharacterName", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "AttachmentStoredName", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "AttachmentOriginalName", "TEXT NULL", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """CREATE INDEX IF NOT EXISTS "IX_Users_GoogleSubject" ON "Users" ("GoogleSubject");""",
             ct);
     }
 

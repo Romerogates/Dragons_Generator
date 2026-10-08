@@ -8,16 +8,18 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { GoogleSignInComponent } from '@shared/components/google-sign-in/google-sign-in';
+import { PushNotificationService } from '@core/services/push-notification.service';
 import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent, GoogleSignInComponent],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -26,6 +28,8 @@ export class RegisterPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly pendingSave = inject(PendingCharacterSaveService);
+  private readonly router = inject(Router);
+  private readonly push = inject(PushNotificationService);
 
   email = '';
   password = '';
@@ -59,6 +63,37 @@ export class RegisterPage implements OnInit {
       this.localDev.set(isLocalDevHost(host));
       this.mailhogUrl.set(mailhogWebUrl(host));
     }
+  }
+
+  onGoogle(idToken: string): void {
+    this.error.set(null);
+    if (!this.acceptedTerms) {
+      this.error.set('Cochez les conditions, puis Google.');
+      return;
+    }
+    this.loading.set(true);
+    this.auth.loginGoogle(idToken, true, this.displayName.trim() || undefined).subscribe({
+      next: () => {
+        this.push.initAfterLogin();
+        this.pendingSave.flushIfPossible().subscribe({
+          next: (saved) => {
+            this.loading.set(false);
+            void this.router.navigateByUrl(saved ? '/character-sheet' : this.loginQueryParams['returnUrl'] || '/');
+          },
+          error: () => {
+            this.loading.set(false);
+            void this.router.navigateByUrl(this.loginQueryParams['returnUrl'] || '/');
+          },
+        });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const e = err?.error;
+        this.error.set(
+          (Array.isArray(e?.errors) && e.errors[0]?.reason) || e?.message || 'Inscription Google impossible.',
+        );
+      },
+    });
   }
 
   submit(): void {

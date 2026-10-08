@@ -54,8 +54,19 @@ public static class AuthHelpers
 {
     public static string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
 
-    public static bool VerifyPassword(string password, string hash) =>
-        BCrypt.Net.BCrypt.Verify(password, hash);
+    public static bool VerifyPassword(string password, string hash)
+    {
+        if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(hash) || !hash.StartsWith("$2", StringComparison.Ordinal))
+            return false;
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     public static string NewToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 

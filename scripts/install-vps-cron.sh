@@ -11,7 +11,7 @@ END="# END DRAGONS-WATCHDOG"
 chmod +x "$WATCH" "$RENEW" "$BACKUP" "$ROOT/scripts/send-backup-email.sh" "$ROOT/scripts/send-alert-email.sh" "$ROOT/scripts/log-ops-event.sh" 2>/dev/null || true
 
 existing=$(crontab -l 2>/dev/null || true)
-filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d")
+filtered=$(printf '%s\n' "$existing" | sed "/^$BEGIN\$/,/^$END\$/d" | grep -v 'backup-sqlite.sh' | grep -v 'vps-watchdog.sh' | grep -v 'renew-letsencrypt.sh' || true)
 
 {
   printf '%s\n' "$filtered"

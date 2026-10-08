@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
     public DbSet<SupportTicketMessage> SupportTicketMessages => Set<SupportTicketMessage>();
     public DbSet<OpsEvent> OpsEvents => Set<OpsEvent>();
+    public DbSet<OutboundEmail> OutboundEmails => Set<OutboundEmail>();
     public DbSet<Friendship> Friendships => Set<Friendship>();
     public DbSet<CampaignRecord> Campaigns => Set<CampaignRecord>();
     public DbSet<CampaignMember> CampaignMembers => Set<CampaignMember>();
@@ -33,6 +34,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Bio).HasMaxLength(280);
             e.Property(x => x.AvatarEmoji).HasMaxLength(64);
             e.Property(x => x.AccentColor).HasMaxLength(16);
+            e.Property(x => x.GoogleSubject).HasMaxLength(128);
+            e.HasIndex(x => x.GoogleSubject);
         });
 
         modelBuilder.Entity<CharacterRecord>(e =>
@@ -70,6 +73,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.HasIndex(x => new { x.TicketId, x.CreatedAt });
             e.Property(x => x.Body).HasMaxLength(8000);
+            e.Property(x => x.CharacterName).HasMaxLength(200);
+            e.Property(x => x.AttachmentOriginalName).HasMaxLength(240);
             e.HasOne(x => x.Ticket)
                 .WithMany(t => t.Messages)
                 .HasForeignKey(x => x.TicketId)
@@ -82,6 +87,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Kind).HasMaxLength(64);
             e.Property(x => x.Title).HasMaxLength(240);
             e.Property(x => x.Detail).HasMaxLength(4000);
+        });
+
+        modelBuilder.Entity<OutboundEmail>(e =>
+        {
+            e.HasIndex(x => x.CreatedAt);
+            e.Property(x => x.ToEmail).HasMaxLength(256);
+            e.Property(x => x.FromEmail).HasMaxLength(256);
+            e.Property(x => x.Subject).HasMaxLength(400);
+            e.Property(x => x.HtmlBody).HasMaxLength(32000);
+            e.Property(x => x.Status).HasMaxLength(16);
+            e.Property(x => x.Error).HasMaxLength(1000);
         });
 
         modelBuilder.Entity<Friendship>(e =>

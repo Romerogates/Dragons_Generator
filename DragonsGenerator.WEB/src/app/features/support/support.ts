@@ -10,8 +10,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '@env/environment';
+import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 import { supportStatusLabel } from '@core/utils/support-status.util';
@@ -35,6 +36,9 @@ interface TicketMessage {
   fromStaff: boolean;
   body: string;
   createdAt: string;
+  characterId?: string;
+  characterName?: string;
+  attachmentOriginalName?: string;
 }
 
 interface TicketThread {
@@ -45,7 +49,7 @@ interface TicketThread {
 @Component({
   selector: 'app-support',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './support.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -54,6 +58,7 @@ export class SupportPage implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly characters = inject(CharacterCloudService);
   private readonly route = inject(ActivatedRoute);
+  readonly auth = inject(AuthService);
   private readonly api = environment.apiUrl;
 
   subject = '';
@@ -61,6 +66,10 @@ export class SupportPage implements OnInit {
   characterId = '';
   file: File | null = null;
   replyBody = '';
+  replyCharacterId = '';
+  replyFile: File | null = null;
+  readonly fileName = signal('');
+  readonly replyFileName = signal('');
 
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
   readonly tickets = signal<Ticket[]>([]);
@@ -86,6 +95,20 @@ export class SupportPage implements OnInit {
   onFile(ev: Event): void {
     const input = ev.target as HTMLInputElement;
     this.file = input.files?.[0] ?? null;
+    this.fileName.set(this.file?.name ?? '');
+  }
+
+  onReplyFile(ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    this.replyFile = input.files?.[0] ?? null;
+    this.replyFileName.set(this.replyFile?.name ?? '');
+  }
+
+  closeThread(): void {
+    this.thread.set(null);
+    this.replyBody = '';
+    this.replyCharacterId = '';
+    this.replyFile = null;
   }
 
   statusLabel(status: string): string {
@@ -116,10 +139,17 @@ export class SupportPage implements OnInit {
     const body = this.replyBody.trim();
     if (!t || body.length < 2) return;
     this.sendingReply.set(true);
-    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, { body }).subscribe({
+    const fd = new FormData();
+    fd.append('body', body);
+    if (this.replyCharacterId) fd.append('characterId', this.replyCharacterId);
+    if (this.replyFile) fd.append('file', this.replyFile, this.replyFile.name);
+    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
       next: () => {
         this.sendingReply.set(false);
         this.replyBody = '';
+        this.replyCharacterId = '';
+        this.replyFile = null;
+        this.replyFileName.set('');
         this.reload(t.id);
       },
       error: () => {
@@ -147,6 +177,7 @@ export class SupportPage implements OnInit {
         this.message = '';
         this.characterId = '';
         this.file = null;
+        this.fileName.set('');
         this.reload(created.id);
       },
       error: (err) => {
@@ -168,5 +199,21 @@ export class SupportPage implements OnInit {
     openTicketAttachment(this.http, ticket.id, () =>
       this.error.set('Impossible d\'ouvrir la pièce jointe.'),
     );
+  }
+
+  downloadMessageCharacter(ticketId: string, m: TicketMessage): void {
+    if (!m.characterId) return;
+    downloadTicketCharacterJson(
+      this.http,
+      ticketId,
+      m.characterName ?? 'personnage',
+      () => this.error.set('Impossible de télécharger le JSON du personnage.'),
+      m.id,
+    );
+  }
+
+  openMessageAttachment(ticketId: string, m: TicketMessage): void {
+    if (!m.attachmentOriginalName) return;
+    openTicketAttachment(this.http, ticketId, () => this.error.set("Impossible d'ouvrir la pièce jointe."), m.id);
   }
 }

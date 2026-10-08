@@ -1,6 +1,7 @@
 using System.Text;
 using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Persistence;
+using DragonsGenerator.API.Endpoints.Admin;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,9 @@ ProductionConfigGuard.EnsureValid(builder.Configuration, builder.Environment);
 
 // --- Options ---
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<ImapOptions>(builder.Configuration.GetSection("Imap"));
+builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection("Google"));
+builder.Services.Configure<HostBackupOptions>(builder.Configuration.GetSection("HostBackup"));
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.PostConfigure<JwtOptions>(opts =>
 {
@@ -67,9 +72,21 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 
 // --- Email ---
 if (string.Equals(smtpHost, "log", StringComparison.OrdinalIgnoreCase))
-    builder.Services.AddSingleton<IEmailSender, LoggingEmailSender>();
+    builder.Services.AddSingleton<LoggingEmailSender>();
 else
-    builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+    builder.Services.AddSingleton<SmtpEmailSender>();
+builder.Services.AddSingleton<IEmailSender>(sp =>
+{
+    IEmailSender inner = string.Equals(smtpHost, "log", StringComparison.OrdinalIgnoreCase)
+        ? sp.GetRequiredService<LoggingEmailSender>()
+        : sp.GetRequiredService<SmtpEmailSender>();
+    return new RecordingEmailSender(
+        inner,
+        sp.GetRequiredService<IServiceScopeFactory>(),
+        sp.GetRequiredService<IOptionsMonitor<SmtpOptions>>(),
+        sp.GetRequiredService<ILogger<RecordingEmailSender>>()
+    );
+});
 
 // --- Auth JWT ---
 builder.Services
@@ -140,6 +157,8 @@ builder.Services.AddSingleton<UserAiSecretProtector>();
 builder.Services.AddScoped<UserAiCredentialResolver>();
 builder.Services.AddScoped<PushNotificationService>();
 builder.Services.AddScoped<SupportDeskService>();
+builder.Services.AddSingleton<GoogleIdTokenValidator>();
+builder.Services.AddSingleton<ImapInboxService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHttpClient("Groq", client =>
 {
@@ -152,6 +171,10 @@ builder.Services.AddHttpClient("LocalLlm", client =>
 builder.Services.AddHttpClient("UserLlm", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(120);
+});
+builder.Services.AddHttpClient("Google", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
 });
 
 var fastEndpoints = builder.Services.AddFastEndpoints();

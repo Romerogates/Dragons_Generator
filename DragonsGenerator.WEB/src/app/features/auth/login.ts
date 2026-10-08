@@ -13,12 +13,13 @@ import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { PushNotificationService } from '@core/services/push-notification.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { GoogleSignInComponent } from '@shared/components/google-sign-in/google-sign-in';
 import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent, GoogleSignInComponent],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -56,6 +57,37 @@ export class LoginPage implements OnInit {
       this.localDev.set(isLocalDevHost(host));
       this.mailhogUrl.set(mailhogWebUrl(host));
     }
+  }
+
+  onGoogle(idToken: string): void {
+    this.error.set(null);
+    this.loading.set(true);
+    this.auth.loginGoogle(idToken, false).subscribe({
+      next: () => {
+        this.push.initAfterLogin();
+        this.pendingSave.flushIfPossible().subscribe({
+          next: (saved) => {
+            this.loading.set(false);
+            void this.router.navigateByUrl(saved ? '/character-sheet' : this.returnUrl);
+          },
+          error: () => {
+            this.loading.set(false);
+            void this.router.navigateByUrl(this.returnUrl);
+          },
+        });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const reason = this.extractError(err);
+        if (err.status === 403 && reason === 'google_register_required') {
+          void this.router.navigate(['/register'], {
+            queryParams: { returnUrl: this.returnUrl, google: '1' },
+          });
+          return;
+        }
+        this.error.set(reason || 'Connexion Google impossible.');
+      },
+    });
   }
 
   submitLogin(): void {
