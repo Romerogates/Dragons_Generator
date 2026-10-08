@@ -135,14 +135,6 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     this.dock.close();
   }
 
-  closeOrCollapse(): void {
-    if (this.dock.expanded()) {
-      this.dock.setExpanded(false);
-      return;
-    }
-    this.close();
-  }
-
   toggleExpanded(): void {
     this.dock.toggleExpanded();
   }

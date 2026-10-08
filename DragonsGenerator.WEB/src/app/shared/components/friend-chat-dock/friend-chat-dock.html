@@ -45,8 +45,9 @@
             <header class="dg-dock-header">
               <button
                 type="button"
-                class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-slate-100"
                 aria-label="Fermer"
+                title="Fermer"
                 (click)="close()"
               >
                 <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
@@ -69,11 +70,12 @@
                 </button>
                 <button
                   type="button"
-                  class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                  class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-slate-100"
                   aria-label="Fermer"
-                  (click)="closeOrCollapse()"
+                  title="Fermer"
+                  (click)="close()"
                 >
-                  <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+                  <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
                 </button>
               </div>
             </header>
@@ -209,11 +211,12 @@
                   </button>
                   <button
                     type="button"
-                    class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                    class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-slate-100"
                     aria-label="Fermer"
-                    (click)="closeOrCollapse()"
+                    title="Fermer"
+                    (click)="close()"
                   >
-                    <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+                    <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
                   </button>
                 </div>
               </header>
