@@ -125,7 +125,11 @@ main() {
       "${db_backup} (${db_count} conservés)" || true
   fi
 
-  maybe_mail "$db_backup" "$uploads_backup"
+  # Pas de mail de succès : ça n’aide pas Anthony. Consulter Admin → Backups / crons.
+  # maybe_mail reste pour un envoi manuel : BACKUP_MAIL=1 ./scripts/backup-sqlite.sh
+  if [ "${BACKUP_MAIL:-0}" = "1" ]; then
+    maybe_mail "$db_backup" "$uploads_backup"
+  fi
 }
 
 main "$@"

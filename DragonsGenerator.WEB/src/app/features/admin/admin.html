@@ -179,6 +179,16 @@
 
   @if (tab() === 'ops') {
     @if (overview(); as o) {
+      <div class="mb-6 rounded-xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 text-sm text-slate-300 leading-relaxed">
+        <p class="font-semibold text-amber-400 mb-1">À quoi sert le backup ?</p>
+        <p>
+          Tous les jours à 3 h, le serveur copie la base SQLite (comptes, campagnes, héros, tickets)
+          et les fichiers uploadés dans <code class="text-amber-200/90">~/backups/dragons/</code>,
+          gardés 14 jours. Ce n’est <strong>pas</strong> un mail à ouvrir : c’est un filet si le VPS
+          casse. Tu télécharges ici. Un mail ne part que si la copie a plus de 36 h de retard (alerte,
+          une fois par jour max).
+        </p>
+      </div>
       <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Crons VPS</h2>
       <div class="overflow-x-auto mb-6">
         <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">

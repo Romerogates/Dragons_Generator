@@ -5,7 +5,7 @@ Guide de secours si la base SQLite, le volume Docker ou le serveur est endommag�
 **Serveur :** VPS Debian (`~/Dragons_Generator`)  
 **Site :** https://dragons-generator.top  
 **Backups automatiques :** tous les jours à **3h** → `~/backups/dragons/`  
-**Copie hors VPS :** les fichiers restent sur le VPS (`~/backups/dragons/`, 14 jours). Un mail de confirmation (sans zip — Hotmail le vidait) part à `Alert__Email`. Téléchargement gratuit depuis le desk admin → onglet Backups / crons.
+**Copie hors VPS :** les fichiers restent sur le VPS (`~/backups/dragons/`, 14 jours). Pas de mail de succès (Hotmail / bruit). Téléchargement depuis le desk admin → onglet Backups / crons. Un mail d’alerte uniquement si le dernier snapshot a plus de 36 h.
 
 ---
 
@@ -32,7 +32,7 @@ cd ~/Dragons_Generator
 ./scripts/backup-sqlite.sh
 ```
 
-Logs cron : `/var/log/dragons-backup.log`
+Logs cron : `~/backups/dragons/backup.log`
 
 ---
 

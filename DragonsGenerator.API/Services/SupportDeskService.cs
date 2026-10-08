@@ -135,7 +135,7 @@ public sealed class SupportDeskService(
         sb.AppendLine();
         sb.AppendLine("## Crons attendus (VPS)");
         sb.AppendLine("- Watchdog santé : toutes les 5 min");
-        sb.AppendLine("- Backup SQLite + mail zip : 03:00");
+        sb.AppendLine("- Backup SQLite (VPS, sans mail) : 03:00");
         sb.AppendLine("- Let’s Encrypt : lundi 04:00");
         sb.AppendLine();
         sb.AppendLine("## Derniers événements ops");

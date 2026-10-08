@@ -74,7 +74,7 @@ public class AdminOpsOverviewEndpoint(AppDbContext db) : EndpointWithoutRequest<
                 dtos,
                 [
                     new CronRowDto("Watchdog santé", "*/5 * * * *", "alert"),
-                    new CronRowDto("Backup SQLite + mail", "0 3 * * *", "backup"),
+                    new CronRowDto("Backup SQLite (fichier VPS, pas de mail)", "0 3 * * *", "backup"),
                     new CronRowDto("Let’s Encrypt", "0 4 * * 1", "cert"),
                 ]
             ),
