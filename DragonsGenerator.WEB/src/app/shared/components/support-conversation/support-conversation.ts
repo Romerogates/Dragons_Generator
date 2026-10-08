@@ -72,15 +72,17 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
   replyFile: File | null = null;
   readonly replyFileName = signal('');
   readonly attachOpen = signal(false);
+  readonly localStatus = signal<string | null>(null);
   private readonly scroller = viewChild<ElementRef<HTMLElement>>('scroller');
   private readonly overlay = inject(SupportOverlayService);
 
   readonly isStaff = computed(() => this.audience() === 'staff');
   readonly ticket = computed(() => this.thread().ticket);
+  readonly statusKey = computed(() => this.localStatus() ?? this.ticket().status);
   readonly waiting = computed(() => {
     const msgs = this.thread().messages;
     const last = msgs.length ? msgs[msgs.length - 1]!.fromStaff : false;
-    return supportWaitingOn(this.ticket().status, last);
+    return supportWaitingOn(this.statusKey(), last);
   });
   readonly waitingText = computed(() => supportWaitingLabel(this.waiting(), this.audience()));
   readonly canEmail = computed(() => !!this.thread().canEmailPlayer);
@@ -102,6 +104,11 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
         }),
       );
     });
+    effect(() => {
+      const incoming = this.thread().ticket.status;
+      const local = untracked(() => this.localStatus());
+      if (local && incoming === local) this.localStatus.set(null);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -114,6 +121,16 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
 
   statusLabel(status: string): string {
     return supportStatusLabel(status, this.audience());
+  }
+
+  applyStatus(status: string): void {
+    this.localStatus.set(status);
+    this.setStatus.emit({ id: this.ticket().id, status });
+  }
+
+  applyTake(): void {
+    this.localStatus.set('in_progress');
+    this.takeTicket.emit(this.ticket().id);
   }
 
   isMine(fromStaff: boolean): boolean {

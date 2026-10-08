@@ -237,18 +237,31 @@ export class AdminPage implements OnInit {
   }
 
   takeTicket(id: string): void {
-    this.http.patch(`${this.api}/admin/support/tickets/${id}`, { status: 'in_progress' }).subscribe({
-      next: () => {
+    this.http.patch<AdminTicket>(`${this.api}/admin/support/tickets/${id}`, { status: 'in_progress' }).subscribe({
+      next: (dto) => {
         this.message.set('Mail envoyé : nous consultons la situation.');
-        this.loadTickets(id);
+        this.mergeTicketStatus(dto);
       },
     });
   }
 
   setTicketStatus(id: string, status: string): void {
-    this.http.patch(`${this.api}/admin/support/tickets/${id}`, { status }).subscribe({
-      next: () => this.loadTickets(id),
+    this.http.patch<AdminTicket>(`${this.api}/admin/support/tickets/${id}`, { status }).subscribe({
+      next: (dto) => this.mergeTicketStatus(dto),
     });
+  }
+
+  private mergeTicketStatus(dto: AdminTicket): void {
+    const th = this.thread();
+    if (th && th.ticket.id === dto.id) {
+      this.thread.set({
+        ...th,
+        ticket: { ...th.ticket, status: dto.status, updatedAt: dto.updatedAt },
+      });
+    }
+    this.tickets.update((list) =>
+      list.map((t) => (t.id === dto.id ? { ...t, status: dto.status } : t)),
+    );
   }
 
   saveNotes(id: string): void {
@@ -282,6 +295,7 @@ export class AdminPage implements OnInit {
               : 'Réponse enregistrée dans le fil.',
           );
         }
+        this.mergeTicketStatus({ ...t, status: t.status === 'closed' ? t.status : 'in_progress' });
         this.loadTickets(t.id);
       },
       error: () => this.error.set('Réponse non envoyée.'),

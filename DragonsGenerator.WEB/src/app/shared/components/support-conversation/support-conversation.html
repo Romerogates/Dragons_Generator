@@ -30,7 +30,7 @@
             >
               {{ waitingText() }}
             </span>
-            <span class="text-[11px] text-slate-400">{{ statusLabel(th.ticket.status) }}</span>
+            <span class="text-[11px] text-slate-400">{{ statusLabel(statusKey()) }}</span>
             @if (isStaff() && th.ticket.userEmail) {
               <span class="truncate text-[11px] text-slate-300">{{ th.ticket.userEmail }}</span>
             }
@@ -41,22 +41,40 @@
         <div class="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            class="rounded-lg border border-emerald-400 bg-emerald-950 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-emerald-100 hover:bg-emerald-900"
-            (click)="takeTicket.emit(th.ticket.id)"
+            class="rounded-lg border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide"
+            [class.border-emerald-300]="statusKey() === 'in_progress'"
+            [class.bg-emerald-400]="statusKey() === 'in_progress'"
+            [class.text-zinc-950]="statusKey() === 'in_progress'"
+            [class.border-slate-500]="statusKey() !== 'in_progress'"
+            [class.bg-transparent]="statusKey() !== 'in_progress'"
+            [class.text-slate-200]="statusKey() !== 'in_progress'"
+            (click)="applyTake()"
           >
             Je consulte
           </button>
           <button
             type="button"
-            class="rounded-lg border border-slate-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-200 hover:bg-slate-800"
-            (click)="setStatus.emit({ id: th.ticket.id, status: 'open' })"
+            class="rounded-lg border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide"
+            [class.border-amber-300]="statusKey() === 'open'"
+            [class.bg-amber-400]="statusKey() === 'open'"
+            [class.text-zinc-950]="statusKey() === 'open'"
+            [class.border-slate-500]="statusKey() !== 'open'"
+            [class.bg-transparent]="statusKey() !== 'open'"
+            [class.text-slate-200]="statusKey() !== 'open'"
+            (click)="applyStatus('open')"
           >
             Rouvrir
           </button>
           <button
             type="button"
-            class="rounded-lg border border-slate-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-200 hover:bg-slate-800"
-            (click)="setStatus.emit({ id: th.ticket.id, status: 'closed' })"
+            class="rounded-lg border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide"
+            [class.border-slate-400]="statusKey() === 'closed'"
+            [class.bg-slate-500]="statusKey() === 'closed'"
+            [class.text-white]="statusKey() === 'closed'"
+            [class.border-slate-500]="statusKey() !== 'closed'"
+            [class.bg-transparent]="statusKey() !== 'closed'"
+            [class.text-slate-200]="statusKey() !== 'closed'"
+            (click)="applyStatus('closed')"
           >
             Fermer
           </button>
