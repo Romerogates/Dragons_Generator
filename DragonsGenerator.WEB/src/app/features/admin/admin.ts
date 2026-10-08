@@ -91,6 +91,39 @@ interface Overview {
   crons: CronRow[];
 }
 
+interface AdminStatsKind {
+  kind: string;
+  total: number;
+  ok: number;
+}
+
+interface AdminStats {
+  users: number;
+  confirmedUsers: number;
+  googleUsers: number;
+  usersLast7Days: number;
+  characters: number;
+  charactersLast7Days: number;
+  campaigns: number;
+  campaignsActive: number;
+  campaignsLast7Days: number;
+  campaignMembers: number;
+  dungeons: number;
+  dungeonsLast7Days: number;
+  friendshipsAccepted: number;
+  friendMessages: number;
+  supportTickets: number;
+  supportMessages: number;
+  guideComments: number;
+  generations: number;
+  generationsOk: number;
+  generationsLast24h: number;
+  generationsLast7Days: number;
+  generationsByKind: AdminStatsKind[];
+}
+
+type AdminTab = 'overview' | 'stats' | 'tickets' | 'ops' | 'mails' | 'users';
+
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -106,10 +139,11 @@ export class AdminPage implements OnInit {
   private readonly api = environment.apiUrl;
   private readonly convo = viewChild(SupportConversation);
 
-  readonly tab = signal<'overview' | 'tickets' | 'ops' | 'mails' | 'users'>('overview');
+  readonly tab = signal<AdminTab>('overview');
   readonly users = signal<AdminUser[]>([]);
   readonly tickets = signal<AdminTicket[]>([]);
   readonly overview = signal<Overview | null>(null);
+  readonly stats = signal<AdminStats | null>(null);
   readonly outboundEmails = signal<OutboundEmail[]>([]);
   readonly selectedMail = signal<OutboundEmail | null>(null);
   readonly hostBackups = signal<HostBackupFile[]>([]);
@@ -130,21 +164,30 @@ export class AdminPage implements OnInit {
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
     const tab = q.get('tab');
-    if (tab === 'tickets' || tab === 'ops' || tab === 'mails' || tab === 'users' || tab === 'overview')
+    if (
+      tab === 'tickets' ||
+      tab === 'ops' ||
+      tab === 'mails' ||
+      tab === 'users' ||
+      tab === 'overview' ||
+      tab === 'stats'
+    )
       this.tab.set(tab);
     this.loadUsers();
     this.loadTickets(q.get('ticket'));
     this.loadOverview();
     if (this.tab() === 'mails') this.loadMails();
     if (this.tab() === 'ops') this.loadHostBackups();
+    if (this.tab() === 'stats') this.loadStats();
   }
 
-  setTab(tab: 'overview' | 'tickets' | 'ops' | 'mails' | 'users'): void {
+  setTab(tab: AdminTab): void {
     this.tab.set(tab);
     void this.router.navigate([], { queryParams: { tab }, queryParamsHandling: 'merge' });
     if (tab === 'overview' || tab === 'ops') this.loadOverview();
     if (tab === 'ops') this.loadHostBackups();
     if (tab === 'mails') this.loadMails();
+    if (tab === 'stats') this.loadStats();
   }
 
   loadMails(): void {
@@ -194,6 +237,13 @@ export class AdminPage implements OnInit {
     this.http.get<Overview>(`${this.api}/admin/ops/overview`).subscribe({
       next: (o) => this.overview.set(o),
       error: () => this.error.set('Impossible de charger le tableau ops.'),
+    });
+  }
+
+  loadStats(): void {
+    this.http.get<AdminStats>(`${this.api}/admin/stats`).subscribe({
+      next: (s) => this.stats.set(s),
+      error: () => this.error.set('Impossible de charger les statistiques.'),
     });
   }
 

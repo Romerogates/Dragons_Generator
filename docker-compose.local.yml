@@ -54,6 +54,8 @@ services:
       LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
+      LocalLlm__MaxAttempts: "1"
+      LocalLlm__MaxRetryWindowMs: "480000"
       RateLimit__Enabled: "false"
       Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
       Admin__Email: admin@dragons.local

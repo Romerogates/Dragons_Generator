@@ -149,6 +149,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
+builder.Services.AddSingleton<AiGenerationTelemetry>();
 builder.Services.AddSingleton<HybridAiService>();
 builder.Services.AddSingleton<UserAiSecretProtector>();
 builder.Services.AddScoped<UserAiCredentialResolver>();
@@ -163,7 +164,11 @@ builder.Services.AddHttpClient("Groq", client =>
 });
 builder.Services.AddHttpClient("LocalLlm", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(50);
+    client.Timeout = TimeSpan.FromSeconds(480);
+}).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+{
+    ConnectTimeout = TimeSpan.FromSeconds(4),
+    PooledConnectionLifetime = TimeSpan.FromMinutes(5),
 });
 builder.Services.AddHttpClient("UserLlm", client =>
 {

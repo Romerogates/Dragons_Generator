@@ -43,6 +43,7 @@ public static class DbMigrationRunner
         new("019_outbound_emails", Apply019OutboundEmailsAsync),
         new("020_google_and_ticket_message_attachments", Apply020GoogleAndTicketMessageAttachmentsAsync),
         new("021_ticket_campaign_attach", Apply021TicketCampaignAttachAsync),
+        new("022_ai_generation_logs", Apply022AiGenerationLogsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -443,6 +444,23 @@ public static class DbMigrationRunner
         await TryAddColumnAsync(db, "SupportTickets", "CampaignName", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTicketMessages", "CampaignId", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTicketMessages", "CampaignName", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply022AiGenerationLogsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "AiGenerationLogs" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_AiGenerationLogs" PRIMARY KEY,
+                "Kind" TEXT NOT NULL,
+                "Ok" INTEGER NOT NULL,
+                "Provider" TEXT NULL,
+                "CreatedAt" TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS "IX_AiGenerationLogs_CreatedAt" ON "AiGenerationLogs" ("CreatedAt");
+            CREATE INDEX IF NOT EXISTS "IX_AiGenerationLogs_Kind_CreatedAt" ON "AiGenerationLogs" ("Kind", "CreatedAt");
+            """,
+            ct);
     }
 
     private static async Task TryAddColumnAsync(

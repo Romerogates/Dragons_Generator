@@ -33,6 +33,7 @@
   <div class="flex flex-wrap gap-2 mb-6">
     @for (t of [
       { id: 'overview', label: 'Vue d’ensemble' },
+      { id: 'stats', label: 'Statistiques' },
       { id: 'tickets', label: 'Tickets' },
       { id: 'ops', label: 'Backups / crons' },
       { id: 'mails', label: 'Mails' },
@@ -50,6 +51,83 @@
       </button>
     }
   </div>
+
+  @if (tab() === 'stats') {
+    @if (stats(); as s) {
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-xs text-slate-500">Compteurs live (créations, générations IA, social).</p>
+        <button type="button" class="text-xs text-amber-400 hover:underline" (click)="loadStats()">Actualiser</button>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Personnages</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.characters }}</p>
+          <p class="text-[10px] text-slate-500">+{{ s.charactersLast7Days }} sur 7 jours</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Aventures / campagnes</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.campaigns }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.campaignsActive }} actives · +{{ s.campaignsLast7Days }} / 7 j</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Générations IA</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.generations }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.generationsOk }} OK · {{ s.generationsLast24h }} / 24 h · {{ s.generationsLast7Days }} / 7 j</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Comptes</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.users }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.confirmedUsers }} confirmés · {{ s.googleUsers }} Google · +{{ s.usersLast7Days }} / 7 j</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Donjons</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.dungeons }}</p>
+          <p class="text-[10px] text-slate-500">+{{ s.dungeonsLast7Days }} sur 7 jours</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Membres de table</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.campaignMembers }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Amitiés / messages</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.friendshipsAccepted }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.friendMessages }} messages</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Support / guide</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.supportTickets }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.supportMessages }} msgs · {{ s.guideComments }} commentaires</p>
+        </div>
+      </div>
+      <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Générations par type</p>
+        @if (s.generationsByKind.length) {
+          <table class="w-full text-left">
+            <thead class="text-[10px] uppercase tracking-widest text-slate-500">
+              <tr>
+                <th class="py-1">Type</th>
+                <th class="py-1">Total</th>
+                <th class="py-1">OK</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (k of s.generationsByKind; track k.kind) {
+                <tr class="border-t border-slate-800">
+                  <td class="py-2 font-mono">{{ k.kind }}</td>
+                  <td class="py-2">{{ k.total }}</td>
+                  <td class="py-2 text-emerald-400">{{ k.ok }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="text-slate-500">Aucune génération journalisée pour l’instant (le compteur démarre maintenant).</p>
+        }
+      </div>
+    } @else {
+      <p class="text-sm text-slate-500">Chargement des stats…</p>
+    }
+  }
 
   @if (tab() === 'overview') {
     @if (overview(); as o) {

@@ -113,7 +113,7 @@ public sealed class OpenAiChatClient
         double temperature)
     {
         var maxAttempts = Math.Clamp(_config.GetValue($"{_configSection}:MaxAttempts", 5), 1, 8);
-        var maxRetryWindowMs = Math.Clamp(_config.GetValue($"{_configSection}:MaxRetryWindowMs", 90_000), 10_000, 240_000);
+        var maxRetryWindowMs = Math.Clamp(_config.GetValue($"{_configSection}:MaxRetryWindowMs", 90_000), 10_000, 480_000);
         var startedUtc = DateTime.UtcNow;
         GroqChatResult? last = null;
         var modelChain = modelChainOverride ?? GetModelChain();

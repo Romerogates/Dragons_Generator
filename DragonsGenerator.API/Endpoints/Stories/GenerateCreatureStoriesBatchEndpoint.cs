@@ -209,7 +209,8 @@ public class GenerateCreatureStoriesBatchEndpoint
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             500,
             ct,
-            userCredentials: _userCreds);
+            userCredentials: _userCreds,
+            tryLocal: false);
 
         return result.Ok ? result.Text : null;
     }

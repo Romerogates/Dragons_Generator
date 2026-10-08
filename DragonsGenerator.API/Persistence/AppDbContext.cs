@@ -22,6 +22,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<SessionReminderLog> SessionReminderLogs => Set<SessionReminderLog>();
     public DbSet<GuideComment> GuideComments => Set<GuideComment>();
     public DbSet<GuideCommentLike> GuideCommentLikes => Set<GuideCommentLike>();
+    public DbSet<AiGenerationLog> AiGenerationLogs => Set<AiGenerationLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -250,6 +251,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AiGenerationLog>(e =>
+        {
+            e.HasIndex(x => x.CreatedAt);
+            e.HasIndex(x => new { x.Kind, x.CreatedAt });
+            e.Property(x => x.Kind).HasMaxLength(32);
+            e.Property(x => x.Provider).HasMaxLength(64);
         });
     }
 }

@@ -313,3 +313,13 @@ public class GuideCommentLike
     public AppUser User { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+public class AiGenerationLog
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    /// <summary>short | adventure | transcribe</summary>
+    public string Kind { get; set; } = "";
+    public bool Ok { get; set; }
+    public string? Provider { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}

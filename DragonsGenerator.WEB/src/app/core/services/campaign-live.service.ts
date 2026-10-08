@@ -1,5 +1,6 @@
 import { Injectable, InjectionToken, OnDestroy, effect, inject, signal } from '@angular/core';
 import {
+  HttpTransportType,
   HubConnection,
   HubConnectionBuilder,
   HubConnectionState,
@@ -168,8 +169,14 @@ export class CampaignLiveService implements OnDestroy {
 
 function defaultHubFactory(url: string): HubConnection {
   return new HubConnectionBuilder()
-    .withUrl(url, { withCredentials: true })
+    .withUrl(url, {
+      withCredentials: true,
+      transport:
+        HttpTransportType.WebSockets |
+        HttpTransportType.ServerSentEvents |
+        HttpTransportType.LongPolling,
+    })
     .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-    .configureLogging(LogLevel.Warning)
+    .configureLogging(LogLevel.Error)
     .build();
 }

@@ -49,11 +49,12 @@ services:
       Groq__FallbackModel: llama-3.3-70b-versatile
       Groq__MaxAttempts: "3"
       Groq__MaxRetryWindowMs: "60000"
-      # Ollama d’abord (budget court), puis Groq — l’API ne dépend pas du process Ollama.
+      # Ollama d’abord (budget long). Groq seulement si Ollama est mort / injoignable.
       LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
-      LocalLlm__MaxRetryWindowMs: "25000"
+      LocalLlm__MaxAttempts: "1"
+      LocalLlm__MaxRetryWindowMs: "480000"
     volumes:
       - dragons-api-data:/app/data
       - ${BACKUP_HOST_DIR:-/home/debian/backups/dragons}:/app/host-backups:ro
