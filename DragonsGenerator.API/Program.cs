@@ -51,8 +51,6 @@ builder.Services.PostConfigure<VapidOptions>(opts =>
     }
 });
 
-var smtpHost = builder.Configuration["Smtp:Host"] ?? "log";
-
 // --- Persistence ---
 var dbPath = builder.Configuration["ConnectionStrings:Default"]
     ?? $"Data Source={Path.Combine(AppContext.BaseDirectory, "data", "dragons.db")}";
@@ -71,13 +69,12 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(sqliteBuilder.ConnectionString, sqlite => sqlite.CommandTimeout(15)));
 
 // --- Email ---
-if (string.Equals(smtpHost, "log", StringComparison.OrdinalIgnoreCase))
-    builder.Services.AddSingleton<LoggingEmailSender>();
-else
-    builder.Services.AddSingleton<SmtpEmailSender>();
+builder.Services.AddSingleton<LoggingEmailSender>();
+builder.Services.AddSingleton<SmtpEmailSender>();
 builder.Services.AddSingleton<IEmailSender>(sp =>
 {
-    IEmailSender inner = string.Equals(smtpHost, "log", StringComparison.OrdinalIgnoreCase)
+    var host = sp.GetRequiredService<IOptionsMonitor<SmtpOptions>>().CurrentValue;
+    IEmailSender inner = host.IsSink
         ? sp.GetRequiredService<LoggingEmailSender>()
         : sp.GetRequiredService<SmtpEmailSender>();
     return new RecordingEmailSender(

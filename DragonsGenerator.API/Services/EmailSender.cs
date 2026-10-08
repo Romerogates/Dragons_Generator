@@ -20,6 +20,10 @@ public class SmtpOptions
     public bool UseSsl { get; set; }
     public string FromEmail { get; set; } = "noreply@dragons-generator.local";
     public string FromName { get; set; } = "Dragons Generator";
+
+    public bool IsSink =>
+        string.IsNullOrWhiteSpace(Host)
+        || Host.Equals("log", StringComparison.OrdinalIgnoreCase);
 }
 
 public class SmtpEmailSender(IOptionsMonitor<SmtpOptions> options, ILogger<SmtpEmailSender> logger)
