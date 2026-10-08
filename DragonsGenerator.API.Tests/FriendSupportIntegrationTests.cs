@@ -583,4 +583,64 @@ public class FriendSupportIntegrationTests
             (await _client.SendAsync(followUp)).EnsureSuccessStatusCode();
         }
     }
+
+    [Fact]
+    public async Task Support_category_inbox_notif_and_disabled_login()
+    {
+        var (_, playerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "deskcat");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        using var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/support/tickets", playerToken);
+        createReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("IA cassée"), "subject" },
+            { new StringContent("La barre IA reste bloquée."), "message" },
+            { new StringContent("ia"), "category" },
+        };
+        var created = await _client.SendAsync(createReq);
+        created.EnsureSuccessStatusCode();
+        var ticket = await created.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("ia", ticket.GetProperty("category").GetString());
+        var ticketId = ticket.GetProperty("id").GetGuid();
+
+        using var inboxReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/support/inbox-count", adminToken);
+        var inboxRes = await _client.SendAsync(inboxReq);
+        inboxRes.EnsureSuccessStatusCode();
+        var inbox = await inboxRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.True(inbox.GetProperty("waitingOnStaff").GetInt32() >= 1);
+
+        using var adminNotifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", adminToken);
+        var adminNotif = await _client.SendAsync(adminNotifReq);
+        adminNotif.EnsureSuccessStatusCode();
+        var adminSummary = await adminNotif.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.True(adminSummary.GetProperty("supportInboxCount").GetInt32() >= 1);
+
+        using var takeReq = ApiTestAuth.Authed(HttpMethod.Patch, $"/admin/support/tickets/{ticketId}", adminToken);
+        takeReq.Content = JsonContent.Create(new { status = "in_progress" });
+        Assert.Equal(HttpStatusCode.OK, (await _client.SendAsync(takeReq)).StatusCode);
+
+        using var staffReq = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", adminToken);
+        staffReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("On regarde le log IA."), "body" },
+        };
+        (await _client.SendAsync(staffReq)).EnsureSuccessStatusCode();
+
+        using var playerNotifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", playerToken);
+        var playerNotif = await _client.SendAsync(playerNotifReq);
+        playerNotif.EnsureSuccessStatusCode();
+        var playerSummary = await playerNotif.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Contains(
+            playerSummary.GetProperty("notifications").EnumerateArray(),
+            n => n.GetProperty("kind").GetString() == "support_reply"
+        );
+
+        var (email, _, userId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "disabledacc");
+        using var disableReq = ApiTestAuth.Authed(HttpMethod.Put, $"/admin/users/{userId}", adminToken);
+        disableReq.Content = JsonContent.Create(new { disabled = true });
+        (await _client.SendAsync(disableReq)).EnsureSuccessStatusCode();
+
+        var login = await _client.PostAsJsonAsync("/auth/login", new { email, password = "TestPass123!" });
+        Assert.Equal(HttpStatusCode.Forbidden, login.StatusCode);
+    }
 }

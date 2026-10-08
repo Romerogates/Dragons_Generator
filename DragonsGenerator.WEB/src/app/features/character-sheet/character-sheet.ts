@@ -25,6 +25,7 @@ import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-pre
 import { CharacterPlayView, type CharacterLivePatch } from './character-play-view';
 import { IllustratedCharacterSheet } from './illustrated-character-sheet';
 import { ForgePreferencesService } from '@core/services/forge-preferences.service';
+import { supportReportHref } from '@core/utils/support-report.util';
 
 type SheetViewMode = 'illustrated' | 'ui';
 
@@ -76,6 +77,21 @@ export class CharacterSheet implements OnInit, OnDestroy {
   });
 
   readonly errorBackLink = computed(() => this.consultReturnUrl() ?? '/characters');
+  readonly reportHref = computed(() => {
+    const err = this.error();
+    const id = this.route.snapshot.paramMap.get('id');
+    const name = this.character()?.name ?? 'Personnage';
+    return supportReportHref({
+      subject: `Problème fiche ${name}`,
+      message: err || 'Impossible de charger ou d’enregistrer la fiche.',
+      category: 'bug',
+      characterId: id,
+    });
+  });
+  readonly reportQuery = computed(() => {
+    const q = this.reportHref().split('?')[1] ?? '';
+    return Object.fromEntries(new URLSearchParams(q));
+  });
   readonly errorBackLabel = computed(() => {
     const url = this.consultReturnUrl();
     if (url?.includes('/play')) return 'Retour à la table';

@@ -50,6 +50,7 @@ export class AiGenerationProgressService {
   readonly kind = signal<AiGenerationKind | null>(null);
   /** Ephemeral toast after a background run completes. */
   readonly toastMessage = signal<string | null>(null);
+  readonly lastError = signal<{ kind: AiGenerationKind; message: string } | null>(null);
 
   /** Full progress UI (not background pill). */
   readonly foregroundActive = computed(() => this.active() && !this.background());
@@ -75,6 +76,7 @@ export class AiGenerationProgressService {
 
     // Claim immediately so a second run() cannot start during async begin().
     this.aborted = false;
+    this.lastError.set(null);
     this.active.set(true);
     this.background.set(false);
     this.kind.set(kind);
@@ -94,6 +96,8 @@ export class AiGenerationProgressService {
       catchError((err) => {
         options?.onError?.(err);
         this.clearRunSubscription();
+        const aborted = this.aborted || (err as { code?: string })?.code === AI_GENERATION_ABORTED;
+        if (!aborted) this.captureLastError(kind, err);
         this.reset();
         return throwError(() => err);
       }),
@@ -222,6 +226,14 @@ export class AiGenerationProgressService {
     this.stop();
   }
 
+  dismissLastError(): void {
+    this.lastError.set(null);
+  }
+
+  private captureLastError(kind: AiGenerationKind, err: unknown): void {
+    this.lastError.set({ kind, message: formatAiError(err) });
+  }
+
   dismissToast(): void {
     if (this.toastTimer) {
       clearTimeout(this.toastTimer);
@@ -287,6 +299,16 @@ export class AiGenerationProgressService {
       this.hideTimer = null;
     }
   }
+}
+
+function formatAiError(err: unknown): string {
+  const e = err as {
+    message?: string;
+    error?: { errors?: { reason?: string }[]; message?: string };
+  };
+  const reason = e?.error?.errors?.[0]?.reason || e?.error?.message || e?.message;
+  if (reason && reason.trim()) return reason.trim();
+  return 'La génération IA a échoué. Tu peux ouvrir un ticket avec le contexte.';
 }
 
 function buildDetail(options?: AiProgressOptions): string | null {

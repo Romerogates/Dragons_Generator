@@ -14,7 +14,7 @@ import { NotificationPreferencesService } from '@core/services/notification-pref
 import { AuthService } from '@core/services/auth.service';
 import type { NotificationItem, NotificationType } from '@core/models/notification.model';
 
-type NotifFilter = 'all' | 'friends' | 'campaigns';
+type NotifFilter = 'all' | 'friends' | 'campaigns' | 'support';
 
 const FRIEND_KINDS: NotificationType[] = ['friend_request', 'friend_message'];
 const CAMPAIGN_ACTION_KINDS: NotificationType[] = [
@@ -56,6 +56,7 @@ export class NotificationsPage implements OnInit {
       .filter((item) => {
         if (f === 'all') return true;
         if (f === 'friends') return FRIEND_KINDS.includes(item.kind);
+        if (f === 'support') return item.kind === 'support_reply';
         return CAMPAIGN_KINDS.includes(item.kind);
       });
   });
@@ -65,6 +66,14 @@ export class NotificationsPage implements OnInit {
       this.notifications
         .items()
         .filter((i) => FRIEND_KINDS.includes(i.kind) && this.notifPrefs.isKindEnabled(i.kind))
+        .filter((i) => !this.notifPrefs.isDismissed(i.key)).length,
+  );
+
+  readonly supportCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter((i) => i.kind === 'support_reply' && this.notifPrefs.isKindEnabled(i.kind))
         .filter((i) => !this.notifPrefs.isDismissed(i.key)).length,
   );
 
@@ -120,6 +129,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:sparkles';
       case 'schedule_rsvp':
         return 'fluent-emoji:spiral-calendar';
+      case 'support_reply':
+        return 'fluent-emoji:envelope';
     }
   }
 

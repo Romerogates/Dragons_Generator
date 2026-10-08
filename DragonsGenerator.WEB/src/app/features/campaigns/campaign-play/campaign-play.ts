@@ -6,6 +6,7 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  computed,
   signal,
   untracked,
   viewChild,
@@ -26,6 +27,7 @@ import { softTablePulse } from '@core/utils/table-feedback.util';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
+import { supportReportHref } from '@core/utils/support-report.util';
 
 @Component({
   selector: 'app-campaign-play',
@@ -48,6 +50,18 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly reportHref = computed(() =>
+    supportReportHref({
+      subject: 'Problème table de jeu',
+      message: this.error() || 'La table n’a pas pu s’ouvrir.',
+      category: 'campagne',
+      campaignId: this.route.snapshot.paramMap.get('id'),
+    }),
+  );
+  readonly reportQuery = computed(() => {
+    const q = this.reportHref().split('?')[1] ?? '';
+    return Object.fromEntries(new URLSearchParams(q));
+  });
   readonly campaign = signal<CampaignDetailModel | null>(null);
   readonly xpNotice = signal<string | null>(null);
   /** Version distante plus récente que l’état local (conflit multi-onglet / autre client). */

@@ -7,7 +7,8 @@ export type NotificationType =
   | 'proposal_rejected'
   | 'proposal_approved'
   | 'xp_awarded'
-  | 'schedule_rsvp';
+  | 'schedule_rsvp'
+  | 'support_reply';
 
 export interface NotificationItem {
   key: string;
@@ -23,4 +24,5 @@ export interface NotificationsSummary {
   campaignsActionCount: number;
   totalCount: number;
   notifications: NotificationItem[];
+  supportInboxCount?: number;
 }

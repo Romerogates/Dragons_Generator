@@ -66,6 +66,25 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
   readonly saveNotes = output<{ id: string; notes: string }>();
   readonly notesChange = output<string>();
 
+  readonly cannedReplies = [
+    {
+      label: 'On regarde',
+      text: 'Merci pour le signalement — on regarde de ce côté et on revient vers toi dès qu’on a une piste.',
+    },
+    {
+      label: 'Plus d’infos',
+      text: 'Peux-tu préciser l’heure, la page (forge, table, fiche) et ce que tu voyais à l’écran ? Une capture aide beaucoup.',
+    },
+    {
+      label: 'Contournement',
+      text: 'En attendant le correctif : recharge la page, puis réessaie. Si ça bloque encore, dis-nous exactement le bouton cliqué.',
+    },
+    {
+      label: 'Corrigé',
+      text: 'C’est corrigé de notre côté. Recharge Dragons Generator et dis-nous si tu vois encore le souci.',
+    },
+  ] as const;
+
   replyBody = '';
   replyCharacterId = '';
   replyCampaignId = '';
@@ -141,6 +160,10 @@ export class SupportConversation implements AfterViewInit, OnDestroy {
     const input = ev.target as HTMLInputElement;
     this.replyFile = input.files?.[0] ?? null;
     this.replyFileName.set(this.replyFile?.name ?? '');
+  }
+
+  applyCanned(text: string): void {
+    this.replyBody = text;
   }
 
   emitSend(notifyEmail: boolean): void {

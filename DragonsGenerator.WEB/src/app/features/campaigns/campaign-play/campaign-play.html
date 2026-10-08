@@ -4,7 +4,10 @@
   } @else if (error(); as err) {
     <div class="max-w-lg mx-auto px-4 py-24 text-center">
       <p class="text-red-400 mb-4">{{ err }}</p>
-      <a routerLink="/campaigns" class="text-violet-400 text-sm">← Retour aux campagnes</a>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a routerLink="/campaigns" class="text-violet-400 text-sm">← Retour aux campagnes</a>
+        <a [routerLink]="['/support']" [queryParams]="reportQuery()" class="text-amber-400 text-sm">Signaler</a>
+      </div>
     </div>
   } @else if (campaign(); as c) {
     @if (c.role === 'spectator') {

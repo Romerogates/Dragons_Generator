@@ -9,6 +9,9 @@ export interface SupportTicket {
   characterName?: string;
   campaignId?: string;
   campaignName?: string;
+  category?: string;
+  assignedStaffUserId?: string;
+  assignedStaffName?: string;
   createdAt: string;
   updatedAt?: string;
   userEmail?: string;

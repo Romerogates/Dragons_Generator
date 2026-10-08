@@ -31,6 +31,9 @@
               {{ waitingText() }}
             </span>
             <span class="text-[11px] text-slate-400">{{ statusLabel(statusKey()) }}</span>
+            @if (th.ticket.category) {
+              <span class="text-[11px] uppercase tracking-wide text-slate-500">{{ th.ticket.category }}</span>
+            }
             @if (isStaff() && th.ticket.userEmail) {
               <span class="truncate text-[11px] text-slate-300">{{ th.ticket.userEmail }}</span>
             }
@@ -207,6 +210,19 @@
             }
           }
 
+          @if (isStaff()) {
+            <div class="flex flex-wrap gap-1.5">
+              @for (c of cannedReplies; track c.label) {
+                <button
+                  type="button"
+                  class="rounded-full border border-slate-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300 hover:border-amber-400 hover:text-amber-300"
+                  (click)="applyCanned(c.text)"
+                >
+                  {{ c.label }}
+                </button>
+              }
+            </div>
+          }
           <label class="sr-only" for="support-reply">Votre message</label>
           <textarea
             id="support-reply"

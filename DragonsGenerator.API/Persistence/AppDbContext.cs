@@ -67,6 +67,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Cascade);
             e.Property(x => x.Subject).HasMaxLength(200);
             e.Property(x => x.Status).HasMaxLength(32);
+            e.Property(x => x.Category).HasMaxLength(32);
             e.Property(x => x.CharacterName).HasMaxLength(200);
             e.Property(x => x.CampaignName).HasMaxLength(200);
         });

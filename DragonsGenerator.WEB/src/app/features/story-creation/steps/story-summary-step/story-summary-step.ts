@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnDestroy,
   OnInit,
@@ -25,6 +26,7 @@ import {
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
 import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
+import { supportReportHref } from '@core/utils/support-report.util';
 import {
   storyLocationContext,
   storyRegionLabel,
@@ -55,6 +57,14 @@ export class StorySummaryStep implements OnInit, OnDestroy {
   readonly saving = signal(false);
   readonly printing = signal(false);
   readonly saveError = signal<string | null>(null);
+  readonly saveReportQuery = computed(() => {
+    const href = supportReportHref({
+      subject: 'Échec sauvegarde aventure',
+      message: this.saveError() || 'La sauvegarde de l’aventure a échoué.',
+      category: 'campagne',
+    });
+    return Object.fromEntries(new URLSearchParams(href.split('?')[1] ?? ''));
+  });
   readonly copyFeedback = signal(false);
   readonly savedCampaignId = signal<string | null>(null);
 

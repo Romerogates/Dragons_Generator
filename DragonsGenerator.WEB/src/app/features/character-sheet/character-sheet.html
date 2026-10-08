@@ -100,9 +100,12 @@
       class="bg-[#1b2028] border border-red-900/50 rounded-2xl p-8 text-center text-red-400"
     >
       <p class="mb-4">{{ err }}</p>
-      <a [routerLink]="errorBackLink()" class="text-amber-400 underline text-sm">{{
-        errorBackLabel()
-      }}</a>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a [routerLink]="errorBackLink()" class="text-amber-400 underline text-sm">{{
+          errorBackLabel()
+        }}</a>
+        <a [routerLink]="['/support']" [queryParams]="reportQuery()" class="text-sky-400 underline text-sm">Signaler</a>
+      </div>
     </div>
   } @else if (viewMode() === 'illustrated') {
     @if (character(); as hero) {

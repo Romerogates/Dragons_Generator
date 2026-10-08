@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   ChangeDetectionStrategy,
   inject,
   signal,
@@ -21,6 +22,12 @@ import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket'
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 import { supportStatusLabel } from '@core/utils/support-status.util';
 import {
+  SUPPORT_CATEGORIES,
+  normalizeSupportCategory,
+  supportCategoryLabel,
+  type SupportCategory,
+} from '@core/utils/support-category.util';
+import {
   SupportConversation,
   SupportReplyPayload,
 } from '@shared/components/support-conversation/support-conversation';
@@ -33,7 +40,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupportPage implements OnInit {
+export class SupportPage implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly characters = inject(CharacterCloudService);
   private readonly campaignsApi = inject(CampaignCloudService);
@@ -44,6 +51,8 @@ export class SupportPage implements OnInit {
 
   subject = '';
   message = '';
+  category: SupportCategory = 'autre';
+  readonly categories = SUPPORT_CATEGORIES;
   characterId = '';
   campaignId = '';
   file: File | null = null;
@@ -58,14 +67,21 @@ export class SupportPage implements OnInit {
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
   readonly sendingReply = signal(false);
+  private pollTimer: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
     const subject = q.get('subject')?.trim();
     const message = q.get('message')?.trim();
     const ticket = q.get('ticket')?.trim();
+    const category = q.get('category')?.trim();
+    const characterId = q.get('characterId')?.trim();
+    const campaignId = q.get('campaignId')?.trim();
     if (subject) this.subject = subject.slice(0, 200);
     if (message) this.message = message.slice(0, 4000);
+    if (category) this.category = normalizeSupportCategory(category);
+    if (characterId) this.characterId = characterId;
+    if (campaignId) this.campaignId = campaignId;
 
     this.characters.list().subscribe((list) => this.myCharacters.set(list));
     this.campaignsApi.list().subscribe((list) =>
@@ -81,8 +97,17 @@ export class SupportPage implements OnInit {
   }
 
   closeThread(): void {
+    this.stopPoll();
     this.thread.set(null);
     this.error.set(null);
+  }
+
+  ngOnDestroy(): void {
+    this.stopPoll();
+  }
+
+  categoryLabel(category: string | undefined): string {
+    return supportCategoryLabel(category);
   }
 
   statusLabel(status: string): string {
@@ -103,8 +128,41 @@ export class SupportPage implements OnInit {
   openTicket(id: string): void {
     this.error.set(null);
     this.http.get<SupportTicketThread>(`${this.api}/support/tickets/${id}`).subscribe({
-      next: (t) => this.thread.set(t),
+      next: (t) => {
+        this.thread.set(t);
+        this.startPoll();
+      },
       error: () => this.error.set('Impossible d’ouvrir ce ticket.'),
+    });
+  }
+
+  private startPoll(): void {
+    if (this.pollTimer) return;
+    this.pollTimer = setInterval(() => this.pollThread(), 8000);
+  }
+
+  private stopPoll(): void {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  private pollThread(): void {
+    const id = this.selectedId();
+    if (!id) return;
+    this.http.get<SupportTicketThread>(`${this.api}/support/tickets/${id}?poll=1`).subscribe({
+      next: (t) => {
+        const cur = this.thread();
+        if (!cur || cur.ticket.id !== t.ticket.id) return;
+        if (
+          t.messages.length !== cur.messages.length ||
+          t.ticket.updatedAt !== cur.ticket.updatedAt ||
+          t.ticket.status !== cur.ticket.status
+        ) {
+          this.thread.set(t);
+        }
+      },
     });
   }
 
@@ -137,6 +195,7 @@ export class SupportPage implements OnInit {
     const fd = new FormData();
     fd.append('subject', this.subject.trim());
     fd.append('message', this.message.trim());
+    fd.append('category', this.category);
     if (this.characterId) fd.append('characterId', this.characterId);
     if (this.campaignId) fd.append('campaignId', this.campaignId);
     if (this.file) fd.append('file', this.file, this.file.name);
@@ -147,6 +206,7 @@ export class SupportPage implements OnInit {
         this.success.set('Ticket ouvert. Le support a été prévenu par mail.');
         this.subject = '';
         this.message = '';
+        this.category = 'autre';
         this.characterId = '';
         this.campaignId = '';
         this.file = null;

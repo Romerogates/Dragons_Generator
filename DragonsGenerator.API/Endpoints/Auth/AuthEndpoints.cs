@@ -303,6 +303,12 @@ public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt, IHostEnvir
             await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
             return;
         }
+        if (user.Disabled)
+        {
+            AddError("account_disabled");
+            await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+            return;
+        }
 
         user.LastLoginAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);

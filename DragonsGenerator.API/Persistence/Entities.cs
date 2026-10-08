@@ -27,6 +27,8 @@ public class AppUser
     public string PreferencesJson { get; set; } = "{}";
     /// <summary>Subject Google (sub) si le compte s’est inscrit via Google.</summary>
     public string? GoogleSubject { get; set; }
+    /// <summary>Compte désactivé : login refusé.</summary>
+    public bool Disabled { get; set; }
 
     public List<CharacterRecord> Characters { get; set; } = [];
     public List<DungeonRecord> Dungeons { get; set; } = [];
@@ -83,6 +85,8 @@ public class SupportTicket
     public string? CharacterName { get; set; }
     public Guid? CampaignId { get; set; }
     public string? CampaignName { get; set; }
+    public string Category { get; set; } = "autre";
+    public Guid? AssignedStaffUserId { get; set; }
     public string Status { get; set; } = "open"; // open | in_progress | closed
     public string? AdminNotes { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

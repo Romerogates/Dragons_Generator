@@ -1,10 +1,37 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
+import { supportReportHref } from '@core/utils/support-report.util';
 
 @Component({
   selector: 'app-ai-generation-progress-bar',
   standalone: true,
+  imports: [RouterLink],
   template: `
+    @if (progress.lastError(); as err) {
+      <div
+        class="rounded-xl border border-red-900/50 bg-red-950/20 p-3 flex flex-wrap items-center justify-between gap-2"
+        data-testid="ai-generation-error"
+      >
+        <p class="text-xs text-red-300">{{ err.message }}</p>
+        <div class="flex items-center gap-2">
+          <a
+            [routerLink]="['/support']"
+            [queryParams]="reportQuery(err.kind, err.message)"
+            class="text-[10px] font-black uppercase tracking-widest text-amber-300 hover:text-amber-200"
+            data-testid="ai-generation-report"
+            >Signaler</a
+          >
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+            (click)="progress.dismissLastError()"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    }
     @if (progress.foregroundActive()) {
       <div
         class="rounded-xl border p-4 space-y-2.5 animate-fade-in"
@@ -60,4 +87,13 @@ import { AiGenerationProgressService } from '@core/services/ai-generation-progre
 export class AiGenerationProgressBar {
   readonly progress = inject(AiGenerationProgressService);
   readonly tone = input<'violet' | 'amber'>('violet');
+
+  reportQuery(kind: string, message: string): Record<string, string> {
+    const href = supportReportHref({
+      subject: `Échec génération IA (${kind})`,
+      message: `La génération « ${kind} » a échoué.\n\n${message}`,
+      category: 'ia',
+    });
+    return Object.fromEntries(new URLSearchParams(href.split('?')[1] ?? ''));
+  }
 }

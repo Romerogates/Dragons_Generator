@@ -189,6 +189,10 @@ export class LoginPage implements OnInit {
           this.error.set('Confirmez d\'abord votre email. Vous pouvez renvoyer le lien ci-dessous.');
           return;
         }
+        if (err.status === 403 && reason === 'account_disabled') {
+          this.error.set('Ce compte a été désactivé. Contacte le support si tu penses que c’est une erreur.');
+          return;
+        }
         this.error.set(reason || 'Connexion impossible.');
       },
     });

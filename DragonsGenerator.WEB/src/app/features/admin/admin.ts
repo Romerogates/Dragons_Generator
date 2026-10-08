@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   ChangeDetectionStrategy,
   inject,
   signal,
@@ -11,9 +12,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '@env/environment';
+import { AuthService } from '@core/services/auth.service';
+import { NotificationService } from '@core/services/notification.service';
 import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
+import { SUPPORT_CATEGORIES, supportCategoryLabel } from '@core/utils/support-category.util';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 import { supportStatusLabel } from '@core/utils/support-status.util';
 import {
@@ -31,6 +35,7 @@ interface AdminUser {
   lastLoginAt?: string;
   characterCount: number;
   passwordStatus: string;
+  disabled?: boolean;
 }
 
 type AdminTicket = SupportTicket;
@@ -127,17 +132,24 @@ type AdminTab = 'overview' | 'stats' | 'tickets' | 'ops' | 'mails' | 'users';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SupportConversation],
+  imports: [CommonModule, FormsModule, SupportConversation],
   templateUrl: './admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdminPage implements OnInit {
+export class AdminPage implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
+  readonly notifications = inject(NotificationService);
   private readonly api = environment.apiUrl;
   private readonly convo = viewChild(SupportConversation);
+  private pollTimer: ReturnType<typeof setInterval> | null = null;
+  readonly ticketStatusFilter = signal<'all' | 'open' | 'in_progress' | 'closed'>('all');
+  readonly ticketCategoryFilter = signal<'all' | string>('all');
+  readonly ticketMineOnly = signal(false);
+  readonly categories = SUPPORT_CATEGORIES;
 
   readonly tab = signal<AdminTab>('overview');
   readonly users = signal<AdminUser[]>([]);
@@ -150,6 +162,18 @@ export class AdminPage implements OnInit {
   readonly inboxMails = signal<InboxMail[]>([]);
   readonly thread = signal<TicketThread | null>(null);
   readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
+  readonly filteredTickets = computed(() => {
+    const status = this.ticketStatusFilter();
+    const category = this.ticketCategoryFilter();
+    const mine = this.ticketMineOnly();
+    const mineId = this.auth.user()?.id;
+    return this.tickets().filter((t) => {
+      if (status !== 'all' && t.status !== status) return false;
+      if (category !== 'all' && (t.category ?? 'autre') !== category) return false;
+      if (mine && t.assignedStaffUserId !== mineId) return false;
+      return true;
+    });
+  });
   readonly diagnostic = signal<string>('');
   readonly message = signal<string | null>(null);
   readonly error = signal<string | null>(null);
@@ -158,7 +182,14 @@ export class AdminPage implements OnInit {
 
   edits: Record<
     string,
-    { email: string; displayName: string; role: string; newPassword: string; emailConfirmed: boolean }
+    {
+      email: string;
+      displayName: string;
+      role: string;
+      newPassword: string;
+      emailConfirmed: boolean;
+      disabled: boolean;
+    }
   > = {};
 
   ngOnInit(): void {
@@ -258,6 +289,7 @@ export class AdminPage implements OnInit {
             role: u.role,
             newPassword: '',
             emailConfirmed: u.emailConfirmed,
+            disabled: !!u.disabled,
           };
         }
       },
@@ -282,6 +314,45 @@ export class AdminPage implements OnInit {
         this.thread.set(t);
         this.adminNotesDraft = t.ticket.adminNotes ?? '';
         this.tab.set('tickets');
+        this.startPoll();
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.stopPoll();
+  }
+
+  categoryLabel(category: string | undefined): string {
+    return supportCategoryLabel(category);
+  }
+
+  private startPoll(): void {
+    if (this.pollTimer) return;
+    this.pollTimer = setInterval(() => this.pollThread(), 8000);
+  }
+
+  private stopPoll(): void {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  private pollThread(): void {
+    const id = this.selectedId();
+    if (!id) return;
+    this.http.get<TicketThread>(`${this.api}/support/tickets/${id}?poll=1`).subscribe({
+      next: (t) => {
+        const cur = this.thread();
+        if (!cur || cur.ticket.id !== t.ticket.id) return;
+        if (
+          t.messages.length !== cur.messages.length ||
+          t.ticket.updatedAt !== cur.ticket.updatedAt ||
+          t.ticket.status !== cur.ticket.status
+        ) {
+          this.thread.set(t);
+        }
       },
     });
   }
@@ -321,6 +392,7 @@ export class AdminPage implements OnInit {
   }
 
   closeThread(): void {
+    this.stopPoll();
     this.thread.set(null);
   }
 
@@ -426,6 +498,7 @@ export class AdminPage implements OnInit {
       displayName: e.displayName,
       role: e.role,
       emailConfirmed: e.emailConfirmed,
+      disabled: e.disabled,
     };
     if (e.newPassword.trim()) body['newPassword'] = e.newPassword.trim();
 

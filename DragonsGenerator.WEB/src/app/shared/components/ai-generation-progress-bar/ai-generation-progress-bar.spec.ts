@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { AiGenerationProgressBar } from './ai-generation-progress-bar';
@@ -23,6 +24,7 @@ describe('AiGenerationProgressBar', () => {
       imports: [AiGenerationProgressBar],
       providers: [
         ...zonelessTestProviders,
+        provideRouter([]),
         {
           provide: AiGenerationProgressService,
           useValue: {
@@ -36,6 +38,8 @@ describe('AiGenerationProgressBar', () => {
             stop,
             sendToBackground,
             restoreForeground: jasmine.createSpy('restoreForeground'),
+            lastError: signal(null),
+            dismissLastError: jasmine.createSpy('dismissLastError'),
           },
         },
       ],

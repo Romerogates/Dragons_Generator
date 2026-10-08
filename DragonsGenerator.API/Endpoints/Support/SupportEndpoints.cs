@@ -22,7 +22,10 @@ public record TicketDto(
     string? AdminNotes,
     int MessageCount,
     Guid? CampaignId = null,
-    string? CampaignName = null
+    string? CampaignName = null,
+    string Category = "autre",
+    Guid? AssignedStaffUserId = null,
+    string? AssignedStaffName = null
 );
 
 public record TicketMessageDto(
@@ -144,6 +147,7 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
             CharacterName = characterName,
             CampaignId = campaignId,
             CampaignName = campaignName,
+            Category = SupportTicketRules.NormalizeCategory(form["category"].ToString()),
         };
         db.SupportTickets.Add(ticket);
         await db.SaveChangesAsync(ct);
@@ -155,7 +159,11 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
         await Send.OkAsync(ToDto(ticket, user?.Email, 0), ct);
     }
 
-    internal static TicketDto ToDto(SupportTicket t, string? email, int messageCount) =>
+    internal static TicketDto ToDto(
+        SupportTicket t,
+        string? email,
+        int messageCount,
+        string? assignedStaffName = null) =>
         new(
             t.Id,
             t.Subject,
@@ -171,7 +179,10 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
             t.AdminNotes,
             messageCount,
             t.CampaignId,
-            t.CampaignName
+            t.CampaignName,
+            string.IsNullOrWhiteSpace(t.Category) ? "autre" : t.Category,
+            t.AssignedStaffUserId,
+            assignedStaffName
         );
 }
 
@@ -398,16 +409,35 @@ public class AdminListTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<
                     .ToListAsync(ct))
                 .ToDictionary(x => x.Key, x => x.Count);
 
+        var staffNames = await SupportInboxHelper.StaffNamesAsync(db, tickets, ct);
         await Send.OkAsync(
             tickets
                 .OrderByDescending(t => t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt)
                 .Select(t => CreateTicketEndpoint.ToDto(
                     t,
                     emailById.GetValueOrDefault(t.UserId),
-                    counts.GetValueOrDefault(t.Id)))
+                    counts.GetValueOrDefault(t.Id),
+                    t.AssignedStaffUserId is { } sid ? staffNames.GetValueOrDefault(sid) : null))
                 .ToList(),
             ct
         );
+    }
+}
+
+public record SupportInboxCountDto(int WaitingOnStaff);
+
+public class AdminSupportInboxCountEndpoint(AppDbContext db) : EndpointWithoutRequest<SupportInboxCountDto>
+{
+    public override void Configure()
+    {
+        Get("/admin/support/inbox-count");
+        Roles(AppRoles.Admin);
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var count = await SupportInboxHelper.CountWaitingOnStaffAsync(db, ct);
+        await Send.OkAsync(new SupportInboxCountDto(count), ct);
     }
 }
 
@@ -436,6 +466,12 @@ public class AdminUpdateTicketEndpoint(AppDbContext db, SupportDeskService desk)
             ticket.Status = req.Status.Trim();
         if (req.AdminNotes is not null)
             ticket.AdminNotes = req.AdminNotes;
+        if (ticket.Status == "in_progress")
+        {
+            var staffId = AuthHelpers.GetUserId(User);
+            if (staffId is not null)
+                ticket.AssignedStaffUserId = staffId;
+        }
         ticket.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -551,9 +587,18 @@ public class GetTicketThreadEndpoint(AppDbContext db, IOptionsMonitor<SmtpOption
                 m.CampaignName))
             .ToList();
 
+        string? staffName = null;
+        if (ticket.AssignedStaffUserId is Guid staffId)
+        {
+            staffName = await db.Users.AsNoTracking()
+                .Where(u => u.Id == staffId)
+                .Select(u => u.DisplayName)
+                .FirstOrDefaultAsync(ct);
+        }
+
         await Send.OkAsync(
             new TicketThreadDto(
-                CreateTicketEndpoint.ToDto(ticket, email, messages.Count),
+                CreateTicketEndpoint.ToDto(ticket, email, messages.Count, staffName),
                 messages,
                 !smtp.CurrentValue.IsSink),
             ct);
@@ -759,6 +804,64 @@ public class PostTicketMessageEndpoint(
                 msg.CampaignName,
                 emailSent),
             ct);
+    }
+}
+
+internal static class SupportInboxHelper
+{
+    public static async Task<int> CountWaitingOnStaffAsync(AppDbContext db, CancellationToken ct)
+    {
+        var tickets = await db.SupportTickets.AsNoTracking()
+            .Where(t => t.Status != "closed")
+            .Select(t => new { t.Id, t.Status })
+            .ToListAsync(ct);
+        if (tickets.Count == 0)
+            return 0;
+
+        var ids = tickets.Select(t => t.Id).ToList();
+        var last = await LastFromStaffByTicketAsync(db, ids, ct);
+        return tickets.Count(t =>
+            SupportTicketRules.WaitingOnStaff(t.Status, last.GetValueOrDefault(t.Id)));
+    }
+
+    public static async Task<Dictionary<Guid, bool?>> LastFromStaffByTicketAsync(
+        AppDbContext db,
+        List<Guid> ticketIds,
+        CancellationToken ct)
+    {
+        var result = new Dictionary<Guid, bool?>();
+        if (ticketIds.Count == 0)
+            return result;
+
+        var msgs = await db.SupportTicketMessages.AsNoTracking()
+            .Where(m => ticketIds.Contains(m.TicketId))
+            .Select(m => new { m.TicketId, m.FromStaff, m.CreatedAt, m.Id })
+            .ToListAsync(ct);
+        foreach (var g in msgs.GroupBy(m => m.TicketId))
+        {
+            var last = g.OrderByDescending(m => m.CreatedAt).ThenByDescending(m => m.Id).First();
+            result[g.Key] = last.FromStaff;
+        }
+
+        return result;
+    }
+
+    public static async Task<Dictionary<Guid, string>> StaffNamesAsync(
+        AppDbContext db,
+        IEnumerable<SupportTicket> tickets,
+        CancellationToken ct)
+    {
+        var ids = tickets
+            .Where(t => t.AssignedStaffUserId is not null)
+            .Select(t => t.AssignedStaffUserId!.Value)
+            .Distinct()
+            .ToList();
+        if (ids.Count == 0)
+            return new Dictionary<Guid, string>();
+
+        return await db.Users.AsNoTracking()
+            .Where(u => ids.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.DisplayName, ct);
     }
 }
 

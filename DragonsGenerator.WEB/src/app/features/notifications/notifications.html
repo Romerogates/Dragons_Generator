@@ -43,7 +43,7 @@
           "
           (click)="setFilter('all')"
         >
-          Tout ({{ friendsCount() + campaignsCount() }})
+          Tout ({{ friendsCount() + campaignsCount() + supportCount() }})
         </button>
         <button
           type="button"
@@ -68,6 +68,18 @@
           (click)="setFilter('campaigns')"
         >
           Campagnes ({{ campaignsCount() }})
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+          [class]="
+            filter() === 'support'
+              ? 'border-sky-500/50 bg-sky-950/30 text-sky-300'
+              : 'border-slate-800 text-slate-500'
+          "
+          (click)="setFilter('support')"
+        >
+          Support ({{ supportCount() }})
         </button>
       </div>
 

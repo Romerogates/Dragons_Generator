@@ -31,7 +31,7 @@ describe('Navbar', () => {
         },
         {
           provide: NotificationService,
-          useValue: { items: signal([]) },
+          useValue: { items: signal([]), supportInboxCount: signal(0) },
         },
         {
           provide: NotificationPreferencesService,

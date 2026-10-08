@@ -1,4 +1,5 @@
 using System.Text.Json;
+using DragonsGenerator.API.Endpoints.Support;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
@@ -19,7 +20,8 @@ public record NotificationsSummaryDto(
     int FriendsActionCount,
     int CampaignsActionCount,
     int TotalCount,
-    List<NotificationItemDto> Notifications
+    List<NotificationItemDto> Notifications,
+    int SupportInboxCount = 0
 );
 
 public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
@@ -322,6 +324,45 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
+        var myTickets = await db.SupportTickets.AsNoTracking()
+            .Where(t => t.UserId == userId && t.Status != "closed")
+            .ToListAsync(ct);
+        var myTicketIds = myTickets.Select(t => t.Id).ToList();
+        var lastByTicket = await SupportInboxHelper.LastFromStaffByTicketAsync(db, myTicketIds, ct);
+        var staffMsgs = myTicketIds.Count == 0
+            ? []
+            : await db.SupportTicketMessages.AsNoTracking()
+                .Where(m => myTicketIds.Contains(m.TicketId) && m.FromStaff)
+                .ToListAsync(ct);
+        foreach (var ticket in myTickets)
+        {
+            lastByTicket.TryGetValue(ticket.Id, out var lastFromStaff);
+            if (!SupportTicketRules.PlayerHasUnreadStaffReply(ticket.Status, lastFromStaff))
+                continue;
+
+            var lastMsg = staffMsgs
+                .Where(m => m.TicketId == ticket.Id)
+                .OrderByDescending(m => m.CreatedAt)
+                .FirstOrDefault();
+            if (lastMsg is null)
+                continue;
+
+            var preview = lastMsg.Body.Trim();
+            if (preview.Length > 80)
+                preview = preview[..77] + "…";
+
+            items.Add(
+                new NotificationItemDto(
+                    $"support-{ticket.Id}-{lastMsg.Id}",
+                    "support_reply",
+                    "Réponse du support",
+                    $"{ticket.Subject} : {preview}",
+                    $"/support?ticket={ticket.Id}",
+                    lastMsg.CreatedAt
+                )
+            );
+        }
+
         items = items.OrderByDescending(i => i.CreatedAt).ToList();
 
         // « Personnage approuvé » = info, pas une action en attente (badge Campagnes / cloche action).
@@ -331,10 +372,14 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                 or "character_proposal"
                 or "character_pick_requested"
                 or "proposal_rejected");
-        var totalCount = friendsCount + campaignsCount;
+        var supportCount = items.Count(i => i.Kind == "support_reply");
+        var totalCount = friendsCount + campaignsCount + supportCount;
+        var supportInboxCount = AuthHelpers.IsAdmin(User)
+            ? await SupportInboxHelper.CountWaitingOnStaffAsync(db, ct)
+            : 0;
 
         await Send.OkAsync(
-            new NotificationsSummaryDto(friendsCount, campaignsCount, totalCount, items),
+            new NotificationsSummaryDto(friendsCount, campaignsCount, totalCount, items, supportInboxCount),
             ct
         );
     }

@@ -44,6 +44,8 @@ public static class DbMigrationRunner
         new("020_google_and_ticket_message_attachments", Apply020GoogleAndTicketMessageAttachmentsAsync),
         new("021_ticket_campaign_attach", Apply021TicketCampaignAttachAsync),
         new("022_ai_generation_logs", Apply022AiGenerationLogsAsync),
+        new("023_support_category_assign", Apply023SupportCategoryAssignAsync),
+        new("024_user_disabled", Apply024UserDisabledAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -463,6 +465,17 @@ public static class DbMigrationRunner
             ct);
     }
 
+    private static async Task Apply023SupportCategoryAssignAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "SupportTickets", "Category", "TEXT NOT NULL DEFAULT 'autre'", ct);
+        await TryAddColumnAsync(db, "SupportTickets", "AssignedStaffUserId", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply024UserDisabledAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Users", "Disabled", "INTEGER NOT NULL DEFAULT 0", ct);
+    }
+
     private static async Task TryAddColumnAsync(
         AppDbContext db,
         string table,
@@ -504,6 +517,7 @@ public static class DbMigrationRunner
         definition is "TEXT NULL"
             or "TEXT NOT NULL DEFAULT 'violet'"
             or "TEXT NOT NULL DEFAULT 'half'"
+            or "TEXT NOT NULL DEFAULT 'autre'"
             or "INTEGER NOT NULL DEFAULT 0";
 }
 

@@ -121,6 +121,8 @@ export class NotificationPreferencesService {
         return p.xpAwards;
       case 'schedule_rsvp':
         return p.sessionReminders;
+      case 'support_reply':
+        return true;
     }
   }
 

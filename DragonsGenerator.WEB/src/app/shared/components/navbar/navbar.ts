@@ -83,8 +83,22 @@ export class Navbar implements OnInit, OnDestroy {
             !this.notifPrefs.isDismissed(item.key),
         ).length,
   );
+  readonly supportReplyCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter(
+          (item) =>
+            item.kind === 'support_reply' &&
+            this.notifPrefs.isKindEnabled(item.kind) &&
+            !this.notifPrefs.isDismissed(item.key),
+        ).length,
+  );
+  readonly supportInboxCount = computed(() =>
+    this.auth.isAdmin() ? this.notifications.supportInboxCount() : 0,
+  );
   readonly notificationCount = computed(
-    () => this.friendsActionCount() + this.campaignsActionCount(),
+    () => this.friendsActionCount() + this.campaignsActionCount() + this.supportReplyCount(),
   );
   readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
   /** Badge hamburger (md–lg) : notifs + demandes + campagnes + guide. */

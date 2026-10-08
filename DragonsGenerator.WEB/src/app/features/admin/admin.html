@@ -48,6 +48,11 @@
         (click)="setTab($any(t.id))"
       >
         {{ t.label }}
+        @if (t.id === 'tickets' && notifications.supportInboxCount() > 0) {
+          <span class="ml-1 inline-flex min-w-[1rem] justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-slate-950">{{
+            notifications.supportInboxCount() > 9 ? '9+' : notifications.supportInboxCount()
+          }}</span>
+        }
       </button>
     }
   </div>
@@ -55,9 +60,10 @@
   @if (tab() === 'stats') {
     @if (stats(); as s) {
       <div class="flex items-center justify-between mb-4">
-        <p class="text-xs text-slate-500">Compteurs live (créations, générations IA, social).</p>
+        <p class="text-xs text-slate-500">Compteurs live — produit, IA, social, support.</p>
         <button type="button" class="text-xs text-amber-400 hover:underline" (click)="loadStats()">Actualiser</button>
       </div>
+      <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Produit</p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
           <p class="text-[10px] uppercase tracking-widest text-slate-500">Personnages</p>
@@ -335,8 +341,36 @@
 
   @if (tab() === 'tickets') {
     <p class="text-sm text-slate-300 mb-3">Clique un ticket pour ouvrir la conversation <span class="text-amber-300 font-semibold">plein écran</span>.</p>
+    <div class="flex flex-wrap gap-2 mb-3">
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="ticketStatusFilter()"
+        (ngModelChange)="ticketStatusFilter.set($event)"
+        name="ticketStatusFilter"
+      >
+        <option value="all">Tous les statuts</option>
+        <option value="open">Ouverts</option>
+        <option value="in_progress">En cours</option>
+        <option value="closed">Fermés</option>
+      </select>
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="ticketCategoryFilter()"
+        (ngModelChange)="ticketCategoryFilter.set($event)"
+        name="ticketCategoryFilter"
+      >
+        <option value="all">Toutes catégories</option>
+        @for (c of categories; track c) {
+          <option [value]="c">{{ categoryLabel(c) }}</option>
+        }
+      </select>
+      <label class="inline-flex items-center gap-2 text-xs text-slate-400">
+        <input type="checkbox" [ngModel]="ticketMineOnly()" (ngModelChange)="ticketMineOnly.set($event)" name="ticketMine" />
+        À moi
+      </label>
+    </div>
     <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
-      @for (t of tickets(); track t.id) {
+      @for (t of filteredTickets(); track t.id) {
         <button
           type="button"
           class="text-left bg-[#1b2028] border-2 rounded-xl p-3 hover:border-amber-400"
@@ -358,7 +392,7 @@
               {{ statusLabel(t.status) }}
             </span>
           </div>
-          <p class="text-[11px] text-slate-300 mt-1">{{ t.userEmail }} · {{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} msg</p>
+          <p class="text-[11px] text-slate-300 mt-1">{{ categoryLabel(t.category) }} · {{ t.userEmail }} · {{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} msg</p>
           <span class="mt-2 inline-block text-[10px] font-bold uppercase tracking-wide text-sky-300">Ouvrir la conversation</span>
           <button
             type="button"
@@ -434,6 +468,10 @@
           <label class="flex items-center gap-2 text-xs text-slate-400 mt-2">
             <input type="checkbox" [(ngModel)]="edits[u.id].emailConfirmed" [name]="'conf-' + u.id" />
             Email confirmé
+          </label>
+          <label class="flex items-center gap-2 text-xs text-red-300/80 mt-2">
+            <input type="checkbox" [(ngModel)]="edits[u.id].disabled" [name]="'dis-' + u.id" />
+            Compte désactivé (bloque la connexion)
           </label>
           <div class="flex flex-wrap gap-2 mt-3">
             <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5" (click)="saveUser(u.id)">

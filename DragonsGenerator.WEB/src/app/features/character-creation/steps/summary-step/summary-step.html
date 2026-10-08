@@ -226,7 +226,10 @@
   }
 
   @if (saveError(); as err) {
-    <p class="text-center text-sm text-red-400 px-4">{{ err }}</p>
+    <p class="text-center text-sm text-red-400 px-4">
+      {{ err }}
+      <a routerLink="/support" [queryParams]="saveReportQuery()" class="ml-2 text-amber-400 underline">Signaler</a>
+    </p>
   }
 
   @if (!isLoggedIn()) {

@@ -98,6 +98,12 @@ public class GoogleLoginEndpoint(
         }
         else
         {
+            if (user.Disabled)
+            {
+                AddError("account_disabled");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
             user.GoogleSubject ??= profile.Subject;
             if (!user.EmailConfirmed)
                 user.EmailConfirmed = true;

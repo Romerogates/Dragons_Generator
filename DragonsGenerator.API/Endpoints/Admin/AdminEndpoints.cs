@@ -18,7 +18,8 @@ public record AdminUserDto(
     DateTimeOffset CreatedAt,
     DateTimeOffset? LastLoginAt,
     int CharacterCount,
-    string PasswordStatus
+    string PasswordStatus,
+    bool Disabled = false
 );
 
 public record AdminUpdateUserRequest(
@@ -26,7 +27,8 @@ public record AdminUpdateUserRequest(
     string? DisplayName,
     string? Role,
     string? NewPassword,
-    bool? EmailConfirmed
+    bool? EmailConfirmed,
+    bool? Disabled = null
 );
 
 public class AdminListUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<List<AdminUserDto>>
@@ -47,6 +49,7 @@ public class AdminListUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<Li
                 u.DisplayName,
                 u.Role,
                 u.EmailConfirmed,
+                u.Disabled,
                 u.CreatedAt,
                 u.LastLoginAt,
                 CharacterCount = u.Characters.Count,
@@ -65,7 +68,8 @@ public class AdminListUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<Li
                     u.CreatedAt,
                     u.LastLoginAt,
                     u.CharacterCount,
-                    "Hashé (non visible — utilisez « Nouveau mot de passe »)"
+                    "Hashé (non visible — utilisez « Nouveau mot de passe »)",
+                    u.Disabled
                 ))
                 .ToList(),
             ct
@@ -126,6 +130,17 @@ public class AdminUpdateUserEndpoint(AppDbContext db) : Endpoint<AdminUpdateUser
             user.Role = req.Role;
         if (req.EmailConfirmed is not null)
             user.EmailConfirmed = req.EmailConfirmed.Value;
+        if (req.Disabled is not null)
+        {
+            var actorId = AuthHelpers.GetUserId(User);
+            if (req.Disabled.Value && actorId == user.Id)
+            {
+                AddError("Vous ne pouvez pas désactiver votre propre compte.");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            user.Disabled = req.Disabled.Value;
+        }
         if (!string.IsNullOrWhiteSpace(req.NewPassword))
         {
             if (req.NewPassword.Length < 8)
@@ -150,7 +165,8 @@ public class AdminUpdateUserEndpoint(AppDbContext db) : Endpoint<AdminUpdateUser
                 user.CreatedAt,
                 user.LastLoginAt,
                 user.Characters.Count,
-                "Hashé (non visible — utilisez « Nouveau mot de passe »)"
+                "Hashé (non visible — utilisez « Nouveau mot de passe »)",
+                user.Disabled
             ),
             ct
         );

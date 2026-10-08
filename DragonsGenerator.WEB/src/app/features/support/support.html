@@ -30,6 +30,23 @@
   <div class="grid lg:grid-cols-[minmax(0,1fr)_22rem] gap-8">
     <form class="bg-[#1b2028] border-2 border-slate-700 rounded-2xl p-6 flex flex-col gap-4" (ngSubmit)="submit()">
       <h2 class="text-sm font-black uppercase tracking-widest text-amber-300">Nouveau ticket</h2>
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Catégorie</p>
+        <div class="flex flex-wrap gap-2">
+          @for (c of categories; track c) {
+            <button
+              type="button"
+              class="rounded-full px-3 py-1.5 text-xs font-semibold"
+              [class.bg-amber-400]="category === c"
+              [class.text-zinc-950]="category === c"
+              [class.bg-slate-800]="category !== c"
+              (click)="category = c"
+            >
+              {{ categoryLabel(c) }}
+            </button>
+          }
+        </div>
+      </div>
       <label class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
         Sujet
         <input required [(ngModel)]="subject" name="subject" class="mt-1 w-full rounded-lg bg-[#0c1017] border-2 border-slate-600 px-3 py-2.5 text-sm text-white outline-none focus:border-amber-400" />
@@ -98,7 +115,7 @@
                 {{ statusLabel(t.status) }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">{{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} message(s)</p>
+            <p class="text-[11px] text-slate-400 mt-1">{{ categoryLabel(t.category) }} · {{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} message(s)</p>
           </button>
         } @empty {
           <p class="text-xs text-slate-500">Aucun ticket pour le moment.</p>

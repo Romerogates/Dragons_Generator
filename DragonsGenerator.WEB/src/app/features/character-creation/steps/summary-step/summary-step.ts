@@ -9,7 +9,8 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { supportReportHref } from '@core/utils/support-report.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { CharacterBuilderService } from '@core/services/character-builder.service';
@@ -39,7 +40,6 @@ import {
 } from '@core/utils/character-export-validation.util';
 import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
 import { switchMap, of } from 'rxjs';
-import { RouterLink } from '@angular/router';
 import {
   classPlaybookPath,
   getGuideClassPlaybook,
@@ -107,6 +107,14 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
+  readonly saveReportQuery = computed(() => {
+    const href = supportReportHref({
+      subject: `Échec sauvegarde héros ${this.character().name || ''}`.trim(),
+      message: this.saveError() || 'La sauvegarde du héros a échoué.',
+      category: 'bug',
+    });
+    return Object.fromEntries(new URLSearchParams(href.split('?')[1] ?? ''));
+  });
   /** Succès file d’attente offline (pas une erreur). */
   readonly saveQueuedNotice = signal<string | null>(null);
 
