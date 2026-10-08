@@ -5,15 +5,21 @@ import {
   inject,
   signal,
   computed,
+  viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '@env/environment';
+import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 import { supportStatusLabel } from '@core/utils/support-status.util';
+import {
+  SupportConversation,
+  SupportReplyPayload,
+} from '@shared/components/support-conversation/support-conversation';
 
 interface AdminUser {
   id: string;
@@ -27,30 +33,7 @@ interface AdminUser {
   passwordStatus: string;
 }
 
-interface AdminTicket {
-  id: string;
-  subject: string;
-  message: string;
-  status: string;
-  userEmail?: string;
-  attachmentOriginalName?: string;
-  attachmentUrl?: string;
-  characterId?: string;
-  characterName?: string;
-  createdAt: string;
-  updatedAt?: string;
-  adminNotes?: string;
-  messageCount?: number;
-}
-
-interface TicketMessage {
-  id: string;
-  fromStaff: boolean;
-  body: string;
-  createdAt: string;
-  characterName?: string;
-  attachmentOriginalName?: string;
-}
+type AdminTicket = SupportTicket;
 
 interface HostBackupFile {
   name: string;
@@ -67,10 +50,7 @@ interface InboxMail {
   date: string;
 }
 
-interface TicketThread {
-  ticket: AdminTicket;
-  messages: TicketMessage[];
-}
+type TicketThread = SupportTicketThread;
 
 interface OpsEvent {
   id: string;
@@ -114,7 +94,7 @@ interface Overview {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, SupportConversation],
   templateUrl: './admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -124,6 +104,7 @@ export class AdminPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = environment.apiUrl;
+  private readonly convo = viewChild(SupportConversation);
 
   readonly tab = signal<'overview' | 'tickets' | 'ops' | 'mails' | 'users'>('overview');
   readonly users = signal<AdminUser[]>([]);
@@ -276,19 +257,80 @@ export class AdminPage implements OnInit {
       .subscribe({ next: () => this.message.set('Notes internes enregistrées.') });
   }
 
+  closeThread(): void {
+    this.thread.set(null);
+  }
+
+  onConversationSend(payload: SupportReplyPayload): void {
+    const t = this.thread()?.ticket;
+    if (!t) return;
+    const fd = new FormData();
+    fd.append('body', payload.body);
+    fd.append('notifyEmail', payload.notifyEmail ? 'true' : 'false');
+    if (payload.file) fd.append('file', payload.file, payload.file.name);
+    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
+      next: () => {
+        this.convo()?.clearReplyUi();
+        this.message.set(
+          payload.notifyEmail
+            ? 'Réponse envoyée (fil + e-mail au joueur).'
+            : 'Réponse enregistrée dans le fil.',
+        );
+        this.loadTickets(t.id);
+      },
+      error: () => this.error.set('Réponse non envoyée.'),
+    });
+  }
+
+  onDownloadCharacter(ev: {
+    ticket?: SupportTicket;
+    message?: { id: string; characterId?: string; characterName?: string };
+  }): void {
+    const thread = this.thread();
+    if (!thread) return;
+    if (ev.message?.characterId) {
+      downloadTicketCharacterJson(
+        this.http,
+        thread.ticket.id,
+        ev.message.characterName ?? 'personnage',
+        () => this.error.set('Impossible de télécharger le JSON du personnage.'),
+        ev.message.id,
+      );
+      return;
+    }
+    const ticket = ev.ticket ?? thread.ticket;
+    if (!ticket.characterId) return;
+    this.downloadCharacterJson(ticket);
+  }
+
+  onOpenAttachment(ev: {
+    ticket?: SupportTicket;
+    message?: { id: string; attachmentOriginalName?: string };
+  }): void {
+    const thread = this.thread();
+    if (!thread) return;
+    if (ev.message?.attachmentOriginalName) {
+      openTicketAttachment(
+        this.http,
+        thread.ticket.id,
+        () => this.error.set("Impossible d'ouvrir la pièce jointe."),
+        ev.message.id,
+      );
+      return;
+    }
+    this.openAttachment(ev.ticket ?? thread.ticket);
+  }
+
   sendReply(): void {
     const t = this.thread()?.ticket;
     const body = this.replyBody.trim();
     if (!t || body.length < 2) return;
-    const fd = new FormData();
-    fd.append('body', body);
-    this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
-      next: () => {
-        this.replyBody = '';
-        this.message.set('Réponse envoyée au joueur (mail + fil).');
-        this.loadTickets(t.id);
-      },
-      error: () => this.error.set('Réponse non envoyée.'),
+    this.onConversationSend({
+      body,
+      characterId: '',
+      campaignId: '',
+      file: null,
+      notifyEmail: true,
     });
   }
 

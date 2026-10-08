@@ -1,7 +1,9 @@
+using DragonsGenerator.API.Endpoints.Campaigns;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DragonsGenerator.API.Endpoints.Support;
 
@@ -18,7 +20,9 @@ public record TicketDto(
     DateTimeOffset UpdatedAt,
     string? UserEmail,
     string? AdminNotes,
-    int MessageCount
+    int MessageCount,
+    Guid? CampaignId = null,
+    string? CampaignName = null
 );
 
 public record TicketMessageDto(
@@ -28,12 +32,14 @@ public record TicketMessageDto(
     DateTimeOffset CreatedAt,
     Guid? CharacterId = null,
     string? CharacterName = null,
-    string? AttachmentOriginalName = null
+    string? AttachmentOriginalName = null,
+    Guid? CampaignId = null,
+    string? CampaignName = null
 );
 
-public record TicketThreadDto(TicketDto Ticket, List<TicketMessageDto> Messages);
+public record TicketThreadDto(TicketDto Ticket, List<TicketMessageDto> Messages, bool CanEmailPlayer = false);
 
-public record PostTicketMessageRequest(string Body);
+public record PostTicketMessageRequest(string Body, Guid? CharacterId = null, Guid? CampaignId = null);
 
 public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILogger<CreateTicketEndpoint> logger)
     : EndpointWithoutRequest<TicketDto>
@@ -109,6 +115,23 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
             characterName = character.Name;
         }
 
+        Guid? campaignId = null;
+        string? campaignName = null;
+        var campaignRaw = form["campaignId"].ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(campaignRaw) && Guid.TryParse(campaignRaw, out var parsedCampId))
+        {
+            var (cid, cname, campError) = await CampaignAccess.ResolveAttachableAsync(
+                db, userId.Value, parsedCampId, ct);
+            if (campError is not null)
+            {
+                AddError(campError);
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            campaignId = cid;
+            campaignName = cname;
+        }
+
         var ticket = new SupportTicket
         {
             UserId = userId.Value,
@@ -118,6 +141,8 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
             AttachmentOriginalName = original,
             CharacterId = characterId,
             CharacterName = characterName,
+            CampaignId = campaignId,
+            CampaignName = campaignName,
         };
         db.SupportTickets.Add(ticket);
         await db.SaveChangesAsync(ct);
@@ -143,7 +168,9 @@ public class CreateTicketEndpoint(AppDbContext db, SupportDeskService desk, ILog
             t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt,
             email,
             t.AdminNotes,
-            messageCount
+            messageCount,
+            t.CampaignId,
+            t.CampaignName
         );
 }
 
@@ -474,7 +501,8 @@ public class DownloadTicketCharacterJsonEndpoint(AppDbContext db) : EndpointWith
     }
 }
 
-public class GetTicketThreadEndpoint(AppDbContext db) : EndpointWithoutRequest<TicketThreadDto>
+public class GetTicketThreadEndpoint(AppDbContext db, IOptionsMonitor<SmtpOptions> smtp)
+    : EndpointWithoutRequest<TicketThreadDto>
 {
     public override void Configure() => Get("/support/tickets/{id}");
 
@@ -517,11 +545,16 @@ public class GetTicketThreadEndpoint(AppDbContext db) : EndpointWithoutRequest<T
                 m.CreatedAt,
                 m.CharacterId,
                 m.CharacterName,
-                m.AttachmentOriginalName))
+                m.AttachmentOriginalName,
+                m.CampaignId,
+                m.CampaignName))
             .ToList();
 
         await Send.OkAsync(
-            new TicketThreadDto(CreateTicketEndpoint.ToDto(ticket, email, messages.Count), messages),
+            new TicketThreadDto(
+                CreateTicketEndpoint.ToDto(ticket, email, messages.Count),
+                messages,
+                !smtp.CurrentValue.IsSink),
             ct);
     }
 }
@@ -545,6 +578,8 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
         }
 
         string body;
+        Guid? jsonCharacterId = null;
+        Guid? jsonCampaignId = null;
         if (HttpContext.Request.HasFormContentType)
         {
             body = HttpContext.Request.Form["body"].ToString();
@@ -553,6 +588,8 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
         {
             var req = await HttpContext.Request.ReadFromJsonAsync<PostTicketMessageRequest>(ct);
             body = req?.Body ?? "";
+            jsonCharacterId = req?.CharacterId;
+            jsonCampaignId = req?.CampaignId;
         }
         body = body.Trim();
         if (body.Length < 2)
@@ -605,7 +642,14 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
         var characterRaw = HttpContext.Request.HasFormContentType
             ? HttpContext.Request.Form["characterId"].ToString().Trim()
             : "";
-        if (!string.IsNullOrWhiteSpace(characterRaw) && Guid.TryParse(characterRaw, out var parsedCharId))
+        var parsedCharId = Guid.Empty;
+        var hasChar = !string.IsNullOrWhiteSpace(characterRaw) && Guid.TryParse(characterRaw, out parsedCharId);
+        if (!hasChar && jsonCharacterId is Guid jsonChar)
+        {
+            parsedCharId = jsonChar;
+            hasChar = true;
+        }
+        if (hasChar)
         {
             var character = await db.Characters.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == parsedCharId && c.UserId == ticket.UserId, ct);
@@ -619,6 +663,33 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
             characterName = character.Name;
         }
 
+        Guid? campaignId = null;
+        string? campaignName = null;
+        var campaignRaw = HttpContext.Request.HasFormContentType
+            ? HttpContext.Request.Form["campaignId"].ToString().Trim()
+            : "";
+        var parsedCampId = Guid.Empty;
+        var hasCamp = !string.IsNullOrWhiteSpace(campaignRaw) && Guid.TryParse(campaignRaw, out parsedCampId);
+        if (!hasCamp && jsonCampaignId is Guid jsonCamp)
+        {
+            parsedCampId = jsonCamp;
+            hasCamp = true;
+        }
+        if (hasCamp)
+        {
+            var attachUserId = isAdmin ? ticket.UserId : userId.Value;
+            var (cid, cname, campError) = await CampaignAccess.ResolveAttachableAsync(
+                db, attachUserId, parsedCampId, ct);
+            if (campError is not null)
+            {
+                AddError(campError);
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            campaignId = cid;
+            campaignName = cname;
+        }
+
         var msg = new SupportTicketMessage
         {
             TicketId = ticket.Id,
@@ -627,6 +698,8 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
             Body = body.Length > 8000 ? body[..8000] : body,
             CharacterId = characterId,
             CharacterName = characterName,
+            CampaignId = campaignId,
+            CampaignName = campaignName,
             AttachmentStoredName = stored,
             AttachmentOriginalName = original,
         };
@@ -636,9 +709,17 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
             ticket.Status = "in_progress";
         await db.SaveChangesAsync(ct);
 
-        if (isAdmin)
+        var notifyEmail = true;
+        if (HttpContext.Request.HasFormContentType)
+        {
+            var raw = HttpContext.Request.Form["notifyEmail"].ToString().Trim();
+            if (raw.Equals("false", StringComparison.OrdinalIgnoreCase) || raw == "0")
+                notifyEmail = false;
+        }
+
+        if (isAdmin && notifyEmail)
             await desk.NotifyReplyAsync(ticket, ticket.User.Email, ticket.User.DisplayName, msg.Body, ct);
-        else
+        else if (!isAdmin)
             await desk.NotifyNewTicketAsync(ticket, ticket.User.Email, ct, msg.Body);
 
         await Send.OkAsync(
@@ -649,7 +730,9 @@ public class PostTicketMessageEndpoint(AppDbContext db, SupportDeskService desk,
                 msg.CreatedAt,
                 msg.CharacterId,
                 msg.CharacterName,
-                msg.AttachmentOriginalName),
+                msg.AttachmentOriginalName,
+                msg.CampaignId,
+                msg.CampaignName),
             ct);
     }
 }

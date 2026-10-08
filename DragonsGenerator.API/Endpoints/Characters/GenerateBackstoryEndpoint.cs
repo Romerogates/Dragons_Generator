@@ -1,4 +1,4 @@
-﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
 using Microsoft.AspNetCore.RateLimiting;

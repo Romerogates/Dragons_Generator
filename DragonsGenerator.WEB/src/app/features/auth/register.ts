@@ -13,13 +13,27 @@ import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { GoogleSignInComponent } from '@shared/components/google-sign-in/google-sign-in';
+import { GoogleCompleteSignupComponent } from '@shared/components/google-complete-signup/google-complete-signup';
 import { PushNotificationService } from '@core/services/push-notification.service';
 import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
+import {
+  clearPendingGoogleIdToken,
+  peekGoogleJwt,
+  peekPendingGoogleIdToken,
+  storePendingGoogleIdToken,
+} from '@core/utils/pending-google.util';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent, GoogleSignInComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    PasswordFieldComponent,
+    GoogleSignInComponent,
+    GoogleCompleteSignupComponent,
+  ],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,6 +60,10 @@ export class RegisterPage implements OnInit {
   readonly saveIntent = signal(false);
   readonly localDev = signal(false);
   readonly mailhogUrl = signal('http://localhost:8025');
+  readonly googleSignup = signal(false);
+  googleDisplayName = '';
+  googleAcceptedTerms = false;
+  readonly googleEmailHint = signal<string | null>(null);
 
   loginQueryParams: Record<string, string> = {};
 
@@ -63,35 +81,92 @@ export class RegisterPage implements OnInit {
       this.localDev.set(isLocalDevHost(host));
       this.mailhogUrl.set(mailhogWebUrl(host));
     }
+    const pending = peekPendingGoogleIdToken();
+    if (pending || q.get('google') === '1') {
+      if (pending) this.enterGoogleSignup(pending);
+      else this.googleSignup.set(true);
+    }
   }
 
   onGoogle(idToken: string): void {
     this.error.set(null);
-    if (!this.acceptedTerms) {
-      this.error.set('Cochez les conditions, puis Google.');
-      return;
-    }
+    storePendingGoogleIdToken(idToken);
     this.loading.set(true);
-    this.auth.loginGoogle(idToken, true, this.displayName.trim() || undefined).subscribe({
+    this.auth.loginGoogle(idToken, false).subscribe({
       next: () => {
-        this.push.initAfterLogin();
-        this.pendingSave.flushIfPossible().subscribe({
-          next: (saved) => {
-            this.loading.set(false);
-            void this.router.navigateByUrl(saved ? '/character-sheet' : this.loginQueryParams['returnUrl'] || '/');
-          },
-          error: () => {
-            this.loading.set(false);
-            void this.router.navigateByUrl(this.loginQueryParams['returnUrl'] || '/');
-          },
-        });
+        clearPendingGoogleIdToken();
+        this.finishAuth();
       },
       error: (err) => {
         this.loading.set(false);
-        const e = err?.error;
+        const e = err?.error as { errors?: { reason?: string }[] };
+        const reason = Array.isArray(e?.errors) ? e.errors[0]?.reason : '';
+        if (err.status === 403 && reason === 'google_register_required') {
+          this.enterGoogleSignup(idToken);
+          return;
+        }
+        this.error.set(reason || 'Inscription Google impossible.');
+      },
+    });
+  }
+
+  completeGoogleSignup(): void {
+    const token = peekPendingGoogleIdToken();
+    if (!token) {
+      this.error.set('Clique d’abord sur Continuer avec Google.');
+      return;
+    }
+    const pseudo = this.googleDisplayName.trim();
+    if (pseudo.length < 2) {
+      this.error.set('Le pseudo est obligatoire (2 caractères minimum).');
+      return;
+    }
+    if (!this.googleAcceptedTerms) {
+      this.error.set('Accepte les conditions et le RGPD pour créer le compte.');
+      return;
+    }
+    this.error.set(null);
+    this.loading.set(true);
+    this.auth.loginGoogle(token, true, pseudo).subscribe({
+      next: () => {
+        clearPendingGoogleIdToken();
+        this.finishAuth();
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const e = err?.error as { errors?: { reason?: string }[]; message?: string };
         this.error.set(
           (Array.isArray(e?.errors) && e.errors[0]?.reason) || e?.message || 'Inscription Google impossible.',
         );
+      },
+    });
+  }
+
+  cancelGoogleSignup(): void {
+    clearPendingGoogleIdToken();
+    this.googleSignup.set(false);
+    this.googleAcceptedTerms = false;
+    this.error.set(null);
+  }
+
+  private enterGoogleSignup(idToken: string): void {
+    const peek = peekGoogleJwt(idToken);
+    this.googleEmailHint.set(peek.email ?? null);
+    if (!this.googleDisplayName.trim() && peek.name) this.googleDisplayName = peek.name;
+    this.googleSignup.set(true);
+    this.error.set(null);
+  }
+
+  private finishAuth(): void {
+    this.push.initAfterLogin();
+    this.pendingSave.flushIfPossible().subscribe({
+      next: (saved) => {
+        this.loading.set(false);
+        void this.router.navigateByUrl(saved ? '/character-sheet' : this.loginQueryParams['returnUrl'] || '/');
+      },
+      error: () => {
+        this.loading.set(false);
+        void this.router.navigateByUrl(this.loginQueryParams['returnUrl'] || '/');
       },
     });
   }

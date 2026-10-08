@@ -358,7 +358,7 @@ export interface CampaignDetail {
   id: string;
   title: string;
   data: CampaignData;
-  role: 'dm' | 'player' | 'spectator';
+  role: 'dm' | 'player' | 'spectator' | 'support';
   isOwner: boolean;
   updatedAt: string;
   members: CampaignMember[];

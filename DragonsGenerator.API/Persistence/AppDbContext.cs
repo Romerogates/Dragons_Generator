@@ -67,6 +67,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Subject).HasMaxLength(200);
             e.Property(x => x.Status).HasMaxLength(32);
             e.Property(x => x.CharacterName).HasMaxLength(200);
+            e.Property(x => x.CampaignName).HasMaxLength(200);
         });
 
         modelBuilder.Entity<SupportTicketMessage>(e =>
@@ -74,6 +75,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.TicketId, x.CreatedAt });
             e.Property(x => x.Body).HasMaxLength(8000);
             e.Property(x => x.CharacterName).HasMaxLength(200);
+            e.Property(x => x.CampaignName).HasMaxLength(200);
             e.Property(x => x.AttachmentOriginalName).HasMaxLength(240);
             e.HasOne(x => x.Ticket)
                 .WithMany(t => t.Messages)

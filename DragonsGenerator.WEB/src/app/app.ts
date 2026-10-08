@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   effect,
   ElementRef,
@@ -22,6 +23,7 @@ import { PushNotificationService } from '@core/services/push-notification.servic
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
+import { SupportOverlayService } from '@core/services/support-overlay.service';
 import { CampaignSessionDockComponent } from './shared/components/campaign-session-dock/campaign-session-dock';
 import { AiGenerationDock } from './shared/components/ai-generation-dock/ai-generation-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
@@ -60,6 +62,7 @@ export class App implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly supportOverlay = inject(SupportOverlayService);
 
   protected readonly title = signal('DragonsGenerator.WEB');
 
@@ -69,13 +72,17 @@ export class App implements OnInit {
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
 
   /** Table /play : plein écran (chrome dédié). Le guide garde navbar + footer. */
-  readonly hideSiteChrome = toSignal(
+  private readonly playFullscreen = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       map(() => this.shouldHideSiteChrome(this.router.url)),
       startWith(this.shouldHideSiteChrome(this.router.url)),
     ),
     { initialValue: false },
+  );
+
+  readonly hideSiteChrome = computed(
+    () => !!this.playFullscreen() || this.supportOverlay.open(),
   );
 
   private shouldHideSiteChrome(url: string): boolean {

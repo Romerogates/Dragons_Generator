@@ -42,6 +42,7 @@ public static class DbMigrationRunner
         new("018_support_desk", Apply018SupportDeskAsync),
         new("019_outbound_emails", Apply019OutboundEmailsAsync),
         new("020_google_and_ticket_message_attachments", Apply020GoogleAndTicketMessageAttachmentsAsync),
+        new("021_ticket_campaign_attach", Apply021TicketCampaignAttachAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -434,6 +435,14 @@ public static class DbMigrationRunner
         await db.Database.ExecuteSqlRawAsync(
             """CREATE INDEX IF NOT EXISTS "IX_Users_GoogleSubject" ON "Users" ("GoogleSubject");""",
             ct);
+    }
+
+    private static async Task Apply021TicketCampaignAttachAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "SupportTickets", "CampaignId", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTickets", "CampaignName", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "CampaignId", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "SupportTicketMessages", "CampaignName", "TEXT NULL", ct);
     }
 
     private static async Task TryAddColumnAsync(

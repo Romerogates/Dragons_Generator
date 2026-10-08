@@ -2,9 +2,9 @@
 
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError, timer } from 'rxjs';
+import { map, retry, shareReplay, tap } from 'rxjs/operators';
 import { ConnectivityService } from './connectivity.service';
 import { OfflineCodexService } from './offline-codex.service';
 import { Civilisation } from '@core/models/Civilisations/civilisations';
@@ -375,7 +375,16 @@ export class DataService {
   }
 
   generateAdventure(request: GenerateAdventureRequest): Observable<GenerateAdventureResponse> {
-    return this.http.post<GenerateAdventureResponse>(`${this.apiUrl}/generate-adventure`, request);
+    return this.http.post<GenerateAdventureResponse>(`${this.apiUrl}/generate-adventure`, request).pipe(
+      retry({
+        count: 1,
+        delay: (err) => {
+          const status = err instanceof HttpErrorResponse ? err.status : 0;
+          if (status === 504 || status === 502) return timer(1500);
+          return throwError(() => err);
+        },
+      }),
+    );
   }
 
   // =========================================================================

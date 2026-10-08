@@ -24,6 +24,7 @@ import { StorySummaryStep } from './steps/story-summary-step/story-summary-step'
     StorySummaryStep,
   ],
   templateUrl: './story-creation.html',
+  host: { class: 'block overflow-visible' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

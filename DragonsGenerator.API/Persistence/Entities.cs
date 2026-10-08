@@ -81,6 +81,8 @@ public class SupportTicket
     public string? AttachmentOriginalName { get; set; }
     public Guid? CharacterId { get; set; }
     public string? CharacterName { get; set; }
+    public Guid? CampaignId { get; set; }
+    public string? CampaignName { get; set; }
     public string Status { get; set; } = "open"; // open | in_progress | closed
     public string? AdminNotes { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
@@ -98,6 +100,8 @@ public class SupportTicketMessage
     public string Body { get; set; } = "";
     public Guid? CharacterId { get; set; }
     public string? CharacterName { get; set; }
+    public Guid? CampaignId { get; set; }
+    public string? CampaignName { get; set; }
     public string? AttachmentStoredName { get; set; }
     public string? AttachmentOriginalName { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
@@ -192,6 +196,8 @@ public static class CampaignMemberRoles
     public const string Player = "player";
     /// <summary>Lecture table sans siège combat / initiative.</summary>
     public const string Spectator = "spectator";
+    /// <summary>Inspection support (jamais persisté dans le roster).</summary>
+    public const string Support = "support";
 }
 
 public static class CharacterProposalStatuses

@@ -300,8 +300,7 @@ function buildProfile(kind: AiGenerationKind, status: AiStatusResponse): AiProgr
     case 'adventure':
       return {
         providerLabel: status.adventureGeneration.primaryLabel,
-        // Aligné sur budget API ~85 s (évite barre « coincée » puis 504).
-        estimatedMs: 75000,
+        estimatedMs: 180000,
         stages: [
           { at: 0, label: 'Préparation du contexte narratif…' },
           { at: 0.08, label: 'Appel Groq (cloud) — rédaction…' },

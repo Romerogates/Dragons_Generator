@@ -84,7 +84,7 @@ export class CampaignCloudService {
       id: string;
       title: string;
       data: CampaignData;
-      role: 'dm' | 'player';
+      role: 'dm' | 'player' | 'spectator' | 'support';
       isOwner: boolean;
       updatedAt: string;
       members: CampaignDetail['members'];

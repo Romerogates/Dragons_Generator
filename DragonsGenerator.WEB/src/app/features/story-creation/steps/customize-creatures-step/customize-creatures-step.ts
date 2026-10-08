@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -18,9 +20,12 @@ import {
   CreatureRole,
   StoryCreatureSelection,
 } from '@core/models/Story/story';
-import { formatChallengeRating } from '@core/utils/creature-display.util';
+import { CreatureSummary } from '@core/models/Creatures/creature-summary';
+import {
+  formatChallengeRating,
+  getCreatureCategoryLabel,
+} from '@core/utils/creature-display.util';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
-import { firstValueFrom } from 'rxjs';
 import { AI_GENERATION_BUSY } from '@core/models/ai-generation.model';
 
 @Component({
@@ -41,6 +46,12 @@ export class CustomizeCreaturesStep implements OnInit {
   readonly generationError = signal<string | null>(null);
   /** Info non bloquante (ex. secours après échec du lot). */
   readonly fallbackNotice = signal<string | null>(null);
+  readonly kindQuery = signal<Record<string, string>>({});
+
+  readonly catalog = toSignal(
+    this.dataService.getCreaturesSummary().pipe(catchError(() => of([] as CreatureSummary[]))),
+    { initialValue: [] as CreatureSummary[] },
+  );
 
   readonly roles = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
 
@@ -51,6 +62,51 @@ export class CustomizeCreaturesStep implements OnInit {
   updateName(creatureId: string, name: string): void {
     this.builder.updateCreature(creatureId, { customName: name });
   }
+
+  kindQueryFor(creatureId: string): string {
+    return this.kindQuery()[creatureId] || '';
+  }
+
+  setKindQuery(creatureId: string, query: string): void {
+    this.kindQuery.update((m) => ({ ...m, [creatureId]: query }));
+  }
+
+  kindOptions(currentId: string): CreatureSummary[] {
+    const list = this.catalog() ?? [];
+    const taken = new Set(this.builder.creatures().map((c) => c.creatureId));
+    taken.delete(currentId);
+    const q = (this.kindQuery()[currentId] ?? '').trim().toLowerCase();
+    const current = list.find((c) => c.id === currentId);
+    const filtered = list
+      .filter((c) => {
+        if (taken.has(c.id)) return false;
+        if (!q) return true;
+        if (c.id === currentId) return true;
+        return (
+          c.name.toLowerCase().includes(q) ||
+          getCreatureCategoryLabel(c.category).toLowerCase().includes(q)
+        );
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    if (current && !filtered.some((c) => c.id === currentId)) {
+      return [current, ...filtered];
+    }
+    return filtered;
+  }
+
+  changeKind(currentId: string, nextId: string): void {
+    if (!nextId || nextId === currentId) return;
+    const next = (this.catalog() ?? []).find((c) => c.id === nextId);
+    if (!next) return;
+    this.builder.replaceCreatureKind(currentId, next);
+    this.kindQuery.update((m) => {
+      const rest = { ...m };
+      delete rest[currentId];
+      return rest;
+    });
+  }
+
+  protected categoryLabel = getCreatureCategoryLabel;
 
   updateRole(creatureId: string, role: CreatureRole): void {
     this.builder.updateCreature(creatureId, { role });

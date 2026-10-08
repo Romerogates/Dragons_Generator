@@ -50,23 +50,57 @@
   </div>
 
   <div class="flex flex-col gap-6 px-4 max-w-3xl mx-auto w-full">
-    @for (creature of builder.creatures(); track creature.creatureId) {
+    @for (creature of builder.creatures(); track $index) {
       <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
         <div class="flex items-start justify-between gap-3">
-          <div>
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
-              {{ creature.creatureName }} · {{ formatCr(creature.challengeRating) }}
-              @if (builder.isBaselineCreature(creature.creatureId)) {
-                <span class="ml-2 text-emerald-500">· existant</span>
-              }
-            </p>
-            <input
-              type="text"
-              placeholder="Nom dans l'histoire"
-              [ngModel]="creature.customName"
-              (ngModelChange)="updateName(creature.creatureId, $event)"
-              class="w-full bg-[#171b22] border border-slate-700 rounded-lg py-2 px-3 text-base font-serif text-violet-300 focus:outline-none focus:border-violet-500/50"
-            />
+          <div class="min-w-0 flex-1 space-y-3">
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">
+                Nom dans l’histoire
+              </label>
+              <input
+                type="text"
+                placeholder="Nom dans l'histoire"
+                [ngModel]="creature.customName"
+                (ngModelChange)="updateName(creature.creatureId, $event)"
+                class="w-full bg-[#171b22] border border-slate-700 rounded-lg py-2 px-3 text-base font-serif text-violet-300 focus:outline-none focus:border-violet-500/50"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5"
+                [attr.for]="'creature-kind-' + $index"
+              >
+                Race / type (bestiaire)
+              </label>
+              <input
+                type="search"
+                placeholder="Filtrer le bestiaire…"
+                [ngModel]="kindQueryFor(creature.creatureId)"
+                (ngModelChange)="setKindQuery(creature.creatureId, $event)"
+                class="w-full bg-[#171b22] border border-slate-700 rounded-lg py-2 px-3 text-sm text-slate-200 focus:outline-none focus:border-violet-500/50 mb-2"
+                [attr.aria-controls]="'creature-kind-' + $index"
+              />
+              <select
+                [id]="'creature-kind-' + $index"
+                class="w-full bg-[#171b22] border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-slate-200 focus:outline-none focus:border-violet-500/50"
+                [ngModel]="creature.creatureId"
+                (ngModelChange)="changeKind(creature.creatureId, $event)"
+                data-testid="creature-kind-select"
+              >
+                @for (opt of kindOptions(creature.creatureId); track opt.id) {
+                  <option [value]="opt.id">
+                    {{ opt.name }} · {{ formatCr(opt.challengeRating) }} · {{ categoryLabel(opt.category) }}
+                  </option>
+                }
+              </select>
+              <p class="mt-1 text-[10px] text-slate-500">
+                {{ creature.creatureName }} · {{ formatCr(creature.challengeRating) }}
+                @if (builder.isBaselineCreature(creature.creatureId)) {
+                  <span class="ml-1 text-emerald-500">· existant</span>
+                }
+              </p>
+            </div>
           </div>
           <button
             type="button"

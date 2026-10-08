@@ -1,176 +1,109 @@
-<div class="max-w-5xl mx-auto px-4 py-10">
-  <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Support</h1>
-  <p class="text-sm text-slate-400 mb-8">
-    Ouvrez un ticket, échangez avec le desk, et joignez une fiche ou une capture si ça aide à
-    reproduire.
+@if (thread(); as th) {
+  <app-support-conversation
+    audience="player"
+    [thread]="th"
+    [myCharacters]="myCharacters()"
+    [myCampaigns]="myCampaigns()"
+    [sending]="sendingReply()"
+    [error]="error()"
+    (closed)="closeThread()"
+    (send)="onConversationSend($event)"
+    (downloadCharacter)="onDownloadCharacter($event)"
+    (openAttachment)="onOpenAttachment($event)"
+  />
+}
+
+<div class="max-w-5xl mx-auto px-4 py-10" [class.hidden]="!!thread()">
+  <h1 class="font-serif text-3xl font-bold text-amber-400 mb-2">Support</h1>
+  <p class="text-sm text-slate-300 mb-8">
+    Ouvre un ticket, puis une conversation plein écran — comme une messagerie, avec tout l’historique.
   </p>
   @if (auth.isAdmin()) {
-    <p class="text-xs text-slate-400 mb-6 bg-[#171b22] border border-slate-800 rounded-xl px-4 py-3">
+    <p class="text-xs text-slate-300 mb-6 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3">
       Desk admin :
-      <a routerLink="/admin" [queryParams]="{ tab: 'mails' }" class="text-amber-400 hover:underline">
-        mails
+      <a routerLink="/admin" [queryParams]="{ tab: 'tickets' }" class="text-amber-300 hover:underline font-semibold">
+        tickets
       </a>
     </p>
   }
 
-  @if (thread(); as th) {
-    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl overflow-hidden min-h-[70vh] flex flex-col" data-testid="support-thread">
-      <header class="flex items-center gap-3 px-4 py-3 border-b border-slate-800 bg-[#171b22]">
-        <button type="button" class="w-10 h-10 rounded-full hover:bg-slate-800 text-slate-300" (click)="closeThread()" aria-label="Retour">
-          <iconify-icon icon="mdi:arrow-left" class="text-xl"></iconify-icon>
-        </button>
-        <div class="min-w-0 flex-1">
-          <h2 class="font-serif text-xl text-amber-400 truncate">{{ th.ticket.subject }}</h2>
-          <p class="text-[10px] uppercase tracking-widest text-slate-500">{{ statusLabel(th.ticket.status) }}</p>
-        </div>
-      </header>
-
-      <div class="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 flex flex-col gap-3">
-        <div class="self-start max-w-[90%] rounded-2xl rounded-tl-sm bg-slate-900 px-4 py-3 text-sm text-slate-200 whitespace-pre-wrap">
-          <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Vous · {{ th.ticket.createdAt | date: 'short' }}</p>
-          {{ th.ticket.message }}
-          @if (th.ticket.characterName) {
-            <button type="button" class="mt-2 block text-[11px] text-violet-300 hover:underline" (click)="downloadCharacterJson(th.ticket)">
-              Fiche : {{ th.ticket.characterName }}
-            </button>
-          }
-          @if (th.ticket.attachmentOriginalName) {
-            <button type="button" class="mt-1 block text-[11px] text-sky-400 hover:underline" (click)="openAttachment(th.ticket)">
-              {{ th.ticket.attachmentOriginalName }}
-            </button>
-          }
-        </div>
-        @for (m of th.messages; track m.id) {
-          <div
-            class="max-w-[90%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap"
-            [class.self-end]="!m.fromStaff"
-            [class.rounded-tr-sm]="!m.fromStaff"
-            [class.bg-violet-950/50]="!m.fromStaff"
-            [class.self-start]="m.fromStaff"
-            [class.rounded-tl-sm]="m.fromStaff"
-            [class.bg-amber-950/40]="m.fromStaff"
-            [class.text-amber-50]="m.fromStaff"
-            [class.text-slate-100]="!m.fromStaff"
-          >
-            <p class="text-[10px] uppercase tracking-wider mb-1 opacity-70">
-              {{ m.fromStaff ? 'Support' : 'Vous' }} · {{ m.createdAt | date: 'short' }}
-            </p>
-            {{ m.body }}
-            @if (m.characterName) {
-              <button type="button" class="mt-2 block text-[11px] text-violet-300 hover:underline" (click)="downloadMessageCharacter(th.ticket.id, m)">
-                Fiche : {{ m.characterName }}
-              </button>
-            }
-            @if (m.attachmentOriginalName) {
-              <button type="button" class="mt-1 block text-[11px] text-sky-400 hover:underline" (click)="openMessageAttachment(th.ticket.id, m)">
-                {{ m.attachmentOriginalName }}
-              </button>
-            }
-          </div>
-        }
-      </div>
-
-      @if (th.ticket.status !== 'closed') {
-        <footer class="border-t border-slate-800 p-4 bg-[#171b22] flex flex-col gap-3">
-          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Joindre un personnage (cartes, pas la liste de tickets)</p>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="rounded-full px-3 py-1.5 text-xs border"
-              [class.border-amber-500]="replyCharacterId === ''"
-              [class.text-amber-400]="replyCharacterId === ''"
-              [class.border-slate-700]="replyCharacterId !== ''"
-              (click)="replyCharacterId = ''"
-            >
-              Aucun
-            </button>
-            @for (c of myCharacters(); track c.id) {
-              <button
-                type="button"
-                class="rounded-full px-3 py-1.5 text-xs border bg-[#1b2028]"
-                [class.border-violet-400]="replyCharacterId === c.id"
-                [class.text-violet-200]="replyCharacterId === c.id"
-                [class.border-slate-700]="replyCharacterId !== c.id"
-                (click)="replyCharacterId = c.id"
-              >
-                {{ c.name }}
-              </button>
-            }
-          </div>
-          <textarea
-            rows="3"
-            [(ngModel)]="replyBody"
-            name="reply"
-            placeholder="Votre message…"
-            class="w-full rounded-xl bg-[#1b2028] border border-slate-700 px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-500"
-          ></textarea>
-          <div class="flex flex-wrap items-center gap-3">
-            <input #replyFile type="file" accept=".pdf,image/*" class="hidden" (change)="onReplyFile($event)" />
-            <button type="button" class="wizard-nav-secondary text-xs px-3 py-2" (click)="replyFile.click()">
-              {{ replyFileName() || 'Ajouter un fichier' }}
-            </button>
-            <button type="button" class="wizard-nav-primary text-xs px-4 py-2 ml-auto" [disabled]="sendingReply()" (click)="sendReply()">
-              {{ sendingReply() ? 'Envoi…' : 'Envoyer' }}
-            </button>
-          </div>
-        </footer>
-      }
-    </div>
-  } @else {
-    <div class="grid lg:grid-cols-[minmax(0,1fr)_20rem] gap-8">
-      <form class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 flex flex-col gap-4" (ngSubmit)="submit()">
-        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300">Nouveau ticket</h2>
-        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-          Sujet
-          <input required [(ngModel)]="subject" name="subject" class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-500" />
-        </label>
-        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-          Message
-          <textarea required rows="5" [(ngModel)]="message" name="message" class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-500"></textarea>
-        </label>
-        <div>
-          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Personnage concerné</p>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" class="rounded-full px-3 py-1.5 text-xs border" [class.border-amber-500]="characterId === ''" [class.text-amber-400]="characterId === ''" [class.border-slate-700]="characterId !== ''" (click)="characterId = ''">Aucun</button>
-            @for (c of myCharacters(); track c.id) {
-              <button type="button" class="rounded-full px-3 py-1.5 text-xs border bg-[#171b22]" [class.border-violet-400]="characterId === c.id" [class.text-violet-200]="characterId === c.id" [class.border-slate-700]="characterId !== c.id" (click)="characterId = c.id">{{ c.name }}</button>
-            }
-          </div>
-        </div>
-        <div>
-          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Fichier (PDF ou image)</p>
-          <input #newFile type="file" accept=".pdf,image/*" class="hidden" (change)="onFile($event)" />
-          <button type="button" class="wizard-nav-secondary text-xs px-3 py-2" (click)="newFile.click()">
-            {{ fileName() || 'Ajouter un fichier' }}
-          </button>
-        </div>
-        @if (error()) {
-          <p class="text-sm text-red-400">{{ error() }}</p>
-        }
-        @if (success()) {
-          <p class="text-sm text-emerald-400">{{ success() }}</p>
-        }
-        <button type="submit" class="wizard-nav-primary self-start" [disabled]="loading()">
-          {{ loading() ? 'Envoi…' : 'Ouvrir un ticket' }}
-        </button>
-      </form>
-
+  <div class="grid lg:grid-cols-[minmax(0,1fr)_22rem] gap-8">
+    <form class="bg-[#1b2028] border-2 border-slate-700 rounded-2xl p-6 flex flex-col gap-4" (ngSubmit)="submit()">
+      <h2 class="text-sm font-black uppercase tracking-widest text-amber-300">Nouveau ticket</h2>
+      <label class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+        Sujet
+        <input required [(ngModel)]="subject" name="subject" class="mt-1 w-full rounded-lg bg-[#0c1017] border-2 border-slate-600 px-3 py-2.5 text-sm text-white outline-none focus:border-amber-400" />
+      </label>
+      <label class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+        Message
+        <textarea required rows="5" [(ngModel)]="message" name="message" class="mt-1 w-full rounded-lg bg-[#0c1017] border-2 border-slate-600 px-3 py-2.5 text-sm text-white outline-none focus:border-amber-400"></textarea>
+      </label>
       <div>
-        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-3">Mes tickets</h2>
-        <div class="flex flex-col gap-2">
-          @for (t of tickets(); track t.id) {
-            <button type="button" class="text-left bg-[#171b22] border border-slate-800 rounded-xl p-3 hover:border-amber-700/60" (click)="openTicket(t.id)">
-              <div class="flex justify-between gap-2">
-                <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-500">{{ statusLabel(t.status) }}</span>
-              </div>
-              <p class="text-[10px] text-slate-500 mt-1">{{ t.createdAt | date: 'short' }}</p>
-            </button>
-          } @empty {
-            <p class="text-xs text-slate-500">Aucun ticket pour le moment.</p>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Personnage (cartes)</p>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="rounded-full px-3 py-1.5 text-xs font-semibold" [class.bg-amber-400]="characterId === ''" [class.text-zinc-950]="characterId === ''" [class.bg-slate-800]="characterId !== ''" (click)="characterId = ''">Aucun</button>
+          @for (c of myCharacters(); track c.id) {
+            <button type="button" class="rounded-full px-3 py-1.5 text-xs font-semibold" [class.bg-violet-600]="characterId === c.id" [class.text-white]="characterId === c.id" [class.bg-slate-800]="characterId !== c.id" (click)="characterId = c.id">{{ c.name }}</button>
           }
         </div>
       </div>
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Campagne (cartes)</p>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="rounded-full px-3 py-1.5 text-xs font-semibold" [class.bg-amber-400]="campaignId === ''" [class.text-zinc-950]="campaignId === ''" [class.bg-slate-800]="campaignId !== ''" (click)="campaignId = ''">Aucune</button>
+          @for (c of myCampaigns(); track c.id) {
+            <button type="button" class="rounded-full px-3 py-1.5 text-xs font-semibold" [class.bg-amber-500]="campaignId === c.id" [class.text-zinc-950]="campaignId === c.id" [class.bg-slate-800]="campaignId !== c.id" (click)="campaignId = c.id">{{ c.title }}</button>
+          }
+        </div>
+      </div>
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Fichier (PDF ou image)</p>
+        <input #newFile type="file" accept=".pdf,image/*" class="hidden" (change)="onFile($event)" />
+        <button type="button" class="rounded-xl border-2 border-slate-500 px-3 py-2 text-xs font-bold text-slate-100" (click)="newFile.click()">
+          {{ fileName() || 'Ajouter un fichier' }}
+        </button>
+      </div>
+      @if (error() && !thread()) {
+        <p class="text-sm text-red-400">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="text-sm text-emerald-400">{{ success() }}</p>
+      }
+      <button type="submit" class="self-start rounded-xl bg-amber-400 px-5 py-2.5 text-xs font-black uppercase tracking-wide text-zinc-950 hover:bg-amber-300" [disabled]="loading()">
+        {{ loading() ? 'Envoi…' : 'Ouvrir un ticket' }}
+      </button>
+    </form>
+
+    <div>
+      <h2 class="text-sm font-black uppercase tracking-widest text-slate-200 mb-3">Mes tickets</h2>
+      <p class="text-[11px] text-slate-500 mb-3">Clique un ticket pour ouvrir la conversation plein écran.</p>
+      <div class="flex flex-col gap-2">
+        @for (t of tickets(); track t.id) {
+          <button
+            type="button"
+            class="text-left rounded-xl border-2 border-slate-700 bg-[#171b22] p-3 hover:border-amber-400"
+            (click)="openTicket(t.id)"
+          >
+            <div class="flex justify-between gap-2">
+              <span class="font-bold text-amber-300 text-sm">{{ t.subject }}</span>
+              <span
+                class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
+                [class.bg-amber-400]="t.status === 'open'"
+                [class.text-zinc-950]="t.status === 'open'"
+                [class.bg-sky-400]="t.status === 'in_progress'"
+                [class.text-sky-950]="t.status === 'in_progress'"
+                [class.bg-slate-600]="t.status === 'closed'"
+                [class.text-white]="t.status === 'closed'"
+              >
+                {{ statusLabel(t.status) }}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">{{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} message(s)</p>
+          </button>
+        } @empty {
+          <p class="text-xs text-slate-500">Aucun ticket pour le moment.</p>
+        }
+      </div>
     </div>
-  }
+  </div>
 </div>

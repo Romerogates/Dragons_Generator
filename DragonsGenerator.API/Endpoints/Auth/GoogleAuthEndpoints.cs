@@ -67,7 +67,13 @@ public class GoogleLoginEndpoint(
                 return;
             }
 
-            var display = (req.DisplayName ?? profile.Name ?? profile.Email.Split('@')[0]).Trim();
+            var display = (req.DisplayName ?? "").Trim();
+            if (display.Length == 0)
+            {
+                AddError("Choisissez un pseudo (pas de mot de passe avec Google).");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
             if (!AuthHelpers.TryNormalizeDisplayName(display, out var normalized, out var nameError))
             {
                 AddError(nameError ?? "Pseudo invalide.");

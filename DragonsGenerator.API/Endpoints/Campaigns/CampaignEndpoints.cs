@@ -175,6 +175,7 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
         }
 
         using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(campaign.JsonData) ? "{}" : campaign.JsonData);
+        var supportInspect = CampaignAccess.IsSupportInspect(membership);
         var role = isOwner ? CampaignMemberRoles.Dm : membership!.Role;
         var isHistory = CampaignHistoryHelpers.IsHistoryView(campaign, membership);
         var membershipStatus = CampaignHistoryHelpers.ResolveMembershipStatus(campaign, membership, isOwner);
@@ -184,7 +185,7 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
         {
             data = CampaignHistoryHelpers.ParseSnapshotOrEmpty(membership!.HistorySnapshotJson);
         }
-        else if (isOwner)
+        else if (isOwner || supportInspect)
         {
             data = doc.RootElement.Clone();
         }
@@ -632,7 +633,7 @@ public class SetCampaignArchivedEndpoint(AppDbContext db) : Endpoint<SetCampaign
 
         var id = Route<Guid>("id");
         var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
-        if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+        if (campaign is null || !CampaignAccess.CanView(isOwner, membership) || CampaignAccess.IsSupportInspect(membership))
         {
             await Send.NotFoundAsync(ct);
             return;

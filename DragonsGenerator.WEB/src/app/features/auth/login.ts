@@ -14,12 +14,26 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
 import { PushNotificationService } from '@core/services/push-notification.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { GoogleSignInComponent } from '@shared/components/google-sign-in/google-sign-in';
+import { GoogleCompleteSignupComponent } from '@shared/components/google-complete-signup/google-complete-signup';
 import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
+import {
+  clearPendingGoogleIdToken,
+  peekGoogleJwt,
+  peekPendingGoogleIdToken,
+  storePendingGoogleIdToken,
+} from '@core/utils/pending-google.util';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PasswordFieldComponent, GoogleSignInComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    PasswordFieldComponent,
+    GoogleSignInComponent,
+    GoogleCompleteSignupComponent,
+  ],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -45,6 +59,10 @@ export class LoginPage implements OnInit {
   readonly saveIntent = signal(false);
   readonly localDev = signal(false);
   readonly mailhogUrl = signal('http://localhost:8025');
+  readonly googleSignup = signal(false);
+  googleDisplayName = '';
+  googleAcceptedTerms = false;
+  readonly googleEmailHint = signal<string | null>(null);
 
   private returnUrl = '/';
 
@@ -57,35 +75,85 @@ export class LoginPage implements OnInit {
       this.localDev.set(isLocalDevHost(host));
       this.mailhogUrl.set(mailhogWebUrl(host));
     }
+    const pending = peekPendingGoogleIdToken();
+    if (pending) this.enterGoogleSignup(pending);
   }
 
   onGoogle(idToken: string): void {
     this.error.set(null);
+    storePendingGoogleIdToken(idToken);
     this.loading.set(true);
     this.auth.loginGoogle(idToken, false).subscribe({
       next: () => {
-        this.push.initAfterLogin();
-        this.pendingSave.flushIfPossible().subscribe({
-          next: (saved) => {
-            this.loading.set(false);
-            void this.router.navigateByUrl(saved ? '/character-sheet' : this.returnUrl);
-          },
-          error: () => {
-            this.loading.set(false);
-            void this.router.navigateByUrl(this.returnUrl);
-          },
-        });
+        clearPendingGoogleIdToken();
+        this.finishAuth();
       },
       error: (err) => {
         this.loading.set(false);
         const reason = this.extractError(err);
         if (err.status === 403 && reason === 'google_register_required') {
-          void this.router.navigate(['/register'], {
-            queryParams: { returnUrl: this.returnUrl, google: '1' },
-          });
+          this.enterGoogleSignup(idToken);
           return;
         }
         this.error.set(reason || 'Connexion Google impossible.');
+      },
+    });
+  }
+
+  completeGoogleSignup(): void {
+    const token = peekPendingGoogleIdToken();
+    if (!token) {
+      this.cancelGoogleSignup();
+      return;
+    }
+    const pseudo = this.googleDisplayName.trim();
+    if (pseudo.length < 2) {
+      this.error.set('Le pseudo est obligatoire (2 caractères minimum).');
+      return;
+    }
+    if (!this.googleAcceptedTerms) {
+      this.error.set('Accepte les conditions et le RGPD pour créer le compte.');
+      return;
+    }
+    this.error.set(null);
+    this.loading.set(true);
+    this.auth.loginGoogle(token, true, pseudo).subscribe({
+      next: () => {
+        clearPendingGoogleIdToken();
+        this.finishAuth();
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.error.set(this.extractError(err) || 'Inscription Google impossible.');
+      },
+    });
+  }
+
+  cancelGoogleSignup(): void {
+    clearPendingGoogleIdToken();
+    this.googleSignup.set(false);
+    this.googleAcceptedTerms = false;
+    this.error.set(null);
+  }
+
+  private enterGoogleSignup(idToken: string): void {
+    const peek = peekGoogleJwt(idToken);
+    this.googleEmailHint.set(peek.email ?? null);
+    if (!this.googleDisplayName.trim() && peek.name) this.googleDisplayName = peek.name;
+    this.googleSignup.set(true);
+    this.error.set(null);
+  }
+
+  private finishAuth(): void {
+    this.push.initAfterLogin();
+    this.pendingSave.flushIfPossible().subscribe({
+      next: (saved) => {
+        this.loading.set(false);
+        void this.router.navigateByUrl(saved ? '/character-sheet' : this.returnUrl);
+      },
+      error: () => {
+        this.loading.set(false);
+        void this.router.navigateByUrl(this.returnUrl);
       },
     });
   }

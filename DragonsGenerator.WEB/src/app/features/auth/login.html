@@ -22,7 +22,17 @@
       </p>
     }
 
-    @if (mode() === 'login') {
+    @if (googleSignup()) {
+      <app-google-complete-signup
+        [(displayName)]="googleDisplayName"
+        [(acceptedTerms)]="googleAcceptedTerms"
+        [emailHint]="googleEmailHint()"
+        [error]="error()"
+        [loading]="loading()"
+        (confirmed)="completeGoogleSignup()"
+        (cancelled)="cancelGoogleSignup()"
+      />
+    } @else if (mode() === 'login') {
       <form class="flex flex-col gap-4" (ngSubmit)="submitLogin()">
         <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
           Email

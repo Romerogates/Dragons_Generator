@@ -2,7 +2,7 @@ namespace DragonsGenerator.API.Common;
 
 /// <summary>
 /// Routage hybride : textes courts via Ollama local (budget), fallback Groq.
-/// Aventures : Ollama en premier essai court, puis Groq — budget global ~85 s (évite 504).
+/// Aventures : Ollama en premier essai court, puis Groq — budget sous le timeout nginx generate.
 /// </summary>
 public sealed class HybridAiService
 {
@@ -11,8 +11,8 @@ public sealed class HybridAiService
     private readonly IConfiguration _config;
     private readonly ILogger<HybridAiService> _logger;
 
-    /// <summary>Budget global avant timeout passerelle nginx (~300s, on reste largement en dessous).</summary>
-    private const int GlobalBudgetSeconds = 85;
+    /// <summary>Budget global avant timeout passerelle nginx generate (600 s) — Groq long + Ollama.</summary>
+    private const int GlobalBudgetSeconds = 240;
 
     /// <summary>Temps max pour un essai Ollama court avant bascule Groq.</summary>
     private const int LocalShortBudgetSeconds = 45;
@@ -126,7 +126,6 @@ public sealed class HybridAiService
 
     /// <summary>
     /// Aventure structurée — Ollama en premier essai (budget court), puis chaîne Groq.
-    /// Budget global ~85 s pour répondre avant le timeout passerelle.
     /// </summary>
     public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,

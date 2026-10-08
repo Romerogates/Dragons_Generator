@@ -29,6 +29,12 @@ export type CampaignEditScope = 'full' | 'creatures-only';
 
 const STORAGE_KEY = 'dragon_story_builder_v1';
 
+function scrollStoryWizardTop(): void {
+  document
+    .querySelector('.story-wizard-shell')
+    ?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 export interface StoryStep {
   number: number;
   title: string;
@@ -137,13 +143,13 @@ export class StoryBuilderService {
 
     if (this.editScope() === 'creatures-only' && step === 2) {
       this.currentStep.set(3);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollStoryWizardTop();
       return;
     }
 
     if (step < this.totalSteps()) {
       this.currentStep.update((s) => s + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollStoryWizardTop();
     }
   }
 
@@ -151,12 +157,12 @@ export class StoryBuilderService {
     const step = this.currentStep();
     if (this.editScope() === 'creatures-only' && step === 3) {
       this.currentStep.set(2);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollStoryWizardTop();
       return;
     }
     if (step > 1) {
       this.currentStep.update((s) => s - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollStoryWizardTop();
     }
   }
 
@@ -174,7 +180,7 @@ export class StoryBuilderService {
     }
     this.stepJumpBlocked.set(null);
     this.currentStep.set(step);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollStoryWizardTop();
     return true;
   }
 
@@ -247,6 +253,37 @@ export class StoryBuilderService {
     this.creatures.update((list) =>
       list.map((c) => (c.creatureId === creatureId ? { ...c, ...patch } : c)),
     );
+  }
+
+  /**
+   * Remplace le type bestiaire d’une carte (race / entrée) sans toucher au nom
+   * d’histoire, au rôle ni au texte de vie.
+   */
+  replaceCreatureKind(currentId: string, next: CreatureSummary): boolean {
+    if (next.id !== currentId && this.creatures().some((c) => c.creatureId === next.id)) {
+      return false;
+    }
+    this.creatures.update((list) =>
+      list.map((c) =>
+        c.creatureId === currentId
+          ? {
+              ...c,
+              creatureId: next.id,
+              creatureName: next.name,
+              category: next.category,
+              challengeRating: next.challengeRating,
+            }
+          : c,
+      ),
+    );
+    this.baselineCreatureIds.update((set) => {
+      if (!set.has(currentId)) return set;
+      const copy = new Set(set);
+      copy.delete(currentId);
+      copy.add(next.id);
+      return copy;
+    });
+    return true;
   }
 
   removeCreature(creatureId: string): void {

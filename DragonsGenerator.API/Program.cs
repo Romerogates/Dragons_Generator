@@ -159,7 +159,7 @@ builder.Services.AddSingleton<ImapInboxService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHttpClient("Groq", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(120);
+    client.Timeout = TimeSpan.FromSeconds(300);
 });
 builder.Services.AddHttpClient("LocalLlm", client =>
 {
@@ -167,7 +167,7 @@ builder.Services.AddHttpClient("LocalLlm", client =>
 });
 builder.Services.AddHttpClient("UserLlm", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(120);
+    client.Timeout = TimeSpan.FromSeconds(300);
 });
 builder.Services.AddHttpClient("Google", client =>
 {
@@ -218,8 +218,10 @@ builder.WebHost.ConfigureKestrel(o =>
 {
     o.Limits.MaxRequestBodySize = 25 * 1024 * 1024; // 25 MB (PDF tickets)
     o.Limits.MaxConcurrentConnections = 256;
-    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
     o.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
+    // Génération IA : pas de corps tant que Groq n’a pas répondu — le débit min. abortait en 504.
+    o.Limits.MinResponseDataRate = null;
 });
 
 var app = builder.Build();

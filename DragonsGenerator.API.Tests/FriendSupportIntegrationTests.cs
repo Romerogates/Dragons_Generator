@@ -470,4 +470,117 @@ public class FriendSupportIntegrationTests
         var adminRes = await _client.SendAsync(adminReq);
         adminRes.EnsureSuccessStatusCode();
     }
+
+    [Fact]
+    public async Task Support_attach_campaign_member_ok_stranger_rejected()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "campown");
+        var (_, strangerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "campstr");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        Guid campaignId;
+        using (var createCamp = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createCamp.Content = JsonContent.Create(new
+            {
+                title = "Table cassée",
+                data = JsonDocument.Parse("""{"notes":"secret-mj"}""").RootElement,
+            });
+            var createdCamp = await _client.SendAsync(createCamp);
+            createdCamp.EnsureSuccessStatusCode();
+            campaignId = (await createdCamp.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        }
+
+        using (var denied = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", adminToken))
+        {
+            Assert.Equal(HttpStatusCode.NotFound, (await _client.SendAsync(denied)).StatusCode);
+        }
+
+        using var createTicket = ApiTestAuth.Authed(HttpMethod.Post, "/support/tickets", ownerToken);
+        createTicket.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Combat figé"), "subject" },
+            { new StringContent("La table ne répond plus après l'init."), "message" },
+            { new StringContent(campaignId.ToString()), "campaignId" },
+        };
+        var ticketRes = await _client.SendAsync(createTicket);
+        ticketRes.EnsureSuccessStatusCode();
+        var ticket = await ticketRes.Content.ReadFromJsonAsync<JsonElement>();
+        var ticketId = ticket.GetProperty("id").GetGuid();
+        Assert.Equal(campaignId, ticket.GetProperty("campaignId").GetGuid());
+        Assert.Equal("Table cassée", ticket.GetProperty("campaignName").GetString());
+
+        using var strangerTicket = ApiTestAuth.Authed(HttpMethod.Post, "/support/tickets", strangerToken);
+        strangerTicket.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Pas ma table"), "subject" },
+            { new StringContent("Je tente d'attacher une campagne d'un autre."), "message" },
+            { new StringContent(campaignId.ToString()), "campaignId" },
+        };
+        Assert.Equal(HttpStatusCode.BadRequest, (await _client.SendAsync(strangerTicket)).StatusCode);
+
+        Guid characterId;
+        using (var charReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/characters", ownerToken))
+        {
+            charReq.Content = JsonContent.Create(new
+            {
+                name = "Lira",
+                data = JsonDocument.Parse("""{"name":"Lira"}""").RootElement,
+            });
+            var charCreated = await _client.SendAsync(charReq);
+            charCreated.EnsureSuccessStatusCode();
+            characterId = (await charCreated.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        }
+
+        var pngBytes = Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        );
+        using var msgReq = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", ownerToken);
+        msgReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Voici la table, la fiche et une capture."), "body" },
+            { new StringContent(characterId.ToString()), "characterId" },
+            { new StringContent(campaignId.ToString()), "campaignId" },
+            { new ByteArrayContent(pngBytes), "file", "capture.png" },
+        };
+        var msgRes = await _client.SendAsync(msgReq);
+        msgRes.EnsureSuccessStatusCode();
+        var msg = await msgRes.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(characterId, msg.GetProperty("characterId").GetGuid());
+        Assert.Equal(campaignId, msg.GetProperty("campaignId").GetGuid());
+        Assert.Equal("capture.png", msg.GetProperty("attachmentOriginalName").GetString());
+
+        using (var inspect = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", adminToken))
+        {
+            var inspectRes = await _client.SendAsync(inspect);
+            inspectRes.EnsureSuccessStatusCode();
+            var detail = await inspectRes.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.False(detail.GetProperty("isOwner").GetBoolean());
+            Assert.Equal("support", detail.GetProperty("role").GetString());
+            Assert.Equal("secret-mj", detail.GetProperty("data").GetProperty("notes").GetString());
+            Assert.DoesNotContain(
+                detail.GetProperty("members").EnumerateArray(),
+                m => m.GetProperty("role").GetString() == "support");
+        }
+
+        using (var put = ApiTestAuth.Authed(HttpMethod.Put, $"/me/campaigns/{campaignId}", adminToken))
+        {
+            put.Content = JsonContent.Create(new
+            {
+                title = "Hijack",
+                data = JsonDocument.Parse("""{"notes":"nope"}""").RootElement,
+            });
+            Assert.Equal(HttpStatusCode.NotFound, (await _client.SendAsync(put)).StatusCode);
+        }
+
+        using (var followUp = ApiTestAuth.Authed(HttpMethod.Post, $"/support/tickets/{ticketId}/messages", ownerToken))
+        {
+            followUp.Content = new MultipartFormDataContent
+            {
+                { new StringContent("Rappel FormData avec campagne."), "body" },
+                { new StringContent(campaignId.ToString()), "campaignId" },
+            };
+            (await _client.SendAsync(followUp)).EnsureSuccessStatusCode();
+        }
+    }
 }

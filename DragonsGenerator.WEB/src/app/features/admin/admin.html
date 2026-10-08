@@ -1,3 +1,21 @@
+@if (thread(); as th) {
+  <app-support-conversation
+    audience="staff"
+    [thread]="th"
+    [sending]="false"
+    [error]="error()"
+    [adminNotes]="adminNotesDraft"
+    (closed)="closeThread()"
+    (send)="onConversationSend($event)"
+    (downloadCharacter)="onDownloadCharacter($event)"
+    (openAttachment)="onOpenAttachment($event)"
+    (takeTicket)="takeTicket($event)"
+    (setStatus)="setTicketStatus($event.id, $event.status)"
+    (saveNotes)="saveNotes($event.id)"
+    (notesChange)="adminNotesDraft = $event"
+  />
+}
+
 <div class="max-w-6xl mx-auto px-4 py-10">
   <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Support & exploitation</h1>
   <p class="text-xs text-slate-400 mb-6">
@@ -228,99 +246,42 @@
   }
 
   @if (tab() === 'tickets') {
-    <div class="grid lg:grid-cols-2 gap-4">
-      <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
-        @for (t of tickets(); track t.id) {
+    <p class="text-sm text-slate-300 mb-3">Clique un ticket pour ouvrir la conversation <span class="text-amber-300 font-semibold">plein écran</span>.</p>
+    <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
+      @for (t of tickets(); track t.id) {
+        <button
+          type="button"
+          class="text-left bg-[#1b2028] border-2 rounded-xl p-3 hover:border-amber-400"
+          [class.border-amber-400]="selectedId() === t.id"
+          [class.border-slate-700]="selectedId() !== t.id"
+          (click)="openTicket(t.id)"
+        >
+          <div class="flex justify-between gap-2">
+            <span class="font-bold text-amber-300 text-sm">{{ t.subject }}</span>
+            <span
+              class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
+              [class.bg-amber-400]="t.status === 'open'"
+              [class.text-zinc-950]="t.status === 'open'"
+              [class.bg-sky-400]="t.status === 'in_progress'"
+              [class.text-sky-950]="t.status === 'in_progress'"
+              [class.bg-slate-600]="t.status === 'closed'"
+              [class.text-white]="t.status === 'closed'"
+            >
+              {{ statusLabel(t.status) }}
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-300 mt-1">{{ t.userEmail }} · {{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} msg</p>
+          <span class="mt-2 inline-block text-[10px] font-bold uppercase tracking-wide text-sky-300">Ouvrir la conversation</span>
           <button
             type="button"
-            class="text-left bg-[#1b2028] border rounded-xl p-3"
-            [class.border-amber-600]="selectedId() === t.id"
-            [class.border-slate-800]="selectedId() !== t.id"
-            (click)="openTicket(t.id)"
+            class="ml-3 text-[10px] font-bold uppercase tracking-wide text-slate-400 hover:text-sky-300"
+            (click)="$event.stopPropagation(); copyDiagnostic(t.id)"
           >
-            <div class="flex justify-between gap-2">
-              <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
-              <span class="text-[10px] text-slate-500">{{ statusLabel(t.status) }}</span>
-            </div>
-            <p class="text-[10px] text-slate-500">{{ t.userEmail }} · {{ t.createdAt | date: 'short' }}</p>
+            Pack Cursor
           </button>
-        } @empty {
-          <p class="text-xs text-slate-500">Aucun ticket.</p>
-        }
-      </div>
-      @if (thread(); as th) {
-        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4" data-testid="admin-ticket-thread">
-          <div class="flex justify-between gap-2 mb-2">
-            <h3 class="font-serif text-lg text-amber-400">{{ th.ticket.subject }}</h3>
-            <span class="text-[10px] text-slate-500">{{ th.ticket.userEmail }}</span>
-          </div>
-          <p class="text-xs text-slate-400 whitespace-pre-wrap mb-3">{{ th.ticket.message }}</p>
-          @if (th.ticket.characterName) {
-            <p class="text-xs text-violet-300 mb-2">
-              Personnage : {{ th.ticket.characterName }}
-              <button type="button" class="ml-2 text-sky-400 hover:underline" (click)="downloadCharacterJson(th.ticket)">
-                JSON
-              </button>
-            </p>
-          }
-          @if (th.ticket.attachmentOriginalName) {
-            <button type="button" class="text-xs text-sky-400 hover:underline mb-3 block" (click)="openAttachment(th.ticket)">
-              {{ th.ticket.attachmentOriginalName }}
-            </button>
-          }
-          <div class="flex flex-wrap gap-2 mb-3">
-            <button type="button" class="text-[10px] uppercase border border-emerald-700 text-emerald-300 px-2 py-1 rounded" (click)="takeTicket(th.ticket.id)">
-              Je consulte (mail joueur)
-            </button>
-            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(th.ticket.id, 'open')">Open</button>
-            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(th.ticket.id, 'closed')">Fermé</button>
-            <button type="button" class="text-[10px] uppercase border border-sky-700 text-sky-300 px-2 py-1 rounded" (click)="copyDiagnostic(th.ticket.id)">
-              Pack Cursor
-            </button>
-          </div>
-          <div class="flex flex-col gap-2 mb-3">
-            @for (m of th.messages; track m.id) {
-              <div
-                class="rounded-lg px-3 py-2 text-xs whitespace-pre-wrap"
-                [class.bg-amber-950/30]="m.fromStaff"
-                [class.bg-slate-900]="!m.fromStaff"
-              >
-                <p class="text-[10px] uppercase tracking-wider mb-1 text-slate-500">
-                  {{ m.fromStaff ? 'Support' : 'Joueur' }} · {{ m.createdAt | date: 'short' }}
-                </p>
-                {{ m.body }}
-                @if (m.characterName) {
-                  <p class="text-[10px] text-violet-300 mt-1">Fiche : {{ m.characterName }}</p>
-                }
-                @if (m.attachmentOriginalName) {
-                  <p class="text-[10px] text-sky-400 mt-1">{{ m.attachmentOriginalName }}</p>
-                }
-              </div>
-            }
-          </div>
-          <textarea
-            rows="3"
-            [(ngModel)]="replyBody"
-            name="adminReply"
-            placeholder="Réponse au joueur…"
-            class="w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm text-slate-100 outline-none mb-2"
-          ></textarea>
-          <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5 mb-4" (click)="sendReply()">
-            Envoyer au joueur
-          </button>
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
-            Notes internes (pas visibles du joueur)
-            <textarea
-              rows="2"
-              [(ngModel)]="adminNotesDraft"
-              name="adminNotes"
-              class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm text-slate-100"
-            ></textarea>
-          </label>
-          <button type="button" class="text-xs mt-2 px-3 py-1.5 rounded-lg border border-slate-600" (click)="saveNotes(th.ticket.id)">
-            Enregistrer les notes
-          </button>
-        </div>
+        </button>
+      } @empty {
+        <p class="text-xs text-slate-500">Aucun ticket.</p>
       }
     </div>
     @if (diagnostic()) {

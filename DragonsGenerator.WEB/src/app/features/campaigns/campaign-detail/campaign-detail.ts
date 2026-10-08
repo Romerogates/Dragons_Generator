@@ -173,6 +173,20 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   readonly currentUserId = computed(() => this.auth.user()?.id ?? null);
   readonly isSpectator = computed(() => this.campaign()?.role === 'spectator');
+  readonly isSupportInspect = computed(
+    () =>
+      this.campaign()?.role === 'support' || this.route.snapshot.queryParamMap.get('support') === '1',
+  );
+
+  /** Affiche les écrans MJ sans siège à la table (inspection support). */
+  mjUi(c: { isOwner: boolean; role?: string } | null | undefined): boolean {
+    if (!c) return false;
+    return (
+      c.isOwner === true ||
+      c.role === 'support' ||
+      this.route.snapshot.queryParamMap.get('support') === '1'
+    );
+  }
   private notifications = inject(NotificationService);
   private banners = inject(UiBannerPreferencesService);
   private data = inject(DataService);
@@ -359,7 +373,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     /** Répare un activeSessionId orphelin (session supprimée). */
     effect(() => {
       const c = this.campaign();
-      if (!c?.isOwner) return;
+      if (!c?.isOwner || this.isSupportInspect()) return;
       const activeId = c.data.activeSessionId;
       if (!activeId) return;
       if ((c.data.sessions ?? []).some((s) => s.id === activeId)) return;
@@ -1296,22 +1310,25 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         });
         const t = this.tab();
         const sub = this.prepSub();
-        if (!c.isOwner && (c.data.pregenCharacters?.length ?? 0) === 0 && t === 'prep') {
+        const mj = this.mjUi(c);
+        if (!mj && (c.data.pregenCharacters?.length ?? 0) === 0 && t === 'prep') {
           this.tab.set('overview');
-        } else if (!c.isOwner && t === 'prep' && sub !== 'pregens') {
+        } else if (!mj && t === 'prep' && sub !== 'pregens') {
           this.prepSub.set('pregens');
         }
-        if (!c.isOwner && (sub === 'creatures' || sub === 'encounters' || sub === 'maps' || sub === 'notebook' || sub === 'scenario')) {
+        if (!mj && (sub === 'creatures' || sub === 'encounters' || sub === 'maps' || sub === 'notebook' || sub === 'scenario')) {
           this.prepSub.set('pregens');
         }
-        if (!c.isOwner) {
+        if (!mj) {
           this.startInitiativeBannerPoll(c.id);
           this.pendingInvites.set([]);
         } else {
           this.stopInitiativeBannerPoll();
           this.initiativeBoard.set(null);
-          this.loadPendingInvites();
-          this.loadJoinLink();
+          if (c.isOwner) {
+            this.loadPendingInvites();
+            this.loadJoinLink();
+          }
         }
         if (this.tab() === 'overview') {
           this.loadActivity();
@@ -2514,7 +2531,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   saveData(patch: Partial<CampaignData>): void {
     const c = this.campaign();
-    if (!c || c.isHistory) return;
+    if (!c || c.isHistory || this.isSupportInspect()) return;
     const data = { ...c.data, ...patch };
     this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
 
@@ -2563,7 +2580,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   private persist(title: string, data: CampaignData, onSuccess?: () => void): void {
     const c = this.campaign();
-    if (!c) return;
+    if (!c || this.isSupportInspect()) return;
     const campaignId = c.id;
     const seq = ++this.persistSeq;
     this.saving.set(true);

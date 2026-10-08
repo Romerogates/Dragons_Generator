@@ -2,10 +2,12 @@
   <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
     <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Créer un compte</h1>
     <p class="text-xs text-slate-400 text-center mb-6 italic">
-      @if (saveIntent()) {
+      @if (googleSignup()) {
+        Google : pseudo + RGPD, sans mot de passe.
+      } @else if (saveIntent()) {
         Créez un compte pour sauvegarder votre héros et y accéder partout.
       } @else {
-        Un email de confirmation sera envoyé.
+        Un email de confirmation sera envoyé — ou inscris-toi avec Google (sans mot de passe).
       }
     </p>
 
@@ -46,8 +48,25 @@
         class="wizard-nav-primary w-full text-center block"
         >Aller à la connexion</a
       >
+    } @else if (googleSignup()) {
+      <app-google-complete-signup
+        [(displayName)]="googleDisplayName"
+        [(acceptedTerms)]="googleAcceptedTerms"
+        [emailHint]="googleEmailHint()"
+        [error]="error()"
+        [loading]="loading()"
+        (confirmed)="completeGoogleSignup()"
+        (cancelled)="cancelGoogleSignup()"
+      />
+      @if (!googleEmailHint()) {
+        <app-google-sign-in (credential)="onGoogle($event)" />
+      }
     } @else {
       <form class="flex flex-col gap-4" (ngSubmit)="submit()">
+        <p class="text-xs text-slate-400 text-center">
+          Avec Google : <span class="text-amber-300">pas de mot de passe</span>, juste un pseudo et le RGPD.
+        </p>
+        <app-google-sign-in (credential)="onGoogle($event)" />
         <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
           Pseudo
           <input
@@ -125,7 +144,6 @@
         <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
           {{ loading() ? 'Création…' : "S'inscrire" }}
         </button>
-        <app-google-sign-in (credential)="onGoogle($event)" />
       </form>
       <p class="mt-4 text-center text-xs text-slate-400">
         Déjà un compte ?

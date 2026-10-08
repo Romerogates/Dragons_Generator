@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   computed,
+  viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,42 +15,20 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignSummary } from '@core/models/Campaign/campaign';
+import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 import { supportStatusLabel } from '@core/utils/support-status.util';
-
-export interface Ticket {
-  id: string;
-  subject: string;
-  message: string;
-  status: string;
-  attachmentOriginalName?: string;
-  attachmentUrl?: string;
-  characterId?: string;
-  characterName?: string;
-  createdAt: string;
-  updatedAt?: string;
-  messageCount?: number;
-}
-
-interface TicketMessage {
-  id: string;
-  fromStaff: boolean;
-  body: string;
-  createdAt: string;
-  characterId?: string;
-  characterName?: string;
-  attachmentOriginalName?: string;
-}
-
-interface TicketThread {
-  ticket: Ticket;
-  messages: TicketMessage[];
-}
+import {
+  SupportConversation,
+  SupportReplyPayload,
+} from '@shared/components/support-conversation/support-conversation';
 
 @Component({
   selector: 'app-support',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SupportConversation],
   templateUrl: './support.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -57,23 +36,23 @@ interface TicketThread {
 export class SupportPage implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly characters = inject(CharacterCloudService);
+  private readonly campaignsApi = inject(CampaignCloudService);
   private readonly route = inject(ActivatedRoute);
   readonly auth = inject(AuthService);
   private readonly api = environment.apiUrl;
+  private readonly convo = viewChild(SupportConversation);
 
   subject = '';
   message = '';
   characterId = '';
+  campaignId = '';
   file: File | null = null;
-  replyBody = '';
-  replyCharacterId = '';
-  replyFile: File | null = null;
   readonly fileName = signal('');
-  readonly replyFileName = signal('');
 
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
-  readonly tickets = signal<Ticket[]>([]);
-  readonly thread = signal<TicketThread | null>(null);
+  readonly myCampaigns = signal<CampaignSummary[]>([]);
+  readonly tickets = signal<SupportTicket[]>([]);
+  readonly thread = signal<SupportTicketThread | null>(null);
   readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
@@ -89,6 +68,9 @@ export class SupportPage implements OnInit {
     if (message) this.message = message.slice(0, 4000);
 
     this.characters.list().subscribe((list) => this.myCharacters.set(list));
+    this.campaignsApi.list().subscribe((list) =>
+      this.myCampaigns.set(list.filter((c) => !c.isHistory)),
+    );
     this.reload(ticket);
   }
 
@@ -98,17 +80,9 @@ export class SupportPage implements OnInit {
     this.fileName.set(this.file?.name ?? '');
   }
 
-  onReplyFile(ev: Event): void {
-    const input = ev.target as HTMLInputElement;
-    this.replyFile = input.files?.[0] ?? null;
-    this.replyFileName.set(this.replyFile?.name ?? '');
-  }
-
   closeThread(): void {
     this.thread.set(null);
-    this.replyBody = '';
-    this.replyCharacterId = '';
-    this.replyFile = null;
+    this.error.set(null);
   }
 
   statusLabel(status: string): string {
@@ -116,7 +90,7 @@ export class SupportPage implements OnInit {
   }
 
   reload(openId?: string | null): void {
-    this.http.get<Ticket[]>(`${this.api}/support/tickets`).subscribe({
+    this.http.get<SupportTicket[]>(`${this.api}/support/tickets`).subscribe({
       next: (list) => {
         this.tickets.set(list);
         const id = openId || this.selectedId();
@@ -128,28 +102,25 @@ export class SupportPage implements OnInit {
 
   openTicket(id: string): void {
     this.error.set(null);
-    this.http.get<TicketThread>(`${this.api}/support/tickets/${id}`).subscribe({
+    this.http.get<SupportTicketThread>(`${this.api}/support/tickets/${id}`).subscribe({
       next: (t) => this.thread.set(t),
       error: () => this.error.set('Impossible d’ouvrir ce ticket.'),
     });
   }
 
-  sendReply(): void {
+  onConversationSend(payload: SupportReplyPayload): void {
     const t = this.thread()?.ticket;
-    const body = this.replyBody.trim();
-    if (!t || body.length < 2) return;
+    if (!t) return;
     this.sendingReply.set(true);
     const fd = new FormData();
-    fd.append('body', body);
-    if (this.replyCharacterId) fd.append('characterId', this.replyCharacterId);
-    if (this.replyFile) fd.append('file', this.replyFile, this.replyFile.name);
+    fd.append('body', payload.body);
+    if (payload.characterId) fd.append('characterId', payload.characterId);
+    if (payload.campaignId) fd.append('campaignId', payload.campaignId);
+    if (payload.file) fd.append('file', payload.file, payload.file.name);
     this.http.post(`${this.api}/support/tickets/${t.id}/messages`, fd).subscribe({
       next: () => {
         this.sendingReply.set(false);
-        this.replyBody = '';
-        this.replyCharacterId = '';
-        this.replyFile = null;
-        this.replyFileName.set('');
+        this.convo()?.clearReplyUi();
         this.reload(t.id);
       },
       error: () => {
@@ -167,15 +138,17 @@ export class SupportPage implements OnInit {
     fd.append('subject', this.subject.trim());
     fd.append('message', this.message.trim());
     if (this.characterId) fd.append('characterId', this.characterId);
+    if (this.campaignId) fd.append('campaignId', this.campaignId);
     if (this.file) fd.append('file', this.file, this.file.name);
 
-    this.http.post<Ticket>(`${this.api}/support/tickets`, fd).subscribe({
+    this.http.post<SupportTicket>(`${this.api}/support/tickets`, fd).subscribe({
       next: (created) => {
         this.loading.set(false);
         this.success.set('Ticket ouvert. Le support a été prévenu par mail.');
         this.subject = '';
         this.message = '';
         this.characterId = '';
+        this.campaignId = '';
         this.file = null;
         this.fileName.set('');
         this.reload(created.id);
@@ -187,33 +160,48 @@ export class SupportPage implements OnInit {
     });
   }
 
-  downloadCharacterJson(ticket: Ticket): void {
+  onDownloadCharacter(ev: {
+    ticket?: SupportTicket;
+    message?: { id: string; characterId?: string; characterName?: string };
+  }): void {
+    const thread = this.thread();
+    if (!thread) return;
+    if (ev.message?.characterId) {
+      downloadTicketCharacterJson(
+        this.http,
+        thread.ticket.id,
+        ev.message.characterName ?? 'personnage',
+        () => this.error.set('Impossible de télécharger le JSON du personnage.'),
+        ev.message.id,
+      );
+      return;
+    }
+    const ticket = ev.ticket ?? thread.ticket;
     if (!ticket.characterId) return;
     downloadTicketCharacterJson(this.http, ticket.id, ticket.characterName ?? 'personnage', () =>
       this.error.set('Impossible de télécharger le JSON du personnage.'),
     );
   }
 
-  openAttachment(ticket: Ticket): void {
+  onOpenAttachment(ev: {
+    ticket?: SupportTicket;
+    message?: { id: string; attachmentOriginalName?: string };
+  }): void {
+    const thread = this.thread();
+    if (!thread) return;
+    if (ev.message?.attachmentOriginalName) {
+      openTicketAttachment(
+        this.http,
+        thread.ticket.id,
+        () => this.error.set("Impossible d'ouvrir la pièce jointe."),
+        ev.message.id,
+      );
+      return;
+    }
+    const ticket = ev.ticket ?? thread.ticket;
     if (!ticket.attachmentOriginalName) return;
     openTicketAttachment(this.http, ticket.id, () =>
-      this.error.set('Impossible d\'ouvrir la pièce jointe.'),
+      this.error.set("Impossible d'ouvrir la pièce jointe."),
     );
-  }
-
-  downloadMessageCharacter(ticketId: string, m: TicketMessage): void {
-    if (!m.characterId) return;
-    downloadTicketCharacterJson(
-      this.http,
-      ticketId,
-      m.characterName ?? 'personnage',
-      () => this.error.set('Impossible de télécharger le JSON du personnage.'),
-      m.id,
-    );
-  }
-
-  openMessageAttachment(ticketId: string, m: TicketMessage): void {
-    if (!m.attachmentOriginalName) return;
-    openTicketAttachment(this.http, ticketId, () => this.error.set("Impossible d'ouvrir la pièce jointe."), m.id);
   }
 }

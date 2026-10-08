@@ -1,4 +1,4 @@
-﻿import {
+import {
   buildCharacterFromCreation,
   type CharacterBuildEditingRef,
 } from '../utils/character-build.util';

@@ -157,6 +157,41 @@ describe('StoryBuilderService', () => {
     expect(service.isBaselineCreature('cre-new')).toBe(false);
   });
 
+  it('replaces bestiary kind without wiping story name or backstory', () => {
+    service.mergeCreatures([
+      {
+        creatureId: 'cre-gob',
+        creatureName: 'Gobelin',
+        category: 'habitants',
+        challengeRating: '1/4',
+        customName: 'Skrix',
+        role: 'antagonist',
+        backstory: 'Vie sombre',
+      },
+    ]);
+
+    const ok = service.replaceCreatureKind('cre-gob', {
+      id: 'cre-orc',
+      name: 'Orc',
+      category: 'soldats',
+      part: null,
+      section: null,
+      challengeRating: '1/2',
+      xp: 100,
+      armorClass: 13,
+    });
+
+    expect(ok).toBeTrue();
+    const [card] = service.creatures();
+    expect(card.creatureId).toBe('cre-orc');
+    expect(card.creatureName).toBe('Orc');
+    expect(card.category).toBe('soldats');
+    expect(card.challengeRating).toBe('1/2');
+    expect(card.customName).toBe('Skrix');
+    expect(card.backstory).toBe('Vie sombre');
+    expect(card.role).toBe('antagonist');
+  });
+
   it('clears edit mode on reset', () => {
     service.loadCampaignIntoBuilder(sampleCampaign);
     service.reset();

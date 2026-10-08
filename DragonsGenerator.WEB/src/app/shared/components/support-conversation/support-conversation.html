@@ -1,0 +1,296 @@
+@if (thread(); as th) {
+  <div
+    class="fixed inset-0 z-[100] flex flex-col bg-[#0c1017] text-slate-100"
+    [attr.data-testid]="isStaff() ? 'admin-ticket-thread' : 'support-thread'"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Conversation : ' + th.ticket.subject"
+  >
+    <header class="shrink-0 border-b border-slate-800 bg-[#121722] px-3 py-3 sm:px-5">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-100 hover:bg-slate-700"
+          (click)="closed.emit()"
+          aria-label="Fermer la conversation"
+        >
+          <iconify-icon icon="mdi:arrow-left" class="text-2xl"></iconify-icon>
+        </button>
+        <div class="min-w-0 flex-1">
+          <h2 class="font-serif text-xl text-amber-300 truncate sm:text-2xl">{{ th.ticket.subject }}</h2>
+          <div class="mt-1 flex flex-wrap items-center gap-2">
+            <span
+              class="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider"
+              [class.bg-amber-400]="waiting() === 'support'"
+              [class.text-zinc-950]="waiting() === 'support'"
+              [class.bg-sky-400]="waiting() === 'player'"
+              [class.text-sky-950]="waiting() === 'player'"
+              [class.bg-slate-600]="waiting() === 'closed'"
+              [class.text-slate-100]="waiting() === 'closed'"
+            >
+              {{ waitingText() }}
+            </span>
+            <span class="text-[11px] text-slate-400">{{ statusLabel(th.ticket.status) }}</span>
+            @if (isStaff() && th.ticket.userEmail) {
+              <span class="truncate text-[11px] text-slate-300">{{ th.ticket.userEmail }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      @if (isStaff()) {
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="rounded-lg border border-emerald-400 bg-emerald-950 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-emerald-100 hover:bg-emerald-900"
+            (click)="takeTicket.emit(th.ticket.id)"
+          >
+            Je consulte
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-slate-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-200 hover:bg-slate-800"
+            (click)="setStatus.emit({ id: th.ticket.id, status: 'open' })"
+          >
+            Rouvrir
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-slate-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-200 hover:bg-slate-800"
+            (click)="setStatus.emit({ id: th.ticket.id, status: 'closed' })"
+          >
+            Fermer
+          </button>
+        </div>
+      }
+    </header>
+
+    <div #scroller class="min-h-0 flex-1 overflow-y-auto custom-scrollbar px-3 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-col gap-3">
+        <p class="self-center rounded-full bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-300">
+          Ouverture du ticket · {{ th.ticket.createdAt | date: 'short' }}
+        </p>
+
+        <div class="flex" [class.justify-end]="isMine(false)" [class.justify-start]="!isMine(false)">
+          <div
+            class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-md"
+            [class.rounded-br-sm]="isMine(false)"
+            [class.rounded-bl-sm]="!isMine(false)"
+            [class.bg-sky-600]="isMine(false)"
+            [class.text-white]="isMine(false)"
+            [class.bg-sky-950]="!isMine(false)"
+            [class.text-sky-50]="!isMine(false)"
+            [class.border]="!isMine(false)"
+            [class.border-sky-400]="!isMine(false)"
+          >
+            <p class="mb-1 text-[10px] font-black uppercase tracking-wider opacity-80">
+              {{ isStaff() ? 'Joueur' : 'Toi' }}
+            </p>
+            {{ th.ticket.message }}
+            <ng-container
+              *ngTemplateOutlet="chips; context: { ticket: th.ticket, message: null }"
+            />
+          </div>
+        </div>
+
+        @for (m of th.messages; track m.id) {
+          <div class="flex" [class.justify-end]="isMine(m.fromStaff)" [class.justify-start]="!isMine(m.fromStaff)">
+            <div
+              class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-md"
+              [class.rounded-br-sm]="isMine(m.fromStaff)"
+              [class.rounded-bl-sm]="!isMine(m.fromStaff)"
+              [class.bg-sky-600]="isMine(m.fromStaff) && !m.fromStaff"
+              [class.text-white]="isMine(m.fromStaff) && !m.fromStaff"
+              [class.bg-amber-400]="isMine(m.fromStaff) && m.fromStaff"
+              [class.text-zinc-950]="isMine(m.fromStaff) && m.fromStaff"
+              [class.bg-sky-950]="!isMine(m.fromStaff) && !m.fromStaff"
+              [class.text-sky-50]="!isMine(m.fromStaff) && !m.fromStaff"
+              [class.border]="!isMine(m.fromStaff)"
+              [class.border-sky-400]="!isMine(m.fromStaff) && !m.fromStaff"
+              [class.bg-amber-950]="!isMine(m.fromStaff) && m.fromStaff"
+              [class.text-amber-50]="!isMine(m.fromStaff) && m.fromStaff"
+              [class.border-amber-400]="!isMine(m.fromStaff) && m.fromStaff"
+            >
+              <p class="mb-1 text-[10px] font-black uppercase tracking-wider opacity-80">
+                {{ m.fromStaff ? 'Support' : isStaff() ? 'Joueur' : 'Toi' }}
+                · {{ m.createdAt | date: 'short' }}
+              </p>
+              {{ m.body }}
+              <ng-container *ngTemplateOutlet="chips; context: { ticket: th.ticket, message: m }" />
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (th.ticket.status !== 'closed') {
+      <footer class="shrink-0 border-t border-slate-700 bg-[#121722] px-3 py-3 sm:px-5">
+        <div class="mx-auto flex max-w-3xl flex-col gap-3">
+          @if (error()) {
+            <p class="text-sm text-red-300">{{ error() }}</p>
+          }
+
+          @if (!isStaff()) {
+            <div class="flex flex-wrap items-center gap-2">
+              @if (selectedCharacter(); as ch) {
+                <span class="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2.5 py-1 text-[11px] font-semibold text-white">
+                  Fiche · {{ ch.name }}
+                  <button type="button" class="text-white/80 hover:text-white" (click)="replyCharacterId = ''" aria-label="Retirer le personnage">×</button>
+                </span>
+              }
+              @if (selectedCampaign(); as camp) {
+                <span class="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold text-zinc-950">
+                  Campagne · {{ camp.title }}
+                  <button type="button" class="hover:text-black" (click)="replyCampaignId = ''" aria-label="Retirer la campagne">×</button>
+                </span>
+              }
+              <button
+                type="button"
+                class="rounded-full border border-slate-500 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-200 hover:border-amber-400 hover:text-amber-200"
+                (click)="attachOpen.set(!attachOpen())"
+              >
+                {{ attachOpen() ? 'Fermer' : 'Joindre' }}
+              </button>
+            </div>
+            @if (attachOpen()) {
+              <div class="rounded-xl border border-slate-700 bg-[#1a2030] p-3">
+                <p class="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Personnage</p>
+                <div class="mb-3 flex flex-wrap gap-2">
+                  <button type="button" class="rounded-full px-3 py-1 text-xs" [class.bg-slate-600]="replyCharacterId === ''" (click)="replyCharacterId = ''">Aucun</button>
+                  @for (c of myCharacters(); track c.id) {
+                    <button
+                      type="button"
+                      class="rounded-full px-3 py-1 text-xs"
+                      [class.bg-violet-600]="replyCharacterId === c.id"
+                      [class.text-white]="replyCharacterId === c.id"
+                      [class.bg-slate-800]="replyCharacterId !== c.id"
+                      (click)="replyCharacterId = c.id"
+                    >
+                      {{ c.name }}
+                    </button>
+                  }
+                </div>
+                <p class="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Campagne</p>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" class="rounded-full px-3 py-1 text-xs" [class.bg-slate-600]="replyCampaignId === ''" (click)="replyCampaignId = ''">Aucune</button>
+                  @for (c of myCampaigns(); track c.id) {
+                    <button
+                      type="button"
+                      class="rounded-full px-3 py-1 text-xs"
+                      [class.bg-amber-500]="replyCampaignId === c.id"
+                      [class.text-zinc-950]="replyCampaignId === c.id"
+                      [class.bg-slate-800]="replyCampaignId !== c.id"
+                      (click)="replyCampaignId = c.id"
+                    >
+                      {{ c.title }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          <label class="sr-only" for="support-reply">Votre message</label>
+          <textarea
+            id="support-reply"
+            rows="3"
+            [(ngModel)]="replyBody"
+            name="supportReply"
+            [placeholder]="isStaff() ? 'Écrire au joueur…' : 'Écrire au support…'"
+            class="w-full rounded-2xl border-2 border-slate-500 bg-[#0c1017] px-4 py-3 text-sm text-white outline-none focus:border-amber-400"
+          ></textarea>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <input #replyFile type="file" accept=".pdf,image/*" class="hidden" (change)="onReplyFile($event)" />
+            <button type="button" class="rounded-xl border border-slate-500 px-3 py-2 text-xs font-bold text-slate-100 hover:border-sky-400" (click)="replyFile.click()">
+              {{ replyFileName() || 'Fichier' }}
+            </button>
+            <button
+              type="button"
+              class="ml-auto rounded-xl bg-sky-500 px-4 py-2.5 text-xs font-black uppercase tracking-wide text-sky-950 hover:bg-sky-400 disabled:opacity-50"
+              [disabled]="sending() || replyBody.trim().length < 2"
+              (click)="emitSend(false)"
+            >
+              {{ sending() ? 'Envoi…' : 'Envoyer dans le fil' }}
+            </button>
+            @if (isStaff()) {
+              <button
+                type="button"
+                class="rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-black uppercase tracking-wide text-zinc-950 hover:bg-amber-300 disabled:opacity-50"
+                [disabled]="sending()"
+                (click)="replyByMail()"
+              >
+                Répondre par mail
+              </button>
+            }
+          </div>
+          @if (isStaff()) {
+            <p class="text-[11px] text-slate-400">
+              @if (canEmail()) {
+                « Répondre par mail » envoie le texte dans le fil <span class="text-amber-200">et</span> par e-mail au joueur
+                @if (th.ticket.userEmail) {
+                  ({{ th.ticket.userEmail }}).
+                }
+              } @else {
+                SMTP indisponible — le bouton ouvre ta messagerie
+                @if (mailtoHref()) {
+                  (<a class="text-sky-300 underline" [href]="mailtoHref()">mailto</a>).
+                }
+                « Envoyer dans le fil » reste obligatoire pour l’historique.
+              }
+            </p>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Notes internes
+              <textarea
+                rows="2"
+                [ngModel]="adminNotes()"
+                (ngModelChange)="notesChange.emit($event)"
+                name="adminNotesFs"
+                class="mt-1 w-full rounded-lg border border-slate-600 bg-[#0c1017] px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-100"
+              ></textarea>
+            </label>
+            <button
+              type="button"
+              class="self-start rounded-lg border border-slate-500 px-3 py-1.5 text-xs text-slate-200"
+              (click)="saveNotes.emit({ id: th.ticket.id, notes: adminNotes() })"
+            >
+              Enregistrer les notes
+            </button>
+          }
+        </div>
+      </footer>
+    }
+  </div>
+}
+
+<ng-template #chips let-ticket="ticket" let-message="message">
+  @if (message ? message.characterName : ticket.characterName) {
+    <button
+      type="button"
+      class="mt-2 block text-[11px] font-semibold underline decoration-2 underline-offset-2"
+      (click)="downloadCharacter.emit({ ticket: message ? undefined : ticket, message })"
+    >
+      Fiche : {{ message ? message.characterName : ticket.characterName }}
+    </button>
+  }
+  @if ((message ? message.campaignId : ticket.campaignId) && (message ? message.campaignName : ticket.campaignName)) {
+    <a
+      [routerLink]="['/campaigns', message ? message.campaignId : ticket.campaignId]"
+      [queryParams]="campaignQuery()"
+      class="mt-2 inline-flex items-center gap-1 rounded-full bg-black/25 px-2.5 py-1 text-[11px] font-bold hover:bg-black/40"
+    >
+      Campagne : {{ message ? message.campaignName : ticket.campaignName }}
+      @if (isStaff()) {
+        <span>· Ouvrir</span>
+      }
+    </a>
+  }
+  @if (message ? message.attachmentOriginalName : ticket.attachmentOriginalName) {
+    <button
+      type="button"
+      class="mt-1 block text-[11px] font-semibold underline"
+      (click)="openAttachment.emit({ ticket: message ? undefined : ticket, message })"
+    >
+      {{ message ? message.attachmentOriginalName : ticket.attachmentOriginalName }}
+    </button>
+  }
+</ng-template>
