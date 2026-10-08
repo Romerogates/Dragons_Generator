@@ -37,4 +37,34 @@ export async function registerAppIcons(): Promise<void> {
   } finally {
     clearTimeout(abortTimer);
   }
+
+  disableIconifyViewportObserver();
+}
+
+/**
+ * Iconify décharge les SVG hors viewport (IntersectionObserver) → flash au scroll.
+ * noobserver + observer DOM pour toutes les icônes, y compris celles ajoutées plus tard.
+ */
+function disableIconifyViewportObserver(): void {
+  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+
+  const mark = (el: Element): void => {
+    if (el.tagName === 'ICONIFY-ICON' && !el.hasAttribute('noobserver')) {
+      el.setAttribute('noobserver', '');
+    }
+  };
+
+  const scan = (root: ParentNode): void => {
+    if (root instanceof Element) mark(root);
+    root.querySelectorAll?.('iconify-icon').forEach(mark);
+  };
+
+  scan(document);
+  new MutationObserver((records) => {
+    for (const rec of records) {
+      rec.addedNodes.forEach((node) => {
+        if (node instanceof Element || node instanceof DocumentFragment) scan(node);
+      });
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
 }

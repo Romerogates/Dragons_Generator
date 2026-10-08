@@ -20,41 +20,6 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2 lg:justify-end">
-      <div
-        class="inline-flex shrink-0 rounded-lg border border-slate-700/80 bg-[#12151b] p-0.5"
-        role="group"
-        aria-label="Mode d'affichage"
-      >
-        <button
-          type="button"
-          class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
-          [class]="
-            viewMode() === 'ui'
-              ? 'bg-amber-500 text-slate-950 shadow-sm'
-              : 'text-slate-400 hover:text-amber-300'
-          "
-          title="Lecture écran"
-          (click)="setViewMode('ui')"
-        >
-          Compacte
-        </button>
-        <button
-          type="button"
-          class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
-          [class]="
-            viewMode() === 'illustrated'
-              ? 'bg-amber-500 text-slate-950 shadow-sm'
-              : 'text-slate-400 hover:text-amber-300'
-          "
-          title="PDF / table"
-          (click)="setViewMode('illustrated')"
-        >
-          Illustrée
-        </button>
-      </div>
-
-      <span class="hidden sm:block w-px h-7 bg-slate-700/80 mx-0.5" aria-hidden="true"></span>
-
       @if (!isConsult()) {
         <button
           type="button"
@@ -79,14 +44,6 @@
           {{ consultBackLabel() }}
         </button>
       }
-      <button
-        type="button"
-        class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
-        (click)="downloadPdf()"
-        [disabled]="!character()"
-      >
-        PDF
-      </button>
     </div>
   </header>
 

@@ -12,6 +12,7 @@ import { SelectCreaturesStep } from './steps/select-creatures-step/select-creatu
 import { CustomizeCreaturesStep } from './steps/customize-creatures-step/customize-creatures-step';
 import { AdventureStep } from './steps/adventure-step/adventure-step';
 import { StorySummaryStep } from './steps/story-summary-step/story-summary-step';
+import { APP_VERSION } from '@env/app-version';
 
 @Component({
   selector: 'app-story-creation',
@@ -31,6 +32,7 @@ import { StorySummaryStep } from './steps/story-summary-step/story-summary-step'
 export class StoryCreation implements OnInit {
   readonly builder = inject(StoryBuilderService);
   readonly showDraftPrompt = signal(false);
+  readonly version = APP_VERSION;
 
   ngOnInit(): void {
     if (this.builder.isEditingCampaign()) {

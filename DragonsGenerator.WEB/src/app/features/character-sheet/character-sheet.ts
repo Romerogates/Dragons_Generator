@@ -24,26 +24,9 @@ import {
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { CharacterPlayView, type CharacterLivePatch } from './character-play-view';
 import { IllustratedCharacterSheet } from './illustrated-character-sheet';
+import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 
 type SheetViewMode = 'illustrated' | 'ui';
-
-const VIEW_MODE_KEY = 'dg_character_sheet_view';
-
-function readStoredViewMode(): SheetViewMode {
-  try {
-    const v = localStorage.getItem(VIEW_MODE_KEY);
-    if (v === 'ui') return 'ui';
-    // Anciens modes pdf / sheet → fiche illustrée (PDF.js).
-    if (v === 'illustrated' || v === 'pdf' || v === 'sheet') return 'illustrated';
-  } catch {
-    /* ignore */
-  }
-  // Mobile : Compacte par défaut (lisible au doigt). Desktop : Illustrée.
-  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
-    return 'ui';
-  }
-  return 'illustrated';
-}
 
 @Component({
   selector: 'app-character-sheet',
@@ -61,6 +44,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   private readonly cloud = inject(CharacterCloudService);
   private readonly campaigns = inject(CampaignCloudService);
   private readonly notifications = inject(NotificationService);
+  private readonly forgePrefs = inject(ForgePreferencesService);
 
   readonly character = signal<Character | null>(null);
   readonly loading = signal(true);
@@ -73,8 +57,10 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly proposalReview = signal<CharacterProposalReview | null>(null);
   readonly proposalActionBusy = signal(false);
   readonly proposalActionError = signal<string | null>(null);
-  /** Interface affichée : fiche = même PDF que le téléchargement (PDF.js), par défaut. */
-  readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
+  /** Affichage : Paramètres → Forge (PDF / Compacte), plus de bascule sur la fiche. */
+  readonly viewMode = signal<SheetViewMode>(
+    this.forgePrefs.mobileRecapMode() === 'compact' ? 'ui' : 'illustrated',
+  );
   readonly illustratedPage = signal(1);
   /** true si le rendu PDF.js a échoué en mode Illustrée → overlay JPEG. */
   readonly illustratedPdfJsFailed = signal(false);
@@ -231,11 +217,6 @@ export class CharacterSheet implements OnInit, OnDestroy {
     if (mode === 'illustrated') {
       this.illustratedPage.set(1);
       this.illustratedPdfJsFailed.set(false);
-    }
-    try {
-      localStorage.setItem(VIEW_MODE_KEY, mode);
-    } catch {
-      /* ignore quota / private mode */
     }
   }
 

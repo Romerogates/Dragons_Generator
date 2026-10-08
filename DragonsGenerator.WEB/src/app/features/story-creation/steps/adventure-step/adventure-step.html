@@ -131,7 +131,7 @@
     } @else {
       <div class="space-y-4" data-testid="adventure-sections-editor">
         @for (section of adventureSections(); track section.title) {
-          <article class="rounded-xl border border-slate-800 bg-[#161b24]/60 overflow-hidden">
+          <article class="rounded-xl border border-slate-800 bg-[#161b24]/60">
             <label
               class="block px-4 pt-3 pb-1 text-[10px] font-black uppercase tracking-[0.18em] text-violet-400"
               [attr.for]="'adv-sec-' + section.title"
@@ -148,7 +148,7 @@
               "
               [ngModel]="sectionEditorValue(section.title)"
               (ngModelChange)="onSectionChange(section.title, $event)"
-              class="w-full bg-transparent border-0 px-4 pb-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:ring-0 resize-y font-serif"
+              class="w-full bg-transparent border-0 px-4 pb-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:ring-0 resize-none overflow-hidden font-serif"
             ></textarea>
           </article>
         }

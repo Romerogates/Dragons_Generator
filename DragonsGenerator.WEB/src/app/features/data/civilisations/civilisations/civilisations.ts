@@ -32,7 +32,7 @@ export class Civilisations implements OnInit, OnDestroy {
 
   readonly mapAspect = EANA_MAP_ASPECT;
   /** Largeur CSS pour occuper l’écran tout en respectant le ratio de Carte.jpg. */
-  readonly mapFullscreenWidth = `min(100%, calc((100dvh - 5.5rem) * ${EANA_MAP_RATIO}))`;
+  readonly mapFullscreenWidth = `min(100vw, calc((100dvh - 7rem) * ${EANA_MAP_RATIO}))`;
 
   civilisations = signal<Civilisation[]>([]);
   isLoading = signal<boolean>(true);

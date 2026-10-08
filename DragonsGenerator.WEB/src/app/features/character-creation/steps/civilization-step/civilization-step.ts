@@ -330,6 +330,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
   }
 
   onWheel(event: WheelEvent): void {
+    if (!event.ctrlKey && !event.metaKey && !this.mapFullscreen()) return;
     event.preventDefault();
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return;

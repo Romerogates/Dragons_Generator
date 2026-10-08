@@ -28,7 +28,7 @@
   <div class="flex-1 min-h-0 flex flex-col lg:flex-row">
     @if (showToc() && toc().length) {
       <aside
-        class="shrink-0 lg:w-64 xl:w-72 border-b lg:border-b-0 lg:border-r border-slate-800 bg-[#12161c] overflow-y-auto max-h-[40vh] lg:max-h-none"
+        class="shrink-0 lg:w-64 xl:w-72 border-b lg:border-b-0 lg:border-r border-slate-800 bg-[#12161c] overflow-y-auto overscroll-contain custom-scrollbar max-h-[40vh] lg:max-h-none"
       >
         <p class="px-4 pt-4 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
           Sommaire
@@ -57,7 +57,7 @@
       </aside>
     }
 
-    <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+    <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
       <div class="max-w-5xl mx-auto px-4 py-8 pb-24">
         <ng-content />
       </div>

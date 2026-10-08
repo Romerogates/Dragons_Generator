@@ -23,7 +23,7 @@ export type FullscreenEnterTone = 'amber' | 'emerald' | 'slate' | 'violet';
   template: `
     <button
       type="button"
-      class="inline-flex h-9 w-9 items-center justify-center rounded-lg border shadow-lg backdrop-blur-sm transition-colors"
+      class="inline-flex h-11 w-11 min-h-11 min-w-11 items-center justify-center rounded-xl border shadow-lg backdrop-blur-sm transition-colors touch-manipulation"
       [class]="toneClasses()"
       (click)="enter.emit($event)"
       [attr.aria-label]="label()"

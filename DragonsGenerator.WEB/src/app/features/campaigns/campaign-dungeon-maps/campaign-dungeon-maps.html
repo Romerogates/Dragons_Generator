@@ -485,19 +485,22 @@
       <button type="button" class="tool-btn" (click)="resetView()" title="Recadrer">Fit</button>
     </div>
     <p class="text-[10px] text-slate-600 -mt-1">
-      Clic hors salle pour désélectionner · Échap aussi · Salle : rectangle ailleurs = nouvelle salle · sur une salle = recadrer · Espace pour déplacer
+      Molette : défiler la page · Ctrl + molette : zoom · 2 doigts : zoom · Espace : déplacer · Clic hors salle pour désélectionner
     </p>
 
     <div
-      class="grid gap-4 min-h-0"
-      [ngClass]="editorFullscreen() ? 'lg:grid-cols-[1fr_280px] flex-1' : 'lg:grid-cols-[1fr_300px]'"
+      class="grid gap-5 min-h-0"
+      [ngClass]="editorFullscreen() ? 'lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] flex-1' : 'lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]'"
     >
       <div
         #viewport
-        class="dungeon-viewport relative rounded-2xl border border-slate-800 overflow-hidden touch-none select-none"
+        class="dungeon-viewport relative rounded-2xl border border-slate-800 overflow-hidden select-none"
         [ngClass]="cursorClass()"
+        [class.touch-none]="mapLocksPageScroll()"
+        [style.touch-action]="mapLocksPageScroll() ? 'none' : 'pan-y'"
         [style.background]="viewportBg()"
-        [class.h-[min(70vh,720px)]]="!editorFullscreen()"
+        [class.h-[min(46vh,380px)]]="!editorFullscreen()"
+        [class.lg:h-[min(68vh,680px)]]="!editorFullscreen()"
         [class.h-full]="editorFullscreen()"
         [class.min-h-0]="editorFullscreen()"
         (pointerdown)="onPointerDown($event)"
@@ -522,37 +525,38 @@
       </div>
 
       <aside
-        class="space-y-4 overflow-y-auto pr-1"
-        [class.max-h-[min(70vh,720px)]]="!editorFullscreen()"
+        class="space-y-5"
+        [class.overflow-y-auto]="editorFullscreen()"
         [class.max-h-full]="editorFullscreen()"
+        [class.pr-1]="editorFullscreen()"
       >
-        <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
-          <h4 class="text-[11px] font-bold uppercase tracking-widest text-amber-400/90 mb-3">Légende</h4>
-          <div class="space-y-2.5">
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-amber-400/90 mb-4">Légende</h4>
+          <div class="space-y-3">
             @for (tile of legendTiles; track tile.kind) {
-              <div class="flex items-center gap-2">
-                <span class="h-4 w-4 rounded shrink-0 ring-1 ring-black/40" [style.background]="legendTileColor(tile.kind, map.theme)"></span>
-                <span class="text-[11px] text-slate-300">{{ tile.label }}</span>
-                <span class="text-[10px] text-slate-600">— {{ tile.desc }}</span>
+              <div class="flex items-center gap-3">
+                <span class="h-6 w-6 rounded-md shrink-0 ring-1 ring-black/40" [style.background]="legendTileColor(tile.kind, map.theme)"></span>
+                <span class="text-sm text-slate-200 font-medium">{{ tile.label }}</span>
+                <span class="text-xs text-slate-500">— {{ tile.desc }}</span>
               </div>
             }
             @for (mk of legendMarkers; track mk.label) {
               @if (mk.symbol !== 'D') {
-                <div class="flex items-center gap-2">
-                  <span class="h-4 w-4 rounded-full shrink-0 flex items-center justify-center text-[8px] font-black text-[#0f1218]" [style.background]="mk.color">{{ mk.symbol }}</span>
-                  <span class="text-[11px] text-slate-300">{{ mk.label }}</span>
+                <div class="flex items-center gap-3">
+                  <span class="h-6 w-6 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black text-[#0f1218]" [style.background]="mk.color">{{ mk.symbol }}</span>
+                  <span class="text-sm text-slate-200 font-medium">{{ mk.label }}</span>
                 </div>
               }
             }
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <h4 class="text-[11px] font-bold uppercase tracking-widest text-violet-400/90">Brouillard de guerre</h4>
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-violet-400/90">Brouillard de guerre</h4>
             <button
               type="button"
-              class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg border transition-colors"
+              class="text-[11px] font-black uppercase px-3 py-1.5 rounded-lg border transition-colors"
               [class.border-violet-500]="map.fogOfWarEnabled"
               [class.bg-violet-950/40]="map.fogOfWarEnabled"
               [class.text-violet-300]="map.fogOfWarEnabled"
@@ -606,12 +610,12 @@
           }
         </div>
 
-        <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
-          <h4 class="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Salles</h4>
-          <div class="space-y-2.5">
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Salles</h4>
+          <div class="space-y-3">
             @for (room of map.rooms; track room.id) {
               <div
-                class="rounded-lg border px-3 py-2 cursor-pointer transition-colors"
+                class="rounded-xl border px-4 py-3 cursor-pointer transition-colors"
                 [class.border-amber-600/70]="selectedRoomId() === room.id"
                 [class.bg-amber-950/20]="selectedRoomId() === room.id"
                 [class.border-slate-700/80]="selectedRoomId() !== room.id"
@@ -619,12 +623,12 @@
               >
                 <input
                   type="text"
-                  class="w-full bg-transparent text-sm text-slate-200 font-semibold outline-none"
+                  class="w-full bg-transparent text-base text-slate-100 font-semibold outline-none"
                   [ngModel]="room.label"
                   (ngModelChange)="patchRoom(room.id, { label: $event })"
                   (click)="$event.stopPropagation()"
                 />
-                <p class="text-[10px] text-slate-500 mt-1">{{ encounterLabel(room, encounters()) }}</p>
+                <p class="text-xs text-slate-400 mt-1">{{ encounterLabel(room, encounters()) }}</p>
 
                 @if (markersForRoom(room); as roomMarkers) {
                   @if (roomMarkers.length) {
@@ -669,9 +673,9 @@
                   </button>
                 }
 
-                <label class="block text-[9px] uppercase text-slate-600 mt-2">Rencontre campagne</label>
+                <label class="block text-[11px] uppercase tracking-wide text-slate-500 mt-3">Rencontre campagne</label>
                 <select
-                  class="w-full mt-0.5 rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1"
+                  class="w-full mt-1 rounded-lg bg-[#0f1218] border border-slate-700 text-sm px-3 py-2"
                   [ngModel]="room.encounterId ?? ''"
                   (ngModelChange)="onEncounterChange(room.id, $event)"
                   (click)="$event.stopPropagation()"
@@ -697,9 +701,9 @@
                 }
 
                 <textarea
-                  rows="2"
+                  rows="3"
                   placeholder="Notes MJ…"
-                  class="w-full mt-2 rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1 resize-none"
+                  class="w-full mt-3 rounded-lg bg-[#0f1218] border border-slate-700 text-sm px-3 py-2 resize-none"
                   [ngModel]="room.notes ?? ''"
                   (ngModelChange)="patchRoom(room.id, { notes: $event })"
                   (click)="$event.stopPropagation()"

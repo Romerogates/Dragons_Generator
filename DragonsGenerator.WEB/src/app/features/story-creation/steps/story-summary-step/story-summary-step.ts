@@ -144,9 +144,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
         const local = this.offlineSync.queueCampaignCreate(title, data);
         this.savedCampaignId.set(local.serverId ?? local.id);
       }
-      this.saved.set(true);
-      this.saving.set(false);
-      this.builder.reset();
+      this.finishSave();
       return;
     }
 
@@ -157,13 +155,8 @@ export class StorySummaryStep implements OnInit, OnDestroy {
 
     save$.subscribe({
       next: (summary) => {
-        this.saved.set(true);
         this.savedCampaignId.set(summary.id);
-        this.saving.set(false);
-        this.builder.reset();
-        if (editId) {
-          this.router.navigate(['/campaigns', summary.id]);
-        }
+        this.finishSave();
       },
       error: (err: { status?: number }) => {
         // 504/502 = passerelle / IA lente — ne pas masquer en « rédigez un résumé ».
@@ -192,12 +185,10 @@ export class StorySummaryStep implements OnInit, OnDestroy {
           const local = this.offlineSync.queueCampaignCreate(title, data);
           this.savedCampaignId.set(local.serverId ?? local.id);
         }
-        this.saved.set(true);
-        this.saving.set(false);
         this.saveError.set(
           'Connexion instable : campagne enregistrée localement. Synchronisation automatique à la reconnexion.',
         );
-        this.builder.reset();
+        this.finishSave();
       },
     });
   }
@@ -226,12 +217,14 @@ export class StorySummaryStep implements OnInit, OnDestroy {
   }
 
   goToLibrary(): void {
-    const id = this.savedCampaignId();
-    if (id) {
-      this.router.navigate(['/campaigns', id]);
-    } else {
-      this.router.navigate(['/campaigns']);
-    }
+    void this.router.navigate(['/campaigns']);
+  }
+
+  private finishSave(): void {
+    this.saved.set(true);
+    this.saving.set(false);
+    this.builder.reset();
+    void this.router.navigate(['/campaigns']);
   }
 
   printBestiary(): void {

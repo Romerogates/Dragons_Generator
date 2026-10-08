@@ -224,6 +224,11 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly spaceHeld = signal(false);
   readonly isPanning = signal(false);
   readonly isPainting = signal(false);
+  readonly pinchActive = signal(false);
+  /** Pendant un geste sur la carte : bloquer le scroll de page. Sinon molette / doigt font défiler. */
+  readonly mapLocksPageScroll = computed(
+    () => this.isPanning() || this.isPainting() || this.pinchActive(),
+  );
   readonly previewMap = signal<CampaignDungeonMap | null>(null);
   /** Aperçu rectangle outil Salle pendant le drag. */
   readonly roomDragRect = signal<GridRect | null>(null);
@@ -1096,6 +1101,7 @@ export class CampaignDungeonMaps implements OnDestroy {
 
     this.touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (this.touchPointers.size === 2) {
+      this.pinchActive.set(true);
       this.isPainting.set(false);
       this.isPanning.set(false);
       this.isDefiningRoom = false;
@@ -1213,7 +1219,10 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   onPointerUp(event: PointerEvent): void {
     this.touchPointers.delete(event.pointerId);
-    if (this.touchPointers.size < 2) this.pinchStartDistance = 0;
+    if (this.touchPointers.size < 2) {
+      this.pinchStartDistance = 0;
+      this.pinchActive.set(false);
+    }
     const viewport = this.viewportRef()?.nativeElement;
     if (viewport?.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
@@ -1873,7 +1882,10 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (!this.editingMap()) return;
     const viewport = this.viewportRef()?.nativeElement;
     if (!viewport) return;
-    if (!viewport.contains(event.target as Node) && !event.ctrlKey && !event.metaKey) return;
+    const overMap = viewport.contains(event.target as Node);
+    // Molette seule = défilement de page. Zoom uniquement avec Ctrl/Cmd (pinch trackpad inclus).
+    if (!event.ctrlKey && !event.metaKey) return;
+    if (!overMap) return;
 
     event.preventDefault();
     const rect = viewport.getBoundingClientRect();

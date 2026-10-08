@@ -654,10 +654,9 @@
     }
   }
 
-  /* Skip offscreen paint work for dense card grids */
+  /* Pas de content-visibility : ça décharge les emojis Iconify au scroll. */
   .perf-card {
-    content-visibility: auto;
-    contain-intrinsic-size: 220px;
+    contain: layout style;
   }
 
   /* Scrollable zones — scrollbar masquée sur PC, scroll conservé */
@@ -670,42 +669,42 @@
     display: none;
   }
 
-  /* Fil d’activité résumé — scrollbar visible et fine */
   .activity-feed-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: rgb(124 58 237 / 0.55) rgb(15 23 42 / 0.35);
-  }
-
-  .activity-feed-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .activity-feed-scroll::-webkit-scrollbar-track {
-    background: rgb(15 23 42 / 0.35);
-    border-radius: 999px;
-    margin-block: 0.5rem;
-  }
-
-  .activity-feed-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgb(167 139 250 / 0.7), rgb(124 58 237 / 0.55));
-    border-radius: 999px;
-  }
-
-  .activity-feed-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgb(167 139 250 / 0.9);
-  }
-}
-
-/* Barre de scroll principale masquée sur PC (souris / trackpad) */
-@media (pointer: fine) {
-  html {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
 
-  html::-webkit-scrollbar {
+  .activity-feed-scroll::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Aucune barre de scroll visible — le défilement reste actif (souris, trackpad, doigt). */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+iconify-icon {
+  display: inline-block;
+  vertical-align: -0.125em;
 }
 
 .safe-area-pb {

@@ -62,7 +62,11 @@ export class AdventureStep implements OnInit {
   }
 
   sectionRows(title: string): number {
-    return title === 'Personnages clés' || title === 'Pistes pour le MJ' ? 5 : 4;
+    const text = this.sectionEditorValue(title);
+    const lineBreaks = (text.match(/\n/g)?.length ?? 0) + 1;
+    const wrapped = Math.ceil(text.length / 62) || 1;
+    const min = title === 'Personnages clés' || title === 'Pistes pour le MJ' ? 6 : 5;
+    return Math.min(48, Math.max(min, lineBreaks, wrapped));
   }
 
   onSectionChange(title: string, value: string): void {
