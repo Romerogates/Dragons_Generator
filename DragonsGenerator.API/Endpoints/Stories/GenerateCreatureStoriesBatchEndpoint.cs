@@ -92,7 +92,7 @@ public class GenerateCreatureStoriesBatchEndpoint
         string? setting,
         CancellationToken ct)
     {
-        var prepared = new List<(GenerateCreatureStoriesBatchItem Item, string Type, string Description)>();
+        var prepared = new List<(GenerateCreatureStoriesBatchItem Item, string Species, string Type, string Description)>();
         foreach (var item in chunk)
         {
             var creature = await _repo.GetCreatureByIdAsync(item.CreatureId, ct);
@@ -106,7 +106,7 @@ public class GenerateCreatureStoriesBatchEndpoint
             var desc = string.IsNullOrWhiteSpace(creature.Description)
                 ? "—"
                 : creature.Description[..Math.Min(creature.Description.Length, 200)];
-            prepared.Add((item, creature.Type, desc));
+            prepared.Add((item, creature.Name, creature.Type, desc));
         }
 
         var expectedIds = chunk.Select(c => c.CreatureId).ToHashSet(StringComparer.Ordinal);
@@ -120,7 +120,7 @@ public class GenerateCreatureStoriesBatchEndpoint
         foreach (var item in missing)
         {
             var prep = prepared.First(p => p.Item.CreatureId == item.CreatureId);
-            var story = await GenerateSingleAsync(item, prep.Type, prep.Description, setting, ct);
+            var story = await GenerateSingleAsync(item, prep.Species, prep.Type, prep.Description, setting, ct);
             if (!string.IsNullOrWhiteSpace(story))
                 byId[item.CreatureId] = story.Trim();
         }
@@ -131,7 +131,7 @@ public class GenerateCreatureStoriesBatchEndpoint
     }
 
     private async Task<bool> TryGenerateBatchJsonAsync(
-        List<(GenerateCreatureStoriesBatchItem Item, string Type, string Description)> prepared,
+        List<(GenerateCreatureStoriesBatchItem Item, string Species, string Type, string Description)> prepared,
         string? setting,
         HashSet<string> expectedIds,
         Dictionary<string, string> byId,
@@ -141,6 +141,7 @@ public class GenerateCreatureStoriesBatchEndpoint
             $"""
             - creatureId: {p.Item.CreatureId}
               nom: {p.Item.CustomName.Trim()}
+              espèce: {p.Species}
               type: {p.Type}
               rôle: {RoleLabel(p.Item.Role)}
               description: {p.Description}
@@ -150,6 +151,7 @@ public class GenerateCreatureStoriesBatchEndpoint
             $"""
             Tu es un maître du jeu expert en jeux de rôle fantasy francophones (univers Eana / Dragons).
             Pour CHAQUE créature listée, rédige sa vie et son histoire personnelle (max 100 mots, un paragraphe dense, en français).
+            {CreatureStoryPrompt.OriginalityRules}
             {(setting != null ? $"Contexte de l'aventure: {setting}" : "")}
 
             CRÉATURES:
@@ -183,26 +185,23 @@ public class GenerateCreatureStoriesBatchEndpoint
 
     private async Task<string?> GenerateSingleAsync(
         GenerateCreatureStoriesBatchItem item,
+        string species,
         string type,
         string description,
         string? setting,
         CancellationToken ct)
     {
-        var prompt =
-            $"""
-            Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).
-            Génère la VIE et l'HISTOIRE PERSONNELLE (background) d'une créature du bestiaire, sous le nom qu'on lui a donné.
-            Maximum 120 mots, un seul paragraphe dense et immersif.
-            L'histoire doit expliquer qui il/elle est, son passé, ses motivations, et un hook pour une aventure.
-            Réponds uniquement avec l'histoire en français. Aucun anglais, aucun plan, aucun brouillon, aucun guillemet autour du texte.
-
-            CRÉATURE:
-            - Nom dans l'histoire: {item.CustomName.Trim()}
-            - Type: {type}
-            - Rôle narratif: {RoleLabel(item.Role)}
-            {(setting != null ? $"- Contexte de l'aventure: {setting}" : "")}
-            - Description: {description}
-            """;
+        var prompt = CreatureStoryPrompt.BuildSingle(
+            item.CustomName,
+            species,
+            type,
+            category: null,
+            challengeRating: null,
+            RoleLabel(item.Role),
+            setting,
+            description,
+            traitsSummary: null,
+            actionsSummary: null);
 
         var result = await _ai.SendShortGenerationAsync(
             prompt,

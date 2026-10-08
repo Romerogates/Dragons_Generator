@@ -53,28 +53,20 @@ public class GenerateCreatureStoryEndpoint(
         var traitsSummary = string.Join("; ", creature.Traits.Take(4).Select(t => t.Name));
         var actionsSummary = string.Join("; ", creature.Actions.Take(3).Select(a => a.Name));
 
-        var prompt = $"""
-            Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).
-            Génère la VIE et l'HISTOIRE PERSONNELLE (background) d'une créature du bestiaire, sous le nom qu'on lui a donné.
-            Maximum 120 mots, un seul paragraphe dense et immersif.
-            L'histoire doit expliquer qui il/elle est, son passé, ses motivations, et un hook pour une aventure.
-            Réponds uniquement avec l'histoire en français. Aucun anglais, aucun plan, aucun brouillon, aucun guillemet autour du texte.
-
-            CRÉATURE DU BESTIAIRE:
-            - Nom officiel: {creature.Name}
-            - Nom dans l'histoire: {req.CustomName}
-            - Type: {creature.Type}
-            - Catégorie: {creature.Category}
-            - Facteur de puissance: {creature.ChallengeRating}
-            - Rôle narratif: {roleLabel}
-            {(req.Setting != null ? $"- Contexte de l'aventure: {req.Setting}" : "")}
-            - Description: {(string.IsNullOrWhiteSpace(creature.Description) ? "Non renseignée" : creature.Description[..Math.Min(creature.Description.Length, 400)])}
-            {(traitsSummary.Length > 0 ? $"- Traits notables: {traitsSummary}" : "")}
-            {(actionsSummary.Length > 0 ? $"- Capacités marquantes: {actionsSummary}" : "")}
-            """;
+        var prompt = CreatureStoryPrompt.BuildSingle(
+            req.CustomName,
+            creature.Name,
+            creature.Type,
+            creature.Category,
+            creature.ChallengeRating,
+            roleLabel,
+            req.Setting,
+            creature.Description,
+            traitsSummary.Length > 0 ? traitsSummary : null,
+            actionsSummary.Length > 0 ? actionsSummary : null);
 
         var cacheKey =
-            $"creature-story:{req.CreatureId}:{req.CustomName.Trim()}:{req.Role}:{req.Setting}";
+            $"creature-story:v2:{req.CreatureId}:{req.CustomName.Trim()}:{req.Role}:{req.Setting}";
         if (!req.Force
             && cache.TryGetValue(cacheKey, out string? cached)
             && !string.IsNullOrWhiteSpace(cached))
