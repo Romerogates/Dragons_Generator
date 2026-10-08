@@ -90,6 +90,8 @@ describe('IdentityStep', () => {
             busyMessage: () => 'busy',
             stop: jasmine.createSpy('stop'),
             sendToBackground: jasmine.createSpy('sendToBackground'),
+            lastError: signal(null),
+            dismissLastError: jasmine.createSpy('dismissLastError'),
           },
         },
       ],

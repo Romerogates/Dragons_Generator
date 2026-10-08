@@ -9,9 +9,10 @@ describe('supportReportHref', () => {
       campaignId: 'camp-1',
     });
     expect(href.startsWith('/support?')).toBeTrue();
-    expect(href).toContain('category=ia');
-    expect(href).toContain('campaignId=camp-1');
-    expect(href).toContain('subject=');
-    expect(decodeURIComponent(href)).toContain('Échec génération IA (adventure)');
+    const q = new URLSearchParams(href.split('?')[1]);
+    expect(q.get('category')).toBe('ia');
+    expect(q.get('campaignId')).toBe('camp-1');
+    expect(q.get('subject')).toBe('Échec génération IA (adventure)');
+    expect(q.get('message')).toBe('502');
   });
 });
