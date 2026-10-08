@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -177,76 +177,11 @@ export class CustomizeCreaturesStep implements OnInit {
 
     this.generationError.set(null);
     this.fallbackNotice.set(null);
-    this.generatingId.set('batch');
-
-    if (pending.length === 1) {
-      this.generateBackstory(pending[0].creatureId);
-      return;
-    }
-
-    this.aiProgress
-      .run(
-        'creature-batch',
-        () =>
-          this.dataService.generateCreatureStoriesBatch({
-            setting: this.builder.setting().trim() || null,
-            creatures: pending.map((c) => ({
-              creatureId: c.creatureId,
-              customName: c.customName.trim(),
-              role: c.role,
-            })),
-          }),
-        {
-          batchTotal: pending.length,
-          onSuccess: (res) => {
-            const generated = new Set(res.backstories.map((item) => item.creatureId));
-            for (const item of res.backstories) {
-              this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
-            }
-            const missing = pending.filter((c) => !generated.has(c.creatureId));
-            if (missing.length) {
-              this.generationError.set(null);
-              this.fallbackNotice.set(
-                'Certaines vies manquaient dans le lot — génération une par une…',
-              );
-              // Après complete()/reset du lot `run()`, sinon le hideTimer écrase le begin séquentiel.
-              queueMicrotask(() => void this.generateBackstoriesSequentially(missing));
-            } else {
-              this.fallbackNotice.set(null);
-              this.generatingId.set(null);
-            }
-          },
-          onError: (err) => {
-            if (isAiRateLimitHttpError(err)) {
-              this.generatingId.set(null);
-              this.fallbackNotice.set(null);
-              return;
-            }
-            const busy = err as { code?: string; message?: string };
-            if (busy.code === AI_GENERATION_BUSY) {
-              this.generatingId.set(null);
-              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
-              return;
-            }
-            // 502/504 lot (proxy / Ollama lent / JSON invalide) → secours séquentiel.
-            this.generationError.set(null);
-            this.fallbackNotice.set(
-              'Le lot IA a échoué (délai ou service) — on continue une créature à la fois…',
-            );
-            queueMicrotask(() => void this.generateBackstoriesSequentially(pending));
-          },
-        },
-      )
-      .subscribe({
-        error: () => undefined,
-        complete: () => {
-          if (!this.fallbackNotice()) this.generatingId.set(null);
-        },
-      });
+    void this.generateBackstoriesSequentially(pending);
   }
 
   private async generateBackstoriesSequentially(pending: StoryCreatureSelection[]): Promise<void> {
-    this.generatingId.set('batch');
+    this.generatingId.set(pending[0]?.creatureId ?? null);
     this.generationError.set(null);
     let failed = 0;
     let ok = 0;
@@ -256,9 +191,11 @@ export class CustomizeCreaturesStep implements OnInit {
     for (let i = 0; i < pending.length; i++) {
       if (this.aiProgress.isAborted()) break;
       const creature = pending[i];
+      this.generatingId.set(creature.creatureId);
       this.aiProgress.setBatchProgress(i, pending.length);
+      this.aiProgress.setStageLabel(`Vie ${i + 1} / ${pending.length} — ${creature.customName.trim()}…`);
       try {
-        const res = await firstValueFrom(
+        const res = await this.aiProgress.awaitWhileActive(
           this.dataService.generateCreatureStory({
             creatureId: creature.creatureId,
             customName: creature.customName.trim(),
@@ -269,8 +206,12 @@ export class CustomizeCreaturesStep implements OnInit {
         if (this.aiProgress.isAborted()) break;
         this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
         ok++;
-      } catch {
+      } catch (err) {
         if (this.aiProgress.isAborted()) break;
+        if (isAiRateLimitHttpError(err)) {
+          failed += pending.length - i;
+          break;
+        }
         failed++;
       }
     }
