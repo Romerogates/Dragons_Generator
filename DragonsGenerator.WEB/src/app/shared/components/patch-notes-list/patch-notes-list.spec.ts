@@ -59,6 +59,8 @@ describe('PatchNotesPage', () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Nouveautés');
-    expect(el.textContent).toContain(PATCH_NOTES[0].player[0]);
+    const playerLine = PATCH_NOTES.find((n) => n.player.length > 0)?.player[0] ?? '';
+    expect(playerLine).toBeTruthy();
+    expect(el.textContent).toContain(playerLine);
   });
 });

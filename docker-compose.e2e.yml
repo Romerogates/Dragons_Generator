@@ -1,13 +1,22 @@
-# CI overlay — no Docker Hub / extra ECR pulls. Reuse nginx:alpine already prefetched
-# for dragons-web. E2E smoke does not send mail or call the local LLM.
+# CI overlay — one ECR pull (node:24-alpine). Stubs + web reuse it; no nginx:alpine,
+# MailHog, or Ollama images. E2E smoke does not send mail or call the local LLM.
 services:
   mailhog:
-    image: nginx:alpine
-    command: ["sleep", "infinity"]
+    image: node:24-alpine
+    entrypoint: ["/bin/sleep"]
+    command: ["infinity"]
 
   ollama:
-    image: nginx:alpine
-    command: ["sleep", "infinity"]
+    image: node:24-alpine
+    entrypoint: ["/bin/sleep"]
+    command: ["infinity"]
     healthcheck:
       disable: true
 
+  dragons-web:
+    build:
+      context: ./DragonsGenerator.WEB
+      dockerfile: Dockerfile.e2e
+      args:
+        NGINX_CONF: nginx.local.conf
+        APP_BUILD_COUNT: ${APP_BUILD_COUNT:-0}

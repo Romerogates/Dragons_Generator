@@ -1,0 +1,20 @@
+# CI e2e only — a single prefetched base (node:24-alpine). Installing nginx
+# from Alpine's apk mirrors avoids a second public.ecr.aws pull (anonymous 429).
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ARG APP_BUILD_COUNT=0
+RUN printf "export const APP_VERSION = '1.%s';\n" "$APP_BUILD_COUNT" > src/environments/app-version.ts
+RUN npm run build --configuration=production
+
+FROM node:24-alpine
+RUN apk add --no-cache nginx \
+    && mkdir -p /run/nginx /usr/share/nginx/html \
+    && rm -f /etc/nginx/http.d/default.conf
+ARG NGINX_CONF=nginx.local.conf
+COPY ${NGINX_CONF} /etc/nginx/http.d/default.conf
+COPY --from=build /app/dist/DragonsGenerator.WEB/browser /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

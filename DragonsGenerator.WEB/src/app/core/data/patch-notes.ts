@@ -13,6 +13,15 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.459',
+    date: '2026-10-10',
+    title: 'CI e2e : un seul pull d’image',
+    player: [],
+    tech: [
+      'E2e CI : plus de second `docker pull` `nginx:alpine` (429 ECR anonyme). Un seul prefetch `node:24-alpine`, stubs MailHog/Ollama + `Dockerfile.e2e` (nginx via apk Alpine).',
+    ],
+  },
+  {
     version: '1.458',
     date: '2026-10-09',
     title: 'Annonces, notes de version et confort d’affichage',
