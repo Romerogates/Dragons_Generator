@@ -1,12 +1,13 @@
-# CI overlay — no Docker Hub. MailHog/Ollama are only depends_on for the API.
-# E2E smoke does not send mail or call the local LLM.
+# CI overlay — no Docker Hub / extra ECR pulls. Reuse nginx:alpine already prefetched
+# for dragons-web. E2E smoke does not send mail or call the local LLM.
 services:
   mailhog:
-    image: busybox:1.36
+    image: nginx:alpine
     command: ["sleep", "infinity"]
 
   ollama:
-    image: busybox:1.36
+    image: nginx:alpine
     command: ["sleep", "infinity"]
     healthcheck:
       disable: true
+
