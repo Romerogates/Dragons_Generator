@@ -70,13 +70,7 @@ jobs:
           cache: npm
           cache-dependency-path: DragonsGenerator.WEB/package-lock.json
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # Official bases from AWS ECR (no Hub quota). MailHog/Ollama pull after login.
+      # No Docker Hub: Hub 429/500 on shared GitHub IPs. Bases + stubs come from AWS ECR.
       - name: Prefetch web base images
         run: |
           set -euo pipefail
@@ -87,14 +81,16 @@ jobs:
           }
           prefetch public.ecr.aws/docker/library/node:24-alpine node:24-alpine
           prefetch public.ecr.aws/docker/library/nginx:alpine nginx:alpine
+          prefetch public.ecr.aws/docker/library/busybox:1.36 busybox:1.36
 
       - name: Start local stack
         run: |
-          # Pull-only images: no --build. Ollama container only (no model pull).
           export APP_BUILD_COUNT
           APP_BUILD_COUNT="$(git rev-list --count HEAD)"
-          compose() { docker compose -f docker-compose.local.yml "$@"; }
-          compose up -d mailhog ollama
+          compose() {
+            docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml "$@"
+          }
+          compose up -d --pull never mailhog ollama
           compose up -d --build --pull never dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
@@ -106,7 +102,7 @@ jobs:
             sleep 5
           done
           echo "Stack failed to become ready"
-          docker compose -f docker-compose.local.yml logs
+          docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml logs
           exit 1
 
       - name: Cache Playwright browsers
@@ -137,7 +133,7 @@ jobs:
 
       - name: Stop local stack
         if: always()
-        run: docker compose -f docker-compose.local.yml down -v
+        run: docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml down -v
 
   deploy:
     needs: [test, e2e]
