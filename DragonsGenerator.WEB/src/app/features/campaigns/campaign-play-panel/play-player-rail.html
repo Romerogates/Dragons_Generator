@@ -1,0 +1,47 @@
+
+    @if (!combat.state.isDm() && !combat.state.isSpectator()) {
+      <nav
+        class="fixed bottom-0 inset-x-0 z-40 border-t border-emerald-900/50 bg-[#0f1318]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] sm:hidden"
+        aria-label="Actions joueur"
+        data-testid="player-mobile-nav"
+      >
+        <div class="max-w-5xl mx-auto grid grid-cols-3 gap-1 px-2 py-2">
+          <button
+            type="button"
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest"
+            [class]="
+              combat.state.activeCombat()?.collectingInitiative
+                ? 'bg-sky-900/50 text-sky-200'
+                : 'text-slate-400'
+            "
+            (click)="combat.actions.scrollToEmbeddedInitiative()"
+            data-testid="player-mobile-init"
+          >
+            Init
+          </button>
+          <button
+            type="button"
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest"
+            [class]="combat.state.isMyTurn() ? 'bg-amber-900/50 text-amber-200' : 'text-slate-400'"
+            (click)="combat.actions.scrollToTurnBanner()"
+            data-testid="player-mobile-turn"
+          >
+            Tour
+          </button>
+          <button
+            type="button"
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400"
+            (click)="shell.openHandoutsOverlay()"
+            data-testid="player-mobile-docs"
+          >
+            Docs
+            @if (combat.state.publishedHandouts().length > 0) {
+              <span class="text-[9px] text-emerald-400 normal-case tracking-normal"
+                >({{ combat.state.publishedHandouts().length }})</span
+              >
+            }
+          </button>
+        </div>
+      </nav>
+      <div class="h-16 sm:hidden" aria-hidden="true"></div>
+    }

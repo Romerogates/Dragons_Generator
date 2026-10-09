@@ -13,6 +13,11 @@ import { NotificationService } from '@core/services/notification.service';
 import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { AuthService } from '@core/services/auth.service';
 import type { NotificationItem, NotificationType } from '@core/models/notification.model';
+import {
+  notificationActionQueryParams,
+  parseNotificationActionPath,
+  type NotificationActionLink,
+} from '@core/utils/notification-action-path.util';
 
 type NotifFilter = 'all' | 'friends' | 'campaigns' | 'support';
 
@@ -152,5 +157,13 @@ export class NotificationsPage implements OnInit {
 
   trackItem(_index: number, item: NotificationItem): string {
     return item.key;
+  }
+
+  actionLink(item: NotificationItem): NotificationActionLink {
+    return parseNotificationActionPath(item.actionPath);
+  }
+
+  actionQuery(item: NotificationItem): Record<string, string> | null {
+    return notificationActionQueryParams(this.actionLink(item));
   }
 }

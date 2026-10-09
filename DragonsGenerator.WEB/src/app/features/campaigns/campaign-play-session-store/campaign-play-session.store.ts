@@ -2,13 +2,40 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { NotificationService } from '@core/services/notification.service';
 import {
   ActiveCombat,
   CampaignData,
   CampaignSession,
   Combatant,
+  EncounterGroup,
   type CampaignDetail as CampaignDetailModel,
+  type CampaignHandout,
+  type NotebookPage,
+  type SessionTimelineItem,
 } from '@core/models/Campaign/campaign';
+import { encounterTotalXp } from '@core/models/Campaign/campaign';
+import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
+import { campaignDataAfterDmDamage } from '@core/utils/play-combat-mutations.util';
+import { sessionPatchAfterPlayEnd } from '@core/utils/play-combat-session.util';
+import { withFogToggled } from '@core/utils/dungeon-fog.util';
+import {
+  buildSceneTimerStart,
+  canToggleTableReady,
+  initialHandoutOverlayId,
+  toggleSceneTimerPauseState,
+  toggleTableReadyUserIds,
+  type PlayPlayerOverlay,
+} from '@core/utils/play-table.util';
+import {
+  bumpEncounterCreatureDefeated,
+  creatureTrackKey,
+  splitEncounterXp,
+  withBulkCreatureRole,
+  withCreatureRole,
+} from '@core/utils/campaign-hub-write.util';
+import type { CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import {
   combatantInitiativeTotal,
   currentTurnCombatant,
@@ -42,6 +69,8 @@ export type PlayConfirmDialog = {
 export class CampaignPlaySessionStore {
   private readonly campaigns = inject(CampaignCloudService);
   private readonly auth = inject(AuthService);
+  private readonly characters = inject(CharacterCloudService);
+  private readonly notifications = inject(NotificationService);
 
   private readonly _campaign = signal<CampaignDetailModel | null>(null);
   readonly campaign = this._campaign.asReadonly();
@@ -52,6 +81,22 @@ export class CampaignPlaySessionStore {
   readonly saving = signal(false);
   readonly feedback = signal<PlayFeedback | null>(null);
   readonly confirmDialog = signal<PlayConfirmDialog | null>(null);
+  readonly awardingXpId = signal<string | null>(null);
+  readonly playerOverlay = signal<PlayPlayerOverlay | null>(null);
+  readonly selectedHandoutId = signal<string | null>(null);
+  readonly myCharacters = signal<{ id: string; name: string }[]>([]);
+  readonly myCharactersLoading = signal(false);
+  readonly proposeBusyId = signal<string | null>(null);
+
+  readonly publishedHandouts = computed((): CampaignHandout[] =>
+    (this._campaign()?.data.handouts ?? []).filter((h) => h.published),
+  );
+
+  readonly selectedHandout = computed((): CampaignHandout | null => {
+    const id = this.selectedHandoutId();
+    if (!id) return null;
+    return this.publishedHandouts().find((h) => h.id === id) ?? null;
+  });
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
@@ -209,6 +254,17 @@ export class CampaignPlaySessionStore {
     this.persist(c.title, data);
   }
 
+  /** Hit MJ : PV + journal + rencontres, une seule écriture. */
+  applyDmCombatHit(targetId: string, damage: number, logLine: string): void {
+    const c = this.requireCampaign();
+    const session = this.activeSession();
+    const combat = this.activeCombat();
+    if (!session || !combat) return;
+    const data = campaignDataAfterDmDamage(c.data, session.id, combat, targetId, damage, logLine);
+    this.patchCampaign(data);
+    this.persist(c.title, data);
+  }
+
   patchSession(patch: Partial<CampaignSession>, options?: { immediate?: boolean }): void {
     const session = this.activeSession();
     if (!session) return;
@@ -298,6 +354,246 @@ export class CampaignPlaySessionStore {
       c.id === combatantId ? { ...c, ...patch } : c,
     );
     this.patchCombat({ ...combat, combatants }, options);
+  }
+
+  startPlaySession(sessionId: string): void {
+    if (!this.isDm()) return;
+    this.flushSessionSave();
+    this.saveData({ activeSessionId: sessionId });
+  }
+
+  endPlaySession(playerRecap?: string, onSuccess?: (campaignId: string) => void): void {
+    const c = this._campaign();
+    const session = this.activeSession();
+    if (!c?.isOwner || !session) return;
+    this.flushPendingSessionWork();
+    const sessions = (c.data.sessions ?? []).map((s) =>
+      s.id === session.id ? { ...s, ...sessionPatchAfterPlayEnd(s, playerRecap) } : s,
+    );
+    this.saveData({ sessions, activeSessionId: null }, () => onSuccess?.(c.id));
+  }
+
+  patchSessionDungeonMap(partial: Partial<CampaignDungeonMap>): void {
+    if (!this.isDm()) return;
+    const map = this.activeSessionMap();
+    const c = this._campaign();
+    if (!map || !c) return;
+    const dungeonMaps = (c.data.dungeonMaps ?? []).map((m) =>
+      m.id === map.id ? { ...m, ...partial, updatedAt: new Date().toISOString() } : m,
+    );
+    this.saveData({ dungeonMaps });
+  }
+
+  startSceneTimer(minutes: number, label = 'Scène'): void {
+    if (!this.isDm()) return;
+    this.patchSession({ sceneTimer: buildSceneTimerStart(minutes, label) }, { immediate: true });
+  }
+
+  toggleSceneTimerPause(): void {
+    if (!this.isDm()) return;
+    const t = this.activeSession()?.sceneTimer;
+    if (!t) return;
+    this.patchSession({ sceneTimer: toggleSceneTimerPauseState(t) }, { immediate: true });
+  }
+
+  stopSceneTimer(): void {
+    if (!this.isDm()) return;
+    this.patchSession({ sceneTimer: null }, { immediate: true });
+  }
+
+  updateCreatureRole(cr: StoryCreatureSelection, role: CreatureRole): void {
+    if (!this.isDm()) return;
+    const c = this._campaign();
+    if (!c) return;
+    this.saveData({ creatures: withCreatureRole(c.data.creatures ?? [], cr, role) });
+  }
+
+  applyBulkCreatureRole(unsorted: StoryCreatureSelection[], role: 'ally' | 'antagonist'): void {
+    if (!this.isDm()) return;
+    const c = this._campaign();
+    if (!c || !unsorted.length) return;
+    const keys = new Set(unsorted.map((cr) => creatureTrackKey(cr)));
+    this.saveData({ creatures: withBulkCreatureRole(c.data.creatures ?? [], keys, role) });
+  }
+
+  /** @returns false si le joueur n’a pas le droit ou pas de session. */
+  togglePlayerTableReady(userId: string): boolean {
+    if (
+      !canToggleTableReady({
+        isSpectator: this.isSpectator(),
+        isDm: this.isDm(),
+        me: this.auth.user()?.id,
+        userId,
+      })
+    ) {
+      return false;
+    }
+    const session = this.activeSession();
+    if (!session) return false;
+    this.patchSession(
+      { tableReadyUserIds: toggleTableReadyUserIds(session.tableReadyUserIds, userId) },
+      { immediate: true },
+    );
+    return true;
+  }
+
+  assignSessionMap(mapId: string | null): void {
+    if (!this.isDm() || !this.activeSession()) return;
+    this.patchSession({ activeMapId: mapId }, { immediate: true });
+  }
+
+  setSessionResume(page: NotebookPage): void {
+    if (!this.isDm()) return;
+    this.saveData({ sessionResume: page });
+  }
+
+  setSessionTimeline(timeline: SessionTimelineItem[]): void {
+    const session = this.activeSession();
+    if (!session || !this.isDm()) return;
+    this.updateSession(session.id, { timeline });
+  }
+
+  bumpEncounterDefeated(encounterId: string, creatureIndex: number, delta: 1 | -1): void {
+    if (!this.isDm()) return;
+    const c = this._campaign();
+    if (!c) return;
+    this.saveData({
+      encounters: bumpEncounterCreatureDefeated(c.data.encounters, encounterId, creatureIndex, delta),
+    });
+  }
+
+  openHandoutsOverlay(): void {
+    this.selectedHandoutId.set(
+      initialHandoutOverlayId(this._campaign()?.data.pinnedHandoutId, this.publishedHandouts()),
+    );
+    this.playerOverlay.set('handouts');
+  }
+
+  openProposeOverlay(): void {
+    this.playerOverlay.set('propose');
+    this.myCharactersLoading.set(true);
+    this.characters.list().subscribe({
+      next: (chars) => {
+        this.myCharacters.set(chars.map((c) => ({ id: c.id, name: c.name })));
+        this.myCharactersLoading.set(false);
+      },
+      error: () => {
+        this.myCharacters.set([]);
+        this.myCharactersLoading.set(false);
+        this.setFeedback('err', 'Impossible de charger vos personnages.');
+      },
+    });
+  }
+
+  closePlayerOverlay(): void {
+    this.playerOverlay.set(null);
+    this.selectedHandoutId.set(null);
+    this.proposeBusyId.set(null);
+  }
+
+  selectHandout(id: string): void {
+    this.selectedHandoutId.set(id);
+  }
+
+  clearSelectedHandout(): void {
+    this.selectedHandoutId.set(null);
+  }
+
+  proposeCharacter(characterId: string, onReload?: () => void): void {
+    if (this.proposeBusyId()) return;
+    const c = this._campaign();
+    if (!c) return;
+    this.proposeBusyId.set(characterId);
+    this.campaigns.proposeCharacter(c.id, characterId).subscribe({
+      next: () => {
+        this.proposeBusyId.set(null);
+        this.closePlayerOverlay();
+        this.setFeedback('ok', 'Héros proposé — en attente de l’approbation du MJ.');
+        this.notifications.refresh();
+        onReload?.();
+      },
+      error: () => {
+        this.proposeBusyId.set(null);
+        this.setFeedback('err', 'Impossible de proposer ce personnage.');
+      },
+    });
+  }
+
+  awardEncounterXp(encounter: EncounterGroup): void {
+    const c = this._campaign();
+    if (!c?.isOwner || encounter.xpAwarded) {
+      this.setFeedback('err', 'XP déjà distribuée ou action impossible.');
+      return;
+    }
+    if (this.awardingXpId()) return;
+    const approved = this.players().filter((p) => p.proposalStatus === 'approved');
+    const xpGained = encounterTotalXp(encounter);
+    const split = splitEncounterXp(xpGained, approved.length);
+    if (!split.ok) {
+      const msg =
+        split.reason === 'no-xp'
+          ? 'Aucun XP à distribuer pour cette rencontre.'
+          : split.reason === 'no-players'
+            ? 'Aucun joueur avec personnage approuvé.'
+            : 'Part d’XP trop faible à répartir.';
+      this.setFeedback('err', msg);
+      return;
+    }
+
+    this.awardingXpId.set(encounter.id);
+    let completed = 0;
+    let failed = 0;
+    for (const player of approved) {
+      this.campaigns.awardXp(c.id, player.id, split.share).subscribe({
+        next: () => {
+          completed++;
+          if (completed + failed !== approved.length) return;
+          this.awardingXpId.set(null);
+          if (failed === 0) {
+            const latest = this._campaign();
+            const encounters = (latest?.data.encounters ?? []).map((e) =>
+              e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+            );
+            this.saveData({ encounters });
+            this.setFeedback(
+              'ok',
+              `+${split.share} XP × ${approved.length} joueur(s) (${xpGained} XP total).`,
+            );
+          } else {
+            this.setFeedback(
+              'err',
+              `XP partiellement envoyée (${completed}/${approved.length}). Réessayez.`,
+            );
+          }
+        },
+        error: () => {
+          failed++;
+          if (completed + failed !== approved.length) return;
+          this.awardingXpId.set(null);
+          this.setFeedback(
+            'err',
+            `Échec XP (${completed}/${approved.length} OK). Vérifiez la connexion.`,
+          );
+        },
+      });
+    }
+  }
+
+  /** @returns false si aucune carte de session (raccourci F). */
+  toggleSessionFog(): boolean {
+    const map = this.activeSessionMap();
+    if (!map || !this.isDm()) return false;
+    const prev = {
+      fogOfWarEnabled: map.fogOfWarEnabled,
+      revealedRoomIds: [...(map.revealedRoomIds ?? [])],
+      revealedCorridorCells: [...(map.revealedCorridorCells ?? [])],
+    };
+    this.patchSessionDungeonMap(withFogToggled(map));
+    const on = !prev.fogOfWarEnabled;
+    this.setFeedback('ok', on ? 'Fog activé.' : 'Fog désactivé.', {
+      undo: () => this.patchSessionDungeonMap(prev),
+    });
+    return true;
   }
 
   /** Partage un jet dans le fil de table (visible party). */

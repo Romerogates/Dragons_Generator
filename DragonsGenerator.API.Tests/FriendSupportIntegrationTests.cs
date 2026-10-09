@@ -643,4 +643,32 @@ public class FriendSupportIntegrationTests
         var login = await _client.PostAsJsonAsync("/auth/login", new { email, password = "TestPass123!" });
         Assert.Equal(HttpStatusCode.Forbidden, login.StatusCode);
     }
+
+    [Fact]
+    public async Task Split_support_endpoint_files_keep_existing_routes()
+    {
+        var (_, playerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "splitsup");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        using (var list = ApiTestAuth.Authed(HttpMethod.Get, "/support/tickets", playerToken))
+        {
+            (await _client.SendAsync(list)).EnsureSuccessStatusCode();
+        }
+
+        using (var missing = ApiTestAuth.Authed(HttpMethod.Get, $"/support/tickets/{Guid.NewGuid()}", playerToken))
+        {
+            var res = await _client.SendAsync(missing);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var inbox = ApiTestAuth.Authed(HttpMethod.Get, "/admin/support/inbox-count", adminToken))
+        {
+            (await _client.SendAsync(inbox)).EnsureSuccessStatusCode();
+        }
+
+        using (var adminList = ApiTestAuth.Authed(HttpMethod.Get, "/admin/support/tickets", adminToken))
+        {
+            (await _client.SendAsync(adminList)).EnsureSuccessStatusCode();
+        }
+    }
 }

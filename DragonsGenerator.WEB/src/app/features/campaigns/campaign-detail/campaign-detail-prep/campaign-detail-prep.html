@@ -1,0 +1,31 @@
+<section class="space-y-5">
+  @if (isMj()) {
+    <app-campaign-setup-guide [state]="guideState()" (action)="guideAction.emit($event)" />
+  }
+
+  <nav class="flex flex-wrap gap-1.5" aria-label="Préparation">
+    @for (s of tabs(); track s.id) {
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-colors"
+        [class]="
+          prepSub() === s.id
+            ? 'border-violet-500 text-violet-300 bg-violet-950/30'
+            : 'border-slate-700 text-slate-500'
+        "
+        (click)="prepSubChange.emit(s.id)"
+      >
+        <iconify-icon
+          noobserver
+          [icon]="s.icon"
+          width="14"
+          height="14"
+          class="inline-block shrink-0"
+        ></iconify-icon>
+        <span>{{ s.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <ng-content />
+</section>

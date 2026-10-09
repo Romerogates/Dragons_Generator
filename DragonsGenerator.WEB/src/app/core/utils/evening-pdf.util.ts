@@ -8,13 +8,13 @@ export interface EveningPackExtras {
   playerNames?: string[];
 }
 
-/** Export PDF « soirée » : run sheet + documents publiés (+ prépa optionnelle). */
-export async function exportEveningPdf(
+/** Construit le PDF soirée (sans déclencher le téléchargement). */
+export async function renderEveningPdf(
   campaignTitle: string,
   session: CampaignSession,
   handouts: CampaignHandout[],
   extras?: EveningPackExtras,
-): Promise<void> {
+): Promise<{ filename: string; save: () => void }> {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const margin = 48;
@@ -114,7 +114,19 @@ export async function exportEveningPdf(
 
   const safe = (campaignTitle || 'campagne').replace(/[^\w-]+/g, '_').slice(0, 40);
   const suffix = extras ? 'pack-soiree' : 'soiree';
-  doc.save(`${safe}-${suffix}.pdf`);
+  const filename = `${safe}-${suffix}.pdf`;
+  return { filename, save: () => doc.save(filename) };
+}
+
+/** Export PDF « soirée » : run sheet + documents publiés (+ prépa optionnelle). */
+export async function exportEveningPdf(
+  campaignTitle: string,
+  session: CampaignSession,
+  handouts: CampaignHandout[],
+  extras?: EveningPackExtras,
+): Promise<void> {
+  const rendered = await renderEveningPdf(campaignTitle, session, handouts, extras);
+  rendered.save();
 }
 
 /** Pack soirée unifié = run sheet + prépa + docs publiés. */

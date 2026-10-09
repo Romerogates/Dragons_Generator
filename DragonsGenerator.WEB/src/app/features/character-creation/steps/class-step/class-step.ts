@@ -56,6 +56,25 @@ import type {
 import { MulticlassPanel } from './multiclass-panel/multiclass-panel';
 import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import {
+  asFeatureJsonList,
+  isConcreteCombatStyleId,
+  resolveAvailableCombatStyles,
+  resolveCombatStyleRequiredCount,
+  resolveCombatStyleUnlockLevel,
+  type CombatStyleOption,
+} from '@core/utils/class-step-combat.util';
+import {
+  classStepCarouselTargetId,
+  classStepPhaseSubtitle,
+  classStepPhaseTitle,
+  classStepSelectionComplete,
+  resolveClassStepPhase,
+  splitClassChoiceAnswers,
+  toggleCappedPick,
+  wrapCarouselIndex,
+  type ClassStepPhase,
+} from '@core/utils/class-step-flow.util';
 
 // ============================================================================
 // TYPES
@@ -110,7 +129,7 @@ interface FeatureJson {
   resolves_to_choice_pool?: string;
 }
 
-type Phase = 'class' | 'subclass' | 'combat_style' | 'sub_choice' | 'prog_choice';
+type Phase = ClassStepPhase;
 
 interface SubclassesConfig {
   name: string;
@@ -138,13 +157,6 @@ interface SubChoice {
   option_descs?: Record<string, string>;
 }
 
-interface ClassChoicePool {
-  id?: string;
-  name?: string;
-  type?: string;
-  pool?: string[];
-}
-
 /** Codes courts (JSON) → libellés français utilisés par `Ability`. */
 const ABILITY_CODE_TO_LABEL: Record<string, Ability> = {
   str: 'Force',
@@ -154,139 +166,6 @@ const ABILITY_CODE_TO_LABEL: Record<string, Ability> = {
   wis: 'Sagesse',
   cha: 'Charisme',
 };
-
-interface CombatStyleOption {
-  id: string;
-  name: string;
-  desc: string;
-}
-
-/** Niveau d'obtention du style de combat par classe (fallback si absent des features). */
-const COMBAT_STYLE_UNLOCK_LEVEL: Record<string, number> = {
-  'cls-guerrier': 1,
-  'cls-paladin': 2,
-  'cls-rodeur': 2,
-};
-
-/** Fallback noms/descriptions si features_details absents. */
-const COMBAT_STYLE_FALLBACK: Record<string, CombatStyleOption> = {
-  'style-archerie': {
-    id: 'style-archerie',
-    name: 'Archerie',
-    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
-  },
-  'feat-style-archerie': {
-    id: 'feat-style-archerie',
-    name: 'Archerie',
-    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
-  },
-  'style-armes-deux-mains': {
-    id: 'style-armes-deux-mains',
-    name: 'Armes à deux mains',
-    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
-  },
-  'style-armes-a-deux-mains': {
-    id: 'style-armes-a-deux-mains',
-    name: 'Armes à deux mains',
-    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
-  },
-  'feat-style-armes-deux-mains': {
-    id: 'feat-style-armes-deux-mains',
-    name: 'Armes à deux mains',
-    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
-  },
-  'style-combat-deux-armes': {
-    id: 'style-combat-deux-armes',
-    name: 'Combat à deux armes',
-    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
-  },
-  'feat-style-combat-deux-armes': {
-    id: 'feat-style-combat-deux-armes',
-    name: 'Combat à deux armes',
-    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
-  },
-  'style-defense': {
-    id: 'style-defense',
-    name: 'Défense',
-    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
-  },
-  'feat-style-defense': {
-    id: 'feat-style-defense',
-    name: 'Défense',
-    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
-  },
-  'style-duel': {
-    id: 'style-duel',
-    name: 'Duel',
-    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
-  },
-  'feat-style-duel': {
-    id: 'feat-style-duel',
-    name: 'Duel',
-    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
-  },
-  'style-protection': {
-    id: 'style-protection',
-    name: 'Protection',
-    desc: 'Imposez un désavantage à une attaque ciblant un allié à 1,50 m (bouclier requis).',
-  },
-  'feat-style-protection': {
-    id: 'feat-style-protection',
-    name: 'Protection',
-    desc: 'Imposez un désavantage à une attaque ciblant un allié à 1,50 m (bouclier requis).',
-  },
-  'style-archerie-rodeur': {
-    id: 'style-archerie-rodeur',
-    name: 'Archerie',
-    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
-  },
-  'style-combat-deux-armes-rodeur': {
-    id: 'style-combat-deux-armes-rodeur',
-    name: 'Combat à deux armes',
-    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
-  },
-  'style-defense-rodeur': {
-    id: 'style-defense-rodeur',
-    name: 'Défense',
-    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
-  },
-  'style-duel-rodeur': {
-    id: 'style-duel-rodeur',
-    name: 'Duel',
-    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
-  },
-};
-
-function isFightingStylePool(pool: ClassChoicePool): boolean {
-  const blob = `${pool.id ?? ''} ${pool.name ?? ''} ${pool.type ?? ''}`.toLowerCase();
-  return (
-    blob.includes('style-combat') ||
-    blob.includes('combat-style') ||
-    blob.includes('fighting_style') ||
-    blob.includes('style de combat')
-  );
-}
-
-function asChoicePools(raw: unknown): ClassChoicePool[] {
-  if (!Array.isArray(raw)) return [];
-  return raw.filter((p): p is ClassChoicePool => !!p && typeof p === 'object');
-}
-
-function asFeatureJsonList(raw: unknown): FeatureJson[] {
-  if (!Array.isArray(raw)) return [];
-  return raw.filter((f): f is FeatureJson => !!f && typeof f === 'object' && typeof (f as FeatureJson).id === 'string');
-}
-
-function isConcreteCombatStyleId(id: string): boolean {
-  if (!id) return false;
-  if (id.includes('style-de-combat')) return false;
-  if (id.includes('style-de-combat-supplementaire')) return false;
-  return (
-    id.startsWith('style-') ||
-    id.startsWith('feat-style-') ||
-    /style-(archerie|defense|duel|protection|armes|combat)/.test(id)
-  );
-}
 
 // ============================================================================
 // CONSTANTES
@@ -425,39 +304,13 @@ export class ClassStep implements OnInit {
   });
 
   /** Styles de combat tirés des choice_pools de la classe (guerrier / paladin / rôdeur). */
-  readonly availableCombatStyles = computed<CombatStyleOption[]>(() => {
-    const cls = this.selectedClass();
-    if (!cls) return [];
-    const pools = asChoicePools(cls.data['choice_pools']);
-    const pool = pools.find((p) => isFightingStylePool(p));
-    if (!pool?.pool?.length) return [];
+  readonly availableCombatStyles = computed<CombatStyleOption[]>(() =>
+    resolveAvailableCombatStyles(this.selectedClass()),
+  );
 
-    const details = asFeatureJsonList(cls.data.features_details);
-    return pool.pool.map((id) => {
-      const feat = details.find((f) => f.id === id);
-      const fallback = COMBAT_STYLE_FALLBACK[id];
-      const rawName = feat?.name ?? fallback?.name ?? labelForGameId(id);
-      const name = rawName.replace(/^Style de combat\s*:\s*/i, '').trim();
-      return {
-        id,
-        name,
-        desc: feat?.desc || fallback?.desc || 'Style de combat martial.',
-      };
-    });
-  });
-
-  readonly combatStyleUnlockLevel = computed(() => {
-    const cls = this.selectedClass();
-    if (!cls) return 99;
-    if (COMBAT_STYLE_UNLOCK_LEVEL[cls.id]) return COMBAT_STYLE_UNLOCK_LEVEL[cls.id];
-    const details = asFeatureJsonList(cls.data.features_details);
-    const grant = details.find(
-      (f) =>
-        typeof f.resolves_to_choice_pool === 'string' &&
-        /style|combat|fighting/i.test(f.resolves_to_choice_pool),
-    );
-    return grant?.level ?? 99;
-  });
+  readonly combatStyleUnlockLevel = computed(() =>
+    resolveCombatStyleUnlockLevel(this.selectedClass()),
+  );
 
   readonly requiresCombatStyle = computed(
     () =>
@@ -466,56 +319,34 @@ export class ClassStep implements OnInit {
   );
 
   /** Nombre de styles à choisir (2 si aptitude Champion « style supplémentaire » ≤ niveau). */
-  readonly combatStyleRequiredCount = computed(() => {
-    if (!this.requiresCombatStyle()) return 0;
-    let n = 1;
-    const lvl = this.targetLevel();
-    const sub = this.selectedSubclass();
-    const extraSub = sub?.features?.find(
-      (f) =>
-        f.id === 'feat-style-de-combat-supplementaire' ||
-        /combat-supplementaire|style.*supplementaire/i.test(String(f.id)),
-    );
-    if (extraSub && (extraSub.level ?? 10) <= lvl) n = 2;
-    const cls = this.selectedClass();
-    const extraCls = asFeatureJsonList(cls?.data?.features_details).find(
-      (f) =>
-        f.id === 'feat-style-de-combat-supplementaire' ||
-        /combat-supplementaire|style.*supplementaire/i.test(String(f.id ?? '')),
-    );
-    const extraLvl = Number(extraCls?.unlocks_at_level ?? extraCls?.level ?? 10);
-    if (extraCls && extraLvl <= lvl) n = 2;
-    return n;
-  });
+  readonly combatStyleRequiredCount = computed(() =>
+    resolveCombatStyleRequiredCount({
+      requiresCombatStyle: this.requiresCombatStyle(),
+      targetLevel: this.targetLevel(),
+      subclassFeatures: this.selectedSubclass()?.features,
+      classFeaturesDetails: this.selectedClass()?.data?.features_details,
+    }),
+  );
 
   readonly combatStylesComplete = computed(
     () => this.selectedCombatStyleIds().length >= this.combatStyleRequiredCount(),
   );
 
   // --- GESTION DES PHASES ---
-  readonly currentPhase = computed<Phase>(() => {
-    const held = this.holdPhase();
-    if (held) return held;
-
-    if (!this.selectedClassId()) return 'class';
-    // Style de combat avant sous-classe (souvent niv.1–2 vs sous-classe niv.3+)
-    // sauf 2e style Champion qui arrive après sous-classe
-    if (this.requiresCombatStyle() && this.selectedCombatStyleIds().length === 0)
-      return 'combat_style';
-    if (this.requiresSubclass() && !this.selectedSubclassId()) return 'subclass';
-    if (
-      this.requiresCombatStyle() &&
-      this.selectedCombatStyleIds().length < this.combatStyleRequiredCount()
-    )
-      return 'combat_style';
-    if (this.nextUnresolvedSubChoice()) return 'sub_choice';
-    if (this.nextUnresolvedProgChoice()) return 'prog_choice';
-    if (this.focusedProgChoiceId() && this.activeProgChoices().length) return 'prog_choice';
-
-    if (this.requiresSubclass() && this.selectedSubclassId()) return 'subclass';
-    if (this.requiresCombatStyle()) return 'combat_style';
-    return 'class';
-  });
+  readonly currentPhase = computed<Phase>(() =>
+    resolveClassStepPhase({
+      holdPhase: this.holdPhase(),
+      classId: this.selectedClassId(),
+      subclassId: this.selectedSubclassId(),
+      requiresSubclass: this.requiresSubclass(),
+      requiresCombatStyle: this.requiresCombatStyle(),
+      selectedStyleCount: this.selectedCombatStyleIds().length,
+      requiredStyleCount: this.combatStyleRequiredCount(),
+      hasUnresolvedSubChoice: !!this.nextUnresolvedSubChoice(),
+      hasUnresolvedProgChoice: !!this.nextUnresolvedProgChoice(),
+      focusedProgChoice: !!this.focusedProgChoiceId() && this.activeProgChoices().length > 0,
+    }),
+  );
 
   /** Pool de sous-classe affiché (en cours ou dernier choisi en relecture). */
   private subChoiceForDisplay(): SubChoice | null {
@@ -548,46 +379,28 @@ export class ClassStep implements OnInit {
   }
 
   readonly phaseTitle = computed<string>(() => {
-    switch (this.currentPhase()) {
-      case 'class':
-        return 'La Vocation';
-      case 'subclass':
-        return this.subclassesConfig()?.name ?? 'Spécialisation';
-      case 'combat_style':
-        return 'Style de Combat';
-      case 'sub_choice': {
-        const choice = this.nextUnresolvedSubChoice();
-        if (!choice) return 'Faites votre choix';
-        const picked = this.subChoiceAnswers().get(choice.id)?.length ?? 0;
-        const need = choice.count || 1;
-        return need > 1 ? `${choice.label} (${picked}/${need})` : choice.label;
-      }
-      case 'prog_choice': {
-        const choice = this.progChoiceForDisplay();
-        if (!choice) return 'Faites votre choix';
-        const picked = this.progChoiceAnswers().get(choice.id)?.length ?? 0;
-        const need = choice.count || 1;
-        return need > 1 ? `${choice.label} (${picked}/${need})` : choice.label;
-      }
-    }
+    const sub = this.nextUnresolvedSubChoice();
+    const prog = this.progChoiceForDisplay();
+    return classStepPhaseTitle({
+      phase: this.currentPhase(),
+      subclassConfigName: this.subclassesConfig()?.name,
+      subChoiceLabel: sub?.label,
+      subChoicePicked: sub ? (this.subChoiceAnswers().get(sub.id)?.length ?? 0) : 0,
+      subChoiceNeed: sub?.count,
+      progChoiceLabel: prog?.label,
+      progChoicePicked: prog ? (this.progChoiceAnswers().get(prog.id)?.length ?? 0) : 0,
+      progChoiceNeed: prog?.count,
+    });
   });
 
-  readonly phaseSubtitle = computed<string>(() => {
-    switch (this.currentPhase()) {
-      case 'class':
-        return 'Choisissez la classe qui dictera vos talents et votre destinée.';
-      case 'subclass':
-        return `Affinez les pouvoirs de votre ${this.selectedClass()?.name}.`;
-      case 'combat_style':
-        return this.combatStyleRequiredCount() > 1
-          ? `Choisissez ${this.combatStyleRequiredCount()} styles (${this.selectedCombatStyleIds().length}/${this.combatStyleRequiredCount()}).`
-          : 'Sélectionnez votre approche martiale de prédilection.';
-      case 'sub_choice':
-        return 'Cette option personnalisera les aptitudes de votre sous-classe.';
-      case 'prog_choice':
-        return 'Choisissez les options de progression débloquées par votre classe.';
-    }
-  });
+  readonly phaseSubtitle = computed<string>(() =>
+    classStepPhaseSubtitle({
+      phase: this.currentPhase(),
+      className: this.selectedClass()?.name,
+      combatStyleNeed: this.combatStyleRequiredCount(),
+      combatStylePicked: this.selectedCombatStyleIds().length,
+    }),
+  );
 
   // --- GESTION DES CARTES ---
   readonly currentCards = computed<CardOption[]>(() => {
@@ -672,20 +485,17 @@ export class ClassStep implements OnInit {
     }
   });
 
-  readonly selectionComplete = computed(() => {
-    if (!this.selectedClass()) return false;
-    if (this.requiresCombatStyle() && !this.combatStylesComplete()) return false;
-    if (this.requiresSubclass() && !this.selectedSubclass()) return false;
-    for (const sc of this.activeSubChoices()) {
-      const picked = this.subChoiceAnswers().get(sc.id) ?? [];
-      if (picked.length < (sc.count || 1)) return false;
-    }
-    for (const pc of this.activeProgChoices()) {
-      const picked = this.progChoiceAnswers().get(pc.id) ?? [];
-      if (picked.length < (pc.count || 1)) return false;
-    }
-    return true;
-  });
+  readonly selectionComplete = computed(() =>
+    classStepSelectionComplete({
+      hasClass: !!this.selectedClass(),
+      requiresCombatStyle: this.requiresCombatStyle(),
+      combatStylesComplete: this.combatStylesComplete(),
+      requiresSubclass: this.requiresSubclass(),
+      hasSubclass: !!this.selectedSubclass(),
+      unresolvedSubChoice: !!this.nextUnresolvedSubChoice(),
+      unresolvedProgChoice: !!this.nextUnresolvedProgChoice(),
+    }),
+  );
 
   /** Re-applique les aptitudes si le niveau change alors que la classe est déjà choisie. */
   private lastAppliedLevel: number | null = null;
@@ -717,16 +527,12 @@ export class ClassStep implements OnInit {
     }
 
     const answers = current.classChoiceAnswers ?? {};
-    const subChoiceIds = new Set(this.activeSubChoices().map((sc) => sc.id));
-    const progMap = new Map<string, string[]>();
-    const subMap = new Map<string, string[]>();
-    for (const [k, v] of Object.entries(answers)) {
-      if (!Array.isArray(v) || v.length === 0) continue;
-      if (subChoiceIds.has(k)) subMap.set(k, v);
-      else progMap.set(k, v);
-    }
-    if (subMap.size) this.subChoiceAnswers.set(subMap);
-    if (progMap.size) this.progChoiceAnswers.set(progMap);
+    const { sub, prog } = splitClassChoiceAnswers(
+      answers,
+      new Set(this.activeSubChoices().map((sc) => sc.id)),
+    );
+    if (sub.size) this.subChoiceAnswers.set(sub);
+    if (prog.size) this.progChoiceAnswers.set(prog);
 
     this.syncCarouselIndexFromSelection();
   }
@@ -747,34 +553,22 @@ export class ClassStep implements OnInit {
   }
 
   private resolveCarouselTargetId(): string | null {
-    switch (this.currentPhase()) {
-      case 'class':
-        return this.selectedClassId();
-      case 'subclass':
-        return this.selectedSubclassId() ?? this.selectedClassId();
-      case 'combat_style': {
-        const styles = this.selectedCombatStyleIds();
-        return styles[styles.length - 1] ?? null;
-      }
-      case 'sub_choice': {
-        const choice =
-          this.nextUnresolvedSubChoice() ??
-          this.activeSubChoices()[this.activeSubChoices().length - 1];
-        if (!choice) return null;
-        const picks = this.subChoiceAnswers().get(choice.id);
-        return picks?.[picks.length - 1] ?? null;
-      }
-      case 'prog_choice': {
-        const choice =
-          this.nextUnresolvedProgChoice() ??
-          this.activeProgChoices()[this.activeProgChoices().length - 1];
-        if (!choice) return null;
-        const picks = this.progChoiceAnswers().get(choice.id);
-        return picks?.[picks.length - 1] ?? null;
-      }
-      default:
-        return this.selectedClassId();
-    }
+    const subChoice =
+      this.nextUnresolvedSubChoice() ??
+      this.activeSubChoices()[this.activeSubChoices().length - 1];
+    const progChoice =
+      this.nextUnresolvedProgChoice() ??
+      this.activeProgChoices()[this.activeProgChoices().length - 1];
+    const subPicks = subChoice ? this.subChoiceAnswers().get(subChoice.id) : undefined;
+    const progPicks = progChoice ? this.progChoiceAnswers().get(progChoice.id) : undefined;
+    return classStepCarouselTargetId({
+      phase: this.currentPhase(),
+      classId: this.selectedClassId(),
+      subclassId: this.selectedSubclassId(),
+      combatStyleIds: this.selectedCombatStyleIds(),
+      subChoiceLastPick: subPicks?.[subPicks.length - 1] ?? null,
+      progChoiceLastPick: progPicks?.[progPicks.length - 1] ?? null,
+    });
   }
 
   // === CARROUSEL LOGIC ===
@@ -858,9 +652,7 @@ export class ClassStep implements OnInit {
   }
 
   normalizedIndex(): number {
-    const total = this.currentCards().length;
-    if (total === 0) return 0;
-    return ((this.currentIndex() % total) + total) % total;
+    return wrapCarouselIndex(this.currentIndex(), this.currentCards().length);
   }
 
   nextCard(): void {
@@ -949,20 +741,9 @@ export class ClassStep implements OnInit {
         break;
       case 'combat_style':
         this.holdPhase.set(null);
-        this.selectedCombatStyleIds.update((ids) => {
-          const need = this.combatStyleRequiredCount();
-          const prev = [...ids];
-          const idx = prev.indexOf(cardId);
-          if (idx >= 0) {
-            prev.splice(idx, 1);
-            return prev;
-          }
-          if (need <= 1) return [cardId];
-          if (prev.length < need) return [...prev, cardId];
-          prev.shift();
-          prev.push(cardId);
-          return prev;
-        });
+        this.selectedCombatStyleIds.update((ids) =>
+          toggleCappedPick(ids, cardId, this.combatStyleRequiredCount()),
+        );
         break;
       case 'sub_choice': {
         const choice = this.nextUnresolvedSubChoice();
@@ -970,21 +751,7 @@ export class ClassStep implements OnInit {
           this.holdPhase.set(null);
           this.subChoiceAnswers.update((m) => {
             const newMap = new Map(m);
-            const need = choice.count || 1;
-            const prev = [...(newMap.get(choice.id) ?? [])];
-            const idx = prev.indexOf(cardId);
-            if (idx >= 0) {
-              prev.splice(idx, 1);
-            } else if (need <= 1) {
-              newMap.set(choice.id, [cardId]);
-              return newMap;
-            } else if (prev.length < need) {
-              prev.push(cardId);
-            } else {
-              prev.shift();
-              prev.push(cardId);
-            }
-            newMap.set(choice.id, prev);
+            newMap.set(choice.id, toggleCappedPick(newMap.get(choice.id) ?? [], cardId, choice.count || 1));
             return newMap;
           });
         }
@@ -997,21 +764,7 @@ export class ClassStep implements OnInit {
           this.focusedProgChoiceId.set(choice.id);
           this.progChoiceAnswers.update((m) => {
             const newMap = new Map(m);
-            const need = choice.count || 1;
-            const prev = [...(newMap.get(choice.id) ?? [])];
-            const idx = prev.indexOf(cardId);
-            if (idx >= 0) {
-              prev.splice(idx, 1);
-            } else if (need <= 1) {
-              newMap.set(choice.id, [cardId]);
-              return this.trimInvalidProgPicks(newMap);
-            } else if (prev.length < need) {
-              prev.push(cardId);
-            } else {
-              prev.shift();
-              prev.push(cardId);
-            }
-            newMap.set(choice.id, prev);
+            newMap.set(choice.id, toggleCappedPick(newMap.get(choice.id) ?? [], cardId, choice.count || 1));
             return this.trimInvalidProgPicks(newMap);
           });
         }
@@ -1198,7 +951,7 @@ export class ClassStep implements OnInit {
       for (const prog of progression) {
         if (prog.level < 1 || prog.level > targetLevel) continue;
         for (const id of prog.features ?? []) {
-          const feat = asFeatureJsonList(cls.data.features_details).find((f) => f.id === id);
+          const feat = this.featureDetailsOf(cls).find((f) => f.id === id);
           if (!feat) continue;
           // Remplacé par le style concret choisi
           if (
@@ -1246,16 +999,14 @@ export class ClassStep implements OnInit {
           const picks = this.subChoiceAnswers().get(sc.id) ?? [];
           for (const pickId of picks) {
             const fromSub = sub.features.find((f) => f.id === pickId);
-            const fromClass = asFeatureJsonList(cls.data.features_details).find(
-              (f) => f.id === pickId,
-            );
+            const fromClass = this.featureDetailsOf(cls).find((f) => f.id === pickId);
             let feat = fromSub ?? fromClass;
             // Choix imbriqués (mechanics.options + choice_quantity, ex. Rôdeur Chasseur) :
             // l'id sélectionné n'est pas une feature de premier niveau mais une option nichée
             // dans `mechanics.options` d'une feature parente. On synthétise une carte dédiée
             // avec le nom/texte réel de la technique choisie, pour rester fidèle aux règles.
             if (!feat) {
-              const allFeats = [...sub.features, ...asFeatureJsonList(cls.data.features_details)];
+              const allFeats = [...sub.features, ...this.featureDetailsOf(cls)];
               for (const parent of allFeats) {
                 const opt = parent.mechanics?.options?.find((o) => o?.id === pickId);
                 if (opt) {
@@ -1558,9 +1309,12 @@ export class ClassStep implements OnInit {
     );
   }
 
+  private featureDetailsOf(cls: CharacterClass | null | undefined): FeatureJson[] {
+    return asFeatureJsonList(cls?.data.features_details) as FeatureJson[];
+  }
+
   private resolveOptionFeature(id: string): FeatureJson | undefined {
-    const cls = this.selectedClass();
-    const fromClass = asFeatureJsonList(cls?.data.features_details).find((f) => f.id === id);
+    const fromClass = this.featureDetailsOf(this.selectedClass()).find((f) => f.id === id);
     if (fromClass) return fromClass;
     return this.selectedSubclass()?.features.find((f) => f.id === id);
   }

@@ -1,0 +1,414 @@
+@let playSession = combat.state.activeSession()!;
+@let c = combat.state.campaign();
+
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">
+          Table de jeu — session en cours
+          <span
+            class="ml-2 font-semibold normal-case tracking-normal"
+            [class.text-emerald-300/80]="combat.liveConnected()"
+            [class.text-amber-400/80]="!combat.liveConnected()"
+            [attr.title]="
+              combat.liveConnected()
+                ? 'Synchronisation live active'
+                : 'Sync live indisponible — actualisation périodique'
+            "
+          >
+            · {{ combat.liveConnected() ? 'live' : 'hors sync' }}
+          </span>
+        </p>
+        <h2 [class]="combat.state.fullscreen() ? 'text-2xl md:text-3xl font-serif text-emerald-200' : 'text-xl font-serif text-emerald-200'">
+          {{ playSession.title }}
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">
+          {{ combat.state.formatSessionDate(playSession.scheduledAt) }}
+          · {{ combat.state.sessionModeLabel(playSession.mode) }}
+        </p>
+        <p class="text-[10px] text-slate-500 mt-1 max-w-xl">
+          {{ combat.state.sessionModeHint(playSession.mode) }}
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        @if (!combat.state.isDm() && !combat.state.isSpectator()) {
+          <button
+            type="button"
+            class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-emerald-600/50"
+            title="Documents publiés par le MJ"
+            (click)="shell.openHandoutsOverlay()"
+            data-testid="play-documents-btn"
+          >
+            Documents
+            @if (combat.state.publishedHandouts().length > 0) {
+              <span class="text-emerald-400">({{ combat.state.publishedHandouts().length }})</span>
+            }
+          </button>
+          @if (combat.state.myHeroProposalStatus() === 'approved') {
+          <button
+            type="button"
+            class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
+              [disabled]="playImport.sheetLoadingId() === combat.state.myApprovedMember()?.id"
+            (click)="playImport.openMySheet()"
+              data-testid="play-my-sheet-btn"
+          >
+            @if (playImport.sheetLoadingId() === combat.state.myApprovedMember()?.id) {
+              Fiche…
+            } @else {
+              Ma fiche
+            }
+          </button>
+          } @else if (combat.state.myHeroProposalStatus() === 'pending') {
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+              <span
+                class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-amber-800/50 bg-amber-950/25 text-amber-200"
+                data-testid="play-hero-pending"
+              >
+                En attente du MJ
+                @if (combat.state.myPlayerMember()?.proposedCharacterName; as n) {
+                  <span class="ml-1 font-serif normal-case tracking-normal text-amber-100/80"
+                    >({{ n }})</span
+                  >
+                }
+              </span>
+              <button
+                type="button"
+                class="text-[10px] text-sky-400 underline hover:text-sky-300"
+                (click)="shell.openProposeOverlay()"
+              >
+                Changer
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-700 text-white hover:bg-sky-600"
+              (click)="shell.openProposeOverlay()"
+              data-testid="play-propose-hero-cta"
+            >
+              @if (combat.state.myHeroProposalStatus() === 'rejected') {
+                Envoyer un autre héros
+              } @else {
+                Envoyer un héros
+              }
+            </button>
+            @if (combat.state.myHeroProposalStatus() === 'rejected') {
+              <p class="basis-full text-[10px] text-red-400/90 sm:basis-auto">
+                Proposition refusée — choisissez un autre personnage.
+              </p>
+            }
+          }
+        }
+        @if (combat.state.isDm() && !combat.state.fullscreen()) {
+          <app-fullscreen-enter-link
+            [link]="['/campaigns', c.id, 'play']"
+            tone="emerald"
+            label="Table plein écran"
+          />
+        }
+        @if (combat.state.isDm()) {
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border text-slate-300 hover:border-emerald-600/50"
+            [class]="
+              shell.zenMode()
+                ? 'bg-emerald-900/40 border-emerald-700/50 text-emerald-300'
+                : 'bg-[#1b2028] border-slate-700'
+            "
+            (click)="shell.toggleZenMode()"
+            data-testid="toggle-zen-mode"
+            [attr.aria-pressed]="shell.zenMode()"
+            [attr.title]="shell.zenMode() ? 'Afficher le chrome complet' : 'Mode zen — chrome minimal'"
+          >
+            {{ shell.zenMode() ? 'Zen ON' : 'Zen' }}
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-rose-900/40 border border-rose-700/50 text-rose-200 hover:bg-rose-800/50"
+            (click)="shell.toggleSecretPanel()"
+            data-testid="open-secret-panel"
+            [attr.aria-expanded]="shell.secretPanelOpen()"
+            aria-controls="mj-secret-panel"
+          >
+            Secrets MJ
+          </button>
+          @if (!shell.zenMode()) {
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
+            (click)="shell.endPlaySession()"
+              data-testid="end-play-session"
+          >
+            Terminer la session
+          </button>
+          }
+        }
+      </div>
+    </div>
+
+    @if (combat.state.isDm() && combat.state.fullscreen() && !shell.zenMode()) {
+      <p class="text-[10px] text-slate-500 mb-2">
+        Raccourcis :
+        <kbd class="text-slate-400">Espace</kbd> tour ·
+        <kbd class="text-slate-400">N</kbd> notes ·
+        <kbd class="text-slate-400">S</kbd> secrets ·
+        <kbd class="text-slate-400">D</kbd> d20 ·
+        <kbd class="text-slate-400">F</kbd> fog ·
+        <kbd class="text-slate-400">Z</kbd> zen
+      </p>
+    }
+
+    @if (combat.state.isSpectator()) {
+      <div
+        class="rounded-lg border border-slate-700/60 bg-slate-900/40 px-3 py-2 flex flex-wrap items-center gap-3"
+        role="status"
+        data-testid="spectator-banner"
+      >
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          Mode spectateur — lecture seule
+        </p>
+        @if (shell.sceneTimerDisplay(); as clock) {
+          <span
+            class="min-h-8 inline-flex items-center px-2.5 rounded-lg text-sm font-mono tabular-nums border border-slate-700 text-slate-300"
+            data-testid="scene-timer"
+          >
+            {{ shell.sceneTimerLabel() }} · {{ clock }}
+          </span>
+        }
+      </div>
+    }
+
+    @if (combat.state.nextAction(); as next) {
+      @if (!combat.state.isSpectator()) {
+      <div
+        class="rounded-xl border px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+        role="status"
+        data-testid="play-next-action"
+        [class]="
+          next.tone === 'sky'
+            ? 'border-sky-800/50 bg-sky-950/30'
+            : next.tone === 'amber'
+              ? 'border-amber-800/50 bg-amber-950/30'
+              : next.tone === 'emerald'
+                ? 'border-emerald-800/50 bg-emerald-950/30'
+                : next.tone === 'rose'
+                  ? 'border-rose-800/50 bg-rose-950/30'
+                  : 'border-slate-700 bg-[#1b2028]/80'
+        "
+      >
+        <div class="min-w-0">
+          <p
+            class="text-[10px] font-black uppercase tracking-widest"
+            [class]="
+              next.tone === 'sky'
+                ? 'text-sky-400'
+                : next.tone === 'amber'
+                  ? 'text-amber-400'
+                  : next.tone === 'emerald'
+                    ? 'text-emerald-400'
+                    : next.tone === 'rose'
+                      ? 'text-rose-400'
+                      : 'text-slate-400'
+            "
+          >
+            Prochaine action
+          </p>
+          <p class="text-sm font-serif text-slate-100 mt-0.5">{{ next.title }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">{{ next.detail }}</p>
+        </div>
+        @if (next.ctaLabel && next.cta) {
+          <button
+            type="button"
+            class="shrink-0 min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+            (click)="combat.actions.runNextActionCta()"
+            data-testid="play-next-action-cta"
+          >
+            {{ next.ctaLabel }}
+          </button>
+        }
+      </div>
+      }
+    }
+
+    @if (combat.state.isDm()) {
+      <div
+        class="rounded-xl border border-slate-700/60 bg-[#1b2028]/70 p-3 flex flex-wrap items-center gap-2"
+        data-testid="mj-table-tools"
+      >
+        <app-play-table-chat
+          [showMacros]="true"
+          [showThread]="false"
+          (macroPerception)="combat.actions.runTableMacro('perception')"
+          (macroNextTurn)="combat.ctrl.nextTurn()"
+          (macroEndCombat)="combat.ctrl.endCombat()"
+        />
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-2 mr-1">Timer</span>
+        <button
+          type="button"
+          class="min-h-9 px-2.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+          (click)="shell.startSceneTimer(5)"
+        >
+          5 min
+        </button>
+        <button
+          type="button"
+          class="min-h-9 px-2.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+          (click)="shell.startSceneTimer(10)"
+        >
+          10 min
+        </button>
+        <button
+          type="button"
+          class="min-h-9 px-2.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+          (click)="shell.startSceneTimer(15)"
+        >
+          15 min
+        </button>
+        @if (shell.sceneTimerDisplay(); as clock) {
+          <span
+            class="min-h-9 inline-flex items-center px-3 rounded-lg text-sm font-mono tabular-nums border"
+            [class]="
+              shell.sceneTimerSeconds() === 0
+                ? 'border-rose-600 text-rose-200 bg-rose-950/40'
+                : shell.sceneTimerPaused()
+                  ? 'border-amber-700 text-amber-200 bg-amber-950/30'
+                  : 'border-emerald-700 text-emerald-200 bg-emerald-950/30'
+            "
+            data-testid="scene-timer"
+          >
+            {{ clock }}
+          </span>
+          <button
+            type="button"
+            class="min-h-9 px-2.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+            (click)="shell.toggleSceneTimerPause()"
+          >
+            {{ shell.sceneTimerPaused() ? 'Reprendre' : 'Pause' }}
+          </button>
+          <button
+            type="button"
+            class="min-h-9 px-2.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-500"
+            (click)="shell.stopSceneTimer()"
+          >
+            Stop
+          </button>
+        }
+      </div>
+    }
+
+    @if (combat.state.saving()) {
+      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 animate-pulse">
+        Sauvegarde…
+      </p>
+    }
+
+    @if (combat.state.approvedPlayers().length && !shell.zenMode() && !combat.state.isSpectator()) {
+      <div class="rounded-xl border border-sky-800/35 bg-sky-950/15 p-3 space-y-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+          Héros à la table
+        </p>
+          <p class="text-[10px] text-slate-500">
+            {{ combat.state.tableReadyCount() }}/{{ combat.state.approvedPlayers().length }} prêt(s)
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (p of combat.state.approvedPlayers(); track p.id) {
+            <div
+              class="flex items-stretch rounded-xl border text-xs overflow-hidden"
+              [class]="
+                combat.state.isPlayerTableReady(p.userId)
+                  ? 'border-emerald-600/60 bg-emerald-950/25'
+                  : 'border-sky-800/50 bg-sky-950/20'
+              "
+            >
+            <button
+              type="button"
+                class="px-3 py-2 text-left text-sky-100 hover:bg-sky-950/40 disabled:opacity-50"
+              [disabled]="playImport.sheetLoadingId() === p.id"
+              (click)="playImport.openMemberSheet(p, p.approvedCharacterName || p.displayName)"
+            >
+              <span class="font-serif block">{{ p.approvedCharacterName }}</span>
+              <span class="text-[10px] text-slate-500">
+                {{ p.displayName }}
+                @if (playImport.sheetLoadingId() === p.id) {
+                  · …
+                } @else {
+                  · Consulter
+                }
+              </span>
+            </button>
+              <button
+                type="button"
+                class="px-2.5 border-l text-[9px] font-black uppercase tracking-widest min-w-14"
+                [class]="
+                  combat.state.isPlayerTableReady(p.userId)
+                    ? 'border-emerald-700/50 text-emerald-300'
+                    : 'border-sky-800/50 text-slate-400 hover:text-emerald-300'
+                "
+                [attr.aria-pressed]="combat.state.isPlayerTableReady(p.userId)"
+                [attr.title]="combat.state.isPlayerTableReady(p.userId) ? 'Marquer pas prêt' : 'Marquer prêt'"
+                (click)="combat.actions.togglePlayerTableReady(p.userId)"
+              >
+                {{ combat.state.isPlayerTableReady(p.userId) ? 'Prêt' : '…' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (shell.feedback(); as fb) {
+      <div
+        role="status"
+        class="flex items-start justify-between gap-3 rounded-xl px-4 py-3 text-sm border"
+        [class]="
+          fb.kind === 'ok'
+            ? 'bg-emerald-950/40 border-emerald-700/50 text-emerald-200'
+            : 'bg-red-950/35 border-red-800/50 text-red-200'
+        "
+      >
+        <p class="leading-snug">{{ fb.text }}</p>
+        <div class="flex shrink-0 items-center gap-1">
+          @if (fb.undo) {
+            <button
+              type="button"
+              class="min-h-11 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest opacity-90 hover:opacity-100 border border-current/30"
+              (click)="shell.runFeedbackUndo()"
+            >
+              Annuler
+            </button>
+          }
+        <button
+          type="button"
+          class="shrink-0 min-h-11 min-w-11 rounded-lg text-xs font-black uppercase opacity-70 hover:opacity-100"
+          aria-label="Fermer le message"
+          (click)="shell.clearFeedback()"
+        >
+          ✕
+        </button>
+        </div>
+      </div>
+    }
+
+    @if (combat.state.isDm() && combat.state.fullscreen() && !shell.zenMode()) {
+      <nav
+        class="sticky z-20 -mx-1 mb-3 flex flex-nowrap gap-1 overflow-x-auto overscroll-x-contain rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[var(--dg-sticky-below-play)]"
+        aria-label="Sections de la session"
+      >
+        @for (tab of combat.state.sessionTabs; track tab.id) {
+          <button
+            type="button"
+            class="min-h-10 shrink-0 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
+            [class.bg-emerald-900/50]="shell.sessionView() === tab.id"
+            [class.text-emerald-200]="shell.sessionView() === tab.id"
+            [class.text-slate-500]="shell.sessionView() !== tab.id"
+            [attr.aria-current]="shell.sessionView() === tab.id ? 'page' : null"
+            [attr.title]="tab.label"
+            (click)="shell.setSessionView(tab.id)"
+          >
+            <span class="sm:hidden">{{ tab.shortLabel }}</span>
+            <span class="hidden sm:inline">{{ tab.label }}</span>
+          </button>
+        }
+      </nav>
+    }

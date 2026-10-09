@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { parseCampaignInviteQuery } from '@core/utils/campaign-invite-query.util';
 import { CampaignCloudService, MAX_CAMPAIGNS_PER_USER } from '@core/services/campaign-cloud.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
@@ -30,6 +31,7 @@ export class Campaigns implements OnInit, OnDestroy {
   private notifications = inject(NotificationService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly banners = inject(UiBannerPreferencesService);
@@ -58,6 +60,7 @@ export class Campaigns implements OnInit, OnDestroy {
   /** Optionnel : première date de table (datetime-local). */
   readonly emptyFirstSessionLocal = signal('');
   readonly isLoggedIn = this.auth.isLoggedIn;
+  readonly highlightedInviteId = signal<string | null>(null);
 
   readonly maxCampaigns = MAX_CAMPAIGNS_PER_USER;
   readonly ownedCampaignCount = computed(
@@ -101,12 +104,18 @@ export class Campaigns implements OnInit, OnDestroy {
   readonly historyCount = computed(() => this.historyList().length);
 
   ngOnInit(): void {
+    this.highlightedInviteId.set(
+      parseCampaignInviteQuery(this.route.snapshot.queryParamMap.get('invite')),
+    );
     if (!this.auth.isLoggedIn()) {
       this.loading.set(false);
       return;
     }
     this.reload();
     this.refreshInvites();
+    if (this.highlightedInviteId()) {
+      queueMicrotask(() => this.scrollToHighlightedInvite());
+    }
     this.softPollTimer = setInterval(() => this.softRefresh(), 12_000);
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', this.onWindowFocus);
@@ -130,6 +139,19 @@ export class Campaigns implements OnInit, OnDestroy {
 
   setListScope(scope: ListScope): void {
     this.listScope.set(scope);
+  }
+
+  isHighlightedInvite(inviteId: string): boolean {
+    return this.highlightedInviteId() === inviteId;
+  }
+
+  private scrollToHighlightedInvite(): void {
+    const id = this.highlightedInviteId();
+    if (!id || typeof document === 'undefined') return;
+    document.getElementById(`campaign-invite-${id}`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
   }
 
   private refreshInvites(): void {

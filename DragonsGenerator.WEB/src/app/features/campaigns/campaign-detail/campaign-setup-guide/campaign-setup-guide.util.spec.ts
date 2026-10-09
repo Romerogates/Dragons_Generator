@@ -1,5 +1,6 @@
 import {
   buildCampaignSetupGuide,
+  dispatchCampaignSetupGuide,
   type CampaignSetupGuideInput,
 } from './campaign-setup-guide.util';
 
@@ -147,5 +148,12 @@ describe('buildCampaignSetupGuide', () => {
     expect(g.current?.id).toBe('session');
     expect(g.current?.primaryLabel).toBe('Planifier une session');
     expect(g.current?.proposal).toContain('combat');
+  });
+
+  it('maps setup CTAs to hub commands', () => {
+    expect(dispatchCampaignSetupGuide('openCreatures')).toEqual({ type: 'tab', tab: 'creatures' });
+    expect(dispatchCampaignSetupGuide('generateEncounters')).toEqual({ type: 'generateEncounters' });
+    expect(dispatchCampaignSetupGuide('skipMaps')).toEqual({ type: 'skipMaps' });
+    expect(dispatchCampaignSetupGuide('openPlayFullscreen')).toEqual({ type: 'openPlayFullscreen' });
   });
 });

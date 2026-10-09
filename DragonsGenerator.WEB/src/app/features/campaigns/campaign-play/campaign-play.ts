@@ -28,6 +28,12 @@ import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
 import { supportReportHref } from '@core/utils/support-report.util';
+import {
+  isButtonishPlayShortcutTarget,
+  isEditablePlayShortcutTarget,
+  mjTableShortcutFromKey,
+  playShortcutBlockedByOverlay,
+} from '@core/utils/play-keyboard.util';
 
 @Component({
   selector: 'app-campaign-play',
@@ -88,32 +94,14 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement ||
-      target?.isContentEditable
-    ) {
-      return;
-    }
+    const target = event.target;
+    if (isEditablePlayShortcutTarget(target)) return;
+
+    const rawKey = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    const shortcut = mjTableShortcutFromKey(rawKey);
     // Évite double-avance Space quand focus sur Suiv. / bouton combat.
-    if (
-      target instanceof HTMLButtonElement ||
-      target?.closest?.('button, [role="button"]')
-    ) {
-      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-      if (key === ' ' || key === 'Spacebar' || key === 'n' || key === 'd' || key === 'f' || key === 's' || key === 'z') {
-        return;
-      }
-    }
-    if (
-      typeof document !== 'undefined' &&
-      (document.querySelector('.dungeon-shell--fullscreen') ||
-        document.querySelector('[aria-label="Notes à la main"]'))
-    ) {
-      return;
-    }
+    if (shortcut && isButtonishPlayShortcutTarget(target)) return;
+    if (typeof document !== 'undefined' && playShortcutBlockedByOverlay(document)) return;
 
     if (event.key === 'Escape' && !event.defaultPrevented) {
       const c = this.campaign();
@@ -125,19 +113,8 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
     if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
     const panel = this.playPanel();
-    if (!panel) return;
-    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-    if (key === ' ' || key === 'Spacebar') {
-      if (panel.handleMjShortcut('space')) {
-        event.preventDefault();
-      }
-      return;
-    }
-    if (key === 'n' || key === 'd' || key === 'f' || key === 's' || key === 'z') {
-      if (panel.handleMjShortcut(key)) {
-        event.preventDefault();
-      }
-    }
+    if (!panel || !shortcut) return;
+    if (panel.handleMjShortcut(shortcut)) event.preventDefault();
   }
 
   ngOnInit(): void {

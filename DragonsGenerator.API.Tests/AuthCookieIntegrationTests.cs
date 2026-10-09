@@ -84,6 +84,21 @@ public class AuthCookieIntegrationTests
     }
 
     [Fact]
+    public async Task Split_auth_endpoint_files_keep_existing_routes()
+    {
+        var anonMe = await _anonClient.GetAsync("/auth/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, anonMe.StatusCode);
+
+        var forgot = await _anonClient.PostAsJsonAsync(
+            "/auth/forgot-password",
+            new { email = "nobody@example.invalid" });
+        forgot.EnsureSuccessStatusCode();
+
+        var logout = await _anonClient.PostAsync("/auth/logout", null);
+        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+    }
+
+    [Fact]
     public async Task Bearer_token_still_works_for_api_clients()
     {
         var token = await ApiTestAuth.LoginAdminAsync(_anonClient);

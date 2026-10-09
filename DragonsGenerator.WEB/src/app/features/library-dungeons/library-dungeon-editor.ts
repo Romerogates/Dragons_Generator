@@ -11,10 +11,14 @@ import { CampaignDungeonMaps } from '@features/campaigns/campaign-dungeon-maps/c
 import {
   CampaignData,
   CampaignDetail,
-  emptyCampaignData,
 } from '@core/models/Campaign/campaign';
 import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
 import { DungeonCloudService } from '@core/services/dungeon-cloud.service';
+import {
+  buildLibraryDungeonShell,
+  dungeonShareUrl,
+  normalizeLibraryDungeonMap,
+} from '@core/utils/dungeon-library-shell.util';
 import { AuthService } from '@core/services/auth.service';
 import { Subject, debounceTime, switchMap, of, catchError } from 'rxjs';
 
@@ -151,34 +155,14 @@ export class LibraryDungeonEditor implements OnInit {
   }
 
   private buildShareUrl(token: string): string {
-    return `${window.location.origin}/dungeons/shared/${token}`;
+    return dungeonShareUrl(window.location.origin, token);
   }
 
   private applyDetail(id: string, name: string, raw: CampaignDungeonMap): void {
-    const map: CampaignDungeonMap = {
-      ...raw,
-      id,
-      name: name || raw.name || 'Donjon',
-    };
+    const map = normalizeLibraryDungeonMap(id, name, raw);
     this.focusMapId.set(id);
-    this.shellCampaign.set(this.buildShell(map));
+    this.shellCampaign.set(buildLibraryDungeonShell(this.cloudId, map, this.readOnly()));
     this.loading.set(false);
-  }
-
-  private buildShell(map: CampaignDungeonMap): CampaignDetail {
-    const data: CampaignData = {
-      ...emptyCampaignData(),
-      dungeonMaps: [map],
-    };
-    return {
-      id: `library-${this.cloudId}`,
-      title: 'Bibliothèque',
-      data,
-      role: 'dm',
-      isOwner: !this.readOnly(),
-      updatedAt: new Date().toISOString(),
-      members: [],
-    };
   }
 
   onDataChange(patch: Partial<CampaignData>): void {

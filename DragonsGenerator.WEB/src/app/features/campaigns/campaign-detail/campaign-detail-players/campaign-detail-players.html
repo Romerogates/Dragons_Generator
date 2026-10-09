@@ -1,0 +1,331 @@
+<section class="space-y-6">
+  @if (isOwner() && rosterFeedback(); as fb) {
+    <p
+      class="text-sm text-emerald-400 rounded-xl border border-emerald-800/40 bg-emerald-950/20 px-4 py-3"
+      data-testid="players-invite-feedback"
+      role="status"
+    >{{ fb }}</p>
+  }
+  @if (isOwner()) {
+    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500">
+          Lien d’invitation
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-violet-700/50 text-violet-300 hover:border-violet-400 disabled:opacity-50"
+            [disabled]="joinLinkBusy()"
+            (click)="copyJoinLink.emit()"
+            data-testid="copy-join-link"
+          >
+            Copier le lien
+          </button>
+          @if (canNativeShare()) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
+              [disabled]="joinLinkBusy()"
+              (click)="shareJoinLink.emit()"
+              data-testid="share-join-link"
+            >
+              Partager
+            </button>
+          }
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300 disabled:opacity-50"
+            [disabled]="joinLinkBusy()"
+            (click)="regenerateJoinLink.emit()"
+          >
+            Régénérer
+          </button>
+          @if (joinLink()?.enabled) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-red-900/40 text-red-300/80 hover:text-red-300 disabled:opacity-50"
+              [disabled]="joinLinkBusy()"
+              (click)="revokeJoinLink.emit()"
+            >
+              Désactiver
+            </button>
+          }
+        </div>
+      </div>
+      <p class="text-xs text-slate-500">
+        @if (joinLink()?.enabled) {
+          Lien actif : les joueurs rejoignent sans être amis. Vous pouvez régénérer ou
+          désactiver le lien à tout moment.
+        } @else {
+          Aucun lien actif — « Copier le lien campagne » en crée un. Les joueurs rejoignent
+          sans être amis.
+        }
+      </p>
+    </div>
+
+    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500">
+          Inviter un ami
+        </h3>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
+          (click)="copyFriendsInviteLink.emit()"
+        >
+          Copier le lien Amis
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        @for (f of invitableFriends(); track f.id) {
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
+            (click)="inviteFriend.emit(f.id)"
+          >
+            <app-profile-avatar
+              [displayName]="f.displayName"
+              [avatarEmoji]="f.avatarEmoji"
+              [accentColor]="f.accentColor"
+              size="xs"
+            />
+            {{ f.displayName }}
+          </button>
+        } @empty {
+          <p class="text-sm text-slate-500 italic">
+            Tous vos amis sont déjà dans la campagne, ou ajoutez-en depuis
+            <a routerLink="/friends" class="text-violet-400">Amis</a>.
+          </p>
+        }
+      </div>
+      @if (pendingInvites().length) {
+        <div class="pt-2 border-t border-slate-800 space-y-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">
+            En attente ({{ pendingInvites().length }})
+          </p>
+          <ul class="space-y-1.5">
+            @for (inv of pendingInvites(); track inv.id) {
+              <li class="text-sm text-slate-300 flex flex-wrap items-center gap-2">
+                <span>{{ inv.displayName }}</span>
+                <span class="text-[10px] text-slate-600 uppercase tracking-widest"
+                  >invitation envoyée</span
+                >
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    @for (m of players(); track m.id) {
+      <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+        <div class="flex justify-between items-start gap-3">
+          <div class="flex-grow">
+            <h3 class="font-bold text-slate-100">{{ m.displayName }}</h3>
+            <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP en campagne</p>
+            @if (m.approvedCharacterName) {
+              <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
+            }
+            @if (m.proposalStatus === 'pending') {
+              <p class="text-sm text-amber-400 mt-2">Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})</p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                  [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                  (click)="viewMemberCharacter.emit({ member: m, scope: 'proposed' })"
+                >
+                  @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
+                  @else { Voir la fiche proposée }
+                </button>
+                <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember.emit(m)">Accepter</button>
+                <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember.emit(m)">Refuser</button>
+              </div>
+            } @else if (canRequestPick(m)) {
+              <p class="text-sm text-sky-300 mt-2">
+                @if (m.proposalStatus === 'rejected') {
+                  Proposition refusée — le joueur doit en choisir un autre.
+                } @else {
+                  Pas encore de personnage — envoyez-lui un rappel.
+                }
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
+                  [disabled]="isCharacterRequestLoading(m.id)"
+                  (click)="requestCharacterPick.emit(m)"
+                >
+                  {{ isCharacterRequestLoading(m.id) ? 'Envoi…' : 'Demander un personnage' }}
+                </button>
+              </div>
+            } @else if (m.approvedCharacterName) {
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                  [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                  (click)="viewMemberCharacter.emit({ member: m, scope: 'approved' })"
+                >
+                  @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                  @else { Voir la fiche }
+                </button>
+              </div>
+            }
+          </div>
+          <div class="flex flex-col gap-2 shrink-0">
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-slate-900/40 border border-slate-700 text-slate-300 hover:border-sky-700/50"
+              (click)="setMemberAsSpectator.emit(m)"
+              title="Passer en spectateur (lecture seule)"
+              data-testid="set-spectator"
+            >
+              Spectateur
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300 hover:bg-red-950/50"
+              (click)="removeMember.emit(m)"
+              title="Retirer de la campagne"
+            >
+              Retirer
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+
+    @if (spectators().length) {
+      <div class="pt-2 space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Spectateurs
+        </p>
+        @for (m of spectators(); track m.id) {
+          <article class="bg-[#1b2028] border border-slate-800/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="font-bold text-slate-200">{{ m.displayName }}</p>
+              <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Lecture seule</p>
+            </div>
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+              (click)="removeMember.emit(m)"
+            >
+              Retirer
+            </button>
+          </article>
+        }
+      </div>
+    }
+  } @else {
+    @if (myPlayerMember(); as me) {
+      <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mon personnage</h3>
+        @if (me.approvedCharacterName) {
+          <p class="text-violet-300 font-serif">{{ me.approvedCharacterName }} — approuvé · niv. {{ me.approvedCharacterLevel ?? '?' }} · {{ me.xpEarnedInCampaign }} XP</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              type="button"
+              class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+              [disabled]="isMemberCharacterLoading(me.id, 'approved')"
+              (click)="viewMemberCharacter.emit({ member: me, scope: 'approved' })"
+            >
+              @if (isMemberCharacterLoading(me.id, 'approved')) { Chargement… }
+              @else { Voir ma fiche }
+            </button>
+            <a
+              routerLink="/guide/joueur-table"
+              class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/30 border border-sky-800/40 text-sky-300 hover:border-sky-500/50"
+            >
+              Comment jouer →
+            </a>
+          </div>
+        } @else if (me.proposalStatus === 'pending') {
+          <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
+        } @else if (me.proposalStatus === 'rejected') {
+          <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
+            <p class="text-sm text-amber-200">Le MJ attend un nouveau personnage — choisissez un héros ou créez-en un.</p>
+            <a
+              routerLink="/guide/joueur-table"
+              class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+            >
+              Comment jouer →
+            </a>
+          </div>
+          <p class="text-red-400 text-sm mb-3">Proposition refusée. Choisissez un autre personnage :</p>
+          <div class="flex flex-wrap gap-2">
+            @for (ch of myCharacters(); track ch.id) {
+              <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter.emit(ch.id)">{{ ch.name }}</button>
+            }
+            <a
+              routerLink="/create"
+              [queryParams]="{ campaignId: campaignId(), returnUrl: '/campaigns/' + campaignId() + '?tab=players' }"
+              class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300"
+              >Créer un personnage →</a
+            >
+          </div>
+        } @else {
+          <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
+            <p class="text-sm text-amber-200">
+              Le MJ attend votre personnage — choisissez un héros existant ou
+              <a
+                routerLink="/create"
+                [queryParams]="{ campaignId: campaignId(), returnUrl: '/campaigns/' + campaignId() + '?tab=players' }"
+                class="text-amber-100 underline hover:text-white"
+                >créez-en un</a
+              >.
+            </p>
+            <a
+              routerLink="/guide/joueur-table"
+              class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+            >
+              Comment jouer →
+            </a>
+          </div>
+          <p class="text-sm text-slate-400 mb-3">Proposez un de vos personnages au MJ :</p>
+          <div class="flex flex-wrap gap-2">
+            @for (ch of myCharacters(); track ch.id) {
+              <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter.emit(ch.id)">{{ ch.name }}</button>
+            } @empty {
+              <a
+                routerLink="/create"
+                [queryParams]="{ campaignId: campaignId(), returnUrl: '/campaigns/' + campaignId() + '?tab=players' }"
+                class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-violet-600 text-white"
+                >Créer mon premier personnage →</a
+              >
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (otherPlayers().length) {
+      <div class="space-y-3">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Autres joueurs</h3>
+        @for (m of otherPlayers(); track m.id) {
+          <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+            <h4 class="font-bold text-slate-100">{{ m.displayName }}</h4>
+            @if (m.approvedCharacterName) {
+              <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                  [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                  (click)="viewMemberCharacter.emit({ member: m, scope: 'approved' })"
+                >
+                  @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                  @else { Voir la fiche }
+                </button>
+              </div>
+            } @else {
+              <p class="text-sm text-slate-500 mt-2 italic">Pas encore de personnage approuvé</p>
+            }
+          </article>
+        }
+      </div>
+    }
+  }
+</section>

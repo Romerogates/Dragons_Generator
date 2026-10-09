@@ -95,7 +95,13 @@
         </h2>
         @for (inv of invites(); track inv.id) {
           <div
-            class="bg-amber-950/20 border border-amber-900/40 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3"
+            [id]="'campaign-invite-' + inv.id"
+            class="bg-amber-950/20 border rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3"
+            [class.border-amber-400]="isHighlightedInvite(inv.id)"
+            [class.ring-2]="isHighlightedInvite(inv.id)"
+            [class.ring-amber-400/60]="isHighlightedInvite(inv.id)"
+            [class.border-amber-900/40]="!isHighlightedInvite(inv.id)"
+            data-testid="campaign-invite-card"
           >
             <div>
               <p class="font-serif text-slate-200">{{ inv.campaignTitle }}</p>

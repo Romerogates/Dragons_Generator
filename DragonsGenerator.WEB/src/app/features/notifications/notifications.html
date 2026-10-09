@@ -116,7 +116,11 @@
             <div
               class="relative flex items-start gap-4 bg-[#1b2028] border border-slate-800 hover:border-amber-800/50 rounded-2xl p-4 transition-colors group"
             >
-              <a [routerLink]="item.actionPath" class="flex items-start gap-4 min-w-0 flex-1">
+              <a
+                [routerLink]="actionLink(item).commands"
+                [queryParams]="actionQuery(item)"
+                class="flex items-start gap-4 min-w-0 flex-1"
+              >
                 <span class="text-2xl shrink-0 mt-0.5"
                   ><iconify-icon [icon]="iconFor(item.kind)"></iconify-icon
                 ></span>

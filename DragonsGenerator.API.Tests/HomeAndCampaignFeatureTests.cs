@@ -1188,6 +1188,63 @@ public class HomeAndCampaignFeatureTests
     }
 
     [Fact]
+    public async Task Split_campaign_endpoint_files_keep_existing_routes()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "splitowner");
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Split routes");
+
+        using (var list = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaigns", ownerToken))
+        {
+            var res = await _client.SendAsync(list);
+            res.EnsureSuccessStatusCode();
+            var arr = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Contains(arr.EnumerateArray(), c => c.GetProperty("id").GetGuid() == campaignId);
+        }
+
+        using (var detail = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            (await _client.SendAsync(detail)).EnsureSuccessStatusCode();
+        }
+
+        using (var pending = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/invites", ownerToken))
+        {
+            (await _client.SendAsync(pending)).EnsureSuccessStatusCode();
+        }
+
+        using (var xp = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/award-xp", ownerToken))
+        {
+            xp.Content = JsonContent.Create(new { memberId = Guid.Empty, xp = 0 });
+            var res = await _client.SendAsync(xp);
+            Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        }
+
+        using (var assign = ApiTestAuth.Authed(
+            HttpMethod.Post,
+            $"/me/campaigns/{campaignId}/pregens/{Guid.NewGuid()}/assign",
+            ownerToken))
+        {
+            assign.Content = JsonContent.Create(new { userId = Guid.NewGuid(), displayName = "X" });
+            var res = await _client.SendAsync(assign);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var memberChar = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/me/campaigns/{campaignId}/members/{Guid.NewGuid()}/character",
+            ownerToken))
+        {
+            var res = await _client.SendAsync(memberChar);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var archive = ApiTestAuth.Authed(HttpMethod.Put, $"/me/campaigns/{campaignId}/archive", ownerToken))
+        {
+            archive.Content = JsonContent.Create(new { archived = true });
+            (await _client.SendAsync(archive)).EnsureSuccessStatusCode();
+        }
+    }
+
+    [Fact]
     public async Task Friend_shared_character_is_readable_by_friend_only()
     {
         var (_, ownerToken, ownerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "shareowner");

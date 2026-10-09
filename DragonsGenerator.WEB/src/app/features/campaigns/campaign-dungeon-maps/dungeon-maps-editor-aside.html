@@ -1,0 +1,236 @@
+@let h = host();
+@let core = h.core;
+@let ed = h.editor;
+@let view = ed.view;
+@let rooms = ed.rooms;
+@let map = core.editingMap()!;
+      <aside
+        class="space-y-5"
+        [class.overflow-y-auto]="view.editorFullscreen()"
+        [class.max-h-full]="view.editorFullscreen()"
+        [class.pr-1]="view.editorFullscreen()"
+      >
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-amber-400/90 mb-4">Légende</h4>
+          <div class="space-y-3">
+            @for (tile of core.legendTiles; track tile.kind) {
+              <div class="flex items-center gap-3">
+                <span class="h-6 w-6 rounded-md shrink-0 ring-1 ring-black/40" [style.background]="rooms.legendTileColor(tile.kind, map.theme)"></span>
+                <span class="text-sm text-slate-200 font-medium">{{ tile.label }}</span>
+                <span class="text-xs text-slate-500">— {{ tile.desc }}</span>
+              </div>
+            }
+            @for (mk of core.legendMarkers; track mk.label) {
+              @if (mk.symbol !== 'D') {
+                <div class="flex items-center gap-3">
+                  <span class="h-6 w-6 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black text-[#0f1218]" [style.background]="mk.color">{{ mk.symbol }}</span>
+                  <span class="text-sm text-slate-200 font-medium">{{ mk.label }}</span>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-violet-400/90">Brouillard de guerre</h4>
+            <button
+              type="button"
+              class="text-[11px] font-black uppercase px-3 py-1.5 rounded-lg border transition-colors"
+              [class.border-violet-500]="map.fogOfWarEnabled"
+              [class.bg-violet-950/40]="map.fogOfWarEnabled"
+              [class.text-violet-300]="map.fogOfWarEnabled"
+              [class.border-slate-700]="!map.fogOfWarEnabled"
+              [class.text-slate-500]="!map.fogOfWarEnabled"
+              (click)="rooms.toggleFogOfWar()"
+            >
+              {{ map.fogOfWarEnabled ? 'Activé' : 'Désactivé' }}
+            </button>
+          </div>
+          @if (map.fogOfWarEnabled) {
+            <div class="flex flex-wrap gap-2 mb-2">
+              <button
+                type="button"
+                class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-emerald-700/50 text-emerald-400 hover:bg-emerald-950/30"
+                (click)="rooms.revealAllRooms()"
+              >
+                Tout révéler
+              </button>
+              <button
+                type="button"
+                class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800/50"
+                (click)="rooms.hideAllRooms()"
+              >
+                Tout masquer
+              </button>
+              @if (rooms.selectedRoomId()) {
+                <button
+                  type="button"
+                  class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-violet-700/50 text-violet-300 hover:bg-violet-950/30"
+                  (click)="rooms.revealSelectedRoom()"
+                >
+                  Révéler sélection
+                </button>
+                <button
+                  type="button"
+                  class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800/50"
+                  (click)="rooms.hideSelectedRoom()"
+                >
+                  Masquer sélection
+                </button>
+              }
+            </div>
+            <p class="text-[10px] text-slate-500 leading-relaxed">
+              Sélectionnez une salle puis révélez-la. En session, cliquez un couloir pour le FoW case par case.
+            </p>
+          } @else {
+            <p class="text-[10px] text-slate-600 leading-relaxed">
+              Activez pour masquer les salles non révélées aux joueurs (handout / table).
+            </p>
+          }
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-[#141820] p-5">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Salles</h4>
+          <div class="space-y-3">
+            @for (room of map.rooms; track room.id) {
+              <div
+                class="rounded-xl border px-4 py-3 cursor-pointer transition-colors"
+                [class.border-amber-600/70]="rooms.selectedRoomId() === room.id"
+                [class.bg-amber-950/20]="rooms.selectedRoomId() === room.id"
+                [class.border-slate-700/80]="rooms.selectedRoomId() !== room.id"
+                (click)="rooms.focusRoom(room.id)"
+              >
+                <input
+                  type="text"
+                  class="w-full bg-transparent text-base text-slate-100 font-semibold outline-none"
+                  [ngModel]="room.label"
+                  (ngModelChange)="rooms.patchRoom(room.id, { label: $event })"
+                  (click)="$event.stopPropagation()"
+                />
+                <p class="text-xs text-slate-400 mt-1">{{ rooms.encounterLabel(room, core.encounters()) }}</p>
+
+                @if (rooms.markersForRoom(room); as roomMarkers) {
+                  @if (roomMarkers.length) {
+                    <div class="mt-2 space-y-1.5 border-t border-slate-800/80 pt-2">
+                      <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Éléments</p>
+                      @for (mk of roomMarkers; track mk.id) {
+                        <div
+                          class="rounded-md border px-2 py-1.5 space-y-1"
+                          [class.border-amber-700/50]="rooms.selectedMarkerId() === mk.id"
+                          [class.border-slate-800]="rooms.selectedMarkerId() !== mk.id"
+                          (click)="rooms.selectMarker(mk.id); $event.stopPropagation()"
+                        >
+                          <p class="text-[10px] text-slate-300 font-semibold">
+                            {{ core.markerLabels[mk.kind] }}
+                            <span class="text-slate-600 font-normal">({{ mk.x }},{{ mk.y }})</span>
+                          </p>
+                          <textarea
+                            rows="2"
+                            placeholder="Note sur cet élément…"
+                            class="w-full rounded bg-[#0f1218] border border-slate-700 text-[11px] px-2 py-1 resize-none text-slate-300"
+                            [ngModel]="mk.notes ?? ''"
+                            (ngModelChange)="rooms.patchMarker(mk.id, { notes: $event })"
+                            (click)="$event.stopPropagation()"
+                          ></textarea>
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+
+                @if (map.fogOfWarEnabled) {
+                  <button
+                    type="button"
+                    class="text-[9px] font-black uppercase mt-1.5 px-2 py-0.5 rounded border"
+                    [class.border-emerald-600/60]="rooms.isRoomRevealed(room.id)"
+                    [class.text-emerald-400]="rooms.isRoomRevealed(room.id)"
+                    [class.border-slate-700]="!rooms.isRoomRevealed(room.id)"
+                    [class.text-slate-500]="!rooms.isRoomRevealed(room.id)"
+                    (click)="rooms.toggleRoomReveal(room.id, $event)"
+                  >
+                    {{ rooms.isRoomRevealed(room.id) ? 'Révélée aux joueurs' : 'Révéler aux joueurs' }}
+                  </button>
+                }
+
+                <label class="block text-[11px] uppercase tracking-wide text-slate-500 mt-3">Rencontre campagne</label>
+                <select
+                  class="w-full mt-1 rounded-lg bg-[#0f1218] border border-slate-700 text-sm px-3 py-2"
+                  [ngModel]="room.encounterId ?? ''"
+                  (ngModelChange)="rooms.onEncounterChange(room.id, $event)"
+                  (click)="$event.stopPropagation()"
+                >
+                  <option value="">— Aléatoire / pool —</option>
+                  @for (enc of core.encounters(); track enc.id) {
+                    <option [value]="enc.id">{{ enc.name }}</option>
+                  }
+                </select>
+
+                <button type="button" class="text-[10px] font-bold uppercase text-amber-400/90 mt-2" (click)="rooms.rerollRoomEncounter(room.id); $event.stopPropagation()">
+                  Relancer aléatoire
+                </button>
+                @if (!core.libraryMode() && !core.readOnly() && room.randomEncounter?.creatures?.length) {
+                  <button
+                    type="button"
+                    class="block text-[10px] font-bold uppercase text-emerald-400/90 mt-1.5"
+                    (click)="rooms.promoteRoomEncounter(room.id); $event.stopPropagation()"
+                    data-testid="promote-theme-encounter"
+                  >
+                    Créer rencontre campagne
+                  </button>
+                }
+
+                <textarea
+                  rows="3"
+                  placeholder="Notes MJ…"
+                  class="w-full mt-3 rounded-lg bg-[#0f1218] border border-slate-700 text-sm px-3 py-2 resize-none"
+                  [ngModel]="room.notes ?? ''"
+                  (ngModelChange)="rooms.patchRoom(room.id, { notes: $event })"
+                  (click)="$event.stopPropagation()"
+                ></textarea>
+
+                @if (!core.readOnly() && rooms.selectedRoomId() === room.id) {
+                  <button
+                    type="button"
+                    class="mt-2 text-[10px] font-bold uppercase text-red-400/90 hover:text-red-300"
+                    (click)="rooms.deleteRoom(room.id, $event)"
+                  >
+                    Supprimer la salle
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (rooms.selectedMarker(); as selMk) {
+          @if (selMk.kind !== 'door') {
+            <div class="rounded-xl border border-amber-900/40 bg-amber-950/20 p-4 space-y-2">
+              <h4 class="text-[11px] font-bold uppercase tracking-widest text-amber-400/90">
+                {{ core.markerLabels[selMk.kind] }} sélectionné
+              </h4>
+              <textarea
+                rows="3"
+                placeholder="Commentaire sur cet élément…"
+                class="w-full rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1.5 resize-none text-slate-300"
+                [ngModel]="selMk.notes ?? ''"
+                (ngModelChange)="rooms.patchMarker(selMk.id, { notes: $event })"
+              ></textarea>
+            </div>
+          }
+        }
+
+        @if (map.markers.length) {
+          <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
+            <h4 class="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Marqueurs</h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              @for (mk of map.markers; track mk.id) {
+                <li class="flex items-center justify-between gap-2">
+                  <span>{{ core.markerLabels[mk.kind] }} ({{ mk.x }}, {{ mk.y }})</span>
+                  <button type="button" class="text-red-400 text-[10px]" (click)="rooms.removeMarker(mk.id)">✕</button>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </aside>

@@ -1,0 +1,308 @@
+@let playSession = combat.state.activeSession()!;
+@let c = combat.state.campaign();
+
+    @if (combat.state.isDm() && !combat.state.fullscreen() && shell.sessionView() === 'resume') {
+      <app-play-session-dock [compact]="true" />
+    }
+
+    @if (combat.state.isDm() && !combat.state.fullscreen() && shell.sessionView() !== 'resume') {
+      <button
+        type="button"
+        class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-300"
+        (click)="shell.backToSessionHub()"
+      >
+        ← Menu de session
+      </button>
+    }
+
+    @if (combat.state.isDm() && combat.state.fullscreen() && shell.sessionView() === 'resume') {
+      <app-play-session-dock />
+    }
+
+    @if (combat.state.isDm() && shell.sessionView() === 'notes') {
+      <app-campaign-session-notes
+        [session]="playSession"
+        [sessionResume]="c.data.sessionResume ?? null"
+        [compact]="!combat.state.fullscreen()"
+        (resumeChange)="shell.onSessionResumeChange($event)"
+        (padsChange)="shell.onSessionPadsChange($event)"
+      />
+    }
+
+    @if (combat.state.isDm() && shell.sessionView() === 'dungeon') {
+      <section class="space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Donjon de session</p>
+            <h3 class="text-lg font-serif text-sky-100">
+              @if (combat.state.activeSessionMap(); as map) {
+                {{ map.name }}
+              } @else {
+                Aucun donjon attribué
+              }
+            </h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            @if (combat.state.activeSessionMap()) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+                (click)="shell.dungeonPickerOpen.set(!shell.dungeonPickerOpen())"
+              >
+                Changer
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                (click)="shell.clearSessionMap()"
+              >
+                Retirer
+              </button>
+            } @else if (combat.state.campaignDungeonMaps().length === 1) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
+                (click)="shell.assignSessionMap(combat.state.campaignDungeonMaps()[0]!.id)"
+              >
+                Attribuer
+              </button>
+            } @else if (combat.state.campaignDungeonMaps().length > 1) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
+                (click)="shell.focusDungeonPicker()"
+              >
+                Attribuer
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (combat.state.campaignDungeonMaps().length > 1) {
+          <div
+            class="flex flex-wrap gap-1.5"
+            data-testid="session-map-switcher"
+            aria-label="Changer de carte de session"
+          >
+            @for (map of combat.state.campaignDungeonMaps(); track map.id) {
+              <button
+                type="button"
+                class="min-h-9 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border"
+                [class.border-sky-500]="playSession.activeMapId === map.id"
+                [class.text-sky-200]="playSession.activeMapId === map.id"
+                [class.bg-sky-950/40]="playSession.activeMapId === map.id"
+                [class.border-slate-700]="playSession.activeMapId !== map.id"
+                [class.text-slate-400]="playSession.activeMapId !== map.id"
+                (click)="shell.assignSessionMap(map.id)"
+              >
+                {{ map.name }}
+              </button>
+            }
+          </div>
+        }
+
+        @if (shell.dungeonPickerOpen() || !combat.state.activeSessionMap()) {
+          @if (combat.state.campaignDungeonMaps().length) {
+            <div id="session-dungeon-picker" class="space-y-2 scroll-mt-24">
+              @if (!combat.state.activeSessionMap()) {
+                <p class="text-xs text-slate-400">Choisissez un donjon pour cette session :</p>
+              }
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                @for (map of combat.state.campaignDungeonMaps(); track map.id) {
+                  <button
+                    type="button"
+                    class="min-h-12 px-4 py-3 rounded-xl text-left border hover:border-sky-600/50"
+                    [class.border-sky-600]="playSession.activeMapId === map.id"
+                    [class.bg-sky-950/30]="playSession.activeMapId === map.id"
+                    [class.border-slate-700]="playSession.activeMapId !== map.id"
+                    [class.bg-[#1b2028]/80]="playSession.activeMapId !== map.id"
+                    (click)="shell.assignSessionMap(map.id)"
+                  >
+                    <span class="block font-serif text-slate-200">
+                      {{ map.name }}
+                      @if (map.libraryDungeonId) {
+                        <span class="ml-1 text-[9px] font-black uppercase tracking-widest text-emerald-400"
+                          >Live</span
+                        >
+                      }
+                    </span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest">
+                      {{ map.gridWidth }}×{{ map.gridHeight }}
+                      @if (map.libraryDungeonId) {
+                        · lien Mes Donjons
+                      }
+                    </span>
+                  </button>
+                }
+              </div>
+            </div>
+          } @else {
+            <app-play-empty-hint
+              tone="sky"
+              title="Aucun donjon dans cette campagne."
+              detail="Générez une carte ou importez un lien live depuis Mes Donjons."
+            >
+              <div class="flex flex-wrap justify-center gap-2 pt-1">
+                <a
+                  [routerLink]="['/campaigns', c.id]"
+                  [queryParams]="{ tab: 'prep', sub: 'maps', mapsAction: 'generate' }"
+                  class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
+                  data-testid="play-dungeon-generate"
+                >
+                  Générer
+                </a>
+                <a
+                  [routerLink]="['/campaigns', c.id]"
+                  [queryParams]="{ tab: 'prep', sub: 'maps', mapsAction: 'import' }"
+                  class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-300 hover:border-sky-500/60"
+                  data-testid="play-dungeon-import"
+                >
+                  Importer Mes Donjons
+                </a>
+              </div>
+            </app-play-empty-hint>
+          }
+        }
+
+        @if (combat.state.activeSessionMap(); as map) {
+          <app-campaign-dungeon-maps
+            [campaign]="c"
+            [focusMapId]="map.id"
+            (dataChange)="shell.onDungeonMapsDataChange($event)"
+          />
+        }
+      </section>
+    }
+
+    @if (combat.state.isDm() && shell.sessionView() === 'history') {
+      <section class="space-y-5">
+        <app-campaign-session-timeline
+          [session]="playSession"
+          (timelineChange)="shell.onSessionTimelineChange($event)"
+        />
+        @if (combat.state.sessionCombatHistory().length) {
+          <div class="space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Historique des combats
+            </h3>
+            @for (entry of combat.state.sessionCombatHistory(); track entry.id + entry.endedAt) {
+              <details class="bg-[#1b2028]/80 border border-slate-800 rounded-xl overflow-hidden group">
+                <summary class="cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-800/30">
+                  <span class="font-serif text-slate-200">
+                    {{ entry.label || 'Combat' }}
+                    <span class="text-slate-500 text-sm font-sans">· manche {{ entry.round }}</span>
+                  </span>
+                  <time class="text-[10px] text-slate-500">{{ combat.state.formatCombatHistoryDate(entry.endedAt) }}</time>
+                </summary>
+                <pre class="px-4 pb-4 text-xs text-slate-400 whitespace-pre-wrap leading-relaxed border-t border-slate-800/80 pt-3">{{ entry.summary }}</pre>
+              </details>
+            }
+          </div>
+        } @else {
+          <p class="text-sm text-slate-500 italic">Aucun combat terminé pour l’instant.</p>
+        }
+      </section>
+    }
+
+    <app-play-combat-flow [host]="combat" />
+
+
+    @if (combat.state.isDm() && shell.sessionView() === 'encounters') {
+      <div class="space-y-4">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</h3>
+        @if (c.data.encounters.length) {
+          @for (enc of c.data.encounters; track enc.id) {
+            <article
+              class="bg-[#1b2028]/80 border border-slate-800 rounded-xl p-4"
+              [class.md:p-5]="combat.state.fullscreen()"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <h4 [class]="combat.state.fullscreen() ? 'text-lg font-serif text-violet-300' : 'font-serif text-violet-300'">
+                  {{ enc.name }}
+                </h4>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    {{ combat.state.encounterTotalXp(enc) }} XP · {{ combat.state.encounterPendingXp(enc) }} restants
+                  </span>
+                  <button
+                    type="button"
+                    class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300 disabled:opacity-50"
+                    [disabled]="playImport.importingParty()"
+                    (click)="playImport.addEncounterToCombat(enc); shell.sessionView.set('combat')"
+                  >
+                    @if (playImport.importingParty()) {
+                      Chargement…
+                    } @else if (combat.state.activeCombat()) {
+                      + Au combat
+                    } @else {
+                      Lancer le combat
+                    }
+                  </button>
+                </div>
+              </div>
+              @for (cr of enc.creatures; track $index) {
+                <div class="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-800/50 last:border-0">
+                  <span [class]="combat.state.fullscreen() ? 'text-base text-slate-200' : 'text-sm text-slate-300'">
+                    {{ cr.customName || cr.creatureName }}
+                    @if (cr.quantity > 1) {
+                      <span class="text-slate-500">×{{ cr.quantity }}</span>
+                    }
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500">{{ cr.defeated }}/{{ cr.quantity }}</span>
+                    @if (cr.defeated > 0) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                        (click)="playImport.undoDefeated(enc.id, $index)"
+                      >
+                        −1
+                      </button>
+                    }
+                    @if (cr.defeated < cr.quantity) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                        (click)="playImport.markDefeated(enc.id, $index)"
+                      >
+                        +1 vaincu
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+              @if (combat.state.encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
+                <button
+                  type="button"
+                  class="mt-3 w-full py-2 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 disabled:opacity-50"
+                  [disabled]="combat.state.awardingXpId() === enc.id"
+                  (click)="playImport.distributeEncounterXp(enc)"
+                >
+                  @if (combat.state.awardingXpId() === enc.id) {
+                    Distribution…
+                  } @else {
+                    Distribuer {{ combat.state.encounterTotalXp(enc) }} XP
+                  }
+                </button>
+              }
+            </article>
+          }
+        } @else {
+          <app-play-empty-hint
+            kicker="Rencontres"
+            title="Aucune rencontre préparée."
+            detail="Générez-en depuis Préparation, ou « Ajouter à une rencontre » sur une fiche Codex."
+          >
+            @if (combat.state.isDm()) {
+              <a
+                [routerLink]="['/campaigns', c.id]"
+                [queryParams]="{ tab: 'prep', sub: 'encounters' }"
+                class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+              >
+                Ouvrir Préparation → Rencontres
+              </a>
+            }
+          </app-play-empty-hint>
+        }
+      </div>
+    }

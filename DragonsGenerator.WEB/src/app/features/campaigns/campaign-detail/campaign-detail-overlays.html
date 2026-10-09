@@ -1,0 +1,217 @@
+@if (vm.hub.campaign(); as c) {
+    @if (vm.roster.showLeaveConfirm()) {
+      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="vm.roster.cancelLeaveCampaign()">
+        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
+          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">Quitter la campagne</p>
+          <p class="text-sm text-slate-300 mb-4">
+            Vous quittez le roster actif, mais un <span class="text-amber-200">historique en lecture seule</span>
+            reste disponible. Pour confirmer, retapez :
+            <span class="font-bold text-slate-100">« {{ c.title }} »</span>
+          </p>
+          <input
+            type="text"
+            [value]="vm.roster.leaveConfirmInput()"
+            (input)="vm.roster.leaveConfirmInput.set($any($event.target).value)"
+            [placeholder]="c.title"
+            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
+            autofocus
+          />
+          <div class="flex justify-end gap-3">
+            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="vm.roster.cancelLeaveCampaign()">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="!vm.roster.canConfirmLeave() || vm.roster.leaving()"
+              (click)="vm.roster.leaveCampaign()"
+            >
+              {{ vm.roster.leaving() ? 'Départ…' : 'Quitter définitivement' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (vm.roster.showDeleteConfirm()) {
+      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="vm.roster.cancelDeleteCampaign()">
+        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
+          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">
+            {{ (c.hasPlayerHistory || vm.players().length > 0) ? 'Fermer la campagne' : 'Supprimer la campagne' }}
+          </p>
+          @if (c.hasPlayerHistory || vm.players().length > 0) {
+            <p class="text-sm text-slate-300 mb-2">
+              Fermeture : plus de jeu, mais chaque joueur conserve un historique en lecture seule.
+            </p>
+            <p class="text-xs text-slate-500 mb-4">
+              Suppression définitive seulement si aucun joueur n’a jamais rejoint. Préférez Archiver pour masquer sans fermer.
+            </p>
+          } @else {
+            <p class="text-sm text-slate-300 mb-2">
+              Aucun joueur n’a jamais rejoint : suppression définitive.
+            </p>
+            <p class="text-xs text-slate-500 mb-4">
+              Préférez Archiver pour masquer sans effacer.
+            </p>
+          }
+          <p class="text-sm text-slate-400 mb-2">
+            Retapez <span class="font-bold text-slate-100">« {{ c.title }} »</span> pour confirmer.
+          </p>
+          <input
+            type="text"
+            [value]="vm.roster.deleteConfirmInput()"
+            (input)="vm.roster.deleteConfirmInput.set($any($event.target).value)"
+            [placeholder]="c.title"
+            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
+            autofocus
+          />
+          @if (vm.roster.deleteCampaignError(); as derr) {
+            <p class="text-sm text-red-400 mb-3">{{ derr }}</p>
+          }
+          <div class="flex justify-end gap-3">
+            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="vm.roster.cancelDeleteCampaign()">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="!vm.roster.canConfirmDeleteCampaign() || vm.roster.deletingCampaign()"
+              (click)="vm.roster.deleteCampaignFromDetail()"
+            >
+              {{ vm.roster.deletingCampaign() ? 'Suppression…' : 'Supprimer définitivement' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (vm.showPinnedOverlay() && vm.pinnedHandout(); as pin) {
+      <div class="fixed inset-x-0 z-[90] p-3 sm:p-4 pointer-events-none" [class.bottom-16]="vm.showMobileSessionBar()" [class.bottom-0]="!vm.showMobileSessionBar()">
+        <div class="max-w-lg mx-auto pointer-events-auto rounded-2xl border border-sky-500/40 bg-[#1b2028]/95 backdrop-blur-md shadow-2xl overflow-hidden">
+          <div class="h-1 bg-gradient-to-r from-sky-600/40 via-sky-400/60 to-sky-600/40"></div>
+          <div class="p-4 sm:p-5">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Document épinglé par le MJ</p>
+              <button type="button" class="text-slate-500 hover:text-slate-200 shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-800/60" (click)="vm.table.dismissPinnedOverlay()" aria-label="Fermer">✕</button>
+            </div>
+            <h3 class="font-bold text-slate-100 font-serif mb-2">{{ pin.title }}</h3>
+            <div class="text-sm text-slate-300 max-h-[min(50vh,320px)] overflow-y-auto guide-sommaire pinned-handout-body" [innerHTML]="pin.body | lightMarkdown"></div>
+            <div class="mt-3 flex flex-wrap gap-3">
+              <button type="button" class="text-[10px] font-black uppercase text-sky-400" (click)="vm.hubNav.setTab('handouts')">Voir tous les documents →</button>
+              <button type="button" class="text-[10px] font-black uppercase text-slate-500" (click)="vm.table.dismissPinnedOverlay()">Masquer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (vm.showMobileSessionBar()) {
+      <nav class="fixed inset-x-0 bottom-0 z-[80] lg:hidden border-t border-slate-800 bg-[#171b22]/95 backdrop-blur-md px-2 pt-2 safe-area-pb">
+        <div class="flex justify-around gap-1 max-w-lg mx-auto pb-1">
+          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="vm.hubNav.tab() === 'overview'" [class.bg-violet-950/40]="vm.hubNav.tab() === 'overview'" [class.text-slate-400]="vm.hubNav.tab() !== 'overview'" (click)="vm.hubNav.setTab('overview')">Résumé</button>
+          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="vm.hubNav.tab() === 'sessions'" [class.bg-amber-950/40]="vm.hubNav.tab() === 'sessions'" [class.text-slate-400]="vm.hubNav.tab() !== 'sessions'" (click)="vm.hubNav.setTab('sessions')">Sessions</button>
+          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="vm.hubNav.tab() === 'calendar'" [class.bg-amber-950/40]="vm.hubNav.tab() === 'calendar'" [class.text-slate-400]="vm.hubNav.tab() !== 'calendar'" (click)="vm.hubNav.setTab('calendar')">Cal.</button>
+          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="vm.hubNav.tab() === 'prep'" [class.bg-violet-950/40]="vm.hubNav.tab() === 'prep'" [class.text-slate-400]="vm.hubNav.tab() !== 'prep'" (click)="vm.hubNav.setTab('prep')">Prépa</button>
+          <div class="relative flex-1">
+            <button
+              type="button"
+              class="relative w-full py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors"
+              [class.text-sky-300]="vm.hubNav.tab() === 'handouts' || vm.hubNav.tab() === 'players' || vm.boot.mobileMoreOpen()"
+              [class.bg-sky-950/40]="vm.hubNav.tab() === 'handouts' || vm.hubNav.tab() === 'players' || vm.boot.mobileMoreOpen()"
+              [class.text-slate-400]="vm.hubNav.tab() !== 'handouts' && vm.hubNav.tab() !== 'players' && !vm.boot.mobileMoreOpen()"
+              [attr.aria-expanded]="vm.boot.mobileMoreOpen()"
+              [attr.aria-label]="
+                vm.playersTabBadgeCount() > 0
+                  ? 'Plus, ' +
+                    vm.playersTabBadgeCount() +
+                    (vm.playersTabBadgeCount() > 1
+                      ? ' propositions en attente'
+                      : ' proposition en attente')
+                  : 'Plus'
+              "
+              (click)="vm.boot.toggleMobileMore()"
+              data-testid="mobile-more-btn"
+            >
+              Plus
+              @if (vm.playersTabBadgeCount() > 0) {
+                <span
+                  class="absolute top-1 right-1.5 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
+                  aria-hidden="true"
+                >{{ vm.playersTabBadgeCount() }}</span>
+              }
+            </button>
+            @if (vm.boot.mobileMoreOpen()) {
+              <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 rounded-xl border border-slate-700 bg-[#1b2028] shadow-xl overflow-hidden z-10"
+                role="menu"
+                data-testid="mobile-more-menu"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-sky-300 hover:bg-sky-950/40"
+                  (click)="vm.hubNav.setTab('handouts'); vm.boot.mobileMoreOpen.set(false)"
+                >
+                  Documents
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-violet-300 hover:bg-violet-950/40"
+                  (click)="vm.hubNav.setTab('players'); vm.boot.mobileMoreOpen.set(false)"
+                >
+                  Joueurs
+                  @if (vm.playersTabBadgeCount() > 0) {
+                    <span class="ml-1 text-amber-400">({{ vm.playersTabBadgeCount() }})</span>
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </nav>
+    }
+
+    @if (vm.table.rosterSheetOpen()) {
+      <div class="fixed inset-0 z-[85] lg:hidden bg-black/50 backdrop-blur-[2px]" (click)="vm.table.toggleRosterSheet()">
+        <div class="absolute inset-x-0 bottom-0 max-h-[min(78vh,640px)] bg-[#1b2028] border-t border-slate-700 rounded-t-2xl shadow-2xl flex flex-col" (click)="$event.stopPropagation()">
+          <div class="flex justify-center pt-2 pb-1 shrink-0">
+            <span class="w-10 h-1 rounded-full bg-slate-600"></span>
+          </div>
+          <div class="flex items-center justify-between px-4 pb-3 shrink-0">
+            <h3 class="text-sm font-bold text-violet-300">Joueurs & personnages</h3>
+            <button type="button" class="text-slate-500 hover:text-slate-200 w-8 h-8 flex items-center justify-center rounded-lg" (click)="vm.table.toggleRosterSheet()" aria-label="Fermer">✕</button>
+          </div>
+          <div class="flex-1 overflow-y-auto px-4 pb-4 guide-sommaire safe-area-pb">
+            <app-campaign-detail-roster
+              [visible]="true"
+              [allowRemove]="true"
+              [feedback]="vm.hub.rosterFeedback()"
+              [playersNeedingCharacter]="vm.playersNeedingCharacter()"
+              [pendingProposals]="vm.pendingProposals()"
+              [approvedPlayers]="vm.approvedPlayersWithCharacter()"
+              [characterRequestLoadingId]="vm.hub.characterRequestLoadingId()"
+              [memberCharacterLoadingKey]="vm.hubSheets.memberCharacterLoadingId()"
+              (requestCharacterPick)="vm.roster.requestCharacterPick($event)"
+              (removeMember)="vm.roster.removeMember($event)"
+              (approveMember)="vm.roster.approveMember($event)"
+              (rejectMember)="vm.roster.rejectMember($event)"
+              (viewMemberCharacter)="vm.roster.onRosterMemberCharacterAction($event, 'view')"
+              (printMemberFullSheet)="vm.roster.onRosterMemberCharacterAction($event, 'print')"
+            />
+          </div>
+        </div>
+      </div>
+    }
+}
+
+@if (vm.boot.confirmDialog(); as dialog) {
+  <app-confirm-dialog
+    [title]="dialog.title"
+    [body]="dialog.body"
+    [confirmLabel]="dialog.confirmLabel"
+    [danger]="dialog.danger ?? true"
+    (cancelled)="vm.boot.cancelConfirmDialog()"
+    (confirmed)="vm.boot.runConfirmDialog()"
+  />
+}

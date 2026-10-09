@@ -1,12 +1,12 @@
-<div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in">
-  @if (!isLoggedIn()) {
+﻿<div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in">
+  @if (!vm.isLoggedIn()) {
     <div class="max-w-lg mx-auto px-4 py-24 text-center">
       <p class="text-slate-400 mb-6 font-serif italic">Connectez-vous pour accéder à vos campagnes.</p>
-      <a routerLink="/login" [queryParams]="{ returnUrl: loginReturnUrl() }" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase tracking-widest">Se connecter</a>
+      <a routerLink="/login" [queryParams]="{ returnUrl: vm.loginReturnUrl() }" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase tracking-widest">Se connecter</a>
     </div>
-  } @else if (loading()) {
+  } @else if (vm.hub.loading()) {
     <p class="text-center py-24 text-violet-400 animate-pulse">Chargement de la campagne...</p>
-  } @else if (offlineSnapshot(); as snap) {
+  } @else if (vm.hub.offlineSnapshot(); as snap) {
     <div class="max-w-2xl mx-auto px-4 py-12 space-y-6" data-testid="campaign-offline-snapshot">
       <a routerLink="/campaigns" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-violet-400">← Campagnes</a>
       <div class="rounded-2xl border border-amber-900/40 bg-amber-950/20 p-4">
@@ -44,33 +44,33 @@
         </div>
       }
     </div>
-  } @else if (error(); as err) {
+  } @else if (vm.hub.error(); as err) {
     <div class="max-w-lg mx-auto px-4 py-24 text-center">
       <p class="text-red-400 mb-4">{{ err }}</p>
       <a routerLink="/campaigns" class="text-violet-400 text-sm">← Retour aux campagnes</a>
     </div>
-  } @else if (campaign(); as c) {
+  } @else if (vm.hub.campaign(); as c) {
     <header class="px-4 py-6 sm:py-8">
       <div class="max-w-5xl mx-auto dg-hero dg-hero-violet">
         <a routerLink="/campaigns" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-violet-300 mb-4 inline-block">← Campagnes</a>
-        @if (isSupportInspect()) {
+        @if (vm.isSupportInspect()) {
           <p class="mb-4 rounded-xl border border-amber-800/50 bg-amber-950/30 px-4 py-2 text-xs text-amber-100">
             Mode support — inspection de la table (vous n’êtes pas MJ ici, les modifications ne sont pas enregistrées).
           </p>
         }
-        @if (welcomeBanner(); as welcome) {
-          @if (showWelcomeBanner()) {
+        @if (vm.boot.welcomeBanner(); as welcome) {
+          @if (vm.showWelcomeBanner()) {
           <div
             class="mb-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-sky-800/40 bg-sky-950/25 px-4 py-3"
             role="status"
           >
             <p class="text-sm text-sky-100/90">{{ welcome }}</p>
             <div class="flex flex-wrap gap-2">
-              @if (!mjUi(c)) {
+              @if (!vm.mjUi(c)) {
                 <button
                   type="button"
                   class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-sky-700 text-white hover:bg-sky-600"
-                  (click)="setTab('players'); dismissWelcomeBanner()"
+                  (click)="vm.hubNav.setTab('players'); vm.boot.dismissWelcomeBanner()"
                 >
                   Proposer un héros
                 </button>
@@ -78,7 +78,7 @@
               <button
                 type="button"
                 class="px-2 py-1 text-[9px] font-black uppercase text-slate-500 hover:text-slate-300"
-                (click)="dismissWelcomeBanner()"
+                (click)="vm.boot.dismissWelcomeBanner()"
               >
                 Fermer
               </button>
@@ -86,34 +86,34 @@
           </div>
           }
         }
-        @if (hubNextAction(); as hub) {
+        @if (vm.hubNextAction(); as nextAction) {
           <div
             class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3"
             role="status"
             data-testid="hub-next-action"
             [class]="
-              hub.tone === 'sky'
+              nextAction.tone === 'sky'
                 ? 'border-sky-800/50 bg-sky-950/30'
-                : hub.tone === 'amber'
+                : nextAction.tone === 'amber'
                   ? 'border-amber-800/50 bg-amber-950/30'
-                  : hub.tone === 'emerald'
+                  : nextAction.tone === 'emerald'
                     ? 'border-emerald-800/50 bg-emerald-950/30'
-                    : hub.tone === 'rose'
+                    : nextAction.tone === 'rose'
                       ? 'border-rose-800/50 bg-rose-950/30'
                       : 'border-slate-700 bg-[#1b2028]/80'
             "
           >
             <div class="min-w-0">
               <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Prochaine action</p>
-              <p class="text-sm font-serif text-slate-100 mt-0.5">{{ hub.title }}</p>
-              <p class="text-xs text-slate-400 mt-0.5">{{ hub.detail }}</p>
+              <p class="text-sm font-serif text-slate-100 mt-0.5">{{ nextAction.title }}</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ nextAction.detail }}</p>
             </div>
-            @if (hub.cta === 'rsvp' && hub.eventId) {
+            @if (nextAction.cta === 'rsvp' && nextAction.eventId) {
               <div class="flex flex-wrap gap-2 shrink-0">
                 <button
                   type="button"
                   class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'yes' })"
+                  (click)="vm.table.onScheduleRsvp({ eventId: nextAction.eventId!, status: 'yes' })"
                   data-testid="hub-rsvp-yes"
                 >
                   Oui
@@ -121,7 +121,7 @@
                 <button
                   type="button"
                   class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-slate-700 text-slate-100 hover:bg-slate-600"
-                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'maybe' })"
+                  (click)="vm.table.onScheduleRsvp({ eventId: nextAction.eventId!, status: 'maybe' })"
                   data-testid="hub-rsvp-maybe"
                 >
                   Peut-être
@@ -129,20 +129,20 @@
                 <button
                   type="button"
                   class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-rose-900/80 text-rose-100 hover:bg-rose-800"
-                  (click)="onScheduleRsvp({ eventId: hub.eventId!, status: 'no' })"
+                  (click)="vm.table.onScheduleRsvp({ eventId: nextAction.eventId!, status: 'no' })"
                   data-testid="hub-rsvp-no"
                 >
                   Non
                 </button>
               </div>
-            } @else if (hub.ctaLabel && hub.cta) {
+            } @else if (nextAction.ctaLabel && nextAction.cta) {
               <button
                 type="button"
                 class="shrink-0 min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-                (click)="runHubNextActionCta()"
+                (click)="vm.runHubNextActionCta()"
                 data-testid="hub-next-action-cta"
               >
-                {{ hub.ctaLabel }}
+                {{ nextAction.ctaLabel }}
               </button>
             }
           </div>
@@ -151,12 +151,12 @@
           <div>
             <h1 class="text-3xl md:text-4xl font-bold text-violet-300 font-serif tracking-wide">{{ c.title }}</h1>
             <p class="text-sm text-slate-400 mt-2 leading-relaxed">
-              Niv. {{ c.data.partyLevel }} · {{ toneLabels[c.data.tone] }}
+              Niv. {{ c.data.partyLevel }} · {{ vm.toneLabels[c.data.tone] }}
               @if (c.data.regionName) { · {{ c.data.regionName }} }
               @if (c.data.setting) { · {{ c.data.setting }} }
-              · {{ c.role === 'support' || isSupportInspect() ? 'Support' : mjUi(c) ? 'MJ' : c.role === 'spectator' ? 'Spectateur' : 'Joueur' }}
+              · {{ c.role === 'support' || vm.isSupportInspect() ? 'Support' : vm.mjUi(c) ? 'MJ' : c.role === 'spectator' ? 'Spectateur' : 'Joueur' }}
             </p>
-            @if ((c.data.atlasPins?.length ?? 0) > 0 || mjUi(c)) {
+            @if ((c.data.atlasPins?.length ?? 0) > 0 || vm.mjUi(c)) {
               <div class="mt-3 flex flex-wrap items-center gap-2" data-testid="campaign-atlas-pins">
                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Atlas</span>
                 @for (pin of c.data.atlasPins ?? []; track pin.id) {
@@ -166,12 +166,12 @@
                     } @else {
                       {{ pin.name }}
                     }
-                    @if (mjUi(c)) {
+                    @if (vm.mjUi(c)) {
                       <button type="button" class="text-slate-600 hover:text-red-400" (click)="removeAtlasPin(pin.id)" aria-label="Retirer">×</button>
                     }
                   </span>
                 }
-                @if (mjUi(c)) {
+                @if (vm.mjUi(c)) {
                   <div class="relative" data-testid="campaign-atlas-add-wrap">
                     <button
                       type="button"
@@ -277,9 +277,9 @@
                 }
               </div>
             }
-            @if (showGuideLinks()) {
+            @if (vm.showGuideLinks()) {
               <p class="mt-2 text-[10px] text-slate-600">
-                @if (mjUi(c)) {
+                @if (vm.mjUi(c)) {
                   <a routerLink="/guide/scenario" class="underline hover:text-violet-400">Guide — campagnes</a>
                   ·
                   <a routerLink="/guide/table" class="underline hover:text-violet-400">table de jeu</a>
@@ -290,7 +290,7 @@
             }
             @if (c.isArchived && !c.isHistory) {
               <p class="mt-2 text-[11px] text-amber-300/90">
-                Archivée pour vous — toujours accessible ; vous n’avez pas quitté la table.
+                Archivée pour vous — toujours accessible ; vous n’avez pas quitté la vm.table.
               </p>
             }
             @if (c.isHistory) {
@@ -304,11 +304,11 @@
             }
           </div>
           <div class="flex items-center gap-3 flex-wrap">
-            @if (mjUi(c) && !c.isHistory) {
+            @if (vm.mjUi(c) && !c.isHistory) {
               <button
                 type="button"
                 class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
-                (click)="copyCampaignJoinLink()"
+                (click)="vm.roster.copyCampaignJoinLink()"
                 data-testid="header-invite-cta"
               >
                 Inviter
@@ -316,43 +316,43 @@
               <button
                 type="button"
                 class="min-h-10 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-violet-500/50 hover:text-violet-300"
-                (click)="setTab('players')"
+                (click)="vm.hubNav.setTab('players')"
               >
                 Joueurs
               </button>
             }
-            @if (saving()) {
+            @if (vm.hub.saving()) {
               <span class="text-[10px] font-black uppercase tracking-widest text-violet-500 animate-pulse">Sauvegarde...</span>
             }
-            @if (syncNotice(); as notice) {
+            @if (vm.hub.syncNotice(); as notice) {
               <div class="flex flex-wrap items-center gap-2 max-w-md" data-testid="campaign-sync-notice">
                 <span
                   class="text-[10px] font-semibold leading-snug"
                   [class.text-amber-300]="!notice.includes('XP reçue')"
                   [class.text-emerald-300]="notice.includes('XP reçue')"
                 >{{ notice }}</span>
-                @if (xpLevelUpAvailable() && notice.includes('XP reçue')) {
+                @if (vm.hub.xpLevelUpAvailable() && notice.includes('XP reçue')) {
                   <button
                     type="button"
                     class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-emerald-700 text-white hover:bg-emerald-600"
-                    (click)="openLevelUpFromXp()"
+                    (click)="vm.roster.openLevelUpFromXp()"
                     data-testid="xp-level-up-cta"
                   >
                     Monter de niveau
                   </button>
                 }
-                @if (staleRemote()) {
+                @if (vm.hub.staleRemote()) {
                   <button
                     type="button"
                     class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-700 text-white hover:bg-amber-600"
-                    (click)="applyStaleRemote()"
+                    (click)="hubSync.applyStaleRemote()"
                   >
                     Recharger
                   </button>
                   <button
                     type="button"
                     class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-600 text-slate-400"
-                    (click)="dismissStaleRemote()"
+                    (click)="hubSync.dismissStaleRemote()"
                   >
                     Garder
                   </button>
@@ -364,41 +364,41 @@
                 <button
                   type="button"
                   class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/40 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
-                  [disabled]="archiving()"
-                  (click)="setCampaignArchived(false)"
+                  [disabled]="vm.roster.archiving()"
+                  (click)="vm.roster.setCampaignArchived(false)"
                 >
-                  {{ archiving() ? '…' : 'Désarchiver' }}
+                  {{ vm.roster.archiving() ? '…' : 'Désarchiver' }}
                 </button>
               } @else {
                 <button
                   type="button"
                   class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-200 disabled:opacity-50"
-                  [disabled]="archiving()"
-                  (click)="setCampaignArchived(true)"
+                  [disabled]="vm.roster.archiving()"
+                  (click)="vm.roster.setCampaignArchived(true)"
                   title="Masquer de votre liste sans quitter"
                 >
-                  {{ archiving() ? '…' : 'Archiver' }}
+                  {{ vm.roster.archiving() ? '…' : 'Archiver' }}
                 </button>
               }
             }
-            @if (mjUi(c) && !c.isHistory) {
+            @if (vm.mjUi(c) && !c.isHistory) {
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40 disabled:opacity-50"
-                [disabled]="deletingCampaign()"
-                (click)="requestDeleteCampaign()"
+                [disabled]="vm.roster.deletingCampaign()"
+                (click)="vm.roster.requestDeleteCampaign()"
               >
-                {{ (c.hasPlayerHistory || players().length > 0) ? 'Fermer' : 'Supprimer' }}
+                {{ (c.hasPlayerHistory || vm.players().length > 0) ? 'Fermer' : 'Supprimer' }}
               </button>
             }
-            @if (!mjUi(c) && !c.isHistory) {
+            @if (!vm.mjUi(c) && !c.isHistory) {
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40 disabled:opacity-50"
-                [disabled]="leaving()"
-                (click)="requestLeaveCampaign()"
+                [disabled]="vm.roster.leaving()"
+                (click)="vm.roster.requestLeaveCampaign()"
               >
-                {{ leaving() ? 'Départ…' : 'Quitter la campagne' }}
+                {{ vm.roster.leaving() ? 'Départ…' : 'Quitter la campagne' }}
               </button>
             }
           </div>
@@ -408,26 +408,26 @@
           class="sticky z-20 flex flex-nowrap gap-1.5 mt-6 p-1.5 rounded-2xl bg-[#141820]/90 backdrop-blur-md border border-slate-800/80 top-[var(--dg-sticky-top)] overflow-x-auto overscroll-x-contain custom-scrollbar"
           aria-label="Sections de la campagne"
         >
-          @for (t of visibleTabs(); track t.id) {
+          @for (t of vm.visibleTabs(); track t.id) {
             <button
               type="button"
               class="relative inline-flex shrink-0 items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
               [class]="
-                tab() === t.id
+                vm.hubNav.tab() === t.id
                   ? 'border-violet-500/50 text-violet-300 bg-violet-950/40 shadow-[0_0_0_1px_rgba(139,92,246,0.12)]'
                   : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/40'
               "
               [attr.aria-label]="
-                t.id === 'players' && playersTabBadgeCount() > 0
+                t.id === 'players' && vm.playersTabBadgeCount() > 0
                   ? t.label +
                     ', ' +
-                    playersTabBadgeCount() +
-                    (playersTabBadgeCount() > 1
+                    vm.playersTabBadgeCount() +
+                    (vm.playersTabBadgeCount() > 1
                       ? ' propositions en attente'
                       : ' proposition en attente')
                   : null
               "
-              (click)="setTab($any(t.id))"
+              (click)="vm.hubNav.setTab($any(t.id))"
             >
               <iconify-icon
                 noobserver
@@ -437,11 +437,11 @@
                 class="inline-block shrink-0 w-4 h-4 text-base leading-none"
               ></iconify-icon>
               <span>{{ t.label }}</span>
-              @if (t.id === 'players' && playersTabBadgeCount() > 0) {
+              @if (t.id === 'players' && vm.playersTabBadgeCount() > 0) {
                 <span
                   class="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[var(--dg-surface)]"
                   aria-hidden="true"
-                >{{ playersTabBadgeCount() }}</span>
+                >{{ vm.playersTabBadgeCount() }}</span>
               }
             </button>
           }
@@ -449,846 +449,7 @@
       </div>
     </header>
 
-    @if (!mjUi(c) && showInitiativeBanner() && initiativeBoard(); as board) {
-      <div class="border-b border-amber-900/40 bg-amber-950/25">
-        <div class="max-w-5xl mx-auto px-4 py-4 space-y-3">
-          <p class="text-sm text-amber-100">
-            <span class="font-semibold">Le MJ attend votre initiative.</span>
-          </p>
-          <app-campaign-initiative-inline
-            [campaignId]="c.id"
-            [board]="board"
-            (submitted)="onInitiativeSubmitted()"
-          />
-        </div>
-      </div>
-    }
-
-    <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
-      @switch (tab()) {
-        @case ('overview') {
-          <app-campaign-detail-overview
-            [isOwner]="mjUi(c)"
-            [liveSession]="activePlaySession() ?? null"
-            [nextSession]="nextHubTable()?.source === 'session' ? nextPlannedSession() : null"
-            [nextSchedule]="nextHubTable()?.source === 'schedule' ? { title: nextHubTable()!.title, startsAt: nextHubTable()!.at, rsvpSummary: nextHubTable()!.rsvpSummary } : null"
-            [liveSessionDateLabel]="activePlaySession() ? formatSessionDate(activePlaySession()!.scheduledAt) : ''"
-            [liveSessionModeLabel]="activePlaySession() ? sessionModeLabel(activePlaySession()!.mode) : ''"
-            [nextSessionDateLabel]="nextHubTable()?.source === 'session' ? formatSessionDate(nextHubTable()!.at) : ''"
-            [nextSessionModeLabel]="nextHubTable()?.source === 'session' && nextPlannedSession() ? sessionModeLabel(nextPlannedSession()!.mode) : ''"
-            [nextScheduleDateLabel]="nextHubTable()?.source === 'schedule' ? formatSessionDate(nextHubTable()!.at) : ''"
-            [creatureCount]="c.data.creatures.length"
-            [encounterCount]="c.data.encounters.length"
-            [playerCount]="players().length"
-            [plannedSessionCount]="plannedSessionCount()"
-            [playedSessionCount]="playedSessionCount()"
-            [documentCount]="documentCount()"
-            [totalXpAwarded]="totalXpAwarded()"
-            [myXpEarned]="myXpEarned()"
-            [approvedCharacterName]="myPlayerMember()?.approvedCharacterName"
-            [adventure]="c.data.adventure ?? ''"
-            [showRoster]="showOverviewRoster()"
-            [rosterFeedback]="rosterFeedback()"
-            [playersNeedingCharacter]="playersNeedingCharacter()"
-            [pendingProposals]="pendingProposals()"
-            [approvedPlayers]="approvedPlayersWithCharacter()"
-            [characterRequestLoadingId]="characterRequestLoadingId()"
-            [memberCharacterLoadingKey]="memberCharacterLoadingId()"
-            [myPlayerMember]="myPlayerMember() ?? null"
-            [lastHandoutTitle]="lastPublishedHandoutTitle() ?? null"
-            [publishedHandoutsCount]="publishedHandoutsCount()"
-            [campaignId]="c.id"
-            [activityLoading]="activityLoading()"
-            [activity]="activity()"
-            [firstSession]="firstSessionChecklist()"
-            (openPlayFullscreen)="openPlayFullscreen()"
-            (startPlaySession)="startPlaySession($event)"
-            (goSessions)="setTab('sessions')"
-            (goCalendar)="setTab('calendar')"
-            (convertNextSchedule)="convertNextHubSchedule()"
-            (openPrepScenario)="openPrepScenario()"
-            (statsNavigate)="onStatsNavigate($event)"
-            (requestCharacterPick)="requestCharacterPick($event)"
-            (removeMember)="removeMember($event)"
-            (approveMember)="approveMember($event)"
-            (rejectMember)="rejectMember($event)"
-            (viewMemberCharacter)="onRosterMemberCharacterAction($event, 'view')"
-            (printMemberFullSheet)="onRosterMemberCharacterAction($event, 'print')"
-            (activityItemClick)="openHandoutFromActivity($event)"
-            (goHandouts)="setTab('handouts')"
-            (firstSessionAction)="onFirstSessionAction($event)"
-            (levelUp)="openLevelUpFromXp()"
-          />
-        }
-
-        @case ('sessions') {
-          <app-campaign-detail-sessions
-            [isOwner]="mjUi(c)"
-            [campaignId]="c.id"
-            [sortedSessions]="sortedSessions()"
-            [upcomingSessions]="upcomingSessions()"
-            [pastSessions]="pastSessions()"
-            [editingSessionId]="editingSessionId()"
-            [hasActiveSession]="!!activePlaySession()"
-            [activeSessionId]="c.data.activeSessionId ?? null"
-            [dungeonMaps]="c.data.dungeonMaps ?? []"
-            [feedback]="rosterFeedback()"
-            (addSession)="addSession()"
-            (startEditSession)="startEditSession($event)"
-            (stopEditSession)="stopEditSession()"
-            (startPlaySession)="startPlaySession($event)"
-            (openLiveSession)="openPlayFullscreen()"
-            (removeSession)="removeSession($event)"
-            (sessionPatch)="onSessionPatch($event)"
-            (sessionPatchImmediate)="onSessionPatchImmediate($event)"
-            (sessionDateChange)="onSessionDateChangeEvent($event)"
-            (exportEveningPdf)="exportSessionEveningPdf($event)"
-            (exportUnifiedPack)="exportSessionUnifiedPack($event)"
-            (prefillRunSheet)="prefillSessionRunSheet($event)"
-          />
-        }
-
-        @case ('calendar') {
-          <app-campaign-calendar
-            [isOwner]="mjUi(c)"
-            [campaignId]="c.id"
-            [campaignTitle]="c.title"
-            [sessions]="c.data.sessions ?? []"
-            [scheduleEvents]="c.data.scheduleEvents ?? []"
-            [heroOptions]="calendarHeroOptions()"
-            [currentUserId]="currentUserId()"
-            [focusEventId]="focusScheduleEventId()"
-            (scheduleEventsChange)="onScheduleEventsChange($event)"
-            (rsvpChange)="onScheduleRsvp($event)"
-            (openSession)="openSessionFromCalendar($event)"
-            (convertToSession)="convertScheduleEventToSession($event)"
-            (focusEventConsumed)="focusScheduleEventId.set(null)"
-          />
-        }
-
-        @case ('prep') {
-          <section class="space-y-5">
-            @if (mjUi(c)) {
-              <app-campaign-setup-guide
-                [state]="setupGuideState()"
-                (action)="onSetupGuideAction($event)"
-              />
-            }
-
-            <nav class="flex flex-wrap gap-1.5" aria-label="Préparation">
-              @for (s of prepSubTabs(); track s.id) {
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-colors"
-                  [class]="prepSub() === s.id ? 'border-violet-500 text-violet-300 bg-violet-950/30' : 'border-slate-700 text-slate-500'"
-                  (click)="setPrepSub(s.id)"
-                >
-                  <iconify-icon noobserver [icon]="s.icon" width="14" height="14" class="inline-block shrink-0"></iconify-icon>
-                  <span>{{ s.label }}</span>
-                </button>
-              }
-            </nav>
-
-            @switch (prepSub()) {
-              @case ('scenario') {
-                <app-campaign-detail-prep-scenario
-                  [isOwner]="mjUi(c)"
-                  [title]="c.title"
-                  [adventure]="c.data.adventure"
-                  (editScenario)="editScenario()"
-                  (titleChange)="saveTitle($event)"
-                />
-              }
-
-              @case ('notebook') {
-                @if (mjUi(c)) {
-                  <app-campaign-notebook
-                    [pages]="notebookPages()"
-                    [page]="activeNotebookPage()"
-                    (pageChange)="onNotebookPageChange($event)"
-                    (pagesChange)="onNotebookPagesChange($event)"
-                  />
-                } @else {
-                  <p class="text-slate-500 italic text-center py-12">Réservé au MJ.</p>
-                }
-              }
-
-              @case ('maps') {
-                @if (mjUi(c)) {
-                  <app-campaign-dungeon-maps
-                    [campaign]="c"
-                    [focusMapId]="focusDungeonMapId()"
-                    [autoAction]="mapsAutoAction()"
-                    (dataChange)="saveData($event)"
-                  />
-                } @else {
-                  <p class="text-slate-500 italic text-center py-12">Réservé au MJ.</p>
-                }
-              }
-
-              @case ('creatures') {
-                <app-campaign-detail-prep-creatures
-                  [isOwner]="mjUi(c)"
-                  [creatures]="c.data.creatures ?? []"
-                  (addCreatures)="addCreaturesOnly()"
-                  (openBestiary)="openBestiaryFullscreen()"
-                  (openCreatureInBook)="openCreatureInBook($event)"
-                  (roleChange)="updateCreatureRole($event.creature, $event.role)"
-                  (cardFieldChange)="onCreatureCardField($event)"
-                  (bulkClassify)="bulkClassifyUnsorted($event)"
-                />
-              }
-
-              @case ('pregens') {
-                <app-campaign-detail-prep-pregens
-                  [isOwner]="mjUi(c)"
-                  [campaignId]="c.id"
-                  [pregens]="c.data.pregenCharacters ?? []"
-                  [players]="players()"
-                  [readyPregens]="readyPregensForPlayers()"
-                  [myAssignedPregens]="myAssignedPregens()"
-                  [dmCharacters]="dmCharacters()"
-                  [feedback]="pregenFeedback()"
-                  [undoAvailable]="pregenUndoAvailable()"
-                  [importing]="importingPregen()"
-                  [generating]="generatingAutoPregen()"
-                  [pdfLoadingId]="pregenPdfLoadingId()"
-                  [aiForegroundActive]="aiProgress.foregroundActive()"
-                  [aiActive]="aiProgress.active()"
-                  [aiBackground]="aiProgress.background()"
-                  [capLabel]="pregenCapLabel()"
-                  [canAdd]="canAddPregen()"
-                  (runUndo)="runPregenUndo()"
-                  (viewCharacter)="viewPregenCharacter($event)"
-                  (useAtTable)="usePregenAtTable($event)"
-                  (claim)="claimPregen($event)"
-                  (printFullSheet)="printPregenFullSheet($event)"
-                  (generateAuto)="generateAutoPregen()"
-                  (importFromCharacter)="importPregenFromCharacter($event)"
-                  (remove)="removePregen($event)"
-                  (patch)="onPregenPatch($event)"
-                  (markReady)="markPregenReady($event)"
-                  (assign)="assignPregen($event.pregen, $event.member)"
-                />
-              }
-
-              @case ('encounters') {
-                <app-campaign-detail-prep-encounters
-                  [isOwner]="mjUi(c)"
-                  [encounters]="c.data.encounters ?? []"
-                  [creaturesCount]="(c.data.creatures ?? []).length"
-                  [dungeonMaps]="dungeonMapOptions()"
-                  [awardingXpId]="awardingXpId()"
-                  (insertEncounterPack)="insertEncounterPack($event)"
-                  (generateEncounters)="generateEncountersFromStory()"
-                  (goCreatures)="setPrepSub('creatures')"
-                  (encounterPatch)="patchEncounter($event.encounterId, $event.patch)"
-                  (openDungeon)="openDungeonForEncounter($event)"
-                  (markDefeated)="markDefeated($event.encounterId, $event.creatureIndex)"
-                  (undoDefeated)="undoDefeated($event.encounterId, $event.creatureIndex)"
-                  (distributeXp)="distributeEncounterXp($event)"
-                />
-              }
-
-
-            }
-          </section>
-        }
-
-        @case ('handouts') {
-          <app-campaign-detail-handouts
-            [isOwner]="mjUi(c)"
-            [handouts]="sortedHandouts()"
-            [kindFilter]="handoutKindFilter()"
-            [editingHandoutId]="editingHandoutId()"
-            [focusHandoutId]="focusHandoutId()"
-            [previewHandout]="previewHandout()"
-            [pinnedHandoutId]="c.data.pinnedHandoutId ?? null"
-            [printing]="printing()"
-            [pdfPreviewUrl]="pdfPreviewUrl()"
-            [pdfPreviewRawUrl]="pdfPreviewRawUrl()"
-            [isLoadingPreview]="isLoadingPreview()"
-            [pdfPreviewKind]="pdfPreviewKind()"
-            [hasCreatures]="!!c.data.creatures.length"
-            [pregens]="pdfUnassignedPregens()"
-            [sheetMembers]="pdfSheetMembers()"
-            [pregenPdfLoadingId]="pregenPdfLoadingId()"
-            [memberSheetLoadingKey]="memberCharacterLoadingId()"
-            (addHandout)="addHandout()"
-            (insertHandoutPack)="insertHandoutPack($event)"
-            (kindFilterChange)="setHandoutKindFilter($event)"
-            (startEdit)="startEditHandout($event)"
-            (stopEdit)="stopEditHandout()"
-            (deleteHandout)="deleteHandout($event)"
-            (preview)="previewHandoutAsPlayer($event)"
-            (closePreview)="closeHandoutPreview()"
-            (handoutPatch)="onHandoutPatch($event)"
-            (handoutPatchImmediate)="onHandoutPatchImmediate($event)"
-            (togglePublished)="onHandoutTogglePublished($event)"
-            (pinHandout)="pinHandout($event)"
-            (printPackMj)="printPackMj()"
-            (printBestiary)="printBestiary()"
-            (printPlayerSummaries)="printPlayerSummariesPdf()"
-            (printAllPlayerSheets)="printAllPlayerSheets()"
-            (loadPackPreview)="loadPackPreview()"
-            (loadBestiaryPreview)="loadBestiaryPreview()"
-            (openPdfFullscreen)="openBestiaryFullscreen()"
-            (downloadPdfPreview)="downloadPdfPreview()"
-            (printPregenFullSheet)="printPregenFullSheet($event)"
-            (printMemberFullSheet)="printMemberFullSheet($event.member, $event.scope)"
-          />
-        }
-
-        @case ('players') {
-          <section class="space-y-6">
-            @if (mjUi(c) && rosterFeedback(); as fb) {
-              <p
-                class="text-sm text-emerald-400 rounded-xl border border-emerald-800/40 bg-emerald-950/20 px-4 py-3"
-                data-testid="players-invite-feedback"
-                role="status"
-              >{{ fb }}</p>
-            }
-            @if (mjUi(c)) {
-              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500">
-                    Lien d’invitation
-                  </h3>
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-violet-700/50 text-violet-300 hover:border-violet-400 disabled:opacity-50"
-                      [disabled]="joinLinkBusy()"
-                      (click)="copyCampaignJoinLink()"
-                      data-testid="copy-join-link"
-                    >
-                      Copier le lien
-                    </button>
-                    @if (canNativeShare()) {
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
-                        [disabled]="joinLinkBusy()"
-                        (click)="shareCampaignJoinLink()"
-                        data-testid="share-join-link"
-                      >
-                        Partager
-                      </button>
-                    }
-                    <button
-                      type="button"
-                      class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300 disabled:opacity-50"
-                      [disabled]="joinLinkBusy()"
-                      (click)="regenerateJoinLink()"
-                    >
-                      Régénérer
-                    </button>
-                    @if (joinLink()?.enabled) {
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-red-900/40 text-red-300/80 hover:text-red-300 disabled:opacity-50"
-                        [disabled]="joinLinkBusy()"
-                        (click)="revokeJoinLink()"
-                      >
-                        Désactiver
-                      </button>
-                    }
-                  </div>
-                </div>
-                <p class="text-xs text-slate-500">
-                  @if (joinLink()?.enabled) {
-                    Lien actif : les joueurs rejoignent sans être amis. Vous pouvez régénérer ou
-                    désactiver le lien à tout moment.
-                  } @else {
-                    Aucun lien actif — « Copier le lien campagne » en crée un. Les joueurs rejoignent
-                    sans être amis.
-                  }
-                </p>
-              </div>
-
-              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500">
-                    Inviter un ami
-                  </h3>
-                  <button
-                    type="button"
-                    class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
-                    (click)="copyFriendsInviteLink()"
-                  >
-                    Copier le lien Amis
-                  </button>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  @for (f of invitableFriends(); track f.id) {
-                    <button
-                      type="button"
-                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
-                      (click)="inviteFriend(f.id)"
-                    >
-                      <app-profile-avatar
-                        [displayName]="f.displayName"
-                        [avatarEmoji]="f.avatarEmoji"
-                        [accentColor]="f.accentColor"
-                        size="xs"
-                      />
-                      {{ f.displayName }}
-                    </button>
-                  } @empty {
-                    <p class="text-sm text-slate-500 italic">
-                      Tous vos amis sont déjà dans la campagne, ou ajoutez-en depuis
-                      <a routerLink="/friends" class="text-violet-400">Amis</a>.
-                    </p>
-                  }
-                </div>
-                @if (pendingInvites().length) {
-                  <div class="pt-2 border-t border-slate-800 space-y-2">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">
-                      En attente ({{ pendingInvites().length }})
-                    </p>
-                    <ul class="space-y-1.5">
-                      @for (inv of pendingInvites(); track inv.id) {
-                        <li class="text-sm text-slate-300 flex flex-wrap items-center gap-2">
-                          <span>{{ inv.displayName }}</span>
-                          <span class="text-[10px] text-slate-600 uppercase tracking-widest"
-                            >invitation envoyée</span
-                          >
-                        </li>
-                      }
-                    </ul>
-                  </div>
-                }
-              </div>
-
-              @for (m of players(); track m.id) {
-                <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                  <div class="flex justify-between items-start gap-3">
-                    <div class="flex-grow">
-                      <h3 class="font-bold text-slate-100">{{ m.displayName }}</h3>
-                      <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP en campagne</p>
-                      @if (m.approvedCharacterName) {
-                        <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
-                      }
-                      @if (m.proposalStatus === 'pending') {
-                        <p class="text-sm text-amber-400 mt-2">Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})</p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
-                            (click)="viewMemberCharacter(m, 'proposed')"
-                          >
-                            @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
-                            @else { Voir la fiche proposée }
-                          </button>
-                          <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
-                          <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
-                        </div>
-                      } @else if (canRequestCharacterPick(m)) {
-                        <p class="text-sm text-sky-300 mt-2">
-                          @if (m.proposalStatus === 'rejected') {
-                            Proposition refusée — le joueur doit en choisir un autre.
-                          } @else {
-                            Pas encore de personnage — envoyez-lui un rappel.
-                          }
-                        </p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
-                            [disabled]="isCharacterRequestLoading(m.id)"
-                            (click)="requestCharacterPick(m)"
-                          >
-                            {{ isCharacterRequestLoading(m.id) ? 'Envoi…' : 'Demander un personnage' }}
-                          </button>
-                        </div>
-                      } @else if (m.approvedCharacterName) {
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
-                            (click)="viewMemberCharacter(m, 'approved')"
-                          >
-                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
-                            @else { Voir la fiche }
-                          </button>
-                        </div>
-                      }
-                    </div>
-                    <div class="flex flex-col gap-2 shrink-0">
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-slate-900/40 border border-slate-700 text-slate-300 hover:border-sky-700/50"
-                        (click)="setMemberAsSpectator(m)"
-                        title="Passer en spectateur (lecture seule)"
-                        data-testid="set-spectator"
-                      >
-                        Spectateur
-                      </button>
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300 hover:bg-red-950/50"
-                        (click)="removeMember(m)"
-                        title="Retirer de la campagne"
-                      >
-                        Retirer
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              }
-
-              @if (spectators().length) {
-                <div class="pt-2 space-y-3">
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    Spectateurs
-                  </p>
-                  @for (m of spectators(); track m.id) {
-                    <article class="bg-[#1b2028] border border-slate-800/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <p class="font-bold text-slate-200">{{ m.displayName }}</p>
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Lecture seule</p>
-                      </div>
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
-                        (click)="removeMember(m)"
-                      >
-                        Retirer
-                      </button>
-                    </article>
-                  }
-                </div>
-              }
-            } @else {
-              @if (isMyPlayerMember(); as me) {
-                <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mon personnage</h3>
-                  @if (me.approvedCharacterName) {
-                    <p class="text-violet-300 font-serif">{{ me.approvedCharacterName }} — approuvé · niv. {{ me.approvedCharacterLevel ?? '?' }} · {{ me.xpEarnedInCampaign }} XP</p>
-                    <div class="flex flex-wrap gap-2 mt-3">
-                      <button
-                        type="button"
-                        class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                        [disabled]="isMemberCharacterLoading(me.id, 'approved')"
-                        (click)="viewMemberCharacter(me, 'approved')"
-                      >
-                        @if (isMemberCharacterLoading(me.id, 'approved')) { Chargement… }
-                        @else { Voir ma fiche }
-                      </button>
-                      <a
-                        routerLink="/guide/joueur-table"
-                        class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/30 border border-sky-800/40 text-sky-300 hover:border-sky-500/50"
-                      >
-                        Comment jouer →
-                      </a>
-                    </div>
-                  } @else if (me.proposalStatus === 'pending') {
-                    <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
-                  } @else if (me.proposalStatus === 'rejected') {
-                    <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
-                      <p class="text-sm text-amber-200">Le MJ attend un nouveau personnage — choisissez un héros ou créez-en un.</p>
-                      <a
-                        routerLink="/guide/joueur-table"
-                        class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
-                      >
-                        Comment jouer →
-                      </a>
-                    </div>
-                    <p class="text-red-400 text-sm mb-3">Proposition refusée. Choisissez un autre personnage :</p>
-                    <div class="flex flex-wrap gap-2">
-                      @for (ch of myCharacters(); track ch.id) {
-                        <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
-                      }
-                      <a
-                        routerLink="/create"
-                        [queryParams]="{ campaignId: c.id, returnUrl: '/campaigns/' + c.id + '?tab=players' }"
-                        class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300"
-                        >Créer un personnage →</a
-                      >
-                    </div>
-                  } @else {
-                    <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
-                      <p class="text-sm text-amber-200">
-                        Le MJ attend votre personnage — choisissez un héros existant ou
-                        <a
-                          routerLink="/create"
-                          [queryParams]="{ campaignId: c.id, returnUrl: '/campaigns/' + c.id + '?tab=players' }"
-                          class="text-amber-100 underline hover:text-white"
-                          >créez-en un</a
-                        >.
-                      </p>
-                      <a
-                        routerLink="/guide/joueur-table"
-                        class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
-                      >
-                        Comment jouer →
-                      </a>
-                    </div>
-                    <p class="text-sm text-slate-400 mb-3">Proposez un de vos personnages au MJ :</p>
-                    <div class="flex flex-wrap gap-2">
-                      @for (ch of myCharacters(); track ch.id) {
-                        <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
-                      } @empty {
-                        <a
-                          routerLink="/create"
-                          [queryParams]="{ campaignId: c.id, returnUrl: '/campaigns/' + c.id + '?tab=players' }"
-                          class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-violet-600 text-white"
-                          >Créer mon premier personnage →</a
-                        >
-                      }
-                    </div>
-                  }
-                </div>
-              }
-
-              @if (otherPlayers().length) {
-                <div class="space-y-3">
-                  <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Autres joueurs</h3>
-                  @for (m of otherPlayers(); track m.id) {
-                    <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                      <h4 class="font-bold text-slate-100">{{ m.displayName }}</h4>
-                      @if (m.approvedCharacterName) {
-                        <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
-                            (click)="viewMemberCharacter(m, 'approved')"
-                          >
-                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
-                            @else { Voir la fiche }
-                          </button>
-                        </div>
-                      } @else {
-                        <p class="text-sm text-slate-500 mt-2 italic">Pas encore de personnage approuvé</p>
-                      }
-                    </article>
-                  }
-                </div>
-              }
-            }
-          </section>
-        }
-      }
-    </div>
-
-    @if (showLeaveConfirm()) {
-      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="cancelLeaveCampaign()">
-        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
-          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">Quitter la campagne</p>
-          <p class="text-sm text-slate-300 mb-4">
-            Vous quittez le roster actif, mais un <span class="text-amber-200">historique en lecture seule</span>
-            reste disponible. Pour confirmer, retapez :
-            <span class="font-bold text-slate-100">« {{ c.title }} »</span>
-          </p>
-          <input
-            type="text"
-            [value]="leaveConfirmInput()"
-            (input)="leaveConfirmInput.set($any($event.target).value)"
-            [placeholder]="c.title"
-            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
-            autofocus
-          />
-          <div class="flex justify-end gap-3">
-            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="cancelLeaveCampaign()">
-              Annuler
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="!canConfirmLeave() || leaving()"
-              (click)="leaveCampaign()"
-            >
-              {{ leaving() ? 'Départ…' : 'Quitter définitivement' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (showDeleteConfirm()) {
-      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="cancelDeleteCampaign()">
-        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
-          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">
-            {{ (c.hasPlayerHistory || players().length > 0) ? 'Fermer la campagne' : 'Supprimer la campagne' }}
-          </p>
-          @if (c.hasPlayerHistory || players().length > 0) {
-            <p class="text-sm text-slate-300 mb-2">
-              Fermeture : plus de jeu, mais chaque joueur conserve un historique en lecture seule.
-            </p>
-            <p class="text-xs text-slate-500 mb-4">
-              Suppression définitive seulement si aucun joueur n’a jamais rejoint. Préférez Archiver pour masquer sans fermer.
-            </p>
-          } @else {
-            <p class="text-sm text-slate-300 mb-2">
-              Aucun joueur n’a jamais rejoint : suppression définitive.
-            </p>
-            <p class="text-xs text-slate-500 mb-4">
-              Préférez Archiver pour masquer sans effacer.
-            </p>
-          }
-          <p class="text-sm text-slate-400 mb-2">
-            Retapez <span class="font-bold text-slate-100">« {{ c.title }} »</span> pour confirmer.
-          </p>
-          <input
-            type="text"
-            [value]="deleteConfirmInput()"
-            (input)="deleteConfirmInput.set($any($event.target).value)"
-            [placeholder]="c.title"
-            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
-            autofocus
-          />
-          @if (deleteCampaignError(); as derr) {
-            <p class="text-sm text-red-400 mb-3">{{ derr }}</p>
-          }
-          <div class="flex justify-end gap-3">
-            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="cancelDeleteCampaign()">
-              Annuler
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="!canConfirmDeleteCampaign() || deletingCampaign()"
-              (click)="deleteCampaignFromDetail()"
-            >
-              {{ deletingCampaign() ? 'Suppression…' : 'Supprimer définitivement' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (showPinnedOverlay() && pinnedHandout(); as pin) {
-      <div class="fixed inset-x-0 z-[90] p-3 sm:p-4 pointer-events-none" [class.bottom-16]="showMobileSessionBar()" [class.bottom-0]="!showMobileSessionBar()">
-        <div class="max-w-lg mx-auto pointer-events-auto rounded-2xl border border-sky-500/40 bg-[#1b2028]/95 backdrop-blur-md shadow-2xl overflow-hidden">
-          <div class="h-1 bg-gradient-to-r from-sky-600/40 via-sky-400/60 to-sky-600/40"></div>
-          <div class="p-4 sm:p-5">
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Document épinglé par le MJ</p>
-              <button type="button" class="text-slate-500 hover:text-slate-200 shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-800/60" (click)="dismissPinnedOverlay()" aria-label="Fermer">✕</button>
-            </div>
-            <h3 class="font-bold text-slate-100 font-serif mb-2">{{ pin.title }}</h3>
-            <div class="text-sm text-slate-300 max-h-[min(50vh,320px)] overflow-y-auto guide-sommaire pinned-handout-body" [innerHTML]="pin.body | lightMarkdown"></div>
-            <div class="mt-3 flex flex-wrap gap-3">
-              <button type="button" class="text-[10px] font-black uppercase text-sky-400" (click)="openHandoutTab()">Voir tous les documents →</button>
-              <button type="button" class="text-[10px] font-black uppercase text-slate-500" (click)="dismissPinnedOverlay()">Masquer</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (showMobileSessionBar()) {
-      <nav class="fixed inset-x-0 bottom-0 z-[80] lg:hidden border-t border-slate-800 bg-[#171b22]/95 backdrop-blur-md px-2 pt-2 safe-area-pb">
-        <div class="flex justify-around gap-1 max-w-lg mx-auto pb-1">
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="tab() === 'overview'" [class.bg-violet-950/40]="tab() === 'overview'" [class.text-slate-400]="tab() !== 'overview'" (click)="openOverviewTab()">Résumé</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="tab() === 'sessions'" [class.bg-amber-950/40]="tab() === 'sessions'" [class.text-slate-400]="tab() !== 'sessions'" (click)="setTab('sessions')">Sessions</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="tab() === 'calendar'" [class.bg-amber-950/40]="tab() === 'calendar'" [class.text-slate-400]="tab() !== 'calendar'" (click)="setTab('calendar')">Cal.</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="tab() === 'prep'" [class.bg-violet-950/40]="tab() === 'prep'" [class.text-slate-400]="tab() !== 'prep'" (click)="setTab('prep')">Prépa</button>
-          <div class="relative flex-1">
-            <button
-              type="button"
-              class="relative w-full py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors"
-              [class.text-sky-300]="tab() === 'handouts' || tab() === 'players' || mobileMoreOpen()"
-              [class.bg-sky-950/40]="tab() === 'handouts' || tab() === 'players' || mobileMoreOpen()"
-              [class.text-slate-400]="tab() !== 'handouts' && tab() !== 'players' && !mobileMoreOpen()"
-              [attr.aria-expanded]="mobileMoreOpen()"
-              [attr.aria-label]="
-                playersTabBadgeCount() > 0
-                  ? 'Plus, ' +
-                    playersTabBadgeCount() +
-                    (playersTabBadgeCount() > 1
-                      ? ' propositions en attente'
-                      : ' proposition en attente')
-                  : 'Plus'
-              "
-              (click)="toggleMobileMore()"
-              data-testid="mobile-more-btn"
-            >
-              Plus
-              @if (playersTabBadgeCount() > 0) {
-                <span
-                  class="absolute top-1 right-1.5 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
-                  aria-hidden="true"
-                >{{ playersTabBadgeCount() }}</span>
-              }
-            </button>
-            @if (mobileMoreOpen()) {
-              <div
-                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 rounded-xl border border-slate-700 bg-[#1b2028] shadow-xl overflow-hidden z-10"
-                role="menu"
-                data-testid="mobile-more-menu"
-              >
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-sky-300 hover:bg-sky-950/40"
-                  (click)="openHandoutTab(); mobileMoreOpen.set(false)"
-                >
-                  Documents
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-violet-300 hover:bg-violet-950/40"
-                  (click)="setTab('players'); mobileMoreOpen.set(false)"
-                >
-                  Joueurs
-                  @if (playersTabBadgeCount() > 0) {
-                    <span class="ml-1 text-amber-400">({{ playersTabBadgeCount() }})</span>
-                  }
-                </button>
-              </div>
-            }
-          </div>
-        </div>
-      </nav>
-    }
-
-    @if (rosterSheetOpen()) {
-      <div class="fixed inset-0 z-[85] lg:hidden bg-black/50 backdrop-blur-[2px]" (click)="toggleRosterSheet()">
-        <div class="absolute inset-x-0 bottom-0 max-h-[min(78vh,640px)] bg-[#1b2028] border-t border-slate-700 rounded-t-2xl shadow-2xl flex flex-col" (click)="$event.stopPropagation()">
-          <div class="flex justify-center pt-2 pb-1 shrink-0">
-            <span class="w-10 h-1 rounded-full bg-slate-600"></span>
-          </div>
-          <div class="flex items-center justify-between px-4 pb-3 shrink-0">
-            <h3 class="text-sm font-bold text-violet-300">Joueurs & personnages</h3>
-            <button type="button" class="text-slate-500 hover:text-slate-200 w-8 h-8 flex items-center justify-center rounded-lg" (click)="toggleRosterSheet()" aria-label="Fermer">✕</button>
-          </div>
-          <div class="flex-1 overflow-y-auto px-4 pb-4 guide-sommaire safe-area-pb">
-            <app-campaign-detail-roster
-              [visible]="true"
-              [allowRemove]="true"
-              [feedback]="rosterFeedback()"
-              [playersNeedingCharacter]="playersNeedingCharacter()"
-              [pendingProposals]="pendingProposals()"
-              [approvedPlayers]="approvedPlayersWithCharacter()"
-              [characterRequestLoadingId]="characterRequestLoadingId()"
-              [memberCharacterLoadingKey]="memberCharacterLoadingId()"
-              (requestCharacterPick)="requestCharacterPick($event)"
-              (removeMember)="removeMember($event)"
-              (approveMember)="approveMember($event)"
-              (rejectMember)="rejectMember($event)"
-              (viewMemberCharacter)="onRosterMemberCharacterAction($event, 'view')"
-              (printMemberFullSheet)="onRosterMemberCharacterAction($event, 'print')"
-            />
-          </div>
-        </div>
-      </div>
-    }
+    <app-campaign-detail-tabs />
+    <app-campaign-detail-overlays />
   }
 </div>
-
-@if (confirmDialog(); as dialog) {
-  <app-confirm-dialog
-    [title]="dialog.title"
-    [body]="dialog.body"
-    [confirmLabel]="dialog.confirmLabel"
-    [danger]="dialog.danger ?? true"
-    (cancelled)="cancelConfirmDialog()"
-    (confirmed)="runConfirmDialog()"
-  />
-}

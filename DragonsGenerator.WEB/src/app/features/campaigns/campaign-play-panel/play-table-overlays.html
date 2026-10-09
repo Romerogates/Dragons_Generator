@@ -1,0 +1,396 @@
+@let c = combat.state.campaign();
+
+@if (!combat.state.activeSession()) {
+@if (combat.state.nextPlannedSession(); as nextSession) {
+  <div
+    class="flex flex-wrap items-center justify-between gap-3"
+    [class]="combat.state.fullscreen() ? 'bg-[#1b2028] border border-emerald-800/40 rounded-2xl p-6' : 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-5'"
+  >
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Pas encore en session</p>
+      <p [class]="combat.state.fullscreen() ? 'text-lg font-serif text-slate-200' : 'font-serif text-slate-200'">
+        {{ nextSession.title }} · {{ combat.state.formatSessionDate(nextSession.scheduledAt) }}
+      </p>
+      <p class="text-xs text-slate-500 mt-2 max-w-md">
+        Entrez en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
+      </p>
+      @if (combat.state.isDm()) {
+        <a
+          routerLink="/guide/mj-table"
+          class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+        >
+          Guide sessions →
+        </a>
+      } @else {
+        <a
+          routerLink="/guide/joueur-table"
+          class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+        >
+          Comment ça marche →
+        </a>
+      }
+    </div>
+    @if (combat.state.isDm()) {
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+        (click)="shell.startPlaySession(nextSession.id)"
+      >
+        Entrer en session
+      </button>
+    } @else {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+      >
+        Voir les sessions
+      </a>
+    }
+  </div>
+} @else {
+  <div
+    class="text-center space-y-3"
+    [class]="combat.state.fullscreen() ? 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-8' : 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-6'"
+  >
+    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Aucune session active</p>
+    <p class="text-sm text-slate-300 font-serif">Planifiez une session pour jouer.</p>
+    <p class="text-xs text-slate-500 max-w-sm mx-auto">
+      {{
+        combat.state.isDm()
+          ? 'Créez une session dans le hub, puis « Entrer en session » pour ouvrir la table.'
+          : 'Le MJ doit ouvrir une session — en attendant, proposez votre héros depuis le hub.'
+      }}
+    </p>
+    @if (combat.state.isDm()) {
+      <a
+        routerLink="/guide/mj-table"
+        class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+      >
+        Guide sessions →
+      </a>
+    } @else {
+      <a
+        routerLink="/guide/joueur-table"
+        class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+      >
+        Comment ça marche →
+      </a>
+    }
+    @if (combat.state.isDm()) {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+      >
+        Planifier une session
+      </a>
+    } @else {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+      >
+        Retour aux sessions
+      </a>
+    }
+  </div>
+}
+}
+
+@if (shell.endSessionDialog(); as endDlg) {
+  <div
+    class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    (click)="shell.cancelEndSessionDialog()"
+  >
+    <div
+      class="max-w-lg w-full rounded-2xl border border-emerald-900/40 bg-[#1b2028] shadow-2xl p-5"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="end-session-title"
+    >
+      <p id="end-session-title" class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-2">
+        Terminer la session
+      </p>
+      <p class="text-sm text-slate-300 mb-3">
+        Les notes de jeu seront archivées. Rédigez un récap visible par les joueurs (optionnel).
+      </p>
+      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1" for="end-session-recap">
+        Récap joueurs
+      </label>
+      <button
+        type="button"
+        class="mb-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300"
+        (click)="shell.fillEndSessionRecapDraft()"
+        data-testid="fill-recap-draft"
+      >
+        Générer brouillon depuis timeline / combats
+      </button>
+      <textarea
+        id="end-session-recap"
+        rows="5"
+        class="w-full mb-4 rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/50"
+        placeholder="Ce que la table a accompli, indices laissés, suite…"
+        [ngModel]="endDlg.recap"
+        (ngModelChange)="shell.endSessionDialog.set({ recap: $event })"
+      ></textarea>
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200"
+          (click)="shell.cancelEndSessionDialog()"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+          (click)="shell.confirmEndSessionDialog()"
+        >
+          Terminer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (shell.confirmDialog(); as dialog) {
+  <app-confirm-dialog
+    [title]="dialog.title"
+    [body]="dialog.body"
+    [confirmLabel]="dialog.confirmLabel"
+    (cancelled)="shell.cancelConfirmDialog()"
+    (confirmed)="shell.runConfirmDialog()"
+  />
+}
+
+@if (combat.state.playerOverlay(); as overlay) {
+  <div
+    class="fixed inset-0 z-[96] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
+    (click)="shell.closePlayerOverlay()"
+    data-testid="play-player-overlay"
+  >
+    <div
+      class="w-full sm:max-w-lg max-h-[85vh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-emerald-900/40 bg-[#1b2028] shadow-2xl flex flex-col"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      @if (overlay === 'handouts') {
+        <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-800">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Documents</p>
+            <h3 class="text-lg font-serif text-slate-100">
+              @if (combat.state.selectedHandout(); as h) {
+                {{ h.title }}
+              } @else {
+                Publiés par le MJ
+              }
+            </h3>
+          </div>
+          <button
+            type="button"
+            class="min-h-10 px-3 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-slate-200 border border-slate-700"
+            (click)="combat.state.selectedHandout() ? shell.clearSelectedHandout() : shell.closePlayerOverlay()"
+          >
+            {{ combat.state.selectedHandout() ? 'Retour' : 'Fermer' }}
+          </button>
+        </div>
+        <div class="overflow-y-auto p-5 space-y-3 flex-1">
+          @if (combat.state.selectedHandout(); as h) {
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              {{ combat.state.handoutKindLabels[h.kind] }}
+            </p>
+            <div class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+              {{ h.body || 'Document vide.' }}
+            </div>
+          } @else if (combat.state.publishedHandouts().length === 0) {
+            <p class="text-sm text-slate-500 italic">Aucun document publié pour l’instant.</p>
+          } @else {
+            @for (h of combat.state.publishedHandouts(); track h.id) {
+              <button
+                type="button"
+                class="w-full text-left px-4 py-3 rounded-xl border border-slate-700 hover:border-emerald-600/50 bg-[#171b22]"
+                [class.border-amber-700/50]="h.id === combat.state.campaign().data.pinnedHandoutId"
+                (click)="shell.selectHandout(h.id)"
+                [attr.data-testid]="
+                  h.id === combat.state.campaign().data.pinnedHandoutId ? 'play-handout-pinned' : null
+                "
+              >
+                <span class="font-serif text-slate-100 block">{{ h.title }}</span>
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest">
+                  {{ combat.state.handoutKindLabels[h.kind] }}
+                  @if (h.id === combat.state.campaign().data.pinnedHandoutId) {
+                    <span class="text-amber-400"> · Épinglé</span>
+                  }
+                </span>
+              </button>
+            }
+          }
+        </div>
+      } @else {
+        <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-800">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Table</p>
+            <h3 class="text-lg font-serif text-slate-100">Proposer un héros</h3>
+          </div>
+          <button
+            type="button"
+            class="min-h-10 px-3 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-slate-200 border border-slate-700"
+            (click)="shell.closePlayerOverlay()"
+          >
+            Fermer
+          </button>
+        </div>
+        <div class="overflow-y-auto p-5 space-y-3 flex-1">
+          <p class="text-xs text-slate-500 mb-2">
+            Choisissez un personnage. Le MJ devra l’approuver avant la fiche à la table.
+          </p>
+          @if (combat.state.myCharactersLoading()) {
+            <p class="text-sm text-slate-500 animate-pulse">Chargement…</p>
+          } @else if (combat.state.myCharacters().length === 0) {
+            <p class="text-sm text-slate-400 mb-3">Aucun personnage dans votre grimoire.</p>
+            <a
+              routerLink="/create"
+              [queryParams]="{ campaignId: combat.state.campaign().id, returnUrl: '/campaigns/' + combat.state.campaign().id + '/play' }"
+              class="inline-flex min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-700 text-white hover:bg-sky-600"
+            >
+              Créer un personnage
+            </a>
+          } @else {
+            <div class="flex flex-col gap-2">
+              @for (ch of combat.state.myCharacters(); track ch.id) {
+                <button
+                  type="button"
+                  class="w-full text-left px-4 py-3 rounded-xl border border-slate-700 hover:border-sky-500/50 text-sm text-slate-200 disabled:opacity-50"
+                  [disabled]="combat.state.proposeBusyId() !== null"
+                  (click)="playImport.proposeCharacterFromPlay(ch.id)"
+                >
+                  @if (combat.state.proposeBusyId() === ch.id) {
+                    Proposition…
+                  } @else {
+                    {{ ch.name }}
+                  }
+                </button>
+              }
+            </div>
+            <a
+              routerLink="/create"
+              [queryParams]="{ campaignId: combat.state.campaign().id, returnUrl: '/campaigns/' + combat.state.campaign().id + '/play' }"
+              class="inline-flex mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 underline"
+            >
+              Créer un autre personnage →
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (combat.state.isDm() && shell.secretPanelOpen()) {
+  <div
+    class="fixed inset-0 z-[97] bg-black/50"
+    (click)="shell.closeSecretPanel()"
+    aria-hidden="true"
+    data-testid="mj-secret-backdrop"
+  ></div>
+  <aside
+    id="mj-secret-panel"
+    class="fixed inset-y-0 right-0 z-[98] w-full max-w-md bg-[#14181f] border-l border-rose-900/40 shadow-xl flex flex-col"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Secrets MJ"
+    data-testid="mj-secret-panel"
+  >
+    <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-800">
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-rose-400">Secrets MJ</p>
+        <p class="text-sm font-serif text-slate-200">Hors vue des joueurs</p>
+      </div>
+      <button
+        type="button"
+        class="min-h-10 px-3 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-slate-200 border border-slate-700"
+        (click)="shell.closeSecretPanel()"
+      >
+        Fermer
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-5">
+      @if (combat.state.activeSession(); as session) {
+        <section class="space-y-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Calepins de session</p>
+          <button
+            type="button"
+            class="w-full text-left rounded-xl border border-slate-800 bg-[#1b2028] p-3 text-sm text-slate-300 hover:border-rose-800/50"
+            (click)="shell.closeSecretPanel(); shell.openSessionNotes()"
+          >
+            @if (shell.sessionNotesPreview(session); as preview) {
+              <span class="whitespace-pre-wrap line-clamp-4">{{ preview }}</span>
+            } @else {
+              <span class="text-slate-600 italic">Aucun texte — ouvrir les notes</span>
+            }
+          </button>
+        </section>
+      }
+
+      <section class="space-y-2">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          PNJ · voix / désir / peur / secret
+        </p>
+        @if (combat.state.secretCreatureCards().length) {
+          <ul class="space-y-3">
+            @for (cr of combat.state.secretCreatureCards(); track cr.creatureId + cr.customName) {
+              <li class="rounded-xl border border-slate-800 bg-[#1b2028]/90 p-3 space-y-2">
+                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                  <p class="font-serif text-slate-100">
+                    {{ cr.customName || cr.creatureName }}
+                  </p>
+                  <span class="text-[10px] uppercase tracking-widest text-slate-500">
+                    {{ combat.state.roleLabels[cr.role] || cr.role }}
+                  </span>
+                </div>
+                @if (cr.noteStats?.trim()) {
+                  <p class="text-[11px] text-amber-200/90 font-mono">{{ cr.noteStats }}</p>
+                }
+                @if (cr.voice?.trim()) {
+                  <p class="text-xs text-slate-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Voix · </span>
+                    {{ cr.voice }}
+                  </p>
+                }
+                @if (cr.desire?.trim()) {
+                  <p class="text-xs text-slate-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Désir · </span>
+                    {{ cr.desire }}
+                  </p>
+                }
+                @if (cr.fear?.trim()) {
+                  <p class="text-xs text-slate-300">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Peur · </span>
+                    {{ cr.fear }}
+                  </p>
+                }
+                @if (cr.secret?.trim()) {
+                  <p class="text-xs text-rose-200/90">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-rose-400/80">Secret · </span>
+                    {{ cr.secret }}
+                  </p>
+                }
+                @if (cr.backstory?.trim() && !cr.secret?.trim() && !cr.voice?.trim()) {
+                  <p class="text-xs text-slate-400 whitespace-pre-wrap line-clamp-4">{{ cr.backstory }}</p>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="text-xs text-slate-500 italic">
+            Remplissez voix / désir / peur / secret sur les créatures (hub → Histoire).
+            Ensuite elles apparaissent ici pendant la table.
+          </p>
+        }
+      </section>
+    </div>
+  </aside>
+}

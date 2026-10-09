@@ -6,6 +6,8 @@ import {
   exportInkDataUrl,
   redrawInkStrokes,
   seedNotebookFromLegacyNotes,
+  notebookPersistPatch,
+  resolveNotebookEnsure,
   sessionNotebookFromPlay,
   sessionPlayPadsPreview,
   syncLegacyPlayNotesFromPads,
@@ -41,6 +43,25 @@ describe('notebook.util', () => {
   it('returns empty seed when notes blank', () => {
     expect(seedNotebookFromLegacyNotes('')).toEqual([]);
     expect(seedNotebookFromLegacyNotes(null)).toEqual([]);
+  });
+
+  it('caps notebook pages and keeps legacy notes when all pages empty', () => {
+    const draft = createNotebookPage('Notes du MJ');
+    const existing = [createNotebookPage('A'), createNotebookPage('B')];
+    const keep = resolveNotebookEnsure(existing, 'legacy', draft);
+    expect(keep.persist).toBeFalse();
+    expect(keep.activeId).toBe(existing[0]!.id);
+    const seeded = resolveNotebookEnsure([], '  Ancien  ', draft);
+    expect(seeded.persist).toBeTrue();
+    expect(seeded.pages[0]!.text).toBe('Ancien');
+    const blank = resolveNotebookEnsure([], '  ', draft);
+    expect(blank.pages[0]!.id).toBe(draft.id);
+    const patch = notebookPersistPatch(
+      [{ ...draft, text: '  Hello  ' }, draft],
+      'fallback',
+    );
+    expect(patch.notes).toBe('Hello');
+    expect(notebookPersistPatch([{ ...draft, text: '   ' }], 'keep').notes).toBe('keep');
   });
 
   it('builds a stable session notebook page', () => {

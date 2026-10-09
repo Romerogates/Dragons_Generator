@@ -69,26 +69,48 @@ describe('CampaignDungeonMaps', () => {
     fixture.detectChanges();
   });
 
+  function ed() {
+    return component.workspace.editor;
+  }
+  function paint() {
+    return ed().paint;
+  }
+  function rooms() {
+    return ed().rooms;
+  }
+  function files() {
+    return ed().files;
+  }
+  function hist() {
+    return ed().hist;
+  }
+  function gen() {
+    return component.workspace.gen;
+  }
+  function core() {
+    return component.workspace.core;
+  }
+
   it('expose les outils éditeur attendus', () => {
-    const ids = component.tools.map((t) => t.id);
+    const ids = paint().tools.map((t) => t.id);
     expect(ids).toContain('floor');
     expect(ids).toContain('wall');
     expect(ids).toContain('fill');
     expect(ids).toContain('door');
-    component.setTool('fill');
-    expect(component.activeTool()).toBe('fill');
-    component.setBrushSize(2);
-    expect(component.brushSize()).toBe(2);
-    component.setFillKind('wall');
-    expect(component.fillKind()).toBe('wall');
+    paint().setTool('fill');
+    expect(paint().activeTool()).toBe('fill');
+    paint().setBrushSize(2);
+    expect(paint().brushSize()).toBe(2);
+    paint().setFillKind('wall');
+    expect(paint().fillKind()).toBe('wall');
   });
 
   it('ouvre le générateur avec grille compacte 32×32', () => {
-    component.openGenerator();
-    expect(component.showGenerator()).toBeTrue();
-    expect(component.genGridW()).toBe(32);
-    expect(component.genGridH()).toBe(32);
-    expect(component.sizePreset()).toBe('compact');
+    gen().openGenerator();
+    expect(gen().showGenerator()).toBeTrue();
+    expect(gen().genGridW()).toBe(32);
+    expect(gen().genGridH()).toBe(32);
+    expect(gen().sizePreset()).toBe('compact');
   });
 
   it('active / désactive le fog of war', () => {
@@ -96,14 +118,14 @@ describe('CampaignDungeonMaps', () => {
     map.id = 'm-fog';
     fixture.componentRef.setInput('campaign', shellCampaign([map]));
     fixture.detectChanges();
-    component.openEditor(map.id);
+    ed().openEditor(map.id);
     fixture.detectChanges();
 
-    expect(component.editingMap()?.fogOfWarEnabled).toBeFalsy();
-    component.toggleFogOfWar();
-    expect(component.editingMap()?.fogOfWarEnabled).toBeTrue();
-    component.toggleFogOfWar();
-    expect(component.editingMap()?.fogOfWarEnabled).toBeFalse();
+    expect(core().editingMap()?.fogOfWarEnabled).toBeFalsy();
+    rooms().toggleFogOfWar();
+    expect(core().editingMap()?.fogOfWarEnabled).toBeTrue();
+    rooms().toggleFogOfWar();
+    expect(core().editingMap()?.fogOfWarEnabled).toBeFalse();
   });
 
   it('paint floor pousse l’undo puis Ctrl+Z restaure', () => {
@@ -120,27 +142,27 @@ describe('CampaignDungeonMaps', () => {
     );
     fixture.componentRef.setInput('campaign', shellCampaign([map]));
     fixture.detectChanges();
-    component.openEditor(map.id);
-    component.setTool('floor');
-    const before = component.editingMap()!.tiles.map((row) => [...row]);
+    ed().openEditor(map.id);
+    paint().setTool('floor');
+    const before = core().editingMap()!.tiles.map((row) => [...row]);
 
     // Trouver une case mur pour peindre
     let painted = false;
     for (let y = 0; y < map.gridHeight && !painted; y++) {
       for (let x = 0; x < map.gridWidth && !painted; x++) {
         if (before[y][x] === 'wall') {
-          component.applyTileAt(x, y, true, false);
+          paint().applyTileAt(x, y, true, false);
           painted = true;
         }
       }
     }
     expect(painted).toBeTrue();
-    expect(component.canUndo()).toBeTrue();
-    expect(component.editingMap()!.tiles).not.toEqual(before);
+    expect(hist().canUndo()).toBeTrue();
+    expect(core().editingMap()!.tiles).not.toEqual(before);
 
-    component.undo();
-    expect(component.editingMap()!.tiles).toEqual(before);
-    expect(component.canRedo()).toBeTrue();
+    hist().undo();
+    expect(core().editingMap()!.tiles).toEqual(before);
+    expect(hist().canRedo()).toBeTrue();
   });
 
   it('promoteRoomEncounter émet un EncounterGroup', () => {
@@ -159,30 +181,30 @@ describe('CampaignDungeonMaps', () => {
     room.randomEncounter = { creatures: [{ name: 'Zombie', quantity: 2, cr: '1/4' }] };
     fixture.componentRef.setInput('campaign', shellCampaign([map]));
     fixture.detectChanges();
-    component.openEditor(map.id);
+    ed().openEditor(map.id);
 
     const spy = jasmine.createSpy('data');
     component.dataChange.subscribe(spy);
-    component.promoteRoomEncounter(room.id);
+    rooms().promoteRoomEncounter(room.id);
 
     const encCall = spy.calls.all().find((c) => c.args[0].encounters);
     expect(encCall).toBeTruthy();
     const encs = encCall!.args[0].encounters as { name: string; creatures: unknown[] }[];
     expect(encs.length).toBe(1);
     expect(encs[0].creatures.length).toBe(1);
-    expect(component.editingMap()?.rooms.find((r) => r.id === room.id)?.encounterId).toBeTruthy();
+    expect(core().editingMap()?.rooms.find((r) => r.id === room.id)?.encounterId).toBeTruthy();
   });
 
   it('exportJson télécharge sans erreur', () => {
     const map = createEmptyDungeonMap('Json');
     fixture.componentRef.setInput('campaign', shellCampaign([map]));
     fixture.detectChanges();
-    component.openEditor(map.id);
+    ed().openEditor(map.id);
 
     const createSpy = spyOn(URL, 'createObjectURL').and.returnValue('blob:test');
     const revokeSpy = spyOn(URL, 'revokeObjectURL');
     const clickSpy = spyOn(HTMLAnchorElement.prototype, 'click');
-    component.exportJson();
+    files().exportJson();
     expect(createSpy).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
     expect(revokeSpy).toHaveBeenCalled();
@@ -190,10 +212,10 @@ describe('CampaignDungeonMaps', () => {
 
   it('affiche un message clair si create bibliothèque échoue (quota)', () => {
     cloud.create.and.returnValue(throwError(() => new Error('quota')));
-    component.openGenerator();
-    component.genName.set('Quota');
-    component.generateMap();
-    expect(component.message()?.includes('Limite atteinte')).toBeTrue();
-    expect(component.message()?.includes('50')).toBeTrue();
+    gen().openGenerator();
+    gen().genName.set('Quota');
+    gen().generateMap();
+    expect(core().message()?.includes('Limite atteinte')).toBeTrue();
+    expect(core().message()?.includes('50')).toBeTrue();
   });
 });

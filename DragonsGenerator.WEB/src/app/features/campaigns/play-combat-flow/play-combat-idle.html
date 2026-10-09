@@ -1,0 +1,175 @@
+@let h = host();
+
+@if (h.state.isDm()) {
+        <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">
+          <p class="text-sm text-slate-400">
+            Démarrez un combat, choisissez les héros, puis les adversaires du bestiaire de campagne. Mode table :
+            <strong class="text-slate-200">{{ h.state.sessionModeLabel(h.state.sessionMode()) }}</strong>.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-900/30 border border-amber-700/50 text-amber-200 hover:bg-amber-900/50"
+              (click)="h.ctrl.startStandaloneCombat(); h.state.allyPickerOpen.set(true)"
+            >
+              Nouveau combat
+            </button>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="h.state.importingParty() || !h.state.approvedPlayers().length"
+              [attr.title]="
+                !h.state.approvedPlayers().length
+                  ? 'Aucun héros approuvé — invitez / validez un joueur d’abord'
+                  : h.state.importingParty()
+                    ? 'Import en cours…'
+                    : null
+              "
+              (click)="h.playImport.importPartyIntoCombat()"
+            >
+              @if (h.state.importingParty() && !h.state.importingAllyId()) {
+                Import…
+              } @else {
+                Combat + toute la party
+              }
+            </button>
+            @if (!h.state.approvedPlayers().length) {
+              <p class="basis-full text-xs text-amber-200/80">
+                Bouton gris : aucun héros approuvé à la table.
+              </p>
+            }
+          </div>
+          @if (h.state.approvedPlayers().length) {
+            <div class="pt-1 space-y-2">
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Ou démarrer avec un héros
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (p of h.state.approvedPlayers(); track p.id) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 disabled:opacity-50"
+                    [disabled]="h.state.importingParty()"
+                    (click)="h.playImport.importPlayerAlly(p)"
+                  >
+                    <span class="font-serif block">{{ p.approvedCharacterName }}</span>
+                    <span class="text-[10px] text-slate-500">{{ p.displayName }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="text-xs text-amber-400/80">
+              Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou démarrez un combat puis ajoutez un allié PNJ / adversaire (ou depuis Créatures).
+            </p>
+          }
+          @if (h.state.campaignAllyCreatures().length) {
+            <div class="pt-1 space-y-2 border-t border-slate-800/80">
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Ou démarrer avec un allié campagne
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (cr of h.state.campaignAllyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 disabled:opacity-50"
+                    [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                    (click)="h.playImport.addCampaignCreatureAlly(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">FP {{ cr.challengeRating || '?' }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+          @if (h.state.campaignEnemyCreatures().length || h.state.campaignUnsortedCreatures().length) {
+            <div class="pt-1 space-y-2 border-t border-slate-800/80">
+              <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                Ou démarrer avec un adversaire
+              </p>
+              @if (h.state.isDm() && h.state.campaignUnsortedCreatures().length) {
+                <div class="flex flex-wrap gap-1">
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-sky-800/50 text-sky-300"
+                    (click)="h.actions.bulkClassifyUnsorted('ally')"
+                  >
+                    Neutres → Alliés
+                  </button>
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-red-800/50 text-red-300"
+                    (click)="h.actions.bulkClassifyUnsorted('antagonist')"
+                  >
+                    Neutres → Adversaires
+                  </button>
+                </div>
+              }
+              <div class="flex flex-wrap gap-2">
+                @for (cr of h.state.campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 disabled:opacity-50"
+                    [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                    (click)="h.playImport.addCampaignCreatureEnemy(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">
+                      FP {{ cr.challengeRating || '?' }} · {{ h.state.roleLabels[cr.role] }}
+                    </span>
+                  </button>
+                }
+                @for (cr of h.state.campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
+                    [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                    (click)="h.playImport.addCampaignCreatureEnemy(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">Non classé</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+} @else {
+        <div class="space-y-3">
+          <p class="text-sm text-slate-500 italic">En attente que le MJ lance un combat…</p>
+          @if (!h.state.isDm()) {
+            <p class="text-xs text-slate-600">
+              En attendant, ouvrez vos
+              <button
+                type="button"
+                class="text-emerald-400 hover:text-emerald-300 underline-offset-2 hover:underline"
+                (click)="h.shell.openHandoutsOverlay()"
+              >
+                documents
+              </button>
+              @if (h.state.myApprovedMember()) {
+                ou
+                <button
+                  type="button"
+                  class="text-sky-400 hover:text-sky-300 underline-offset-2 hover:underline disabled:opacity-40"
+                  [disabled]="h.state.sheetLoadingId() === h.state.myApprovedMember()?.id"
+                  (click)="h.playImport.openMySheet()"
+                >
+                  votre fiche
+                </button>
+              } @else {
+                ou
+                <button
+                  type="button"
+                  class="text-sky-400 hover:text-sky-300 underline-offset-2 hover:underline"
+                  (click)="h.shell.openProposeOverlay()"
+                >
+                  proposez un héros
+                </button>
+              }
+              .
+            </p>
+          }
+        </div>
+}

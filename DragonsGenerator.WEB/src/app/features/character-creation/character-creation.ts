@@ -31,6 +31,14 @@ import {
 import { autoCompleteRemainingCreation } from '@core/utils/character-auto-complete.util';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import type { CharacterCreation as CreationState } from '@core/models/Character/character';
+import {
+  consumePendingForgeAction,
+  nextLevelUpTarget,
+  resolveForgeEntry,
+  shouldFallbackAutoCompleteToGenerate,
+  shouldStartLevelUp,
+  type PendingForgeAction,
+} from '@core/utils/forge-bootstrap.util';
 
 // Steps
 import { LevelStep } from './steps/level-step/level-step';
@@ -45,8 +53,6 @@ import { IdentityStep } from './steps/identity-step/identity-step';
 import { SummaryStep } from './steps/summary-step/summary-step';
 import { MagicStep } from './steps/magic-step/magic-step';
 import { BackgroundStep } from './steps/background-step/background-step';
-
-type PendingForgeAction = 'generate' | 'complete' | null;
 
 @Component({
   selector: 'app-character-creation',
@@ -76,6 +82,7 @@ type PendingForgeAction = 'generate' | 'complete' | null;
   },
 })
 export class CharacterCreation implements OnInit {
+  // --- 1. Wiring ---
   readonly builder = inject(CharacterBuilderService);
   private readonly router = inject(Router);
   private readonly connectivity = inject(ConnectivityService);
@@ -97,7 +104,7 @@ export class CharacterCreation implements OnInit {
   readonly codexDownloading = this.offlineCodex.downloading;
   readonly codexDownloadError = this.offlineCodex.downloadError;
 
-  /** Affiche l'overlay de choix brouillon. */
+  // --- 2. Entrée (brouillon / mode / level-up) ---
   readonly showDraftPrompt = signal(false);
   /** Confirm avant d’effacer le brouillon (Recommencer). */
   readonly showDraftDiscardConfirm = signal(false);
@@ -108,8 +115,9 @@ export class CharacterCreation implements OnInit {
   readonly showForgeModePrompt = signal(false);
   /** Rappeler de choisir un niveau avant Générer / Compléter. */
   readonly showLevelRequiredPrompt = signal(false);
-  private pendingForgeAction: PendingForgeAction = null;
+  private pendingForgeAction: PendingForgeAction | null = null;
 
+  // --- 3. Auto-génération ---
   readonly autoCompleteBusy = signal(false);
   readonly autoCompleteHint = signal<string | null>(null);
   readonly canUndoAutoComplete = signal(false);
@@ -141,26 +149,23 @@ export class CharacterCreation implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Mode édition depuis /characters → priorité absolue
-    const hasEditData = this.handoff.hasEditPending();
-    if (hasEditData) {
+    const entry = resolveForgeEntry({
+      hasEditData: this.handoff.hasEditPending(),
+      hasPendingDraft: this.builder.hasPendingDraft(),
+      isEditMode: this.builder.isEditMode,
+      skipModePrompt: this.forgePrefs.skipModePrompt(),
+    });
+    if (entry === 'edit') {
       this.builder.checkForEditMode();
-      if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('levelUp') === '1') {
-        this.beginLevelUpFlow();
-      }
+      const search = typeof window !== 'undefined' ? window.location.search : '';
+      if (shouldStartLevelUp(search)) this.beginLevelUpFlow();
       return;
     }
-
-    // 2. Brouillon détecté → demander à l'utilisateur
-    if (this.builder.hasPendingDraft() && !this.builder.isEditMode) {
+    if (entry === 'draft') {
       this.showDraftPrompt.set(true);
       return;
     }
-
-    // 3. Forge vierge → proposer pré-tiré vs manuel (sauf préférence / level-up)
-    if (!this.forgePrefs.skipModePrompt() && !this.builder.isEditMode) {
-      this.showForgeModePrompt.set(true);
-    }
+    if (entry === 'mode_prompt') this.showForgeModePrompt.set(true);
   }
 
   /**
@@ -170,10 +175,7 @@ export class CharacterCreation implements OnInit {
   private beginLevelUpFlow(): void {
     this.levelUpMode.set(true);
     this.builder.goToStep(1);
-    const cur = this.builder.targetLevel();
-    if (cur < 20) {
-      this.builder.setTargetLevel(cur + 1);
-    }
+    this.builder.setTargetLevel(nextLevelUpTarget(this.builder.targetLevel()));
   }
 
   /** Raccourci : aller aux caractéristiques (ASI / dons du nouveau niveau). */
@@ -221,7 +223,7 @@ export class CharacterCreation implements OnInit {
   confirmLevelAndContinue(): void {
     this.builder.acknowledgeLevel();
     this.showLevelRequiredPrompt.set(false);
-    const action = this.pendingForgeAction;
+    const action = consumePendingForgeAction(this.pendingForgeAction);
     this.pendingForgeAction = null;
     if (action === 'generate') void this.runQuickGenerate();
     else if (action === 'complete') void this.runAutoComplete();
@@ -263,7 +265,7 @@ export class CharacterCreation implements OnInit {
     await this.runQuickGenerate();
   }
 
-  private ensureLevelChosen(action: Exclude<PendingForgeAction, null>): boolean {
+  private ensureLevelChosen(action: PendingForgeAction): boolean {
     if (this.builder.levelAcknowledged()) return true;
     this.pendingForgeAction = action;
     this.showLevelRequiredPrompt.set(true);
@@ -303,7 +305,7 @@ export class CharacterCreation implements OnInit {
     try {
       const c = this.builder.creation();
       // Rien de structurant choisi → même pipeline que « Générer un héros » au niveau courant.
-      if (!c.speciesId || !c.classId) {
+      if (shouldFallbackAutoCompleteToGenerate(c)) {
         this.autoCompleteBusy.set(false);
         await this.runQuickGenerate();
         return;
@@ -360,6 +362,7 @@ export class CharacterCreation implements OnInit {
     this.requestStartFresh();
   }
 
+  // --- 4. Sortie ---
   finishCreation(): void {
     const character = this.builder.build();
     this.handoff.setCurrent(character);

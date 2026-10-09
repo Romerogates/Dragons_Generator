@@ -3,6 +3,7 @@ import {
   InkStroke,
   NOTEBOOK_INK_JPEG_QUALITY,
   NOTEBOOK_INK_MAX_DIMENSION,
+  NOTEBOOK_MAX_PAGES,
   NotebookPage,
   SESSION_PLAY_PAD_MAX,
   SessionPlayPad,
@@ -10,6 +11,32 @@ import {
   createSessionPlayPad,
 } from '@core/models/Campaign/campaign';
 import { ensurePadsHaveLayouts } from './pad-layout.util';
+
+export function notebookPersistPatch(
+  pages: NotebookPage[],
+  fallbackNotes: string,
+  maxPages = NOTEBOOK_MAX_PAGES,
+): { notebookPages: NotebookPage[]; notes: string } {
+  const capped = pages.slice(0, maxPages);
+  const firstText = capped.find((p) => p.text?.trim())?.text?.trim() ?? '';
+  return {
+    notebookPages: capped,
+    notes: firstText || fallbackNotes,
+  };
+}
+
+export function resolveNotebookEnsure(
+  existing: NotebookPage[] | undefined,
+  legacyNotes: string | undefined,
+  draft: NotebookPage,
+): { pages: NotebookPage[]; persist: boolean; activeId: string } {
+  if (existing?.length) {
+    return { pages: existing, persist: false, activeId: existing[0]!.id };
+  }
+  const seeded = seedNotebookFromLegacyNotes(legacyNotes);
+  const pages = seeded.length ? seeded : [draft];
+  return { pages, persist: true, activeId: pages[0]!.id };
+}
 
 export function seedNotebookFromLegacyNotes(notes: string | undefined | null): NotebookPage[] {
   const trimmed = notes?.trim();

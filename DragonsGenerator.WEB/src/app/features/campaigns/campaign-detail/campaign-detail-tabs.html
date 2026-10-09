@@ -1,0 +1,313 @@
+@if (vm.hub.campaign(); as c) {
+    @if (!vm.mjUi(c) && vm.showInitiativeBanner() && vm.hub.initiativeBoard(); as board) {
+      <div class="border-b border-amber-900/40 bg-amber-950/25">
+        <div class="max-w-5xl mx-auto px-4 py-4 space-y-3">
+          <p class="text-sm text-amber-100">
+            <span class="font-semibold">Le MJ attend votre initiative.</span>
+          </p>
+          <app-campaign-initiative-inline
+            [campaignId]="c.id"
+            [board]="board"
+            (submitted)="vm.boot.onInitiativeSubmitted()"
+          />
+        </div>
+      </div>
+    }
+
+    <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
+      @switch (vm.hubNav.tab()) {
+        @case ('overview') {
+          <app-campaign-detail-overview
+            [isOwner]="vm.mjUi(c)"
+            [liveSession]="vm.activePlaySession() ?? null"
+            [nextSession]="vm.nextHubTable()?.source === 'session' ? vm.nextPlannedSession() : null"
+            [nextSchedule]="vm.nextHubTable()?.source === 'schedule' ? { title: vm.nextHubTable()!.title, startsAt: vm.nextHubTable()!.at, rsvpSummary: vm.nextHubTable()!.rsvpSummary } : null"
+            [liveSessionDateLabel]="vm.activePlaySession() ? vm.formatSessionDate(vm.activePlaySession()!.scheduledAt) : ''"
+            [liveSessionModeLabel]="vm.activePlaySession() ? vm.sessionModeLabel(vm.activePlaySession()!.mode) : ''"
+            [nextSessionDateLabel]="vm.nextHubTable()?.source === 'session' ? vm.formatSessionDate(vm.nextHubTable()!.at) : ''"
+            [nextSessionModeLabel]="vm.nextHubTable()?.source === 'session' && vm.nextPlannedSession() ? vm.sessionModeLabel(vm.nextPlannedSession()!.mode) : ''"
+            [nextScheduleDateLabel]="vm.nextHubTable()?.source === 'schedule' ? vm.formatSessionDate(vm.nextHubTable()!.at) : ''"
+            [creatureCount]="c.data.creatures.length"
+            [encounterCount]="c.data.encounters.length"
+            [playerCount]="vm.players().length"
+            [plannedSessionCount]="vm.plannedSessionCount()"
+            [playedSessionCount]="vm.playedSessionCount()"
+            [documentCount]="vm.documentCount()"
+            [totalXpAwarded]="vm.totalXpAwarded()"
+            [myXpEarned]="vm.myXpEarned()"
+            [approvedCharacterName]="vm.myPlayerMember()?.approvedCharacterName"
+            [adventure]="c.data.adventure ?? ''"
+            [showRoster]="vm.showOverviewRoster()"
+            [rosterFeedback]="vm.hub.rosterFeedback()"
+            [playersNeedingCharacter]="vm.playersNeedingCharacter()"
+            [pendingProposals]="vm.pendingProposals()"
+            [approvedPlayers]="vm.approvedPlayersWithCharacter()"
+            [characterRequestLoadingId]="vm.hub.characterRequestLoadingId()"
+            [memberCharacterLoadingKey]="vm.hubSheets.memberCharacterLoadingId()"
+            [myPlayerMember]="vm.myPlayerMember() ?? null"
+            [lastHandoutTitle]="vm.lastPublishedHandoutTitle() ?? null"
+            [publishedHandoutsCount]="vm.publishedHandoutsCount()"
+            [campaignId]="c.id"
+            [activityLoading]="vm.hub.activityLoading()"
+            [activity]="vm.hub.activity()"
+            [firstSession]="vm.firstSessionChecklist()"
+            (openPlayFullscreen)="vm.table.openPlayFullscreen()"
+            (startPlaySession)="vm.table.startPlaySession($event)"
+            (goSessions)="vm.hubNav.setTab('sessions')"
+            (goCalendar)="vm.hubNav.setTab('calendar')"
+            (convertNextSchedule)="vm.table.convertNextHubSchedule()"
+            (openPrepScenario)="vm.hubNav.setTab('scenario')"
+            (statsNavigate)="vm.onStatsNavigate($event)"
+            (requestCharacterPick)="vm.roster.requestCharacterPick($event)"
+            (removeMember)="vm.roster.removeMember($event)"
+            (approveMember)="vm.roster.approveMember($event)"
+            (rejectMember)="vm.roster.rejectMember($event)"
+            (viewMemberCharacter)="vm.roster.onRosterMemberCharacterAction($event, 'view')"
+            (printMemberFullSheet)="vm.roster.onRosterMemberCharacterAction($event, 'print')"
+            (activityItemClick)="vm.table.openHandoutFromActivity($event)"
+            (goHandouts)="vm.hubNav.setTab('handouts')"
+            (firstSessionAction)="vm.onFirstSessionAction($event)"
+            (levelUp)="vm.roster.openLevelUpFromXp()"
+          />
+        }
+
+        @case ('sessions') {
+          <app-campaign-detail-sessions
+            [isOwner]="vm.mjUi(c)"
+            [campaignId]="c.id"
+            [sortedSessions]="vm.table.sortedSessions()"
+            [upcomingSessions]="vm.table.upcomingSessions()"
+            [pastSessions]="vm.pastSessions()"
+            [editingSessionId]="vm.hubNav.editingSessionId()"
+            [hasActiveSession]="!!vm.activePlaySession()"
+            [activeSessionId]="c.data.activeSessionId ?? null"
+            [dungeonMaps]="c.data.dungeonMaps ?? []"
+            [feedback]="vm.hub.rosterFeedback()"
+            (addSession)="vm.table.addSession()"
+            (startEditSession)="vm.table.startEditSession($event)"
+            (stopEditSession)="vm.table.stopEditSession()"
+            (startPlaySession)="vm.table.startPlaySession($event)"
+            (openLiveSession)="vm.table.openPlayFullscreen()"
+            (removeSession)="vm.table.removeSession($event)"
+            (sessionPatch)="vm.table.onSessionPatch($event)"
+            (sessionPatchImmediate)="vm.table.onSessionPatchImmediate($event)"
+            (sessionDateChange)="vm.table.onSessionDateChangeEvent($event)"
+            (exportEveningPdf)="vm.table.exportSessionEveningPdf($event)"
+            (exportUnifiedPack)="vm.table.exportSessionUnifiedPack($event)"
+            (prefillRunSheet)="vm.table.prefillSessionRunSheet($event)"
+          />
+        }
+
+        @case ('calendar') {
+          <app-campaign-calendar
+            [isOwner]="vm.mjUi(c)"
+            [campaignId]="c.id"
+            [campaignTitle]="c.title"
+            [sessions]="c.data.sessions ?? []"
+            [scheduleEvents]="c.data.scheduleEvents ?? []"
+            [heroOptions]="vm.calendarHeroOptions()"
+            [currentUserId]="vm.currentUserId()"
+            [focusEventId]="vm.hubNav.focusScheduleEventId()"
+            (scheduleEventsChange)="vm.table.onScheduleEventsChange($event)"
+            (rsvpChange)="vm.table.onScheduleRsvp($event)"
+            (openSession)="vm.table.openSessionFromCalendar($event)"
+            (convertToSession)="vm.table.convertScheduleEventToSession($event)"
+            (focusEventConsumed)="vm.hubNav.focusScheduleEventId.set(null)"
+          />
+        }
+
+        @case ('prep') {
+          <app-campaign-detail-prep
+            [isMj]="vm.mjUi(c)"
+            [prepSub]="vm.hubNav.prepSub()"
+            [tabs]="vm.prepSubTabs()"
+            [guideState]="vm.setupGuideState()"
+            (prepSubChange)="vm.hubNav.setPrepSub($event)"
+            (guideAction)="vm.onSetupGuideAction($event)"
+          >
+            @switch (vm.hubNav.prepSub()) {
+              @case ('scenario') {
+                <app-campaign-detail-prep-scenario
+                  [isOwner]="vm.mjUi(c)"
+                  [title]="c.title"
+                  [adventure]="c.data.adventure"
+                  (editScenario)="vm.prep.editScenario()"
+                  (titleChange)="vm.prep.saveTitle($event)"
+                />
+              }
+
+              @case ('notebook') {
+                @if (vm.mjUi(c)) {
+                  <app-campaign-notebook
+                    [pages]="vm.prep.notebookPages()"
+                    [page]="vm.prep.activeNotebookPage()"
+                    (pageChange)="vm.prep.onNotebookPageChange($event)"
+                    (pagesChange)="vm.prep.onNotebookPagesChange($event)"
+                  />
+                } @else {
+                  <p class="text-slate-500 italic text-center py-12">Réservé au MJ.</p>
+                }
+              }
+
+              @case ('maps') {
+                @if (vm.mjUi(c)) {
+                  <app-campaign-dungeon-maps
+                    [campaign]="c"
+                    [focusMapId]="vm.hubNav.focusDungeonMapId()"
+                    [autoAction]="vm.hubNav.mapsAutoAction()"
+                    (dataChange)="vm.prep.saveData($event)"
+                  />
+                } @else {
+                  <p class="text-slate-500 italic text-center py-12">Réservé au MJ.</p>
+                }
+              }
+
+              @case ('creatures') {
+                <app-campaign-detail-prep-creatures
+                  [isOwner]="vm.mjUi(c)"
+                  [creatures]="c.data.creatures ?? []"
+                  (addCreatures)="vm.prep.addCreaturesOnly()"
+                  (openBestiary)="vm.prep.openBestiaryFullscreen()"
+                  (openCreatureInBook)="vm.prep.openCreatureInBook($event)"
+                  (roleChange)="vm.prep.updateCreatureRole($event.creature, $event.role)"
+                  (cardFieldChange)="vm.prep.onCreatureCardField($event)"
+                  (bulkClassify)="vm.prep.bulkClassifyUnsorted($event)"
+                />
+              }
+
+              @case ('pregens') {
+                <app-campaign-detail-prep-pregens
+                  [isOwner]="vm.mjUi(c)"
+                  [campaignId]="c.id"
+                  [pregens]="c.data.pregenCharacters ?? []"
+                  [players]="vm.players()"
+                  [readyPregens]="vm.prep.readyPregensForPlayers()"
+                  [myAssignedPregens]="vm.prep.myAssignedPregens()"
+                  [dmCharacters]="vm.boot.dmCharacters()"
+                  [feedback]="vm.hub.pregenFeedback()"
+                  [undoAvailable]="vm.hub.pregenUndoAvailable()"
+                  [importing]="vm.hub.importingPregen()"
+                  [generating]="vm.hub.generatingAutoPregen()"
+                  [pdfLoadingId]="vm.hubSheets.pregenPdfLoadingId()"
+                  [aiForegroundActive]="vm.aiProgress.foregroundActive()"
+                  [aiActive]="vm.aiProgress.active()"
+                  [aiBackground]="vm.aiProgress.background()"
+                  [capLabel]="vm.prep.pregenCapLabel()"
+                  [canAdd]="vm.prep.canAddPregen()"
+                  (runUndo)="vm.prep.runPregenUndo()"
+                  (viewCharacter)="vm.prep.viewPregenCharacter($event)"
+                  (useAtTable)="vm.prep.usePregenAtTable($event)"
+                  (claim)="vm.prep.claimPregen($event)"
+                  (printFullSheet)="vm.prep.printPregenFullSheet($event)"
+                  (generateAuto)="vm.prep.generateAutoPregen()"
+                  (importFromCharacter)="vm.prep.importPregenFromCharacter($event)"
+                  (remove)="vm.prep.removePregen($event)"
+                  (patch)="vm.prep.onPregenPatch($event)"
+                  (markReady)="vm.prep.markPregenReady($event)"
+                  (assign)="vm.prep.assignPregen($event.pregen, $event.member)"
+                />
+              }
+
+              @case ('encounters') {
+                <app-campaign-detail-prep-encounters
+                  [isOwner]="vm.mjUi(c)"
+                  [encounters]="c.data.encounters ?? []"
+                  [creaturesCount]="(c.data.creatures ?? []).length"
+                  [dungeonMaps]="vm.prep.dungeonMapOptions()"
+                  [awardingXpId]="vm.hub.awardingXpId()"
+                  (insertEncounterPack)="vm.prep.insertEncounterPack($event)"
+                  (generateEncounters)="vm.prep.generateEncountersFromStory()"
+                  (goCreatures)="vm.hubNav.setPrepSub('creatures')"
+                  (encounterPatch)="vm.prep.patchEncounter($event.encounterId, $event.patch)"
+                  (openDungeon)="vm.prep.openDungeonForEncounter($event)"
+                  (markDefeated)="vm.prep.markDefeated($event.encounterId, $event.creatureIndex)"
+                  (undoDefeated)="vm.prep.undoDefeated($event.encounterId, $event.creatureIndex)"
+                  (distributeXp)="vm.prep.distributeEncounterXp($event)"
+                />
+              }
+
+
+            }
+          </app-campaign-detail-prep>
+        }
+
+        @case ('handouts') {
+          <app-campaign-detail-handouts
+            [isOwner]="vm.mjUi(c)"
+            [handouts]="vm.sortedHandouts()"
+            [kindFilter]="vm.table.handoutKindFilter()"
+            [editingHandoutId]="vm.table.editingHandoutId()"
+            [focusHandoutId]="vm.hubNav.focusHandoutId()"
+            [previewHandout]="vm.table.previewHandout()"
+            [pinnedHandoutId]="c.data.pinnedHandoutId ?? null"
+            [printing]="vm.hubPdf.printing()"
+            [pdfPreviewUrl]="vm.hubPdf.pdfPreviewUrl()"
+            [pdfPreviewRawUrl]="vm.hubPdf.pdfPreviewRawUrl()"
+            [isLoadingPreview]="vm.hubPdf.isLoadingPreview()"
+            [pdfPreviewKind]="vm.hubPdf.pdfPreviewKind()"
+            [hasCreatures]="!!c.data.creatures.length"
+            [pregens]="vm.pdfUnassignedPregens()"
+            [sheetMembers]="vm.pdfSheetMembers()"
+            [pregenPdfLoadingId]="vm.hubSheets.pregenPdfLoadingId()"
+            [memberSheetLoadingKey]="vm.hubSheets.memberCharacterLoadingId()"
+            (addHandout)="vm.table.addHandout()"
+            (insertHandoutPack)="vm.table.insertHandoutPack($event)"
+            (kindFilterChange)="vm.table.setHandoutKindFilter($event)"
+            (startEdit)="vm.table.startEditHandout($event)"
+            (stopEdit)="vm.table.stopEditHandout()"
+            (deleteHandout)="vm.table.deleteHandout($event)"
+            (preview)="vm.table.previewHandoutAsPlayer($event)"
+            (closePreview)="vm.table.closeHandoutPreview()"
+            (handoutPatch)="vm.table.onHandoutPatch($event)"
+            (handoutPatchImmediate)="vm.table.onHandoutPatchImmediate($event)"
+            (togglePublished)="vm.table.onHandoutTogglePublished($event)"
+            (pinHandout)="vm.table.pinHandout($event)"
+            (printPackMj)="vm.hubPdf.printPackMj()"
+            (printBestiary)="vm.hubPdf.printBestiary()"
+            (printPlayerSummaries)="vm.hubPdf.printPlayerSummariesPdf()"
+            (printAllPlayerSheets)="vm.hubPdf.printAllPlayerSheets()"
+            (loadPackPreview)="vm.prep.loadPackPreview()"
+            (loadBestiaryPreview)="vm.prep.loadBestiaryPreview()"
+            (openPdfFullscreen)="vm.prep.openBestiaryFullscreen()"
+            (downloadPdfPreview)="vm.hubPdf.downloadPdfPreview()"
+            (printPregenFullSheet)="vm.prep.printPregenFullSheet($event)"
+            (printMemberFullSheet)="vm.hubSheets.printMemberFullSheet($event.member, $event.scope)"
+          />
+        }
+
+        @case ('players') {
+          <app-campaign-detail-players
+            [isOwner]="vm.mjUi(c)"
+            [campaignId]="c.id"
+            [rosterFeedback]="vm.hub.rosterFeedback()"
+            [joinLink]="vm.hub.joinLink()"
+            [joinLinkBusy]="vm.hub.joinLinkBusy()"
+            [canNativeShare]="vm.roster.canNativeShare()"
+            [invitableFriends]="vm.invitableFriends()"
+            [pendingInvites]="vm.hub.pendingInvites()"
+            [players]="vm.players()"
+            [spectators]="vm.spectators()"
+            [myPlayerMember]="vm.myPlayerMember() ?? null"
+            [myCharacters]="vm.boot.myCharacters()"
+            [otherPlayers]="vm.otherPlayers()"
+            [characterRequestLoadingId]="vm.hub.characterRequestLoadingId()"
+            [memberCharacterLoadingKey]="vm.hubSheets.memberCharacterLoadingId()"
+            (copyJoinLink)="vm.roster.copyCampaignJoinLink()"
+            (shareJoinLink)="vm.roster.shareCampaignJoinLink()"
+            (regenerateJoinLink)="vm.roster.regenerateJoinLink()"
+            (revokeJoinLink)="vm.roster.revokeJoinLink()"
+            (copyFriendsInviteLink)="vm.roster.copyFriendsInviteLink()"
+            (inviteFriend)="vm.roster.inviteFriend($event)"
+            (viewMemberCharacter)="vm.hubSheets.viewMemberCharacter($event.member, $event.scope)"
+            (approveMember)="vm.roster.approveMember($event)"
+            (rejectMember)="vm.roster.rejectMember($event)"
+            (requestCharacterPick)="vm.roster.requestCharacterPick($event)"
+            (setMemberAsSpectator)="vm.roster.setMemberAsSpectator($event)"
+            (removeMember)="vm.roster.removeMember($event)"
+            (proposeCharacter)="vm.roster.proposeCharacter($event)"
+          />
+        }
+      }
+    </div>
+
+}

@@ -1,0 +1,285 @@
+@let h = host();
+
+        @if (h.state.isDm() && (h.state.combatFlowPhase() === 'setup' || h.state.advancedToolsOpen())) {
+          <div class="space-y-3">
+            @if (h.state.combatFlowPhase() !== 'setup') {
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Outils avancés</p>
+            }
+            <div class="flex flex-wrap gap-2 items-center">
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/40 text-sky-300 hover:border-sky-600/50"
+                (click)="h.playImport.toggleAllyPicker()"
+              >
+                + Allié joueur
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/40 text-sky-200 hover:border-sky-600/50"
+                (click)="h.playImport.toggleCampaignAllyPicker()"
+              >
+                + Allié campagne
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-sky-600/50"
+                (click)="h.ctrl.addAllyCombatant()"
+              >
+                + Allié PNJ
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
+                (click)="h.playImport.toggleEnemyPicker()"
+              >
+                + Adversaire
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                [disabled]="h.state.importingParty() || !h.state.availablePlayerAllies().length"
+                [attr.title]="
+                  !h.state.availablePlayerAllies().length
+                    ? 'Tous les PJ approuvés sont déjà dans le combat (ou aucun héros)'
+                    : h.state.importingParty()
+                      ? 'Import en cours…'
+                      : null
+                "
+                (click)="h.playImport.importPartyIntoCombat()"
+              >
+                @if (h.state.importingParty() && !h.state.importingAllyId()) {
+                  Import…
+                } @else {
+                  + Toute la party
+                }
+              </button>
+              @if (!h.state.availablePlayerAllies().length) {
+                <p class="basis-full text-[10px] text-slate-500">
+                  Bouton party gris : plus de PJ hors combat à importer.
+                </p>
+              }
+              <label class="flex items-center gap-2 text-[10px] text-slate-500">
+                Δ PV
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  class="w-14 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-slate-300"
+                  [ngModel]="h.state.hpAdjustAmount()"
+                  (ngModelChange)="h.actions.setHpAdjustAmount($event)"
+                />
+              </label>
+            </div>
+
+            @if (h.state.allyPickerOpen()) {
+              <div class="rounded-xl border border-sky-800/40 bg-sky-950/20 p-3 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                  Choisir un héros joueur
+                </p>
+                @if (!h.state.approvedPlayers().length) {
+                  <p class="text-xs text-slate-500 italic">
+                    Aucun personnage approuvé dans la campagne. Approuvez un héros dans l’onglet Joueurs, ou ajoutez un allié campagne.
+                  </p>
+                } @else if (!h.state.availablePlayerAllies().length) {
+                  <p class="text-xs text-slate-500 italic">Tous les PJ approuvés sont déjà dans ce combat.</p>
+                } @else {
+                  <div class="flex flex-wrap gap-2">
+                    @for (p of h.state.availablePlayerAllies(); track p.id) {
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 hover:bg-sky-950/40 disabled:opacity-50"
+                        [disabled]="h.state.importingParty()"
+                        (click)="h.playImport.importPlayerAlly(p)"
+                      >
+                        <span class="font-serif block">{{ p.approvedCharacterName }}</span>
+                        <span class="text-[10px] text-slate-500">{{ p.displayName }}</span>
+                        @if (h.state.importingAllyId() === p.id) {
+                          <span class="text-[10px] text-sky-400 ml-1">…</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (h.state.campaignAllyPickerOpen()) {
+              <div class="rounded-xl border border-sky-800/40 bg-sky-950/20 p-3 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                  Alliés du bestiaire de campagne
+                </p>
+                @if (!h.state.campaignAllyCreatures().length) {
+                  <p class="text-xs text-slate-500 italic">
+                    Aucun allié marqué dans l’onglet Créatures. Ajoutez une créature et choisissez le camp « Allié ».
+                  </p>
+                } @else {
+                  <div class="flex flex-wrap gap-2">
+                    @for (cr of h.state.campaignAllyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 hover:bg-sky-950/40 disabled:opacity-50"
+                        [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                        (click)="h.playImport.addCampaignCreatureAlly(cr)"
+                      >
+                        <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                        <span class="text-[10px] text-slate-500">
+                          {{ cr.creatureName }}
+                          @if (cr.challengeRating) {
+                            · FP {{ cr.challengeRating }}
+                          }
+                        </span>
+                        @if (h.state.importingCreatureId() === cr.creatureId) {
+                          <span class="text-[10px] text-sky-400 ml-1">…</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (h.state.enemyPickerOpen()) {
+              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-3">
+                <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                  Ajouter un adversaire
+                </p>
+
+                @if (h.state.campaignEnemyCreatures().length || h.state.campaignUnsortedCreatures().length) {
+                  <div class="space-y-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Bestiaire de campagne
+                    </p>
+                    @if (h.state.campaignEnemyCreatures().length) {
+                      <div class="flex flex-wrap gap-2">
+                        @for (cr of h.state.campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                          <button
+                            type="button"
+                            class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                            [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                            (click)="h.playImport.addCampaignCreatureEnemy(cr)"
+                          >
+                            <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                            <span class="text-[10px] text-slate-500">
+                              {{ cr.creatureName }}
+                              @if (cr.challengeRating) {
+                                · FP {{ cr.challengeRating }}
+                              }
+                              · {{ h.state.roleLabels[cr.role] }}
+                            </span>
+                            @if (h.state.importingCreatureId() === cr.creatureId) {
+                              <span class="text-[10px] text-red-400 ml-1">…</span>
+                            }
+                          </button>
+                        }
+                      </div>
+                    }
+                    @if (h.state.campaignUnsortedCreatures().length) {
+                      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Non classés (neutres)
+                        </p>
+                        <div class="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-sky-800/50 text-sky-300"
+                            (click)="h.actions.bulkClassifyUnsorted('ally')"
+                          >
+                            Tous → Alliés
+                          </button>
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-red-800/50 text-red-300"
+                            (click)="h.actions.bulkClassifyUnsorted('antagonist')"
+                          >
+                            Tous → Adversaires
+                          </button>
+                        </div>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        @for (cr of h.state.campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
+                          <button
+                            type="button"
+                            class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
+                            [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.creatureId"
+                            (click)="h.playImport.addCampaignCreatureEnemy(cr)"
+                          >
+                            <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                            <span class="text-[10px] text-slate-500">Ou importer comme adversaire</span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                <div class="space-y-2 border-t border-red-900/30 pt-3">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Codex (bestiaire)
+                  </p>
+                  <input
+                    type="search"
+                    placeholder="Rechercher un gobelin, orc, type…"
+                    class="w-full bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+                    [ngModel]="h.state.codexCreatureSearch()"
+                    (ngModelChange)="h.playImport.setCodexCreatureSearch($event)"
+                  />
+                  @if (h.state.codexCreaturesLoading()) {
+                    <p class="text-xs text-slate-500 italic">Chargement du codex…</p>
+                  } @else if (!h.state.filteredCodexCreatures().length) {
+                    <p class="text-xs text-slate-500 italic">
+                      @if (h.state.codexCreatureSearch().trim()) {
+                        Aucune créature pour « {{ h.state.codexCreatureSearch() }} ».
+                      } @else {
+                        Tapez un nom ou un type pour filtrer le bestiaire.
+                      }
+                    </p>
+                  } @else {
+                    <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto overscroll-contain">
+                      @for (cr of h.state.filteredCodexCreatures(); track cr.id) {
+                        <button
+                          type="button"
+                          class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/40 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                          [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.id"
+                          (click)="h.playImport.addCodexCreatureEnemy(cr)"
+                        >
+                          <span class="font-serif block">{{ cr.name }}</span>
+                          <span class="text-[10px] text-slate-500">
+                            {{ cr.category }}
+                            @if (cr.challengeRating) {
+                              · FP {{ cr.challengeRating }}
+                            }
+                            · CA {{ cr.armorClass || 10 }}
+                          </span>
+                          @if (h.state.importingCreatureId() === cr.id) {
+                            <span class="text-[10px] text-red-400 ml-1">…</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="border-t border-red-900/30 pt-3">
+                  <button
+                    type="button"
+                    class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-red-700/50 hover:text-red-200"
+                    (click)="h.actions.addBlankEnemyCombatant()"
+                  >
+                    Adversaire vierge
+                  </button>
+                  <p class="text-[10px] text-slate-600 mt-1.5">Sans fiche — CA 10, à remplir à la main.</p>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (h.state.isDm() && h.state.combatFlowPhase() === 'fight') {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+            (click)="h.actions.toggleAdvancedTools()"
+          >
+            {{ h.state.advancedToolsOpen() ? 'Masquer édition / roster' : 'Éditer combattants / roster' }}
+          </button>
+        }

@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import type { CampaignMember } from '@core/models/Campaign/campaign';
+import { memberCharacterLoadingKey } from '@core/utils/campaign-roster.util';
 
 export type MemberCharacterScope = 'proposed' | 'approved';
 
@@ -40,6 +41,6 @@ export class CampaignDetailRoster {
   readonly printMemberFullSheet = output<MemberCharacterAction>();
 
   isMemberCharacterLoading(memberId: string, scope: MemberCharacterScope): boolean {
-    return this.memberCharacterLoadingKey() === `${memberId}-${scope}`;
+    return this.memberCharacterLoadingKey() === memberCharacterLoadingKey(memberId, scope);
   }
 }

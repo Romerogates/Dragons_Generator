@@ -8,6 +8,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CREATURE_ROLE_LABELS, type CreatureRole, type StoryCreatureSelection } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
+import { creatureTrackKey } from '@core/utils/campaign-hub-write.util';
 
 export type CreatureCardField = 'voice' | 'desire' | 'fear' | 'secret' | 'noteStats';
 
@@ -66,6 +67,6 @@ export class CampaignDetailPrepCreatures {
   readonly categoryLabel = getCreatureCategoryLabel;
 
   creatureTrackKey(cr: StoryCreatureSelection): string {
-    return `${cr.creatureId}::${cr.customName || cr.creatureName}`;
+    return creatureTrackKey(cr);
   }
 }

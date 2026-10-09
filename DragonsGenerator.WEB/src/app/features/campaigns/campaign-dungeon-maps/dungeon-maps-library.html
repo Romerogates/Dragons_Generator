@@ -1,0 +1,115 @@
+@let h = host();
+@let core = h.core;
+@let gen = h.gen;
+@let ed = h.editor;
+@let files = ed.files;
+  <section class="space-y-6 dungeon-shell">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="font-serif text-2xl text-amber-200/90 tracking-tight">Cartes &amp; donjons</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-xl">
+          Thème, taille, gravure — puis peignez et partagez pour la table.
+        </p>
+      </div>
+      @if (core.campaign().isOwner && !core.libraryMode()) {
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-700 text-amber-50 shadow-lg shadow-amber-950/40 hover:bg-amber-600 transition-colors"
+            (click)="gen.openGenerator()"
+          >
+            Nouveau donjon
+          </button>
+          <button
+            type="button"
+            class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-600 text-slate-300 hover:border-amber-600/50 hover:text-amber-200 transition-colors"
+            (click)="h.openLibraryPicker()"
+          >
+            Depuis ma bibliothèque
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (core.message(); as msg) {
+      <p class="text-sm text-emerald-400/90 animate-fade-in">{{ msg }}</p>
+    }
+
+    @if (gen.showGenerator()) {
+      <app-dungeon-maps-generator [host]="h" />
+    }
+
+    @if (core.sortedMaps().length === 0 && !gen.showGenerator()) {
+      <div class="rounded-2xl border border-dashed border-slate-700/80 p-14 text-center bg-[#12161d]/50 space-y-4">
+        <p class="font-serif text-xl text-slate-400">Aucune carte</p>
+        <p class="text-sm text-slate-600">Créez un donjon pour préparer vos sessions.</p>
+        @if (core.campaign().isOwner) {
+          <button
+            type="button"
+            class="inline-flex min-h-11 items-center px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-700 text-amber-50 hover:bg-amber-600"
+            (click)="gen.openGenerator()"
+          >
+            Nouveau donjon
+          </button>
+        }
+      </div>
+    } @else if (core.sortedMaps().length) {
+      <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        @for (map of core.sortedMaps(); track map.id) {
+          <article class="map-card group rounded-2xl border border-slate-800/90 bg-[#141820] overflow-hidden hover:border-amber-800/50 transition-colors">
+            <button type="button" class="block w-full text-left" (click)="ed.openEditor(map.id)">
+              <div class="aspect-[4/3] bg-[#0a0c10] overflow-hidden relative">
+                @if (core.thumbUrls()[map.id]; as thumb) {
+                  <img [src]="thumb" [alt]="map.name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+                } @else {
+                  <div class="absolute inset-0 animate-pulse bg-slate-900"></div>
+                }
+                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#141820] to-transparent"></div>
+              </div>
+              <div class="p-4 pt-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="font-serif text-lg text-slate-100 truncate">{{ map.name }}</h3>
+                  @if (map.libraryDungeonId) {
+                    <span
+                      class="shrink-0 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-emerald-700/60 text-emerald-300 bg-emerald-950/40"
+                      title="Lien live vers Mes Donjons"
+                      >Live</span
+                    >
+                  }
+                </div>
+                <p class="text-[11px] text-slate-500 mt-1">
+                  {{ core.themeLabels[map.theme] }}
+                  · {{ map.rooms.length }} salles
+                  · {{ map.gridWidth }}×{{ map.gridHeight }}
+                </p>
+                <p class="text-[10px] text-slate-600 mt-1">{{ core.formatDate(map.updatedAt) }}</p>
+                @if (core.handoutForMap(map); as ho) {
+                  <p class="text-[11px] mt-2" [class]="ho.published ? 'text-emerald-400' : 'text-amber-400/90'">
+                    Document {{ ho.published ? 'publié' : 'brouillon' }}
+                  </p>
+                }
+              </div>
+            </button>
+            @if (core.campaign().isOwner) {
+              <div class="px-4 pb-4 flex gap-2">
+                <button type="button" class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase bg-amber-800/50 text-amber-100 hover:bg-amber-700/60" (click)="ed.openEditor(map.id)">
+                  Éditer
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border border-slate-700 text-slate-300 hover:border-amber-700/50"
+                  title="Copier un lien pour les membres"
+                  (click)="files.copyMemberMapLink(map.id)"
+                >
+                  Lien
+                </button>
+                <button type="button" class="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border border-red-900/40 text-red-400/90 hover:bg-red-950/30" (click)="ed.deleteMap(map.id)">
+                  Suppr.
+                </button>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>

@@ -37,7 +37,6 @@ import {
   isRoomRevealedOnMap,
   withAllRoomsRevealed,
   withCorridorCellRevealed,
-  withFogToggled,
   withNoRoomsRevealed,
   withRoomRevealed,
 } from '@core/utils/dungeon-fog.util';
@@ -139,21 +138,9 @@ export class PlayBattleMap implements OnDestroy {
 
   /** Raccourci MJ F. */
   toggleSessionFog(): void {
-    const map = this.activeSessionMap();
-    if (!map) {
+    if (!this.store.toggleSessionFog()) {
       this.store.setFeedback('err', 'Aucune carte de session pour le fog.');
-      return;
     }
-    const prev = {
-      fogOfWarEnabled: map.fogOfWarEnabled,
-      revealedRoomIds: [...(map.revealedRoomIds ?? [])],
-      revealedCorridorCells: [...(map.revealedCorridorCells ?? [])],
-    };
-    this.patchSessionDungeonMap(withFogToggled(map));
-    const on = !prev.fogOfWarEnabled;
-    this.store.setFeedback('ok', on ? 'Fog activé.' : 'Fog désactivé.', {
-      undo: () => this.patchSessionDungeonMap(prev),
-    });
   }
 
   selectTokenForPlacement(combatantId: string): void {
@@ -275,9 +262,9 @@ export class PlayBattleMap implements OnDestroy {
     if (!map?.fogOfWarEnabled) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
     const revealed = isRoomRevealedOnMap(map, roomId);
-    this.patchSessionDungeonMap(withRoomRevealed(map, roomId, !revealed));
+    this.store.patchSessionDungeonMap(withRoomRevealed(map, roomId, !revealed));
     this.store.setFeedback('ok', revealed ? 'Salle masquée.' : 'Salle révélée.', {
-      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+      undo: () => this.store.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
     });
   }
 
@@ -289,9 +276,9 @@ export class PlayBattleMap implements OnDestroy {
     const map = this.activeSessionMap();
     if (!map) return;
     const prevIds = [...(map.revealedRoomIds ?? [])];
-    this.patchSessionDungeonMap(withAllRoomsRevealed(map));
+    this.store.patchSessionDungeonMap(withAllRoomsRevealed(map));
     this.store.setFeedback('ok', 'Toutes les salles révélées.', {
-      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+      undo: () => this.store.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
     });
   }
 
@@ -305,9 +292,9 @@ export class PlayBattleMap implements OnDestroy {
       revealedRoomIds: [...(map?.revealedRoomIds ?? [])],
       revealedCorridorCells: [...(map?.revealedCorridorCells ?? [])],
     };
-    this.patchSessionDungeonMap(withNoRoomsRevealed());
+    this.store.patchSessionDungeonMap(withNoRoomsRevealed());
     this.store.setFeedback('ok', 'Fog tout masqué.', {
-      undo: () => this.patchSessionDungeonMap(prev),
+      undo: () => this.store.patchSessionDungeonMap(prev),
     });
   }
 
@@ -322,9 +309,9 @@ export class PlayBattleMap implements OnDestroy {
     if (kind !== 'floor' && kind !== 'door') return;
     const revealed = isCorridorCellRevealedOnMap(map, x, y);
     const prev = [...(map.revealedCorridorCells ?? [])];
-    this.patchSessionDungeonMap(withCorridorCellRevealed(map, x, y, !revealed));
+    this.store.patchSessionDungeonMap(withCorridorCellRevealed(map, x, y, !revealed));
     this.store.setFeedback('ok', revealed ? 'Couloir masqué.' : 'Couloir révélé.', {
-      undo: () => this.patchSessionDungeonMap({ revealedCorridorCells: prev }),
+      undo: () => this.store.patchSessionDungeonMap({ revealedCorridorCells: prev }),
     });
   }
 
@@ -346,17 +333,6 @@ export class PlayBattleMap implements OnDestroy {
       c.id === combatantId ? { ...c, mapX: x, mapY: y } : c,
     );
     this.store.patchCombat({ ...combat, combatants }, { immediate: options?.immediate !== false });
-  }
-
-  private patchSessionDungeonMap(partial: Partial<CampaignDungeonMap>): void {
-    if (!this.isDm()) return;
-    const map = this.activeSessionMap();
-    const c = this.store.campaign();
-    if (!map || !c) return;
-    const dungeonMaps = (c.data.dungeonMaps ?? []).map((m) =>
-      m.id === map.id ? { ...m, ...partial, updatedAt: new Date().toISOString() } : m,
-    );
-    this.store.saveData({ dungeonMaps });
   }
 
   private bindLiveDungeonCanvas(

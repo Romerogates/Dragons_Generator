@@ -1,0 +1,246 @@
+@let h = host();
+@let core = h.core;
+@let ed = h.editor;
+@let view = ed.view;
+@let hist = ed.hist;
+@let paint = ed.paint;
+@let files = ed.files;
+@let map = core.editingMap()!;
+<section
+    class="space-y-4 dungeon-shell"
+    [class.dungeon-reveal]="view.revealMap()"
+    [class.dungeon-shell--fullscreen]="view.editorFullscreen()"
+  >
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0 flex-1 flex flex-col gap-2">
+        @if (!core.libraryMode()) {
+          <button
+            type="button"
+            class="self-start text-[11px] font-bold uppercase tracking-wide text-slate-500 hover:text-amber-300"
+            (click)="ed.closeEditor()"
+          >
+            ← Liste des cartes
+          </button>
+        }
+        <input
+          type="text"
+          class="block font-serif text-2xl leading-tight text-amber-100/90 bg-transparent border-b border-slate-700/80 focus:border-amber-500/70 outline-none w-full max-w-lg min-w-0"
+          [ngModel]="map.name"
+          (ngModelChange)="core.patchEditingMap({ name: $event })"
+          [attr.aria-label]="'Nom du donjon'"
+        />
+        <p class="text-[11px] text-slate-500">
+          {{ core.themeLabels[map.theme] }} · molette zoom · espace + glisser · Ctrl+Z / Ctrl+Y
+          @if (view.editorFullscreen()) {
+            · Échap pour quitter
+          }
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        @if (!view.editorFullscreen()) {
+          <app-fullscreen-enter-btn tone="amber" (enter)="view.toggleEditorFullscreen()" />
+        }
+        <button type="button" class="editor-action" [disabled]="!hist.canUndo()" (click)="hist.undo()">Annuler</button>
+        <button type="button" class="editor-action" [disabled]="!hist.canRedo()" (click)="hist.redo()">Rétablir</button>
+        @if (!core.libraryMode()) {
+          @if (core.mapSaveState() === 'pending' || core.mapSaveState() === 'saving') {
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 animate-pulse" data-testid="map-autosave">
+              Enregistrement…
+            </span>
+          } @else if (core.mapSaveState() === 'saved') {
+            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400" data-testid="map-autosave">
+              Enregistré
+            </span>
+          }
+        }
+        @if (!core.libraryMode()) {
+          <button
+            type="button"
+            class="editor-action"
+            title="Copier un lien pour les membres connectés de la campagne"
+            (click)="files.copyMemberMapLink()"
+          >
+            Copier le lien
+          </button>
+        }
+        <button type="button" class="editor-action" (click)="ed.regenerateEditingMap()">Régénérer</button>
+
+        <div class="relative">
+          <button
+            type="button"
+            class="editor-action"
+            [class.editor-action--open]="files.exportMenuOpen()"
+            (click)="files.toggleExportMenu(); $event.stopPropagation()"
+          >
+            Exporter
+          </button>
+          @if (files.exportMenuOpen()) {
+            <div
+              class="editor-menu-panel absolute right-0 top-full mt-1 z-20 min-w-[9rem] rounded-xl border border-slate-700 bg-[#141820] p-1 shadow-xl"
+              (click)="$event.stopPropagation()"
+            >
+              <button type="button" class="editor-menu-item" [disabled]="files.exportBusy()" (click)="files.exportPng()">PNG</button>
+              <button type="button" class="editor-menu-item" [disabled]="files.exportBusy()" (click)="files.sharePng()">Partager</button>
+              <button type="button" class="editor-menu-item" [disabled]="files.exportBusy()" (click)="files.exportPdf()">PDF</button>
+              <button type="button" class="editor-menu-item" (click)="files.exportJson()">JSON</button>
+              @if (!core.libraryMode() && core.campaign().isOwner) {
+                <button
+                  type="button"
+                  class="editor-menu-item"
+                  [disabled]="core.libraryBusy()"
+                  (click)="ed.saveEditingToLibrary()"
+                >
+                  @if (map.libraryDungeonId) { Sync Mes Donjons } @else { Lier (live) Mes Donjons }
+                </button>
+                <button
+                  type="button"
+                  class="editor-menu-item"
+                  [disabled]="core.libraryBusy()"
+                  (click)="ed.duplicateLinkedToLibrary()"
+                  title="Crée une variante isolée dans Mes Donjons (plus de sync live)"
+                >
+                  Dupliquer (variante isolée)
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        @if (!core.libraryMode()) {
+        <div class="relative">
+          <button
+            type="button"
+            class="editor-action editor-action--accent"
+            [class.editor-action--open]="files.docMenuOpen()"
+            (click)="files.toggleDocMenu(); $event.stopPropagation()"
+          >
+            Document
+          </button>
+          @if (files.docMenuOpen()) {
+            <div
+              class="editor-menu-panel absolute right-0 top-full mt-1 z-20 min-w-[11rem] rounded-xl border border-slate-700 bg-[#141820] p-1 shadow-xl"
+              (click)="$event.stopPropagation()"
+            >
+              <button type="button" class="editor-menu-item" (click)="files.createOrUpdateHandout()">Brouillon</button>
+              <button type="button" class="editor-menu-item" (click)="files.createOrUpdateHandout({ publish: true })">Publier aux joueurs</button>
+            </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    @if (core.message(); as msg) {
+      <p class="text-sm text-emerald-400/90 flex flex-wrap items-center gap-2">
+        <span>{{ msg }}</span>
+        @if (core.lastHandoutNav(); as nav) {
+          <a
+            class="underline underline-offset-2 text-sky-300 hover:text-sky-200"
+            [routerLink]="['/campaigns', core.campaign().id]"
+            [queryParams]="{ tab: 'handouts', handoutId: nav.handoutId }"
+          >Voir dans Documents</a>
+        }
+        <button
+          type="button"
+          class="ml-auto text-slate-500 hover:text-slate-200 w-7 h-7 rounded-lg hover:bg-slate-800/60"
+          aria-label="Fermer le message"
+          (click)="core.dismissMessage()"
+        >✕</button>
+      </p>
+    }
+
+    <div class="flex flex-wrap items-center gap-1.5">
+      @for (tool of paint.tools; track tool.id) {
+        <button
+          type="button"
+          class="tool-btn"
+          [class.tool-btn--active]="paint.activeTool() === tool.id"
+          [title]="tool.hint"
+          (click)="paint.setTool(tool.id)"
+        >
+          {{ tool.label }}
+        </button>
+      }
+      @if (paint.activeTool() === 'floor' || paint.activeTool() === 'wall') {
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 ml-1">Brosse</span>
+        @for (size of paint.brushSizes; track size) {
+          <button
+            type="button"
+            class="tool-btn"
+            [class.tool-btn--active]="paint.brushSize() === size"
+            [title]="'Taille de brosse ' + size"
+            (click)="paint.setBrushSize(size)"
+          >
+            {{ size }}
+          </button>
+        }
+      }
+      @if (paint.activeTool() === 'fill') {
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 ml-1">Remplir en</span>
+        <button
+          type="button"
+          class="tool-btn"
+          [class.tool-btn--active]="paint.fillKind() === 'floor'"
+          (click)="paint.setFillKind('floor')"
+        >
+          Sol
+        </button>
+        <button
+          type="button"
+          class="tool-btn"
+          [class.tool-btn--active]="paint.fillKind() === 'wall'"
+          (click)="paint.setFillKind('wall')"
+        >
+          Mur
+        </button>
+      }
+      <span class="mx-1 h-5 w-px bg-slate-700/80"></span>
+      <button type="button" class="tool-btn" (click)="view.zoom(-0.15)" title="Dézoomer">−</button>
+      <span class="text-[11px] text-slate-500 tabular-nums w-12 text-center">{{ (view.scale() * 100) | number: '1.0-0' }}%</span>
+      <button type="button" class="tool-btn" (click)="view.zoom(0.15)" title="Zoomer">+</button>
+      <button type="button" class="tool-btn" (click)="view.resetView()" title="Recadrer">Fit</button>
+    </div>
+    <p class="text-[10px] text-slate-600 -mt-1">
+      Molette : défiler la page · Ctrl + molette : zoom · 2 doigts : zoom · Espace : déplacer · Clic hors salle pour désélectionner
+    </p>
+
+    <div
+      class="grid gap-5 min-h-0"
+      [ngClass]="view.editorFullscreen() ? 'lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] flex-1' : 'lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]'"
+    >
+      <div
+        #viewport
+        class="dungeon-viewport relative rounded-2xl border border-slate-800 overflow-hidden select-none"
+        [ngClass]="paint.cursorClass()"
+        [class.touch-none]="paint.mapLocksPageScroll()"
+        [style.touch-action]="paint.mapLocksPageScroll() ? 'none' : 'pan-y'"
+        [style.background]="view.viewportBg()"
+        [class.h-[min(46vh,380px)]]="!view.editorFullscreen()"
+        [class.lg:h-[min(68vh,680px)]]="!view.editorFullscreen()"
+        [class.h-full]="view.editorFullscreen()"
+        [class.min-h-0]="view.editorFullscreen()"
+        (pointerdown)="paint.onPointerDown($event)"
+        (pointermove)="paint.onPointerMove($event)"
+        (pointerup)="paint.onPointerUp($event)"
+        (pointercancel)="paint.onPointerUp($event)"
+        (contextmenu)="$event.preventDefault()"
+      >
+        <div
+          class="absolute origin-top-left will-change-transform"
+          [style.transform]="'translate(' + view.panX() + 'px,' + view.panY() + 'px) scale(' + view.scale() + ')'"
+        >
+          <canvas #editorCanvas class="block shadow-2xl shadow-black/50"></canvas>
+        </div>
+        <div class="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/35 to-transparent"></div>
+        <div
+          class="pointer-events-none absolute bottom-3 left-3 rounded-lg px-2 py-1 text-[10px] uppercase tracking-wider text-slate-400 bg-black/50 border border-white/5"
+          [style.borderColor]="view.themeAccent() + '44'"
+        >
+          {{ map.gridWidth }}×{{ map.gridHeight }} · {{ map.rooms.length }} salles
+        </div>
+      </div>
+
+      <app-dungeon-maps-editor-aside [host]="h" />
+    </div>
+  </section>
+

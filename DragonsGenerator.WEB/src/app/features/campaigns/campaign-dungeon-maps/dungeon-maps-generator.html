@@ -1,0 +1,184 @@
+@let h = host();
+@let core = h.core;
+@let gen = h.gen;
+      <div class="dungeon-generator rounded-2xl border border-amber-900/40 bg-gradient-to-br from-[#1a1410] via-[#141820] to-[#0f1218] p-5 md:p-6 overflow-hidden relative">
+        <div class="absolute inset-0 pointer-events-none opacity-30 dungeon-generator__glow"></div>
+        <div class="relative grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.9fr)] gap-6">
+          <div class="space-y-4">
+            <h3 class="font-serif text-lg text-amber-100/90">Forger la carte</h3>
+            <p class="text-xs text-slate-500">Choisissez un thème et une taille, puis gravez.</p>
+
+            <label class="block text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+              Nom
+              <input
+                type="text"
+                class="mt-1.5 w-full rounded-xl bg-black/30 border border-slate-700/80 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-600/60 outline-none"
+                [ngModel]="gen.genName()"
+                (ngModelChange)="gen.genName.set($event)"
+              />
+            </label>
+
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-2">Thème</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                @for (t of gen.themes; track t) {
+                  <button
+                    type="button"
+                    class="theme-chip flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-all"
+                    [class.theme-chip--active]="gen.genTheme() === t"
+                    (click)="gen.onThemeChange(t)"
+                  >
+                    <span class="h-3.5 w-3.5 rounded-full shrink-0 ring-1 ring-black/40" [style.background]="gen.themeSwatch(t)"></span>
+                    <span class="text-[11px] font-semibold text-slate-200 truncate">{{ core.themeLabels[t] }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-2">Taille</p>
+              <div class="grid grid-cols-3 gap-2">
+                @for (p of gen.sizePresets; track p.id) {
+                  <button
+                    type="button"
+                    class="theme-chip rounded-xl border px-2.5 py-2.5 text-left transition-all"
+                    [class.theme-chip--active]="gen.sizePreset() === p.id"
+                    (click)="gen.applySizePreset(p.id)"
+                  >
+                    <span class="block text-[11px] font-semibold text-slate-200">{{ p.label }}</span>
+                    <span class="block text-[10px] text-slate-500 mt-0.5">{{ p.hint }}</span>
+                  </button>
+                }
+              </div>
+              @if (gen.sizePreset() === 'custom') {
+                <p class="mt-1.5 text-[10px] text-amber-400/80">Options avancées personnalisées</p>
+              }
+            </div>
+
+            <div class="rounded-xl border border-slate-800/80 bg-black/20">
+              <button
+                type="button"
+                class="w-full flex items-center justify-between px-3 py-2.5 text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-200"
+                (click)="gen.toggleAdvanced()"
+              >
+                Options avancées
+                <span class="text-slate-600 normal-case tracking-normal">{{ gen.showAdvanced() ? 'Masquer' : 'Afficher' }}</span>
+              </button>
+              @if (gen.showAdvanced()) {
+                <div class="grid sm:grid-cols-2 gap-4 px-3 pb-3 border-t border-slate-800/80 pt-3">
+                  <label class="dg-range-field">
+                    Largeur · {{ gen.genGridW() }}
+                    <input
+                      type="range"
+                      min="32"
+                      max="80"
+                      [ngModel]="gen.genGridW()"
+                      (ngModelChange)="gen.onAdvancedParamInput('w', +$event)"
+                      (change)="gen.onAdvancedParamCommit()"
+                      (pointerup)="gen.onAdvancedParamCommit()"
+                      class="dg-range"
+                    />
+                  </label>
+                  <label class="dg-range-field">
+                    Hauteur · {{ gen.genGridH() }}
+                    <input
+                      type="range"
+                      min="32"
+                      max="80"
+                      [ngModel]="gen.genGridH()"
+                      (ngModelChange)="gen.onAdvancedParamInput('h', +$event)"
+                      (change)="gen.onAdvancedParamCommit()"
+                      (pointerup)="gen.onAdvancedParamCommit()"
+                      class="dg-range"
+                    />
+                  </label>
+                  <label class="dg-range-field">
+                    Salles · {{ gen.genRoomCount() }}
+                    <input
+                      type="range"
+                      min="4"
+                      max="20"
+                      [ngModel]="gen.genRoomCount()"
+                      (ngModelChange)="gen.onAdvancedParamInput('rooms', +$event)"
+                      (change)="gen.onAdvancedParamCommit()"
+                      (pointerup)="gen.onAdvancedParamCommit()"
+                      class="dg-range"
+                    />
+                  </label>
+                  <label class="dg-range-field">
+                    Couloirs · {{ gen.genCorridorDensity() }}%
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      [ngModel]="gen.genCorridorDensity()"
+                      (ngModelChange)="gen.onAdvancedParamInput('corridors', +$event)"
+                      (change)="gen.onAdvancedParamCommit()"
+                      (pointerup)="gen.onAdvancedParamCommit()"
+                      class="dg-range"
+                    />
+                  </label>
+                  @for (hint of gen.genParamHints; track hint.label) {
+                    <p class="text-[10px] text-slate-500 sm:col-span-2">
+                      <span class="font-bold text-slate-400">{{ hint.label }} :</span> {{ hint.desc }}
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button
+                type="button"
+                class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-600 text-amber-50 hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                [disabled]="gen.generating()"
+                (click)="gen.generateMap()"
+              >
+                {{ gen.generating() ? 'Gravure…' : 'Gravure' }}
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-400 hover:text-slate-200"
+                [disabled]="gen.generating()"
+                (click)="gen.reshufflePreview()"
+                title="Nouveau tirage avec les mêmes paramètres"
+              >
+                Autre layout
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-400 hover:text-slate-200"
+                [disabled]="gen.generating()"
+                (click)="gen.closeGenerator()"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+
+          <div class="relative min-h-[240px] rounded-xl border border-slate-800/80 bg-black/40 overflow-hidden flex flex-col items-center justify-center gap-2 p-3">
+            @if (gen.generating()) {
+              <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0c10]/75 backdrop-blur-[2px]">
+                <div class="dungeon-pulse h-16 w-16 rounded-full border border-amber-500/40"></div>
+                <p class="font-serif text-amber-100/90 text-lg">Gravure de la carte…</p>
+              </div>
+            }
+            <canvas #previewCanvas class="max-w-full max-h-[320px] dungeon-preview-canvas"></canvas>
+            @if (!gen.previewMap() && !gen.generating()) {
+              <p class="absolute text-xs text-slate-600">Aperçu en cours…</p>
+            }
+            <div class="flex flex-wrap justify-center gap-3 pt-1">
+              @for (tile of core.legendTiles; track tile.kind) {
+                <span class="inline-flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span class="h-3 w-3 rounded shrink-0 ring-1 ring-black/40" [style.background]="gen.legendTileColor(tile.kind)"></span>
+                  {{ tile.label }}
+                </span>
+              }
+              <span class="inline-flex items-center gap-1.5 text-[10px] text-slate-400">
+                <span class="h-3 w-3 rounded-full shrink-0 bg-slate-200 text-[7px] font-black text-[#0f1218] flex items-center justify-center">1</span>
+                Salle
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>

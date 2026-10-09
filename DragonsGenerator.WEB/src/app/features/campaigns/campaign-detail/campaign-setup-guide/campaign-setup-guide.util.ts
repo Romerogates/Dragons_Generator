@@ -256,3 +256,45 @@ function describeStep(
       };
   }
 }
+
+/** Le hub n’exécute que ces commandes ; le mapping CTA → navigation reste ici. */
+export type CampaignSetupDispatch =
+  | { type: 'tab'; tab: 'creatures' | 'maps' | 'encounters' | 'players' | 'pregens' | 'sessions' }
+  | { type: 'editScenario' }
+  | { type: 'generateEncounters' }
+  | { type: 'addSession' }
+  | { type: 'startNextSession' }
+  | { type: 'openPlay' }
+  | { type: 'openPlayFullscreen' }
+  | { type: 'skipMaps' };
+
+export function dispatchCampaignSetupGuide(action: CampaignSetupAction): CampaignSetupDispatch {
+  switch (action) {
+    case 'editScenario':
+      return { type: 'editScenario' };
+    case 'openCreatures':
+      return { type: 'tab', tab: 'creatures' };
+    case 'openMaps':
+      return { type: 'tab', tab: 'maps' };
+    case 'openEncounters':
+      return { type: 'tab', tab: 'encounters' };
+    case 'generateEncounters':
+      return { type: 'generateEncounters' };
+    case 'openPlayers':
+      return { type: 'tab', tab: 'players' };
+    case 'openPregens':
+      return { type: 'tab', tab: 'pregens' };
+    case 'addSession':
+      return { type: 'addSession' };
+    case 'openSessions':
+      return { type: 'tab', tab: 'sessions' };
+    case 'startNextSession':
+      return { type: 'startNextSession' };
+    case 'openPlay':
+      return { type: 'openPlay' };
+    case 'openPlayFullscreen':
+      return { type: 'openPlayFullscreen' };
+    case 'skipMaps':
+      return { type: 'skipMaps' };
+  }
+}
