@@ -71,15 +71,13 @@ jobs:
           cache-dependency-path: DragonsGenerator.WEB/package-lock.json
 
       - name: Log in to Docker Hub
-        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # GitHub-hosted runners share IPs; Docker Hub anonymous pulls 429.
-      # Official bases: AWS public ECR. Hub community images: Google's Hub mirror.
-      - name: Prefetch Docker images off Hub
+      # Official bases from AWS ECR (no Hub quota). MailHog/Ollama pull after login.
+      - name: Prefetch web base images
         run: |
           set -euo pipefail
           prefetch() {
@@ -89,8 +87,6 @@ jobs:
           }
           prefetch public.ecr.aws/docker/library/node:24-alpine node:24-alpine
           prefetch public.ecr.aws/docker/library/nginx:alpine nginx:alpine
-          prefetch mirror.gcr.io/mailhog/mailhog:v1.0.1 mailhog/mailhog:v1.0.1
-          prefetch mirror.gcr.io/ollama/ollama:latest ollama/ollama:latest
 
       - name: Start local stack
         run: |
@@ -98,7 +94,7 @@ jobs:
           export APP_BUILD_COUNT
           APP_BUILD_COUNT="$(git rev-list --count HEAD)"
           compose() { docker compose -f docker-compose.local.yml "$@"; }
-          compose up -d --pull never mailhog ollama
+          compose up -d mailhog ollama
           compose up -d --build --pull never dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
