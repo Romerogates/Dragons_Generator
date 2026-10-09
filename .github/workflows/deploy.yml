@@ -71,8 +71,8 @@ jobs:
           cache-dependency-path: DragonsGenerator.WEB/package-lock.json
 
       # GitHub-hosted runners share IPs; Docker Hub anonymous pulls 429.
-      # Seed official bases from AWS's public mirror so `FROM node`/`nginx` stay local.
-      - name: Prefetch web base images
+      # Official bases: AWS public ECR. Hub community images: Google's Hub mirror.
+      - name: Prefetch Docker images off Hub
         run: |
           set -euo pipefail
           prefetch() {
@@ -82,6 +82,8 @@ jobs:
           }
           prefetch public.ecr.aws/docker/library/node:24-alpine node:24-alpine
           prefetch public.ecr.aws/docker/library/nginx:alpine nginx:alpine
+          prefetch mirror.gcr.io/mailhog/mailhog:v1.0.1 mailhog/mailhog:v1.0.1
+          prefetch mirror.gcr.io/ollama/ollama:latest ollama/ollama:latest
 
       - name: Start local stack
         run: |
@@ -89,17 +91,7 @@ jobs:
           export APP_BUILD_COUNT
           APP_BUILD_COUNT="$(git rev-list --count HEAD)"
           compose() { docker compose -f docker-compose.local.yml "$@"; }
-          for attempt in 1 2 3; do
-            if compose up -d mailhog ollama; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "mailhog/ollama still failing after ${attempt} attempts"
-              exit 1
-            fi
-            echo "Hub/registry flake on mailhog/ollama, retry ${attempt}/3…"
-            sleep $((attempt * 20))
-          done
+          compose up -d --pull never mailhog ollama
           compose up -d --build --pull never dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
