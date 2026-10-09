@@ -70,6 +70,13 @@ jobs:
           cache: npm
           cache-dependency-path: DragonsGenerator.WEB/package-lock.json
 
+      - name: Log in to Docker Hub
+        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       # GitHub-hosted runners share IPs; Docker Hub anonymous pulls 429.
       # Official bases: AWS public ECR. Hub community images: Google's Hub mirror.
       - name: Prefetch Docker images off Hub
