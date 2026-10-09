@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { EMPTY, catchError, of, throwError } from 'rxjs';
 
-const QUIET_GET = ['/me/notifications', '/me/friends/messages'];
+const QUIET_GET = ['/me/notifications', '/me/friends/messages', '/announcements/active'];
 
 const EMPTY_NOTIFICATIONS = {
   friendsActionCount: 0,

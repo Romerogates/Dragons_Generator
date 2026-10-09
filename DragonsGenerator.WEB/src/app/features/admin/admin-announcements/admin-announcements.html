@@ -1,0 +1,123 @@
+<div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-6">
+  <form
+    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 space-y-3 text-xs text-slate-300"
+    (ngSubmit)="submit()"
+    data-testid="admin-announcement-form"
+  >
+    <p class="text-[10px] uppercase tracking-widest text-slate-500">Nouvelle annonce</p>
+    <p class="text-slate-400">
+      Affichée en bannière en haut du site (chaque joueur peut la masquer d’un clic) et ajoutée à ses
+      notifications.
+    </p>
+
+    <label class="block">
+      <span class="text-[10px] uppercase tracking-widest text-slate-500">Type</span>
+      <select
+        name="severity"
+        class="mt-1 w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2"
+        [(ngModel)]="severity"
+      >
+        @for (s of severities; track s) {
+          <option [value]="s">{{ severityLabel(s) }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="block">
+      <span class="text-[10px] uppercase tracking-widest text-slate-500">Titre (optionnel)</span>
+      <input
+        name="title"
+        type="text"
+        class="mt-1 w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2"
+        [maxlength]="limits.titleMax"
+        placeholder="Par défaut selon le type"
+        [(ngModel)]="title"
+      />
+    </label>
+
+    <label class="block">
+      <span class="text-[10px] uppercase tracking-widest text-slate-500">Message</span>
+      <textarea
+        name="body"
+        rows="4"
+        class="mt-1 w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2"
+        [maxlength]="limits.messageMax"
+        placeholder="Ex. La génération IA est en maintenance ce soir de 21 h à 22 h."
+        data-testid="admin-announcement-message"
+        [(ngModel)]="body"
+      ></textarea>
+      <span class="text-[10px] text-slate-500">{{ body.length }} / {{ limits.messageMax }}</span>
+    </label>
+
+    <label class="block">
+      <span class="text-[10px] uppercase tracking-widest text-slate-500">Durée (jours)</span>
+      <input
+        name="durationDays"
+        type="number"
+        class="mt-1 w-28 rounded-lg bg-slate-900 border border-slate-700 px-3 py-2"
+        [min]="limits.minDays"
+        [max]="limits.maxDays"
+        [(ngModel)]="durationDays"
+      />
+    </label>
+
+    @if (message()) {
+      <p class="text-emerald-400">{{ message() }}</p>
+    }
+    @if (error()) {
+      <p class="text-red-400">{{ error() }}</p>
+    }
+
+    <button
+      type="submit"
+      class="px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] bg-amber-500 text-slate-950 disabled:opacity-40"
+      [disabled]="!canSubmit()"
+      data-testid="admin-announcement-submit"
+    >
+      {{ saving() ? 'Publication…' : 'Publier' }}
+    </button>
+  </form>
+
+  <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-[10px] uppercase tracking-widest text-slate-500">Historique</p>
+      <button type="button" class="text-amber-400 hover:underline" (click)="load()">Actualiser</button>
+    </div>
+    @if (loading() && history().length === 0) {
+      <p class="text-slate-500">Chargement…</p>
+    } @else if (history().length === 0) {
+      <p class="text-slate-500">Aucune annonce publiée.</p>
+    } @else {
+      <ul class="space-y-2">
+        @for (a of history(); track a.id) {
+          <li class="border border-slate-800 rounded-lg p-3" [class.opacity-60]="!a.active">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest"
+                [class.bg-rose-900]="a.severity === 'outage'"
+                [class.bg-amber-900]="a.severity === 'warning'"
+                [class.bg-indigo-900]="a.severity === 'info'"
+              >
+                {{ severityLabel(a.severity) }}
+              </span>
+              <span class="font-bold text-slate-100">{{ a.title }}</span>
+              <span class="ml-auto text-[10px]" [class.text-emerald-400]="a.active" [class.text-slate-500]="!a.active">
+                {{ a.active ? 'En ligne' : 'Terminée' }}
+              </span>
+            </div>
+            <p class="mt-1 whitespace-pre-line">{{ a.message }}</p>
+            <p class="mt-1 text-[10px] text-slate-500">
+              {{ a.startsAt | date: 'dd/MM HH:mm' }} → {{ a.endsAt | date: 'dd/MM HH:mm' }}
+            </p>
+            <div class="mt-2 flex gap-3">
+              @if (a.active) {
+                <button type="button" class="text-amber-400 hover:underline" (click)="end(a)">Terminer</button>
+              }
+              <button type="button" class="text-red-400 hover:underline" (click)="remove(a)">Supprimer</button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

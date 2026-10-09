@@ -327,3 +327,35 @@ public class AiGenerationLog
     public string? Provider { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+public static class SiteAnnouncementSeverities
+{
+    public const string Info = "info";
+    public const string Warning = "warning";
+    public const string Outage = "outage";
+
+    public static bool IsValid(string? value) => value is Info or Warning or Outage;
+}
+
+public static class SiteAnnouncementLimits
+{
+    public const int TitleMax = 120;
+    public const int MessageMax = 1000;
+    public const int MinDays = 1;
+    public const int MaxDays = 60;
+}
+
+/// <summary>Message staff affiché en bannière site + dans l’inbox, entre StartsAt et EndsAt.</summary>
+public class SiteAnnouncement
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Title { get; set; } = "";
+    public string Message { get; set; } = "";
+    public string Severity { get; set; } = SiteAnnouncementSeverities.Info;
+    public DateTimeOffset StartsAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset EndsAt { get; set; } = DateTimeOffset.UtcNow.AddDays(1);
+    public Guid? CreatedByUserId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public bool IsActiveAt(DateTimeOffset now) => StartsAt <= now && now < EndsAt;
+}

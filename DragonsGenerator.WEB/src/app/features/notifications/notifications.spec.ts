@@ -86,4 +86,20 @@ describe('NotificationsPage', () => {
       }
     }
   });
+
+  it('counts site announcements in "Tout" and gives them a megaphone icon', () => {
+    items.set([
+      item({ key: 'announcement-a1', kind: 'announcement', actionPath: '/notifications?announcement=a1' }),
+      item({ key: 'f1', kind: 'friend_request' }),
+    ]);
+    fixture.detectChanges();
+    expect(component.announcementsCount()).toBe(1);
+    expect(component.iconFor('announcement')).toBe('fluent-emoji:loudspeaker');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Tout (2)');
+
+    component.setFilter('friends');
+    expect(component.visibleItems().map((i) => i.key)).toEqual(['f1']);
+    component.setFilter('all');
+    expect(component.visibleItems().length).toBe(2);
+  });
 });

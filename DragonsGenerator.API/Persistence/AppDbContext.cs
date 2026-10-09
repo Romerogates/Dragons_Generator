@@ -23,6 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<GuideComment> GuideComments => Set<GuideComment>();
     public DbSet<GuideCommentLike> GuideCommentLikes => Set<GuideCommentLike>();
     public DbSet<AiGenerationLog> AiGenerationLogs => Set<AiGenerationLog>();
+    public DbSet<SiteAnnouncement> SiteAnnouncements => Set<SiteAnnouncement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -260,6 +261,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.Kind, x.CreatedAt });
             e.Property(x => x.Kind).HasMaxLength(32);
             e.Property(x => x.Provider).HasMaxLength(64);
+        });
+
+        modelBuilder.Entity<SiteAnnouncement>(e =>
+        {
+            e.HasIndex(x => x.EndsAt);
+            e.Property(x => x.Title).HasMaxLength(SiteAnnouncementLimits.TitleMax);
+            e.Property(x => x.Message).HasMaxLength(SiteAnnouncementLimits.MessageMax);
+            e.Property(x => x.Severity).HasMaxLength(16);
         });
     }
 }

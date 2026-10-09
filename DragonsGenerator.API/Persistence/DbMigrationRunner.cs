@@ -46,6 +46,7 @@ public static class DbMigrationRunner
         new("022_ai_generation_logs", Apply022AiGenerationLogsAsync),
         new("023_support_category_assign", Apply023SupportCategoryAssignAsync),
         new("024_user_disabled", Apply024UserDisabledAsync),
+        new("025_site_announcements", Apply025SiteAnnouncementsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -474,6 +475,25 @@ public static class DbMigrationRunner
     private static async Task Apply024UserDisabledAsync(AppDbContext db, CancellationToken ct)
     {
         await TryAddColumnAsync(db, "Users", "Disabled", "INTEGER NOT NULL DEFAULT 0", ct);
+    }
+
+    private static async Task Apply025SiteAnnouncementsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "SiteAnnouncements" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_SiteAnnouncements" PRIMARY KEY,
+                "Title" TEXT NOT NULL,
+                "Message" TEXT NOT NULL,
+                "Severity" TEXT NOT NULL,
+                "StartsAt" TEXT NOT NULL,
+                "EndsAt" TEXT NOT NULL,
+                "CreatedByUserId" TEXT NULL,
+                "CreatedAt" TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS "IX_SiteAnnouncements_EndsAt" ON "SiteAnnouncements" ("EndsAt");
+            """,
+            ct);
     }
 
     private static async Task TryAddColumnAsync(

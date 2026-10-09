@@ -8,7 +8,8 @@ export type NotificationType =
   | 'proposal_approved'
   | 'xp_awarded'
   | 'schedule_rsvp'
-  | 'support_reply';
+  | 'support_reply'
+  | 'announcement';
 
 export interface NotificationItem {
   key: string;

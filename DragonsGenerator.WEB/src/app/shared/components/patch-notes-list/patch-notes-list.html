@@ -1,0 +1,21 @@
+<ol class="space-y-5" data-testid="patch-notes-list">
+  @for (n of entries(); track n.version; let first = $first) {
+    <li class="bg-[#1b2028] border rounded-xl p-4 sm:p-5" [class.border-amber-700]="first" [class.border-slate-800]="!first">
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
+        <span class="font-mono text-xs font-bold text-amber-400">v{{ n.version }}</span>
+        <h2 class="font-serif text-lg font-bold text-slate-100">{{ n.title }}</h2>
+        @if (first) {
+          <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-widest">
+            Dernière version
+          </span>
+        }
+        <time class="ml-auto text-[11px] text-slate-500" [attr.datetime]="n.date">{{ formatDate(n.date) }}</time>
+      </div>
+      <ul class="space-y-1.5 text-sm text-slate-300 list-disc pl-5 marker:text-amber-600">
+        @for (item of n.items; track $index) {
+          <li [class.font-mono]="audience() === 'tech'" [class.text-xs]="audience() === 'tech'">{{ item }}</li>
+        }
+      </ul>
+    </li>
+  }
+</ol>

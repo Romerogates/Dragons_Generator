@@ -32,7 +32,8 @@
     }
 
     <div
-      class="relative w-full mx-auto"
+      #previewStage
+      class="summary-preview-stage relative w-full mx-auto"
       [ngClass]="showMobilePdf() ? '' : 'hidden sm:block'"
     >
       @if (isLoadingPreview()) {
@@ -48,7 +49,12 @@
 
       @if (!isLoadingPreview() && pdfRawUrl(); as url) {
         @if (!pdfJsFailed()) {
-          <app-pdf-page-preview [src]="url" [bare]="true" (loadFailed)="onPdfJsFailed()" />
+          <app-pdf-page-preview
+            [src]="url"
+            [bare]="true"
+            (loadFailed)="onPdfJsFailed()"
+            (pageRendered)="onPreviewRendered(previewStage)"
+          />
         } @else if (pdfPreviewUrl(); as safeUrl) {
           @if (!useNativePdfFallback) {
             <iframe

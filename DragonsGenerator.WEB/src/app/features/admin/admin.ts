@@ -24,6 +24,8 @@ import {
   SupportConversation,
   SupportReplyPayload,
 } from '@shared/components/support-conversation/support-conversation';
+import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-list';
+import { AdminAnnouncements } from './admin-announcements/admin-announcements';
 
 interface AdminUser {
   id: string;
@@ -127,12 +129,31 @@ interface AdminStats {
   generationsByKind: AdminStatsKind[];
 }
 
-type AdminTab = 'overview' | 'stats' | 'tickets' | 'ops' | 'mails' | 'users';
+type AdminTab =
+  | 'overview'
+  | 'stats'
+  | 'tickets'
+  | 'ops'
+  | 'mails'
+  | 'users'
+  | 'announcements'
+  | 'patchnotes';
+
+const ADMIN_TABS: readonly AdminTab[] = [
+  'overview',
+  'stats',
+  'tickets',
+  'ops',
+  'mails',
+  'users',
+  'announcements',
+  'patchnotes',
+];
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, SupportConversation],
+  imports: [CommonModule, FormsModule, SupportConversation, AdminAnnouncements, PatchNotesList],
   templateUrl: './admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -195,15 +216,7 @@ export class AdminPage implements OnInit, OnDestroy {
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
     const tab = q.get('tab');
-    if (
-      tab === 'tickets' ||
-      tab === 'ops' ||
-      tab === 'mails' ||
-      tab === 'users' ||
-      tab === 'overview' ||
-      tab === 'stats'
-    )
-      this.tab.set(tab);
+    if (ADMIN_TABS.includes(tab as AdminTab)) this.tab.set(tab as AdminTab);
     this.loadUsers();
     this.loadTickets(q.get('ticket'));
     this.loadOverview();

@@ -71,12 +71,20 @@ export class PdfPagePreview implements OnDestroy {
    * `false` = aperçu encadré sombre (legacy).
    */
   readonly bare = input(true);
+  /**
+   * Pager `bare` : la page entière tient dans la hauteur d’écran (budget `--pdf-fit-height`).
+   * `false` = largeur seule (fiche plus grande, défilement vertical).
+   */
+  readonly fitPage = input(true);
   /** Émis si PDF.js ne peut pas charger — le parent peut basculer sur iframe. */
   readonly loadFailed = output<void>();
+  /** Émis après chaque peinture de page en mode pager. */
+  readonly pageRendered = output<void>();
 
   readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('pdfCanvas');
   readonly stripCanvases = viewChildren<ElementRef<HTMLCanvasElement>>('stripCanvas');
   readonly bookRef = viewChild<ElementRef<HTMLElement>>('bookStage');
+  readonly fitProbeRef = viewChild<ElementRef<HTMLElement>>('fitProbe');
   private readonly injector = inject(Injector);
 
   readonly loading = signal(false);
@@ -106,6 +114,13 @@ export class PdfPagePreview implements OnDestroy {
     this.cancelRenders();
     void this.pdf?.destroy();
     this.pdf = null;
+  }
+
+  /** Le ResizeObserver ne voit que la largeur du livre ; la hauteur dépend de la fenêtre. */
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!this.pdf || this.mode() !== 'pager' || !this.usesHeightFit()) return;
+    this.scheduleRerender();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -244,15 +259,29 @@ export class PdfPagePreview implements OnDestroy {
         : this.canvasRef()?.nativeElement?.parentElement;
     if (!host) return;
     this.teardownResize();
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.resizeTimer != null) clearTimeout(this.resizeTimer);
-      this.resizeTimer = setTimeout(() => {
-        this.resizeTimer = null;
-        if (this.mode() === 'strip') void this.renderAllPages();
-        else void this.renderPagerPage();
-      }, 80);
-    });
+    this.resizeObserver = new ResizeObserver(() => this.scheduleRerender());
     this.resizeObserver.observe(host as Element);
+  }
+
+  private scheduleRerender(): void {
+    if (this.resizeTimer != null) clearTimeout(this.resizeTimer);
+    this.resizeTimer = setTimeout(() => {
+      this.resizeTimer = null;
+      if (this.mode() === 'strip') void this.renderAllPages();
+      else void this.renderPagerPage();
+    }, 80);
+  }
+
+  private usesHeightFit(): boolean {
+    return this.bare() && this.fitPage();
+  }
+
+  /** Hauteur CSS max d’une page (sonde `--pdf-fit-height`), ou null si pas de contrainte. */
+  private fitHeightBudget(): number | null {
+    if (!this.usesHeightFit()) return null;
+    const probe = this.fitProbeRef()?.nativeElement;
+    const h = probe?.clientHeight ?? 0;
+    return h > 0 ? Math.max(280, h) : null;
   }
 
   private cancelRenders(): void {
@@ -276,7 +305,11 @@ export class PdfPagePreview implements OnDestroy {
     const host = this.bookRef()?.nativeElement ?? canvas.parentElement;
     const page = await pdf.getPage(this.page());
     if (seq !== this.renderSeq) return;
-    await this.paintPage(page, canvas, host, seq, { fitHeight: !this.bare() });
+    await this.paintPage(page, canvas, host, seq, {
+      fitHeight: !this.bare(),
+      maxCssHeight: this.fitHeightBudget(),
+    });
+    if (seq === this.renderSeq) this.pageRendered.emit();
   }
 
   private async renderAllPages(): Promise<void> {
@@ -304,7 +337,7 @@ export class PdfPagePreview implements OnDestroy {
     canvas: HTMLCanvasElement,
     host: HTMLElement | null | undefined,
     seq: number,
-    opts: { fitHeight?: boolean },
+    opts: { fitHeight?: boolean; maxCssHeight?: number | null },
   ): Promise<void> {
     if (seq !== this.renderSeq) return;
 
@@ -323,7 +356,9 @@ export class PdfPagePreview implements OnDestroy {
       cssH = Math.floor(unscaled.height * cssScale);
     } else {
       // Sur grand écran, monter jusqu’à ~3× pour remplir la largeur utile (A4 ~595pt).
-      const cssScale = Math.min(3, Math.max(0.45, parentW / unscaled.width));
+      let fit = parentW / unscaled.width;
+      if (opts.maxCssHeight) fit = Math.min(fit, opts.maxCssHeight / unscaled.height);
+      const cssScale = Math.min(3, Math.max(0.3, fit));
       cssW = Math.floor(unscaled.width * cssScale);
       cssH = Math.floor(unscaled.height * cssScale);
     }

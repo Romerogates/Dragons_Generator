@@ -6,6 +6,8 @@ import { AuthService } from '@core/services/auth.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
+import { SiteAnnouncementService } from '@core/services/site-announcement.service';
+import type { NotificationItem } from '@core/models/notification.model';
 import { of } from 'rxjs';
 import { Navbar } from './navbar';
 import { DataService } from '@core/services/data.service';
@@ -13,8 +15,12 @@ import { DataService } from '@core/services/data.service';
 describe('Navbar', () => {
   let component: Navbar;
   let fixture: ComponentFixture<Navbar>;
+  const notifItems = signal<NotificationItem[]>([]);
+  const bannerDismissed = new Set<string>();
 
   beforeEach(async () => {
+    notifItems.set([]);
+    bannerDismissed.clear();
     await TestBed.configureTestingModule({
       imports: [Navbar],
       providers: [
@@ -31,7 +37,11 @@ describe('Navbar', () => {
         },
         {
           provide: NotificationService,
-          useValue: { items: signal([]), supportInboxCount: signal(0) },
+          useValue: { items: notifItems, supportInboxCount: signal(0) },
+        },
+        {
+          provide: SiteAnnouncementService,
+          useValue: { isDismissed: (id: string) => bannerDismissed.has(id) },
         },
         {
           provide: NotificationPreferencesService,
@@ -88,5 +98,20 @@ describe('Navbar', () => {
     component.toggleMobile();
     expect(component.mobileOpen()).toBeTrue();
     expect(component.mobileMenuMounted()).toBeTrue();
+  });
+
+  it('badges unseen announcements until the banner is dismissed', () => {
+    const announcement = (id: string): NotificationItem => ({
+      key: `announcement-${id}`,
+      kind: 'announcement',
+      title: 'Incident en cours',
+      message: 'Maintenance',
+      actionPath: `/notifications?announcement=${id}`,
+      createdAt: new Date().toISOString(),
+    });
+    bannerDismissed.add('seen');
+    notifItems.set([announcement('new'), announcement('seen')]);
+    expect(component.announcementCount()).toBe(1);
+    expect(component.notificationCount()).toBe(1);
   });
 });

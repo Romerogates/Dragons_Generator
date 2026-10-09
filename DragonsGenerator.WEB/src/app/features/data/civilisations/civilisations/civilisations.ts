@@ -47,7 +47,6 @@ export class Civilisations implements OnInit, OnDestroy {
     return list.filter(
       (civ) =>
         civ.name.toLowerCase().includes(term) ||
-        (civ.lore?.fullDescription ?? '').toLowerCase().includes(term) ||
         (civ.lore?.geographyTags ?? []).some((t) => t.toLowerCase().includes(term)),
     );
   });

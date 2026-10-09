@@ -63,6 +63,30 @@
     </div>
   }
 
+  @if (announcements().length > 0) {
+    <div data-dg-banner class="sticky top-0 z-[60] flex flex-col" data-testid="site-announcements">
+      @for (a of announcements(); track a.id) {
+        <button
+          type="button"
+          class="group w-full flex items-start sm:items-center justify-center gap-2 sm:gap-3 border-b px-3 py-2 text-left sm:text-center text-xs sm:text-sm transition-colors"
+          [class]="announcementTone(a.severity)"
+          [attr.aria-label]="'Masquer l’annonce : ' + a.title"
+          title="Cliquer pour masquer"
+          data-testid="site-announcement"
+          (click)="dismissAnnouncement(a.id)"
+        >
+          <span class="font-black uppercase tracking-widest text-[10px] shrink-0 pt-0.5 sm:pt-0">
+            {{ a.title }}
+          </span>
+          <span class="min-w-0 line-clamp-2 sm:line-clamp-1">{{ a.message }}</span>
+          <span class="shrink-0 opacity-60 group-hover:opacity-100 text-[10px] uppercase tracking-widest" aria-hidden="true">
+            ✕
+          </span>
+        </button>
+      }
+    </div>
+  }
+
   @if (!hideSiteChrome()) {
     <app-navbar />
   }

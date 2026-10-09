@@ -82,6 +82,13 @@ export class NotificationsPage implements OnInit {
         .filter((i) => !this.notifPrefs.isDismissed(i.key)).length,
   );
 
+  readonly announcementsCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter((i) => i.kind === 'announcement' && !this.notifPrefs.isDismissed(i.key)).length,
+  );
+
   readonly campaignsCount = computed(
     () =>
       this.notifications
@@ -136,6 +143,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:spiral-calendar';
       case 'support_reply':
         return 'fluent-emoji:envelope';
+      case 'announcement':
+        return 'fluent-emoji:loudspeaker';
     }
   }
 

@@ -40,6 +40,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/legal/terms/terms').then((m) => m.TermsPage),
   },
   {
+    path: 'patch-notes',
+    title: 'Nouveautés — Dragons Generator',
+    loadComponent: () =>
+      import('./features/patch-notes/patch-notes').then((m) => m.PatchNotesPage),
+  },
+  {
     path: 'guide',
     children: [
       {

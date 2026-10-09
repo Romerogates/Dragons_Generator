@@ -1,3 +1,4 @@
+using DragonsGenerator.API.Endpoints.Announcements;
 using DragonsGenerator.API.Endpoints.Support;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
@@ -331,6 +332,21 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                     $"{ticket.Subject} : {NotificationsInboxHelper.Preview(lastMsg.Body, 80)}",
                     $"/support?ticket={ticket.Id}",
                     lastMsg.CreatedAt
+                )
+            );
+        }
+
+        var announcements = await SiteAnnouncementMapping.LoadActiveAsync(db, DateTimeOffset.UtcNow, ct);
+        foreach (var a in announcements)
+        {
+            items.Add(
+                new NotificationItemDto(
+                    $"announcement-{a.Id}",
+                    "announcement",
+                    a.Title,
+                    a.Message,
+                    $"/notifications?announcement={a.Id}",
+                    a.StartsAt
                 )
             );
         }

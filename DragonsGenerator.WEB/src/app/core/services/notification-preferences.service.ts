@@ -122,6 +122,7 @@ export class NotificationPreferencesService {
       case 'schedule_rsvp':
         return p.sessionReminders;
       case 'support_reply':
+      case 'announcement':
         return true;
     }
   }

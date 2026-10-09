@@ -38,6 +38,8 @@
       { id: 'ops', label: 'Backups / crons' },
       { id: 'mails', label: 'Mails' },
       { id: 'users', label: 'Comptes' },
+      { id: 'announcements', label: 'Annonces' },
+      { id: 'patchnotes', label: 'Patch notes' },
     ]; track t.id) {
       <button
         type="button"
@@ -56,6 +58,18 @@
       </button>
     }
   </div>
+
+  @if (tab() === 'announcements') {
+    <app-admin-announcements />
+  }
+
+  @if (tab() === 'patchnotes') {
+    <p class="text-xs text-slate-500 mb-4">
+      Version technique du journal. Les joueurs voient la version grand public sur
+      <a href="/patch-notes" class="text-amber-400 hover:underline">/patch-notes</a>.
+    </p>
+    <app-patch-notes-list audience="tech" />
+  }
 
   @if (tab() === 'stats') {
     @if (stats(); as s) {

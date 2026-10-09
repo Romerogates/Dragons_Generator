@@ -24,6 +24,8 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { SupportOverlayService } from '@core/services/support-overlay.service';
+import { SiteAnnouncementService } from '@core/services/site-announcement.service';
+import type { SiteAnnouncementSeverity } from '@core/models/site-announcement.model';
 import { CampaignSessionDockComponent } from './shared/components/campaign-session-dock/campaign-session-dock';
 import { AiGenerationDock } from './shared/components/ai-generation-dock/ai-generation-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
@@ -63,6 +65,7 @@ export class App implements OnInit {
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly supportOverlay = inject(SupportOverlayService);
+  private readonly siteAnnouncements = inject(SiteAnnouncementService);
 
   protected readonly title = signal('DragonsGenerator.WEB');
 
@@ -70,6 +73,7 @@ export class App implements OnInit {
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly updateReady = this.pwa.updateReady;
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
+  readonly announcements = this.siteAnnouncements.visible;
 
   /** Table /play : plein écran (chrome dédié). Le guide garde navbar + footer. */
   private readonly playFullscreen = toSignal(
@@ -96,6 +100,7 @@ export class App implements OnInit {
       void this.showReconnectBanner();
       void this.isOnline();
       void this.updateReady();
+      void this.announcements();
       queueMicrotask(() => this.measureBannerHeight());
     });
     this.destroyRef.onDestroy(() => {
@@ -123,6 +128,7 @@ export class App implements OnInit {
       if (this.showReconnectBanner()) rows += 1;
       if (!this.isOnline()) rows += 1;
       if (this.updateReady()) rows += 1;
+      rows += this.announcements().length;
       total = rows * BANNER_ROW_PX_FALLBACK;
     }
     document.documentElement.style.setProperty('--dg-banner-height', `${Math.round(total)}px`);
@@ -134,6 +140,7 @@ export class App implements OnInit {
     this.auth.initSessionSync();
     this.offlineSync.init();
     this.notifications.init();
+    this.siteAnnouncements.init();
     this.pwa.init();
     if (this.auth.isLoggedIn()) {
       this.push.initAfterLogin();
@@ -147,6 +154,21 @@ export class App implements OnInit {
 
   dismissUpdate(): void {
     this.pwa.dismissUpdate();
+  }
+
+  dismissAnnouncement(id: string): void {
+    this.siteAnnouncements.dismiss(id);
+  }
+
+  announcementTone(severity: SiteAnnouncementSeverity): string {
+    switch (severity) {
+      case 'outage':
+        return 'bg-rose-950/95 border-rose-800/60 text-rose-100 hover:bg-rose-900/95';
+      case 'warning':
+        return 'bg-amber-950/95 border-amber-800/60 text-amber-100 hover:bg-amber-900/95';
+      default:
+        return 'bg-indigo-950/95 border-indigo-800/60 text-indigo-100 hover:bg-indigo-900/95';
+    }
   }
 
   dismissReconnectBanner(): void {

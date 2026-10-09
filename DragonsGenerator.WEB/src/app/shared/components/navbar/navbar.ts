@@ -16,6 +16,7 @@ import { AuthService } from '@core/services/auth.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
+import { SiteAnnouncementService } from '@core/services/site-announcement.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import type { NotificationType } from '@core/models/notification.model';
 import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
@@ -48,6 +49,7 @@ export class Navbar implements OnInit, OnDestroy {
   private readonly codexSearch = inject(CodexSearchService);
   private readonly notifications = inject(NotificationService);
   private readonly notifPrefs = inject(NotificationPreferencesService);
+  private readonly announcements = inject(SiteAnnouncementService);
   readonly guidePrefs = inject(GuidePreferencesService);
   private routerSub?: Subscription;
 
@@ -94,11 +96,27 @@ export class Navbar implements OnInit, OnDestroy {
             !this.notifPrefs.isDismissed(item.key),
         ).length,
   );
+  /** Annonces encore jamais vues : retirer la bannière ou la notif suffit à éteindre le badge. */
+  readonly announcementCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter(
+          (item) =>
+            item.kind === 'announcement' &&
+            !this.notifPrefs.isDismissed(item.key) &&
+            !this.announcements.isDismissed(item.key.replace(/^announcement-/, '')),
+        ).length,
+  );
   readonly supportInboxCount = computed(() =>
     this.auth.isAdmin() ? this.notifications.supportInboxCount() : 0,
   );
   readonly notificationCount = computed(
-    () => this.friendsActionCount() + this.campaignsActionCount() + this.supportReplyCount(),
+    () =>
+      this.friendsActionCount() +
+      this.campaignsActionCount() +
+      this.supportReplyCount() +
+      this.announcementCount(),
   );
   readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
   /** Badge hamburger (md–lg) : notifs + demandes + campagnes + guide. */

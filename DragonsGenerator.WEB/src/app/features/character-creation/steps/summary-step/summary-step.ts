@@ -144,6 +144,15 @@ export class SummaryStep implements OnInit, OnDestroy {
     this.pdfJsFailed.set(true);
   }
 
+  private previewFramed = false;
+
+  /** Premier rendu : cadre la fiche sous le bandeau d’étapes (haut et bas visibles). */
+  onPreviewRendered(stage: HTMLElement): void {
+    if (this.previewFramed) return;
+    this.previewFramed = true;
+    stage.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+
   fmt(n: number): string {
     return n >= 0 ? `+${n}` : `${n}`;
   }
