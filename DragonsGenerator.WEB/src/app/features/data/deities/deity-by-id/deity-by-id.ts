@@ -5,7 +5,7 @@ import {
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
@@ -14,7 +14,7 @@ import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-de
 @Component({
   selector: 'app-deity-by-id',
   standalone: true,
-  imports: [RouterLink, CodexDetailShell],
+  imports: [CodexDetailShell],
   templateUrl: './deity-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

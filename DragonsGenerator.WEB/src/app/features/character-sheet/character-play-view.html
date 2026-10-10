@@ -5,7 +5,7 @@
         <h2 class="text-xl sm:text-2xl font-serif text-slate-100 leading-tight">{{ c.name }}</h2>
         <p class="text-sm text-slate-400 mt-0.5">
           {{ identityLine() }}
-          @if (c.personality?.alignment) {
+          @if (c.personality.alignment) {
             <span class="text-slate-600"> · </span>{{ c.personality.alignment }}
           }
         </p>

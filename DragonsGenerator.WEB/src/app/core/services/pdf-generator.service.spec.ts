@@ -78,7 +78,7 @@ describe('PdfGeneratorService', () => {
         ],
         totalLevel: 6,
         proficiencies: {
-          armor: ['ar-medium', 'ar-light'],
+          armor: ['ar-light', 'ar-medium', 'ar-heavy', 'ar-shield'],
           weapons: ['wp-dague', 'wp-flechette', 'wp-cat-simple', 'wp-cat-martial', 'wp-lance'],
           tools: [],
           savingThrows: ['Intelligence', 'Sagesse'],

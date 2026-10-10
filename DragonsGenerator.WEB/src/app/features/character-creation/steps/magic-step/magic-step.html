@@ -23,7 +23,7 @@
             (click)="selectCaster(i)"
             [attr.data-testid]="'magic-caster-tab-' + src.classId"
           >
-            {{ casterTabLabels()[i] ?? src.className + ' ' + src.level }}
+            {{ casterTabLabels()[i] }}
           </button>
         }
       </div>

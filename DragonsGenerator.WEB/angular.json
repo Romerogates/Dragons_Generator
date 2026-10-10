@@ -49,14 +49,25 @@
               "includePaths": [
                 "src/styles"
               ]
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "core-js",
+              "html2canvas",
+              "raf",
+              "rgbcolor"
+            ],
+            "externalDependencies": [
+              "canvg",
+              "html2canvas"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "560kB",
+                  "maximumWarning": "700kB",
                   "maximumError": "1MB"
                 },
                 {
@@ -160,12 +171,13 @@
               }
             ],
             "styles": [
-              "@fullcalendar/angular/skeleton.css",
-              "@fullcalendar/angular/themes/breezy/theme.css",
-              "@fullcalendar/angular/themes/breezy/palettes/amber.css",
-              "src/styles.scss",
-              "src/styles/_fullcalendar-dark.scss"
-            ]
+              "src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles"
+              ]
+            }
           }
         },
         "lint": {

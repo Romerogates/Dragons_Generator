@@ -108,7 +108,9 @@
   <app-context-menu />
   <app-ai-rate-limit-dialog />
   @if (!hideSiteChrome()) {
-    <app-campaign-session-dock />
-    <app-friend-chat-dock />
+    @defer (on idle) {
+      <app-campaign-session-dock />
+      <app-friend-chat-dock />
+    }
   }
 </div>

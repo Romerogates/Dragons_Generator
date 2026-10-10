@@ -112,6 +112,10 @@ const PAGE2 = {
   armorYs: [100, 124],
   weaponX: 125,
   weaponYs: [148, 172],
+  /** Avant la boîte « Résistances » (resX 380) : laisse une marge pour ne pas déborder en X. */
+  profMaxWidth: 230,
+  profFontSize: 11,
+  profMinFontSize: 7,
 
   // --- Résistances & immunités (haut-droite) ---
   resX: 380,
@@ -612,7 +616,7 @@ export class PdfGeneratorService {
    */
   private drawPage2Proficiencies(pdf: jsPDF, c: Character): void {
     const P = PAGE2;
-    pdf.setFontSize(15);
+    pdf.setFontSize(P.profFontSize);
 
     const packTwoLines = (ids: string[]): [string, string] => {
       const sorted = this.prioritizeCategoryTokens(ids);
@@ -623,14 +627,18 @@ export class PdfGeneratorService {
       return [first, rest];
     };
 
+    const writeProf = (value: string, x: number, y: number): void => {
+      this.textFit(pdf, value, x, y, P.profMaxWidth, P.profFontSize, P.profMinFontSize);
+    };
+
     const [armor0, armor1] = packTwoLines(c.proficiencies.armor ?? []);
-    if (armor0) this.text(pdf, armor0, P.armorX, P.armorYs[0]);
-    if (armor1) this.text(pdf, armor1, P.armorX, P.armorYs[1]);
+    if (armor0) writeProf(armor0, P.armorX, P.armorYs[0]);
+    if (armor1) writeProf(armor1, P.armorX, P.armorYs[1]);
 
     // Armes : uniquement catégories / spécialisations (pas chaque wp-* — déjà en équip. / attaques).
     const [weapon0, weapon1] = packTwoLines(this.weaponSpecializationIds(c.proficiencies.weapons ?? []));
-    if (weapon0) this.text(pdf, weapon0, P.weaponX, P.weaponYs[0]);
-    if (weapon1) this.text(pdf, weapon1, P.weaponX, P.weaponYs[1]);
+    if (weapon0) writeProf(weapon0, P.weaponX, P.weaponYs[0]);
+    if (weapon1) writeProf(weapon1, P.weaponX, P.weaponYs[1]);
   }
 
   /**

@@ -6,7 +6,7 @@ import {
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
@@ -26,7 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-feat-by-id',
   standalone: true,
-  imports: [RouterLink, CodexDetailShell],
+  imports: [CodexDetailShell],
   templateUrl: './feat-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -150,9 +150,9 @@
                       </p>
                     }
                   </div>
-                  @if (liveMap.fogOfWarEnabled && (liveMap.rooms ?? []).length) {
+                  @if (liveMap.fogOfWarEnabled && liveMap.rooms.length) {
                     <div class="flex flex-wrap gap-1.5">
-                      @for (room of (liveMap.rooms ?? []); track room.id) {
+                      @for (room of liveMap.rooms; track room.id) {
                         <button
                           type="button"
                           class="min-h-9 px-2 py-1 rounded-lg text-[10px] font-bold border"

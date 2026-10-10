@@ -4,6 +4,8 @@
   "compilerOptions": {
 
     "paths": {
+      "canvg": ["./src/app/core/pdf/optional-pdf-plugin.stub.ts"],
+      "html2canvas": ["./src/app/core/pdf/optional-pdf-plugin.stub.ts"],
       "@core/*": ["./src/app/core/*"],
       "@shared/*": ["./src/app/shared/*"],
       "@features/*": ["./src/app/features/*"],

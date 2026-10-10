@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.460',
+    date: '2026-10-10',
+    title: 'Fiche page 2 : maîtrises d’armure lisibles',
+    player: [
+      'Sur la fiche (page Aptitudes), les maîtrises d’armure tiennent dans la colonne de gauche et n’empiètent plus sur les résistances.',
+      'Le site s’affiche un peu plus vite au premier chargement (messages et session se chargent ensuite).',
+    ],
+    tech: [
+      'PDF page 2 : `textFit` sur armures/armes (police 11→7, largeur max 230 px avant `resX`).',
+      'Warnings Angular NG8102/NG8107/NG8113 : `??`/`?.` inutiles et `RouterLink` morts (Background/Deity/Feat by-id).',
+      'Bundle initial ~800→699 kB : docks messages/session en `@defer (on idle)`. jsPDF : `externalDependencies` canvg+html2canvas (exports JPEG uniquement, plus d’alertes CommonJS). CSS FullCalendar reste global (encapsulation Angular casse le thème). Budget warning 700 kB.',
+    ],
+  },
+  {
     version: '1.459',
     date: '2026-10-10',
     title: 'CI e2e : un seul pull d’image',

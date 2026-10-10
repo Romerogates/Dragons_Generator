@@ -378,7 +378,7 @@
                     {{ cr.secret }}
                   </p>
                 }
-                @if (cr.backstory?.trim() && !cr.secret?.trim() && !cr.voice?.trim()) {
+                @if (cr.backstory.trim() && !cr.secret?.trim() && !cr.voice?.trim()) {
                   <p class="text-xs text-slate-400 whitespace-pre-wrap line-clamp-4">{{ cr.backstory }}</p>
                 }
               </li>

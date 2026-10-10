@@ -36,7 +36,7 @@
             [totalXpAwarded]="vm.totalXpAwarded()"
             [myXpEarned]="vm.myXpEarned()"
             [approvedCharacterName]="vm.myPlayerMember()?.approvedCharacterName"
-            [adventure]="c.data.adventure ?? ''"
+            [adventure]="c.data.adventure"
             [showRoster]="vm.showOverviewRoster()"
             [rosterFeedback]="vm.hub.rosterFeedback()"
             [playersNeedingCharacter]="vm.playersNeedingCharacter()"
@@ -103,7 +103,7 @@
             [isOwner]="vm.mjUi(c)"
             [campaignId]="c.id"
             [campaignTitle]="c.title"
-            [sessions]="c.data.sessions ?? []"
+            [sessions]="c.data.sessions"
             [scheduleEvents]="c.data.scheduleEvents ?? []"
             [heroOptions]="vm.calendarHeroOptions()"
             [currentUserId]="vm.currentUserId()"
@@ -165,7 +165,7 @@
               @case ('creatures') {
                 <app-campaign-detail-prep-creatures
                   [isOwner]="vm.mjUi(c)"
-                  [creatures]="c.data.creatures ?? []"
+                  [creatures]="c.data.creatures"
                   (addCreatures)="vm.prep.addCreaturesOnly()"
                   (openBestiary)="vm.prep.openBestiaryFullscreen()"
                   (openCreatureInBook)="vm.prep.openCreatureInBook($event)"
@@ -179,7 +179,7 @@
                 <app-campaign-detail-prep-pregens
                   [isOwner]="vm.mjUi(c)"
                   [campaignId]="c.id"
-                  [pregens]="c.data.pregenCharacters ?? []"
+                  [pregens]="c.data.pregenCharacters"
                   [players]="vm.players()"
                   [readyPregens]="vm.prep.readyPregensForPlayers()"
                   [myAssignedPregens]="vm.prep.myAssignedPregens()"
@@ -211,8 +211,8 @@
               @case ('encounters') {
                 <app-campaign-detail-prep-encounters
                   [isOwner]="vm.mjUi(c)"
-                  [encounters]="c.data.encounters ?? []"
-                  [creaturesCount]="(c.data.creatures ?? []).length"
+                  [encounters]="c.data.encounters"
+                  [creaturesCount]="c.data.creatures.length"
                   [dungeonMaps]="vm.prep.dungeonMapOptions()"
                   [awardingXpId]="vm.hub.awardingXpId()"
                   (insertEncounterPack)="vm.prep.insertEncounterPack($event)"
