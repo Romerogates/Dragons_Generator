@@ -12,12 +12,16 @@ export type PatchNotesAudience = 'player' | 'tech';
 export class PatchNotesList {
   readonly audience = input<PatchNotesAudience>('player');
   readonly notes = input<readonly PatchNote[]>(PATCH_NOTES);
+  /** Accueil : n’afficher que les n dernières versions. 0 = tout. */
+  readonly limit = input(0);
 
   readonly entries = computed(() => {
     const tech = this.audience() === 'tech';
-    return this.notes()
+    const list = this.notes()
       .map((n) => ({ ...n, items: tech ? n.tech : n.player }))
       .filter((n) => n.items.length > 0);
+    const n = this.limit();
+    return n > 0 ? list.slice(0, n) : list;
   });
 
   formatDate(iso: string): string {

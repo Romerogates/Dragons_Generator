@@ -324,6 +324,13 @@
                   >Paramètres</a
                 >
                 <a
+                  routerLink="/patch-notes"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  data-testid="account-patch-notes"
+                  (click)="closeMenus()"
+                  >Nouveautés</a
+                >
+                <a
                   routerLink="/support"
                   class="relative block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
@@ -358,6 +365,13 @@
                   Déconnexion
                 </button>
               } @else {
+                <a
+                  routerLink="/patch-notes"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  data-testid="account-patch-notes"
+                  (click)="closeMenus()"
+                  >Nouveautés</a
+                >
                 <a
                   routerLink="/login"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
@@ -601,6 +615,17 @@
             <span class="text-sm font-bold tracking-wide">Paramètres</span>
           </a>
           <a
+            routerLink="/patch-notes"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            data-testid="mobile-patch-notes"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"
+              ><iconify-icon noobserver icon="fluent-emoji:sparkles"></iconify-icon
+            ></span>
+            <span class="text-sm font-bold tracking-wide">Nouveautés</span>
+          </a>
+          <a
             routerLink="/support"
             class="relative flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
@@ -641,6 +666,17 @@
             <span class="text-sm font-bold tracking-wide">Déconnexion</span>
           </button>
         } @else {
+          <a
+            routerLink="/patch-notes"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            data-testid="mobile-patch-notes"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"
+              ><iconify-icon noobserver icon="fluent-emoji:sparkles"></iconify-icon
+            ></span>
+            <span class="text-sm font-bold tracking-wide">Nouveautés</span>
+          </a>
           <a
             routerLink="/login"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"

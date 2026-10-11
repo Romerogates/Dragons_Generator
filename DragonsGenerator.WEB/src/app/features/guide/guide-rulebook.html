@@ -1,8 +1,5 @@
-<div
-  class="guide-shell bg-[#0e1117] text-slate-300 overflow-hidden flex flex-col
-         h-[calc(100dvh-var(--dg-sticky-top))] max-h-[calc(100dvh-var(--dg-sticky-top))]"
->
-  <div class="flex flex-col lg:flex-row flex-1 min-h-0">
+<div class="guide-shell text-slate-300">
+  <div class="max-w-3xl mx-auto px-4 py-8 md:py-10 space-y-6">
     <app-guide-sidebar
       [(query)]="navQuery"
       [(audience)]="audience"
@@ -11,11 +8,9 @@
       [activeRulebookId]="activeRulebookId()"
       [activeClassId]="classBook()?.classId ?? null"
     />
-
-    <div class="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
       @if (displayTitle()) {
-        <header class="border-b border-slate-800 bg-[#141820]">
-          <div class="max-w-2xl mx-auto px-4 md:px-8 py-4 md:py-6 space-y-3 md:space-y-4">
+        <header class="border-b border-slate-800 pb-4">
+          <div class="space-y-3 md:space-y-4">
             <nav
               class="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500"
             >
@@ -77,7 +72,7 @@
             }
 
             <nav
-              class="guide-sommaire -mx-4 px-4 md:mx-0 md:px-0 flex gap-2 overflow-x-auto overscroll-x-contain
+              class="guide-sommaire flex gap-2 overflow-x-auto overscroll-x-contain
                      snap-x snap-mandatory md:flex-wrap md:overflow-visible
                      text-xs text-slate-500 pt-0.5"
               aria-label="Sommaire du livret"
@@ -96,7 +91,7 @@
           </div>
         </header>
 
-        <article class="max-w-2xl mx-auto px-4 md:px-8 py-6 md:py-8 space-y-8 md:space-y-10 pb-20 safe-area-pb">
+        <article class="space-y-8 md:space-y-10 pb-8">
           @for (ch of displayChapters(); track ch.id) {
             <section [id]="ch.id" class="space-y-4 md:space-y-5 scroll-mt-20 md:scroll-mt-8">
               <h2 class="text-lg md:text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">
@@ -162,13 +157,12 @@
           }
         </article>
       } @else {
-        <div class="max-w-lg mx-auto px-4 py-16 text-center space-y-4">
+        <div class="py-10 text-center space-y-4">
           <p class="text-slate-400">Livret introuvable.</p>
           <a routerLink="/guide" class="text-amber-400 text-sm font-bold uppercase tracking-widest"
             >Retour au guide</a
           >
         </div>
       }
-    </div>
   </div>
 </div>

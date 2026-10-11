@@ -27,6 +27,13 @@ describe('GuideSidebar', () => {
     expect(sidebar.navOpen()).toBe(false);
   });
 
+  it('hides the outline on the hub', () => {
+    fixture.componentRef.setInput('showOutline', false);
+    fixture.detectChanges();
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('Sommaire');
+  });
+
   it('linkClass distinguishes active state', () => {
     expect(sidebar.linkClass(true)).toContain('amber');
     expect(sidebar.linkClass(false)).toContain('slate');

@@ -31,6 +31,19 @@ describe('PatchNotesList', () => {
     expect(el.querySelectorAll('ol > li').length).toBe(1);
   });
 
+  it('limits entries when asked (home teaser)', async () => {
+    await TestBed.configureTestingModule({
+      imports: [PatchNotesList],
+      providers: [...zonelessTestProviders],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(PatchNotesList);
+    fixture.componentRef.setInput('audience', 'tech');
+    fixture.componentRef.setInput('notes', notes);
+    fixture.componentRef.setInput('limit', 1);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('ol > li').length).toBe(1);
+  });
+
   it('shows technical items for support and keeps unparsable dates', async () => {
     const el = await render('tech');
     expect(el.textContent).toContain('Tech A');

@@ -78,6 +78,14 @@ describe('Navbar', () => {
     fixture.detectChanges();
   });
 
+  it('links to patch notes from the account menu', () => {
+    component.accountOpen.set(true);
+    fixture.detectChanges();
+    const link = fixture.nativeElement.querySelector('[data-testid="account-patch-notes"]') as HTMLAnchorElement | null;
+    expect(link).toBeTruthy();
+    expect(link?.getAttribute('href')).toBe('/patch-notes');
+  });
+
   it('does not list Accueil Codex in the dropdown', () => {
     expect(component.codexLinks.some((l) => l.path === '/codex')).toBeFalse();
     expect(component.codexLinks.some((l) => /accueil/i.test(l.label))).toBeFalse();

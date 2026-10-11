@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.461',
+    date: '2026-10-11',
+    title: 'Nouveautés à portée de main, guide recentré',
+    player: [
+      'Les nouveautés de chaque version sont sur la page d’accueil et dans le menu du compte, à côté des paramètres et du support.',
+      'Le guide s’affiche comme les autres pages : au centre, sans barre latérale à part.',
+    ],
+    tech: [
+      'Lien `/patch-notes` dans le menu compte (desktop + mobile) et teaser accueil (`PatchNotesList` `limit=1`).',
+      'Guide : plus de rail gauche ; colonne `max-w-3xl` ; sommaire repliable sur les fiches/livrets (`showOutline`).',
+    ],
+  },
+  {
     version: '1.460',
     date: '2026-10-10',
     title: 'Fiche page 2 : maîtrises d’armure lisibles',

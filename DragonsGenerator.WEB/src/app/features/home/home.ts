@@ -14,11 +14,12 @@ import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
+import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-list';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PatchNotesList],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

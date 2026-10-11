@@ -1,27 +1,19 @@
-<div
-  class="guide-shell bg-[#0e1117] text-slate-300 overflow-hidden flex flex-col
-         h-[calc(100dvh-var(--dg-sticky-top))] max-h-[calc(100dvh-var(--dg-sticky-top))]"
->
-  <div class="flex flex-col lg:flex-row flex-1 min-h-0">
-    <app-guide-sidebar
-      class="guide-no-print"
-      [(query)]="query"
-      [(audience)]="audience"
-      [sections]="sections()"
-      [searchEmpty]="searchEmpty()"
-    />
+<div class="guide-shell text-slate-300">
+  <div class="max-w-3xl mx-auto px-4 py-8 md:py-10 space-y-8 md:space-y-10 pb-16">
+    <header class="space-y-3">
+      <h1 class="text-2xl md:text-3xl font-serif text-slate-50 tracking-tight">Guide</h1>
+      <p class="text-sm text-slate-400 leading-relaxed max-w-lg">
+        Livrets PDF : MJ / Joueur (table ou en ligne), plus une feuille one-shot. Puis l’aide du site.
+      </p>
+      <app-guide-sidebar
+        [(query)]="query"
+        [(audience)]="audience"
+        [sections]="sections()"
+        [searchEmpty]="searchEmpty()"
+        [showOutline]="false"
+      />
+    </header>
 
-    <main class="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
-      <header class="border-b border-slate-800 bg-[#141820]">
-        <div class="max-w-2xl mx-auto px-4 md:px-8 py-5 md:py-7 space-y-2">
-          <h1 class="text-2xl md:text-3xl font-serif text-slate-50 tracking-tight">Guide</h1>
-          <p class="text-sm text-slate-400 leading-relaxed max-w-lg">
-            Livrets PDF : MJ / Joueur (table ou en ligne), plus une feuille one-shot. Puis l’aide du site.
-          </p>
-        </div>
-      </header>
-
-      <div class="max-w-2xl mx-auto px-4 md:px-8 py-6 md:py-8 space-y-8 md:space-y-10 pb-20 safe-area-pb">
         <section class="space-y-3">
           <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">MJ</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -202,7 +194,5 @@
             }
           </ul>
         </section>
-      </div>
-    </main>
   </div>
 </div>
