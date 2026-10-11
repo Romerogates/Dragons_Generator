@@ -13,6 +13,15 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.463',
+    date: '2026-10-11',
+    title: 'CI : couverture fiche PDF',
+    player: [],
+    tech: [
+      'Karma branches : specs `format-sheet-feature`, `class-resource-labels`, `downloadPdf` (seuil 90 %).',
+    ],
+  },
+  {
     version: '1.462',
     date: '2026-10-11',
     title: 'Fiche : PDF en un clic et aptitudes lisibles',

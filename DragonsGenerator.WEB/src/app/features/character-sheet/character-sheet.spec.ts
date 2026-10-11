@@ -161,7 +161,30 @@ describe('CharacterSheet', () => {
     const btn = fixture.nativeElement.querySelector('[data-testid="sheet-download-pdf"]') as HTMLButtonElement | null;
     expect(btn).toBeTruthy();
     btn?.click();
+    await fixture.whenStable();
     expect(pdf.generatePdf).toHaveBeenCalled();
+    expect(component.pdfDownloading()).toBeFalse();
+  });
+
+  it('skips PDF download without a loaded character', async () => {
+    await component.downloadPdf();
+    expect(pdf.generatePdf).not.toHaveBeenCalled();
+  });
+
+  it('skips PDF download while another generation is in flight', async () => {
+    handoff.peekCurrent.and.returnValue(sampleCharacter());
+    await component.ngOnInit();
+    component.pdfDownloading.set(true);
+    await component.downloadPdf();
+    expect(pdf.generatePdf).not.toHaveBeenCalled();
+  });
+
+  it('clears the downloading flag if PDF generation fails', async () => {
+    handoff.peekCurrent.and.returnValue(sampleCharacter());
+    pdf.generatePdf.and.rejectWith(new Error('pdf fail'));
+    await component.ngOnInit();
+    await expectAsync(component.downloadPdf()).toBeRejectedWithError('pdf fail');
+    expect(component.pdfDownloading()).toBeFalse();
   });
 
   it('falls back to JPEG overlay when PDF generation fails in illustrated mode', async () => {
