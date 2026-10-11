@@ -53,6 +53,11 @@ describe('game-id-labels', () => {
     expect(labelForGameId('wp-nouvelle-arme-magique')).toBe('Nouvelle Arme Magique');
   });
 
+  it('accentuates ranger enemy/terrain slugs', () => {
+    expect(labelForGameId('ennemi-creations-magiques')).toMatch(/Créations magiques/i);
+    expect(labelForGameId('terrain-marecage-zones-humides')).toMatch(/Marécage/i);
+  });
+
   it('strips cls- prefix for class invoker labels', () => {
     expect(labelForGameId('cls-ensorceleur')).toBe('Ensorceleur');
     expect(labelForGameId('cls-magicien')).toBe('Magicien');

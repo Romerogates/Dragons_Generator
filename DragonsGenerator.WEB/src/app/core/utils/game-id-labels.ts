@@ -237,6 +237,12 @@ const TOKEN_FIXES: Record<string, string> = {
   matelassee: 'matelassée',
   sacree: 'sacrée',
   sacre: 'sacré',
+  marecage: 'marécage',
+  creations: 'créations',
+  ethere: 'éthéré',
+  feerie: 'féerie',
+  foret: 'forêt',
+  equatoriale: 'équatoriale',
 };
 
 const PREFIXES =

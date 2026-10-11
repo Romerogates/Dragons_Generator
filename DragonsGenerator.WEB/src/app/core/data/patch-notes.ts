@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.462',
+    date: '2026-10-11',
+    title: 'Fiche : PDF en un clic et aptitudes lisibles',
+    player: [
+      'Sur la fiche d’un héros, le bouton PDF est de nouveau entre « Mes héros » et « Modifier ».',
+      'Page Aptitudes : les styles de combat, l’ennemi juré et les terrains du rôdeur s’affichent en français, sans codes techniques.',
+    ],
+    tech: [
+      'Sheet : `data-testid="sheet-download-pdf"` → `PdfGeneratorService.generatePdf`.',
+      'PDF p2 : `foldFeaturesForSheet` + `textFit` noms ; masque `enemy_count`/`terrain_count`.',
+    ],
+  },
+  {
     version: '1.461',
     date: '2026-10-11',
     title: 'Nouveautés à portée de main, guide recentré',

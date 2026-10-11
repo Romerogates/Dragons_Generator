@@ -111,12 +111,13 @@ describe('CharacterSheet', () => {
       'setCurrent',
       'clearCurrent',
     ]);
-    pdf = jasmine.createSpyObj('PdfGeneratorService', ['generatePdfBlob', 'downloadPdf']);
+    pdf = jasmine.createSpyObj('PdfGeneratorService', ['generatePdfBlob', 'generatePdf']);
     handoff.peekMode.and.returnValue('own');
     handoff.peekSourceLabel.and.returnValue(null);
     handoff.peekReturnUrl.and.returnValue(null);
     handoff.peekProposalReview.and.returnValue(null);
     pdf.generatePdfBlob.and.resolveTo('blob:mock');
+    pdf.generatePdf.and.resolveTo(undefined);
 
     await TestBed.configureTestingModule({
       imports: [CharacterSheet],
@@ -151,6 +152,16 @@ describe('CharacterSheet', () => {
     expect(component.isConsult()).toBeTrue();
     expect(component.viewMode()).toBe('ui');
     expect(component.compactEditable()).toBeFalse();
+  });
+
+  it('offers a one-click PDF download between list and edit', async () => {
+    handoff.peekCurrent.and.returnValue(sampleCharacter());
+    await component.ngOnInit();
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector('[data-testid="sheet-download-pdf"]') as HTMLButtonElement | null;
+    expect(btn).toBeTruthy();
+    btn?.click();
+    expect(pdf.generatePdf).toHaveBeenCalled();
   });
 
   it('falls back to JPEG overlay when PDF generation fails in illustrated mode', async () => {

@@ -62,6 +62,9 @@ export function classResourceLabel(key: string): string {
 /** Ressources utiles à afficher sur la fiche (ignore compteurs internes). */
 const HIDDEN_KEYS = new Set([
   'conquete_methodique_effects',
+  /** Compteurs internes rôdeur — déjà visibles via Ennemi juré / Explorateur-né. */
+  'enemy_count',
+  'terrain_count',
 ]);
 
 export function isHiddenClassResourceKey(key: string): boolean {

@@ -30,6 +30,15 @@
         </button>
         <button
           type="button"
+          class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors disabled:opacity-50"
+          data-testid="sheet-download-pdf"
+          [disabled]="pdfDownloading()"
+          (click)="downloadPdf()"
+        >
+          {{ pdfDownloading() ? 'PDF…' : 'PDF' }}
+        </button>
+        <button
+          type="button"
           class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
           (click)="editCharacter()"
         >

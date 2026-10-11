@@ -28,6 +28,7 @@ import {
 import { DataService } from '@core/services/data.service';
 import type { Spell } from '@core/models/Spells/spell';
 import { visibleClassResources } from '@core/utils/class-resource-labels';
+import { foldFeaturesForSheet } from '@core/utils/format-sheet-feature.util';
 import {
   Character,
   FeatureInstance,
@@ -761,7 +762,9 @@ export class PdfGeneratorService {
       'feat-conquete-methodique',
     ]);
 
-    const allFeatures = c.features.filter((f) => !EXCLUDED_IDS.has(f.refId ?? ''));
+    const allFeatures = foldFeaturesForSheet(
+      c.features.filter((f) => !EXCLUDED_IDS.has(f.refId ?? '')),
+    );
 
     // Trier par source : species/subspecies d'abord, puis class/subclass
     const sortBySource = (a: FeatureInstance, b: FeatureInstance) => {
@@ -793,6 +796,8 @@ export class PdfGeneratorService {
       P.unlimitedStartY,
       P.unlimitedLineH,
       P.unlimitedMaxLines,
+      undefined,
+      P.unlimitedUsesX - P.unlimitedNameX - 8,
     );
 
     // --- Section "Regain en repos court" ---
@@ -805,6 +810,7 @@ export class PdfGeneratorService {
       P.shortRestLineH,
       P.shortRestMaxLines,
       { nameX: P.shortRestCol2NameX, usesX: P.shortRestCol2UsesX },
+      P.shortRestUsesX - P.shortRestNameX - 8,
     );
 
     // --- Section "Regain en repos long" ---
@@ -817,6 +823,7 @@ export class PdfGeneratorService {
       P.longRestLineH,
       P.longRestMaxLines,
       { nameX: P.longRestCol2NameX, usesX: P.longRestCol2UsesX },
+      P.longRestUsesX - P.longRestNameX - 8,
     );
   }
 
@@ -856,6 +863,7 @@ export class PdfGeneratorService {
     lineH: number,
     maxLines: number,
     col2?: { nameX: number; usesX: number },
+    maxNameWidth = 150,
   ): void {
     pdf.setFontSize(10);
 
@@ -880,7 +888,7 @@ export class PdfGeneratorService {
         label += ` (×${feat.uses.max})`;
       }
 
-      this.text(pdf, label, xName, y);
+      this.textFit(pdf, label, xName, y, maxNameWidth, 10, 7);
 
       // Dessiner des cercles cochables si l'aptitude a un nombre d'utilisations
       if (feat.uses && feat.uses.max > 0 && feat.uses.max <= 10) {

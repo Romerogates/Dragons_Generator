@@ -65,6 +65,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly illustratedPage = signal(1);
   /** true si le rendu PDF.js a échoué en mode Illustrée → overlay JPEG. */
   readonly illustratedPdfJsFailed = signal(false);
+  readonly pdfDownloading = signal(false);
 
   readonly consultBackLabel = computed(() => {
     const url = this.consultReturnUrl();
@@ -288,9 +289,15 @@ export class CharacterSheet implements OnInit, OnDestroy {
     return this.character()?.defense?.armorClass ?? 10;
   }
 
-  downloadPdf(): void {
+  async downloadPdf(): Promise<void> {
     const c = this.character();
-    if (c) this.pdfService.generatePdf(c);
+    if (!c || this.pdfDownloading()) return;
+    this.pdfDownloading.set(true);
+    try {
+      await this.pdfService.generatePdf(c);
+    } finally {
+      this.pdfDownloading.set(false);
+    }
   }
 
   editCharacter(): void {
