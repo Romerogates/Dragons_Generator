@@ -9,7 +9,6 @@ public record AiRouteInfo(
     string? FallbackLabel);
 
 public record AiStatusResponse(
-    bool LocalLlmEnabled,
     bool GroqConfigured,
     AiRouteInfo ShortGeneration,
     AiRouteInfo AdventureGeneration);
@@ -24,26 +23,25 @@ public class AiStatusEndpoint(IConfiguration config) : EndpointWithoutRequest
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var localEnabled = config.GetValue("LocalLlm:Enabled", false);
         var groqConfigured = !string.IsNullOrWhiteSpace(config["Groq:ApiKey"]);
+        var geminiConfigured = !string.IsNullOrWhiteSpace(config["Gemini:ApiKey"]);
 
-        var shortPrimary = localEnabled ? "ollama" : "groq";
-        var shortFallback = localEnabled ? "groq" : null;
+        var shortPrimary = geminiConfigured ? "gemini" : "groq";
+        var shortFallback = geminiConfigured ? "groq" : null;
 
         await Send.OkAsync(
             new AiStatusResponse(
-                localEnabled,
                 groqConfigured,
                 new AiRouteInfo(
                     shortPrimary,
                     shortFallback,
-                    localEnabled ? "Ollama (local)" : "Groq (cloud)",
-                    localEnabled ? "Groq (cloud)" : null),
+                    geminiConfigured ? "Gemini (cloud)" : "Groq (cloud)",
+                    geminiConfigured ? "Groq (cloud)" : null),
                 new AiRouteInfo(
-                    shortPrimary,
-                    shortFallback,
-                    localEnabled ? "Ollama (local)" : "Groq (cloud)",
-                    localEnabled ? "Groq (cloud)" : null)),
+                    "groq",
+                    null,
+                    "Groq (cloud)",
+                    null)),
             ct);
     }
 }

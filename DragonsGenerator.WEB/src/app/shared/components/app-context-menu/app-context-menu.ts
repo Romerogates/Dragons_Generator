@@ -32,10 +32,9 @@ export class AppContextMenu {
 
   readonly primaryLinks: ContextMenuLink[] = [
     { label: 'Accueil', path: '/', icon: 'fluent-emoji:house' },
-    { label: 'Forger un héros', path: '/create', icon: 'fluent-emoji:hammer-and-pick' },
-    { label: 'Mes héros', path: '/characters', icon: 'fluent-emoji:busts-in-silhouette' },
-    { label: 'Scénario', path: '/story/create', icon: 'fluent-emoji:scroll' },
     { label: 'Campagnes', path: '/campaigns', icon: 'fluent-emoji:world-map' },
+    { label: 'Héros', path: '/characters', icon: 'fluent-emoji:busts-in-silhouette' },
+    { label: 'Donjons', path: '/dungeons', icon: 'fluent-emoji:japanese-castle' },
     { label: 'Amis', path: '/friends', icon: 'fluent-emoji:handshake' },
   ];
 

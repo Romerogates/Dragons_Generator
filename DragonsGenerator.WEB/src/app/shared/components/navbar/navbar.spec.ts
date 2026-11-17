@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { AuthService } from '@core/services/auth.service';
@@ -89,6 +89,53 @@ describe('Navbar', () => {
   it('does not list Accueil Codex in the dropdown', () => {
     expect(component.codexLinks.some((l) => l.path === '/codex')).toBeFalse();
     expect(component.codexLinks.some((l) => /accueil/i.test(l.label))).toBeFalse();
+  });
+
+  it('lists Héros and Donjons without a Création dropdown or wizard shortcuts', () => {
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-creation"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-characters"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-dungeons"]')).toBeTruthy();
+    expect(component.workshopLinks.map((l) => l.path)).toEqual(['/characters', '/dungeons']);
+    expect(component.workshopLinks.some((l) => l.path === '/create' || l.path === '/story/create')).toBeFalse();
+  });
+
+  it('treats story and character wizards as the parent list in the nav', () => {
+    const router = TestBed.inject(Router);
+    expect(component.isNavPathActive('/dungeons')).toBeFalse();
+
+    spyOnProperty(router, 'url', 'get').and.returnValue('/story/create?x=1');
+    expect(component.isNavPathActive('/campaigns')).toBeTrue();
+    expect(component.isNavPathActive('/characters')).toBeFalse();
+  });
+
+  it('highlights Héros while forging a character', () => {
+    const router = TestBed.inject(Router);
+    spyOnProperty(router, 'url', 'get').and.returnValue('/create/review#top');
+    expect(component.isNavPathActive('/characters')).toBeTrue();
+    expect(component.isNavPathActive('/campaigns')).toBeFalse();
+    expect(component.isNavPathActive('/dungeons')).toBeFalse();
+  });
+
+  it('matches campaign, character, and dungeon list URLs', () => {
+    const router = TestBed.inject(Router);
+    const url = spyOnProperty(router, 'url', 'get');
+    url.and.returnValue('/campaigns');
+    expect(component.isNavPathActive('/campaigns')).toBeTrue();
+    url.and.returnValue('/campaigns/abc');
+    expect(component.isNavPathActive('/campaigns')).toBeTrue();
+    url.and.returnValue('/scenario/create');
+    expect(component.isNavPathActive('/campaigns')).toBeTrue();
+    url.and.returnValue('/characters');
+    expect(component.isNavPathActive('/characters')).toBeTrue();
+    url.and.returnValue('/characters/char-1');
+    expect(component.isNavPathActive('/characters')).toBeTrue();
+    url.and.returnValue('/dungeons');
+    expect(component.isNavPathActive('/dungeons')).toBeTrue();
+    url.and.returnValue('/dungeons/map-1');
+    expect(component.isNavPathActive('/dungeons')).toBeTrue();
+    url.and.returnValue('/guide');
+    expect(component.isNavPathActive('/dungeons')).toBeFalse();
   });
 
   it('keeps the mobile menu mounted after first open so icons are not recreated', () => {

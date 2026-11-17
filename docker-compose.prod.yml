@@ -5,34 +5,6 @@ x-logging: &default-logging
     max-file: "3"
 
 services:
-  ollama:
-    container_name: dragons-ollama
-    image: ollama/ollama:latest
-    restart: unless-stopped
-    environment:
-      # Un seul modèle, une inférence à la fois, décharge après 5 min d’inactivité.
-      OLLAMA_MAX_LOADED_MODELS: "1"
-      OLLAMA_NUM_PARALLEL: "1"
-      OLLAMA_KEEP_ALIVE: "60m"
-    volumes:
-      - ollama-data:/root/.ollama
-    networks:
-      - dragons-network
-    # Limite cgroup réelle (deploy.resources est ignoré hors Swarm).
-    mem_limit: 2800m
-    memswap_limit: 2800m
-    cpus: "1.0"
-    oom_score_adj: 400
-    logging: *default-logging
-    labels:
-      autoheal: "true"
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
   dragons-api:
     container_name: dragons-api
     restart: unless-stopped
@@ -53,13 +25,6 @@ services:
       Gemini__BaseUrl: https://generativelanguage.googleapis.com/v1beta/openai
       Gemini__Model: gemini-3.8-flash
       Gemini__MaxAttempts: "3"
-      # Ollama sur ce VPS fait tomber nginx/API (OOM / connection refused). Groq uniquement en prod.
-      LocalLlm__Enabled: "false"
-      LocalLlm__BaseUrl: http://ollama:11434/v1
-      LocalLlm__Model: qwen2.5:3b
-      LocalLlm__MaxAttempts: "1"
-      LocalLlm__MaxRetryWindowMs: "480000"
-      LocalLlm__FirstTokenSeconds: "40"
     volumes:
       - dragons-api-data:/app/data
       - ${BACKUP_HOST_DIR:-/home/debian/backups/dragons}:/app/host-backups:ro
@@ -133,7 +98,6 @@ services:
 
 volumes:
   dragons-api-data:
-  ollama-data:
 
 networks:
   dragons-network:

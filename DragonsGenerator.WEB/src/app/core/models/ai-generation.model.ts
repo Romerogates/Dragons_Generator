@@ -14,7 +14,6 @@ export interface AiRouteInfo {
 }
 
 export interface AiStatusResponse {
-  localLlmEnabled: boolean;
   groqConfigured: boolean;
   shortGeneration: AiRouteInfo;
   adventureGeneration: AiRouteInfo;

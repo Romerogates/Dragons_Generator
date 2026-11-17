@@ -83,11 +83,9 @@ Clés VAPID (push PWA) : générées automatiquement par `scripts/ensure-vapid-k
 
 ```bash
 cd ~/Dragons_Generator
-chmod +x scripts/ensure-vapid-keys.sh scripts/ensure-ollama-model.sh
+chmod +x scripts/ensure-vapid-keys.sh
 ./scripts/ensure-vapid-keys.sh "$HOME/Dragons_Generator/.env"
 
-docker compose -f docker-compose.prod.yml up --build -d ollama || true
-./scripts/ensure-ollama-model.sh docker-compose.prod.yml || true
 docker compose -f docker-compose.prod.yml up --build -d dragons-api dragons-web
 
 docker compose -f docker-compose.prod.yml ps

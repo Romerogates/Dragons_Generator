@@ -1,40 +1,26 @@
 namespace DragonsGenerator.API.Common;
 
 /// <summary>
-/// Ollama d’abord (budget long, IA gratuite). Groq seulement si Ollama est mort, injoignable, ou a échoué.
+/// Génération IA cloud : Gemini si une clé est configurée, sinon Groq. BYOK inchangé.
 /// </summary>
 public sealed class HybridAiService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly OpenAiChatClient? _local;
     private readonly OpenAiChatClient? _gemini;
     private readonly OpenAiChatClient _remote;
     private readonly IConfiguration _config;
     private readonly ILogger<HybridAiService> _logger;
     private readonly AiGenerationTelemetry _telemetry;
-    private readonly object _skipLock = new();
-    private DateTimeOffset _skipLocalUntil = DateTimeOffset.MinValue;
 
-    /// <summary>Budget global sous le timeout nginx generate (600 s) — Ollama long + Groq de secours.</summary>
+    /// <summary>Budget global sous le timeout nginx generate (600 s).</summary>
     private const int GlobalBudgetSeconds = 540;
 
-    /// <summary>Ollama a le temps de charger le modèle et d’écrire (vies, historiques).</summary>
-    private const int LocalShortBudgetSeconds = 420;
-
-    /// <summary>Ollama aventure — même ordre de grandeur, Groq garde ~2 min derrière.</summary>
-    private const int LocalAdventureBudgetSeconds = 420;
-
-    private static readonly TimeSpan LocalProbeTimeout = TimeSpan.FromSeconds(3);
-    private static readonly TimeSpan LocalSkipAfterFail = TimeSpan.FromMinutes(2);
-
     public HybridAiService(
-        IHttpClientFactory httpClientFactory,
         IConfiguration config,
         ILoggerFactory loggerFactory,
+        IHttpClientFactory httpClientFactory,
         GroqRequestCoordinator coordinator,
         AiGenerationTelemetry telemetry)
     {
-        _httpClientFactory = httpClientFactory;
         _config = config;
         _logger = loggerFactory.CreateLogger<HybridAiService>();
         _telemetry = telemetry;
@@ -56,21 +42,11 @@ public sealed class HybridAiService
                 "Gemini",
                 "Gemini");
         }
-
-        if (config.GetValue("LocalLlm:Enabled", false))
-        {
-            _local = new OpenAiChatClient(
-                httpClientFactory,
-                config,
-                loggerFactory.CreateLogger<OpenAiChatClient>(),
-                "LocalLlm",
-                "LocalLlm");
-        }
     }
 
     /// <summary>
     /// Backstory personnage, vie de créature, batch court.
-    /// Ollama d’abord (budget), puis Groq. Si <paramref name="acceptText"/> rejette, bascule Groq.
+    /// Gemini (si configuré) puis Groq. Si <paramref name="acceptText"/> rejette, on enchaîne.
     /// </summary>
     public async Task<GroqChatResult> SendShortGenerationAsync(
         string userPrompt,
@@ -78,21 +54,7 @@ public sealed class HybridAiService
         int maxTokens,
         CancellationToken ct,
         Func<string, bool>? acceptText = null,
-        UserLlmCredentials? userCredentials = null,
-        bool tryLocal = true)
-    {
-        return await SendShortGenerationCoreAsync(
-            userPrompt, systemPrompt, maxTokens, ct, acceptText, userCredentials, tryLocal);
-    }
-
-    private async Task<GroqChatResult> SendShortGenerationCoreAsync(
-        string userPrompt,
-        string systemPrompt,
-        int maxTokens,
-        CancellationToken ct,
-        Func<string, bool>? acceptText,
-        UserLlmCredentials? userCredentials,
-        bool tryLocal)
+        UserLlmCredentials? userCredentials = null)
     {
         if (userCredentials is not null)
         {
@@ -123,20 +85,6 @@ public sealed class HybridAiService
 
         try
         {
-            if (tryLocal)
-            {
-                var local = await TryOllamaAsync(userPrompt, systemPrompt, maxTokens, LocalShortBudgetSeconds, budgetCt);
-                var localOk = AcceptShort(local, acceptText);
-                if (localOk is not null)
-                {
-                    _logger.LogInformation("Génération courte servie par Ollama local");
-                    return Done("short", "ollama", localOk);
-                }
-
-                if (local is { Ok: true })
-                    _logger.LogWarning("Ollama local réponse rejetée (méta / pas du français) — bascule cloud");
-            }
-
             if (_gemini is not null)
             {
                 var gemini = await _gemini.SendChatAsync(
@@ -183,26 +131,13 @@ public sealed class HybridAiService
         }
     }
 
-    /// <summary>
-    /// Aventure structurée — Ollama d’abord (budget long), Groq si Ollama est mort ou la réponse inutilisable.
-    /// </summary>
+    /// <summary>Aventure structurée — Groq (chaîne de modèles).</summary>
     public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
         CancellationToken ct,
         UserLlmCredentials? userCredentials = null)
-    {
-        return await SendAdventureGenerationCoreAsync(
-            userPrompt, systemPrompt, maxTokens, ct, userCredentials);
-    }
-
-    private async Task<GroqChatResult> SendAdventureGenerationCoreAsync(
-        string userPrompt,
-        string systemPrompt,
-        int maxTokens,
-        CancellationToken ct,
-        UserLlmCredentials? userCredentials)
     {
         if (userCredentials is not null)
         {
@@ -237,25 +172,6 @@ public sealed class HybridAiService
         GroqChatResult? last = null;
         try
         {
-            var local = await TryOllamaAsync(
-                userPrompt, systemPrompt, maxTokens, LocalAdventureBudgetSeconds, budgetCt);
-            if (local is not null)
-            {
-                last = local;
-                if (local.Ok && !string.IsNullOrWhiteSpace(local.Text))
-                {
-                    var finalized = FinalizeAdventure(local);
-                    if (finalized.Ok)
-                    {
-                        _logger.LogInformation("Aventure servie par Ollama local");
-                        return Done("adventure", "ollama", finalized);
-                    }
-
-                    _logger.LogWarning("Aventure Ollama rejetée après nettoyage — bascule Groq (Ollama reste dispo)");
-                    last = finalized;
-                }
-            }
-
             foreach (var model in GetAdventureModelChain())
             {
                 budgetCt.ThrowIfCancellationRequested();
@@ -321,98 +237,6 @@ public sealed class HybridAiService
             ct,
             [visionModel]);
         return Done("transcribe", "groq", result);
-    }
-
-    private bool LocalReady
-    {
-        get
-        {
-            if (_local is null) return false;
-            lock (_skipLock)
-                return DateTimeOffset.UtcNow >= _skipLocalUntil;
-        }
-    }
-
-    /// <summary>
-    /// Probe 3 s : si Ollama est mort, Groq tout de suite.
-    /// Sinon on lui laisse le budget long pour générer.
-    /// </summary>
-    private async Task<GroqChatResult?> TryOllamaAsync(
-        string userPrompt,
-        string systemPrompt,
-        int maxTokens,
-        int budgetSeconds,
-        CancellationToken budgetCt)
-    {
-        if (!LocalReady)
-            return null;
-
-        if (!await LocalIsReachableAsync(budgetCt))
-        {
-            SkipLocal("injoignable");
-            return null;
-        }
-
-        using var localBudget = CancellationTokenSource.CreateLinkedTokenSource(budgetCt);
-        localBudget.CancelAfter(TimeSpan.FromSeconds(budgetSeconds));
-        try
-        {
-            var local = await _local!.SendChatAsync(userPrompt, systemPrompt, maxTokens, localBudget.Token);
-            if (LooksDead(local))
-            {
-                SkipLocal(local.Error ?? "indisponible");
-                return null;
-            }
-
-            return local;
-        }
-        catch (OperationCanceledException) when (!budgetCt.IsCancellationRequested)
-        {
-            SkipLocal($"aucune réponse après {budgetSeconds}s");
-            return null;
-        }
-    }
-
-    private async Task<bool> LocalIsReachableAsync(CancellationToken ct)
-    {
-        try
-        {
-            using var probe = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            probe.CancelAfter(LocalProbeTimeout);
-            var client = _httpClientFactory.CreateClient("LocalLlm");
-            var baseUrl = (_config["LocalLlm:BaseUrl"] ?? "http://ollama:11434/v1").TrimEnd('/');
-            using var response = await client.GetAsync($"{baseUrl}/models", probe.Token);
-            if (response.IsSuccessStatusCode)
-                return true;
-
-            _logger.LogWarning("Ollama probe HTTP {Status}", (int)response.StatusCode);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Ollama probe échoué");
-            return false;
-        }
-    }
-
-    private static bool LooksDead(GroqChatResult result)
-    {
-        if (result.Ok) return false;
-        var error = result.Error ?? "";
-        return error.Contains("Impossible de joindre", StringComparison.OrdinalIgnoreCase)
-            || error.Contains("surchargé", StringComparison.OrdinalIgnoreCase)
-            || error.Contains("erreur temporaire", StringComparison.OrdinalIgnoreCase)
-            || error.Contains("met trop de temps", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private void SkipLocal(string reason)
-    {
-        lock (_skipLock)
-            _skipLocalUntil = DateTimeOffset.UtcNow.Add(LocalSkipAfterFail);
-        _logger.LogWarning(
-            "Ollama injoignable — Groq pendant {Minutes} min ({Reason})",
-            LocalSkipAfterFail.TotalMinutes,
-            reason);
     }
 
     private static GroqChatResult? AcceptShort(GroqChatResult? result, Func<string, bool>? acceptText)

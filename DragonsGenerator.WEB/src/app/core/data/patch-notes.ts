@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.464',
+    date: '2026-11-17',
+    title: 'Barre : plus de doublons de création',
+    player: [
+      'La barre affiche Campagnes, Héros et Donjons — plus de menu Création.',
+      'Pour forger un héros, passez par Héros ; pour un nouveau scénario, passez par Campagnes.',
+      'Les textes générés par l’IA passent uniquement par le cloud (plus de moteur local).',
+    ],
+    tech: [
+      'Navbar : plus de `nav-creation` / `creationLinks` ; `workshopLinks` = `/characters`, `/dungeons`.',
+      '`isNavPathActive` : `/create` → Héros, `/story/create` → Campagnes. Menu contextuel aligné.',
+      'Ollama retiré des compose local/prod/e2e ; `LocalLlm`, `OllamaWarmupWorker` et le stream local supprimés. Groq (+ Gemini si clé).',
+    ],
+  },
+  {
     version: '1.463',
     date: '2026-10-11',
     title: 'CI : couverture fiche PDF',

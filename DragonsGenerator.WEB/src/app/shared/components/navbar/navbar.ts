@@ -60,7 +60,6 @@ export class Navbar implements OnInit, OnDestroy {
    */
   readonly mobileMenuMounted = signal(false);
   readonly codexOpen = signal(false);
-  readonly creationOpen = signal(false);
   readonly accountOpen = signal(false);
 
   readonly friendsActionCount = computed(
@@ -127,9 +126,8 @@ export class Navbar implements OnInit, OnDestroy {
   private savedScrollY = 0;
   private bodyScrollLocked = false;
 
-  readonly creationLinks: NavLink[] = [
-    { label: 'Forger un héros', path: '/create', icon: 'fluent-emoji:hammer-and-pick' },
-    { label: 'Nouveau scénario', path: '/story/create', icon: 'fluent-emoji:scroll' },
+  /** Listes (la forge / le scénario se lancent depuis ces pages, pas depuis la barre). */
+  readonly workshopLinks: NavLink[] = [
     { label: 'Héros', path: '/characters', icon: 'fluent-emoji:busts-in-silhouette' },
     { label: 'Donjons', path: '/dungeons', icon: 'fluent-emoji:japanese-castle' },
   ];
@@ -178,7 +176,6 @@ export class Navbar implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement | null;
-    if (!target?.closest('[data-creation-menu]')) this.creationOpen.set(false);
     if (!target?.closest('[data-codex-menu]')) this.codexOpen.set(false);
     if (!target?.closest('[data-account-menu]')) this.accountOpen.set(false);
   }
@@ -188,18 +185,10 @@ export class Navbar implements OnInit, OnDestroy {
     this.closeMenus();
   }
 
-  toggleCreation(event: Event): void {
-    event.stopPropagation();
-    this.creationOpen.update((v) => !v);
-    this.codexOpen.set(false);
-    this.accountOpen.set(false);
-  }
-
   toggleCodex(event: Event): void {
     event.stopPropagation();
     this.codexOpen.update((v) => !v);
     if (this.codexOpen()) this.codexSearch.ensureIndex();
-    this.creationOpen.set(false);
     this.accountOpen.set(false);
   }
 
@@ -211,7 +200,6 @@ export class Navbar implements OnInit, OnDestroy {
   toggleAccount(event: Event): void {
     event.stopPropagation();
     this.accountOpen.update((v) => !v);
-    this.creationOpen.set(false);
     this.codexOpen.set(false);
   }
 
@@ -224,7 +212,6 @@ export class Navbar implements OnInit, OnDestroy {
     }
     this.syncBodyScrollLock();
     if (!opening) {
-      this.creationOpen.set(false);
       this.codexOpen.set(false);
       this.accountOpen.set(false);
     }
@@ -232,7 +219,6 @@ export class Navbar implements OnInit, OnDestroy {
 
   closeMenus(): void {
     this.mobileOpen.set(false);
-    this.creationOpen.set(false);
     this.codexOpen.set(false);
     this.accountOpen.set(false);
     this.codexFilter.set('');
@@ -244,8 +230,20 @@ export class Navbar implements OnInit, OnDestroy {
     this.auth.logout();
   }
 
-  isCreationActive(): boolean {
-    return this.creationLinks.some((l) => this.router.url.startsWith(l.path));
+  isNavPathActive(path: string): boolean {
+    const url = (this.router.url.split('?')[0] ?? '').split('#')[0] ?? '';
+    if (path === '/campaigns') {
+      return (
+        url === '/campaigns' ||
+        url.startsWith('/campaigns/') ||
+        url.startsWith('/story/create') ||
+        url.startsWith('/scenario/create')
+      );
+    }
+    if (path === '/characters') {
+      return url === '/characters' || url.startsWith('/characters/') || url === '/create' || url.startsWith('/create/');
+    }
+    return url === path || url.startsWith(`${path}/`);
   }
 
   isCodexActive(): boolean {

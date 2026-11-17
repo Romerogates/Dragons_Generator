@@ -10,7 +10,7 @@ Application web de création de personnages et de gestion de campagnes JDR (Angu
 | `DragonsGenerator.API/` | API REST .NET 9 (FastEndpoints, SQLite, auth cookie HttpOnly) |
 | `DragonsGenerator.API.Tests/` | Tests d'intégration API |
 | `docs/` | Documentation fonctionnelle et ops |
-| `scripts/` | Scripts deploy (Ollama, VAPID, etc.) |
+| `scripts/` | Scripts deploy (VAPID, backups, etc.) |
 | `docker-compose.*.yml` | Stack locale, test et production |
 
 ## Prérequis
@@ -46,7 +46,7 @@ Compte perso en local : copier `.env.local.example` → `.env.local` (gitignored
 
 ```bash
 # Terminal 1 — API seule (si la stack complète n'est pas déjà up)
-docker compose -f docker-compose.local.yml up -d mailhog ollama dragons-api
+docker compose -f docker-compose.local.yml up -d mailhog dragons-api
 
 # Terminal 2
 cd DragonsGenerator.WEB

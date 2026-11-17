@@ -332,31 +332,28 @@ function buildProfile(kind: AiGenerationKind, status: AiStatusResponse): AiProgr
         ],
       };
     case 'creature-batch':
-      return shortProfile(status, 'Génération des vies (lot)…', 90000);
+      return shortProfile(status, 'Génération des vies (lot)…', 40000);
     case 'creature-backstory':
-      return shortProfile(status, 'Génération de la vie…', 10000);
+      return shortProfile(status, 'Génération de la vie…', 4500);
     case 'character-backstory':
-      return shortProfile(status, 'Génération de l\'histoire…', 10000);
+      return shortProfile(status, 'Génération de l\'histoire…', 4500);
     case 'pregen-story':
-      return shortProfile(status, 'Création du récit du héros…', 12000);
+      return shortProfile(status, 'Création du récit du héros…', 5400);
     case 'pregen-hero':
       return pregenHeroProfile(status);
   }
 }
 
 function pregenHeroProfile(status: AiStatusResponse): AiProgressProfile {
-  const usesOllama = status.shortGeneration.primary === 'ollama';
+  const cloudLabel = `${status.shortGeneration.primaryLabel} — récit du héros…`;
   return {
     providerLabel: status.shortGeneration.primaryLabel,
-    estimatedMs: usesOllama ? 38000 : 24000,
+    estimatedMs: 24000,
     stages: [
       { at: 0, label: 'Chargement du codex…' },
       { at: 0.1, label: 'Tirage aléatoire — espèce, classe, équipement…' },
       { at: 0.35, label: 'Validation et enregistrement de la fiche…' },
-      {
-        at: 0.52,
-        label: usesOllama ? 'Ollama (local) — récit du héros…' : 'Groq (cloud) — récit du héros…',
-      },
+      { at: 0.52, label: cloudLabel },
       { at: 0.78, label: 'Finalisation du pré-tiré…' },
       ...(status.shortGeneration.fallback
         ? [{ at: 0.9, label: 'Secours Groq (cloud) si besoin…' }]
@@ -368,25 +365,15 @@ function pregenHeroProfile(status: AiStatusResponse): AiProgressProfile {
 function shortProfile(
   status: AiStatusResponse,
   intro: string,
-  ollamaMs: number,
+  estimatedMs: number,
 ): AiProgressProfile {
-  const usesOllama = status.shortGeneration.primary === 'ollama';
   return {
     providerLabel: status.shortGeneration.primaryLabel,
-    estimatedMs: usesOllama ? ollamaMs : Math.round(ollamaMs * 0.45),
-    stages: usesOllama
-      ? [
-          { at: 0, label: intro },
-          { at: 0.15, label: 'Ollama (local) — rédaction…' },
-          { at: 0.65, label: 'Peaufinage du texte…' },
-          ...(status.shortGeneration.fallback
-            ? [{ at: 0.85, label: 'Secours Groq (cloud) si besoin…' }]
-            : []),
-        ]
-      : [
-          { at: 0, label: intro },
-          { at: 0.2, label: 'Groq (cloud) — rédaction…' },
-          { at: 0.7, label: 'Peaufinage du texte…' },
-        ],
+    estimatedMs,
+    stages: [
+      { at: 0, label: intro },
+      { at: 0.2, label: `${status.shortGeneration.primaryLabel} — rédaction…` },
+      { at: 0.7, label: 'Peaufinage du texte…' },
+    ],
   };
 }

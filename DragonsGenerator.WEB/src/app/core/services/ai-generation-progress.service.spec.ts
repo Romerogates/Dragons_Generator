@@ -18,19 +18,18 @@ describe('AiGenerationProgressService', () => {
           useValue: {
             getStatus: () =>
               of({
-                localLlmEnabled: true,
                 groqConfigured: true,
                 shortGeneration: {
-                  primary: 'ollama',
-                  fallback: 'groq',
-                  primaryLabel: 'Ollama (local)',
-                  fallbackLabel: 'Groq (cloud)',
+                  primary: 'groq',
+                  fallback: null,
+                  primaryLabel: 'Groq (cloud)',
+                  fallbackLabel: null,
                 },
                 adventureGeneration: {
                   primary: 'groq',
-                  fallback: 'ollama',
+                  fallback: null,
                   primaryLabel: 'Groq (cloud)',
-                  fallbackLabel: 'Ollama (local)',
+                  fallbackLabel: null,
                 },
               }),
           },
@@ -49,7 +48,7 @@ describe('AiGenerationProgressService', () => {
     await service.begin('creature-backstory');
     expect(service.active()).toBeTrue();
     expect(service.foregroundActive()).toBeTrue();
-    expect(service.providerLabel()).toBe('Ollama (local)');
+    expect(service.providerLabel()).toBe('Groq (cloud)');
     expect(service.stageLabel()).toContain('Génération');
     service.cancel();
     expect(service.active()).toBeFalse();

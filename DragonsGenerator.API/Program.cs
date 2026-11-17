@@ -158,7 +158,6 @@ builder.Services.AddScoped<SupportDeskService>();
 builder.Services.AddSingleton<GoogleIdTokenValidator>();
 builder.Services.AddSingleton<ImapInboxService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
-builder.Services.AddHostedService<OllamaWarmupWorker>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient("Groq", client =>
 {
@@ -167,14 +166,6 @@ builder.Services.AddHttpClient("Groq", client =>
 builder.Services.AddHttpClient("Gemini", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(60);
-});
-builder.Services.AddHttpClient("LocalLlm", client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(480);
-}).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-{
-    ConnectTimeout = TimeSpan.FromSeconds(4),
-    PooledConnectionLifetime = TimeSpan.FromMinutes(5),
 });
 builder.Services.AddHttpClient("UserLlm", client =>
 {

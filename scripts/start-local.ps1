@@ -71,7 +71,7 @@ $composeArgs = @('-f', $ComposeFile, 'up', '-d')
 if ($Build) { $composeArgs += '--build' }
 
 Write-Host "=== Démarrage stack locale ===" -ForegroundColor Cyan
-docker compose @composeArgs mailhog ollama
+docker compose @composeArgs mailhog
 if ($Build) {
     docker compose -f $ComposeFile build dragons-api dragons-web
 }

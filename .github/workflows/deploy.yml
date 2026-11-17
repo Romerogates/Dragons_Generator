@@ -97,7 +97,7 @@ jobs:
           compose() {
             docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml "$@"
           }
-          compose up -d --pull never mailhog ollama
+          compose up -d --pull never mailhog
           compose up -d --build --pull never dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
@@ -226,7 +226,7 @@ jobs:
             }
 
             docker compose -f docker-compose.prod.yml stop ollama >/dev/null 2>&1 || true
-            echo "Ollama stopped on this VPS — Groq handles generation so the site stays up"
+            docker compose -f docker-compose.prod.yml rm -f ollama >/dev/null 2>&1 || true
             mkdir -p /var/www/certbot 2>/dev/null || sudo -n mkdir -p /var/www/certbot 2>/dev/null || true
             mkdir -p ~/backups/dragons
             chmod +x scripts/renew-letsencrypt.sh scripts/vps-watchdog.sh scripts/install-vps-cron.sh scripts/send-alert-email.sh scripts/backup-sqlite.sh scripts/send-backup-email.sh scripts/log-ops-event.sh

@@ -6,7 +6,6 @@ import { environment } from '@env/environment';
 import type { AiStatusResponse } from '@core/models/ai-generation.model';
 
 const DEFAULT_STATUS: AiStatusResponse = {
-  localLlmEnabled: false,
   groqConfigured: true,
   shortGeneration: {
     primary: 'groq',
