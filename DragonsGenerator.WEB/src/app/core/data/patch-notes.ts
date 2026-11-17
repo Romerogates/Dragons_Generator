@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.470',
+    date: '2026-11-17',
+    title: 'Compte Google : mot de passe et suppression',
+    player: [
+      'Si vous vous connectez avec Google, vous pouvez choisir un mot de passe dans Paramètres → Sécurité, sans en connaître un actuel.',
+      'Vous pouvez aussi supprimer votre compte dans Paramètres → Données en tapant votre email, sans mot de passe.',
+    ],
+    tech: [
+      'UserDto.googleLinked depuis AppUser.GoogleSubject.',
+      'POST /auth/change-password : currentPassword optionnel si GoogleSubject.',
+      'DELETE /auth/me : confirmEmail suffit pour un compte Google (sinon currentPassword).',
+    ],
+  },
+  {
     version: '1.469',
     date: '2026-11-17',
     title: 'La table en ligne devient une scène',

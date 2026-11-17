@@ -17,6 +17,7 @@ export interface AuthUser {
   avatarEmoji?: string | null;
   accentColor?: string;
   memberSince?: string;
+  googleLinked?: boolean;
 }
 
 export interface UpdateProfilePayload {
@@ -102,9 +103,9 @@ export class AuthService {
     this.offlineProfile.writeProfile(u.id, next);
   }
 
-  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+  changePassword(currentPassword: string | null, newPassword: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.api}/auth/change-password`, {
-      currentPassword,
+      currentPassword: currentPassword || undefined,
       newPassword,
     });
   }
@@ -113,9 +114,12 @@ export class AuthService {
     return this.http.get(`${this.api}/me/export`, { responseType: 'blob' });
   }
 
-  deleteAccount(currentPassword: string): Observable<void> {
+  deleteAccount(currentPassword: string | null, confirmEmail?: string): Observable<void> {
     return this.http.request<void>('DELETE', `${this.api}/auth/me`, {
-      body: { currentPassword },
+      body: {
+        currentPassword: currentPassword || undefined,
+        confirmEmail: confirmEmail || undefined,
+      },
     });
   }
 

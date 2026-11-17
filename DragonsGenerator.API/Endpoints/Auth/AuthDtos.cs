@@ -14,5 +14,5 @@ public record ForgotPasswordRequest(string Email, string? WebUrl);
 public record ResendConfirmationRequest(string Email, string? WebUrl);
 public record ResetPasswordRequest(string Token, string NewPassword);
 public record UpdateProfileRequest(string DisplayName, string? Bio, string? AvatarEmoji, string? AccentColor);
-public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
+public record ChangePasswordRequest(string? CurrentPassword, string NewPassword);
 public record AuthResponse(string? Token, UserDto User);

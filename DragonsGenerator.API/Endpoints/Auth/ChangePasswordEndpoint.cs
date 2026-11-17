@@ -39,7 +39,10 @@ public class ChangePasswordEndpoint(AppDbContext db) : Endpoint<ChangePasswordRe
             return;
         }
 
-        if (!AuthHelpers.VerifyPassword(req.CurrentPassword ?? "", user.PasswordHash))
+        var googleAccount = !string.IsNullOrWhiteSpace(user.GoogleSubject);
+        var current = req.CurrentPassword ?? "";
+        var skipCurrent = googleAccount && string.IsNullOrWhiteSpace(current);
+        if (!skipCurrent && !AuthHelpers.VerifyPassword(current, user.PasswordHash))
         {
             AddError("Mot de passe actuel incorrect.");
             await Send.ErrorsAsync(StatusCodes.Status401Unauthorized, ct);
@@ -48,6 +51,9 @@ public class ChangePasswordEndpoint(AppDbContext db) : Endpoint<ChangePasswordRe
 
         user.PasswordHash = AuthHelpers.HashPassword(req.NewPassword);
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(new { message = "Mot de passe mis à jour." }, ct);
+        var message = skipCurrent
+            ? "Mot de passe enregistré. Vous pouvez aussi vous connecter avec votre email."
+            : "Mot de passe mis à jour.";
+        await Send.OkAsync(new { message }, ct);
     }
 }

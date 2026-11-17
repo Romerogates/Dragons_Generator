@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Gdpr;
 
-public record DeleteAccountRequest(string CurrentPassword);
+public record DeleteAccountRequest(string? CurrentPassword, string? ConfirmEmail = null);
 
 public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
 {
@@ -196,7 +196,18 @@ public class DeleteAccountEndpoint(AppDbContext db, IHostEnvironment env, ILogge
             return;
         }
 
-        if (!AuthHelpers.VerifyPassword(req.CurrentPassword ?? "", user.PasswordHash))
+        var googleAccount = !string.IsNullOrWhiteSpace(user.GoogleSubject);
+        var current = req.CurrentPassword ?? "";
+        if (googleAccount && string.IsNullOrWhiteSpace(current))
+        {
+            if (!string.Equals((req.ConfirmEmail ?? "").Trim(), user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                AddError("Confirmez votre email pour supprimer le compte.");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+        }
+        else if (!AuthHelpers.VerifyPassword(current, user.PasswordHash))
         {
             AddError("Mot de passe incorrect.");
             await Send.ErrorsAsync(StatusCodes.Status401Unauthorized, ct);

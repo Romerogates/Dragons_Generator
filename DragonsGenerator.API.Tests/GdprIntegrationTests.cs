@@ -1,6 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DragonsGenerator.API.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DragonsGenerator.API.Tests;
 
@@ -8,9 +11,11 @@ namespace DragonsGenerator.API.Tests;
 public class GdprIntegrationTests
 {
     private readonly HttpClient _client;
+    private readonly CustomWebApplicationFactory _factory;
 
     public GdprIntegrationTests(CustomWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateTestClient();
     }
 
@@ -81,5 +86,55 @@ public class GdprIntegrationTests
         deleteReq.Content = JsonContent.Create(new { currentPassword = "WrongPass999!" });
         var deleted = await _client.SendAsync(deleteReq);
         Assert.Equal(HttpStatusCode.Unauthorized, deleted.StatusCode);
+    }
+
+    [Fact]
+    public async Task Google_user_sets_password_without_current_and_deletes_with_email()
+    {
+        var (email, token, userId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "ggl");
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var user = await db.Users.FindAsync(userId);
+            Assert.NotNull(user);
+            user!.GoogleSubject = $"google-{userId:N}";
+            await db.SaveChangesAsync();
+        }
+
+        using (var meReq = ApiTestAuth.Authed(HttpMethod.Get, "/auth/me", token))
+        {
+            var me = await _client.SendAsync(meReq);
+            me.EnsureSuccessStatusCode();
+            var json = JsonDocument.Parse(await me.Content.ReadAsStringAsync()).RootElement;
+            Assert.True(json.GetProperty("googleLinked").GetBoolean());
+        }
+
+        using (var changeReq = ApiTestAuth.Authed(HttpMethod.Post, "/auth/change-password", token))
+        {
+            changeReq.Content = JsonContent.Create(new { newPassword = "GooglePass123!" });
+            var changed = await _client.SendAsync(changeReq);
+            Assert.True(changed.IsSuccessStatusCode, await changed.Content.ReadAsStringAsync());
+        }
+
+        var login = await _client.PostAsJsonAsync(
+            "/auth/login",
+            new { email, password = "GooglePass123!" }
+        );
+        login.EnsureSuccessStatusCode();
+
+        using (var badDelete = ApiTestAuth.Authed(HttpMethod.Delete, "/auth/me", token))
+        {
+            badDelete.Content = JsonContent.Create(new { confirmEmail = "wrong@dragons.local" });
+            var rejected = await _client.SendAsync(badDelete);
+            Assert.Equal(HttpStatusCode.BadRequest, rejected.StatusCode);
+        }
+
+        using (var deleteReq = ApiTestAuth.Authed(HttpMethod.Delete, "/auth/me", token))
+        {
+            deleteReq.Content = JsonContent.Create(new { confirmEmail = email });
+            var deleted = await _client.SendAsync(deleteReq);
+            Assert.Equal(HttpStatusCode.NoContent, deleted.StatusCode);
+        }
     }
 }

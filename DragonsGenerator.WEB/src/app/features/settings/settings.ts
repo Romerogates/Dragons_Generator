@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  computed,
   inject,
   OnInit,
   signal,
@@ -125,6 +126,7 @@ export class SettingsPage implements OnInit {
   readonly installBusy = signal(false);
 
   readonly user = this.auth.user;
+  readonly googleLinked = computed(() => this.user()?.googleLinked === true);
 
   readonly tabs: { id: SettingsTab; label: string; icon: string }[] = [
     { id: 'account', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette' },
@@ -158,6 +160,8 @@ export class SettingsPage implements OnInit {
     if (this.activeTab() === 'ai' || tab === 'ai') {
       this.loadAiSettings();
     }
+
+    this.auth.refreshMe().subscribe();
   }
 
   setTab(tab: SettingsTab): void {
@@ -378,26 +382,30 @@ export class SettingsPage implements OnInit {
 
   canConfirmDelete(): boolean {
     const email = this.user()?.email ?? '';
-    return (
-      this.deletePassword.length >= 8 &&
-      this.deleteConfirmEmail().trim().toLowerCase() === email.toLowerCase()
-    );
+    const emailOk = this.deleteConfirmEmail().trim().toLowerCase() === email.toLowerCase();
+    if (this.googleLinked()) return emailOk;
+    return this.deletePassword.length >= 8 && emailOk;
   }
 
   deleteAccount(): void {
     if (!this.canConfirmDelete() || this.deleteLoading()) return;
     this.deleteError.set(null);
     this.deleteLoading.set(true);
-    this.auth.deleteAccount(this.deletePassword).subscribe({
-      next: () => {
-        this.deleteLoading.set(false);
-        this.auth.logoutAndClearLocalData();
-      },
-      error: (err) => {
-        this.deleteLoading.set(false);
-        this.deleteError.set(this.extractError(err) || 'Impossible de supprimer le compte.');
-      },
-    });
+    this.auth
+      .deleteAccount(
+        this.googleLinked() ? null : this.deletePassword,
+        this.deleteConfirmEmail().trim(),
+      )
+      .subscribe({
+        next: () => {
+          this.deleteLoading.set(false);
+          this.auth.logoutAndClearLocalData();
+        },
+        error: (err) => {
+          this.deleteLoading.set(false);
+          this.deleteError.set(this.extractError(err) || 'Impossible de supprimer le compte.');
+        },
+      });
   }
 
   clearCodexDownload(): void {
@@ -450,7 +458,7 @@ export class SettingsPage implements OnInit {
       return;
     }
     this.passwordLoading.set(true);
-    this.auth.changePassword(this.currentPassword, this.newPassword).subscribe({
+    this.auth.changePassword(this.googleLinked() ? null : this.currentPassword, this.newPassword).subscribe({
       next: (res) => {
         this.passwordLoading.set(false);
         this.passwordMsg.set(res.message || 'Mot de passe mis à jour.');

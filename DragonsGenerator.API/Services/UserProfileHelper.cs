@@ -69,7 +69,8 @@ public static class UserProfileHelper
             user.Bio,
             user.AvatarEmoji,
             NormalizeAccentColor(user.AccentColor),
-            user.CreatedAt
+            user.CreatedAt,
+            !string.IsNullOrWhiteSpace(user.GoogleSubject)
         );
 
     public static PublicUserProfileDto ToPublicProfile(
@@ -98,7 +99,8 @@ public record UserDto(
     string? Bio,
     string? AvatarEmoji,
     string AccentColor,
-    DateTimeOffset MemberSince
+    DateTimeOffset MemberSince,
+    bool GoogleLinked = false
 );
 
 public record PublicUserProfileDto(

@@ -596,9 +596,16 @@
   @if (activeTab() === 'security') {
     <section class="settings-panel">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mot de passe</h2>
-      <p class="text-xs text-slate-400 mb-4">
-        Modifiez votre mot de passe uniquement si nécessaire — 8 caractères minimum.
-      </p>
+      @if (googleLinked()) {
+        <p class="text-xs text-slate-400 mb-4">
+          Vous vous connectez avec Google, donc vous n’avez pas encore de mot de passe Dragons Generator.
+          Vous pouvez en choisir un ici (8 caractères minimum) pour aussi vous connecter avec votre email.
+        </p>
+      } @else {
+        <p class="text-xs text-slate-400 mb-4">
+          Modifiez votre mot de passe uniquement si nécessaire — 8 caractères minimum.
+        </p>
+      }
 
       @if (!showPasswordForm()) {
         <button
@@ -606,16 +613,18 @@
           class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-amber-600/40 hover:text-amber-200"
           (click)="togglePasswordForm()"
         >
-          Modifier le mot de passe
+          {{ googleLinked() ? 'Choisir un mot de passe' : 'Modifier le mot de passe' }}
         </button>
       } @else {
         <form class="flex flex-col gap-4" (ngSubmit)="savePassword()">
-          <app-password-field
-            label="Mot de passe actuel"
-            name="currentPassword"
-            [required]="true"
-            [(value)]="currentPassword"
-          />
+          @if (!googleLinked()) {
+            <app-password-field
+              label="Mot de passe actuel"
+              name="currentPassword"
+              [required]="true"
+              [(value)]="currentPassword"
+            />
+          }
           <app-password-field
             label="Nouveau mot de passe"
             name="newPassword"
@@ -684,6 +693,9 @@
         <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400/90 mb-2">Zone de danger</h3>
         <p class="text-xs text-slate-400 mb-3">
           La suppression efface définitivement votre compte, vos personnages et campagnes hébergées.
+          @if (googleLinked()) {
+            Comme vous vous connectez avec Google, confirmez simplement votre email — aucun mot de passe n’est demandé.
+          }
         </p>
         @if (!showDeleteForm()) {
           <button
@@ -695,12 +707,14 @@
           </button>
         } @else {
           <div class="flex flex-col gap-3">
-            <app-password-field
-              label="Mot de passe actuel"
-              name="deletePassword"
-              [required]="true"
-              [(value)]="deletePassword"
-            />
+            @if (!googleLinked()) {
+              <app-password-field
+                label="Mot de passe actuel"
+                name="deletePassword"
+                [required]="true"
+                [(value)]="deletePassword"
+              />
+            }
             <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
               Confirmer en tapant votre email
               <input
