@@ -29,14 +29,15 @@ export const GUIDE_TIPS: string[] = [
       'Utilisez le bandeau campagne pour saisir votre initiative rapidement.',
       'Publiez un document : les joueurs le voient dans Activité et Documents.',
       'Terminez le combat pour archiver un résumé dans l’historique MJ.',
-      'Générez un donjon depuis Préparation → Donjons — le thème suit souvent la région Eana.',
+      'Pendant la table : Générer une carte sans quitter la soirée — elle s’affiche pour tout le monde.',
+      'Vous pouvez aussi préparer les donjons plus tôt dans Préparation → Donjons.',
       'document brouillon carte : image PNG + légende — les joueurs ne voient qu’après publication.',
       'Paramètres → onglet Notifications : filtrez amis, campagnes et push par type.',
 ];
 
-export const GUIDE_UPDATED_AT = '31 août 2026';
+export const GUIDE_UPDATED_AT = '17 novembre 2026';
 
-export const GUIDE_VERSION = '1.5';
+export const GUIDE_VERSION = '1.6';
 
 export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
@@ -71,7 +72,7 @@ export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
     { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all' },
-    { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm' },
+    { id: 'table', label: 'La table', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'all' },
     { id: 'donjons', label: 'Donjons & cartes', icon: 'fluent-emoji:castle', accent: 'text-violet-400', audience: 'dm' },
     { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all' },
     { id: 'documents', label: 'Documents', icon: 'fluent-emoji:scroll', accent: 'text-sky-400', audience: 'all' },
@@ -159,6 +160,18 @@ export function isGuideBlogPostNew(post: GuideBlogPost, now = Date.now()): boole
 }
 
 export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
+    {
+      id: 'news-carte-soiree',
+      date: '17 novembre 2026',
+      tag: 'Table',
+      title: 'La carte de la soirée, sur la table',
+      summary:
+        'Pendant la session, le donjon s’affiche pour tout le monde. Le MJ le génère ou l’importe sans quitter la table, pose les héros et les déplace. Les joueurs voient qui est vraiment à la table.',
+      icon: 'fluent-emoji:world-map',
+      border: 'border-sky-500/30',
+      tagColor: 'text-sky-400 bg-sky-950/40',
+      isNew: true,
+    },
     {
       id: 'news-campagne-vide-handout',
       date: '31 août 2026',
@@ -292,8 +305,9 @@ export const GUIDE_ONESHOT_STEPS: GuideOneshotStep[] = [
     { role: 'Joueur', title: 'Accepter & proposer', detail: 'Invitation → proposer un héros · le MJ est notifié.' },
     { role: 'MJ', title: 'Valider les fiches', detail: 'Notif / Activité → Voir la fiche → Accepter (ou Refuser).' },
     { role: 'Joueur', title: 'Confirmation', detail: 'Push « approuvé » ou « refusé » → re-proposer si besoin.' },
-    { role: 'MJ', title: 'Préparer & planifier', detail: 'Rencontre + session + push activés.' },
-    { role: 'MJ', title: 'Entrer en session', detail: 'Notes live · import party · combat.' },
+    { role: 'MJ', title: 'Préparer & planifier', detail: 'Rencontre + session + push activés. Une carte n’est pas obligatoire à l’avance.' },
+    { role: 'MJ', title: 'Entrer en session', detail: 'Générer ou choisir la carte de soirée · notes · combat.' },
+    { role: 'Joueur', title: 'Rejoindre la table', detail: 'Depuis l’accueil ou « Ce soir » · vous voyez la carte et qui est là.' },
     { role: 'Joueur', title: 'Saisir l’initiative', detail: 'Bandeau / notification → jet d20.' },
     { role: 'MJ', title: 'Fin de session', detail: 'Terminer combat → historique · Terminer session.' },
   ];
@@ -336,10 +350,28 @@ export const GUIDE_FLASH_CARDS: GuideFlashCard[] = [
     },
     {
       title: 'Générer un donjon',
-      bullets: ['Campagne → Préparation → Donjons', 'Curseurs + thème → Générer', 'Export ou document brouillon'],
+      bullets: [
+        'Pendant la table : Générer (sans quitter)',
+        'Ou Préparation → Donjons plus tôt',
+        'La première carte devient celle de la soirée',
+      ],
       audience: 'dm',
       icon: 'fluent-emoji:castle',
       sectionId: 'donjons',
+    },
+    {
+      title: 'Carte de la soirée',
+      bullets: ['MJ : Entrer en session → Générer ou choisir', 'Les héros apparaissent sur la carte', 'Glissez un pion (MJ)'],
+      audience: 'dm',
+      icon: 'fluent-emoji:world-map',
+      sectionId: 'table',
+    },
+    {
+      title: 'Rejoindre la soirée',
+      bullets: ['Campagne → Ce soir, ou Rejoindre la table', 'Vous voyez qui est à la table', 'La carte s’affiche quand le MJ l’a choisie'],
+      audience: 'player',
+      icon: 'fluent-emoji:fire',
+      sectionId: 'table',
     },
     {
       title: 'Collecter l’init',
@@ -393,7 +425,7 @@ export const GUIDE_START_STEPS: GuideStep[] = [
     },
     {
       title: 'Rejoindre la table',
-      body: 'Joueur : acceptez l’invitation, proposez un personnage, attendez l’approbation.',
+      body: 'Joueur : acceptez l’invitation, proposez un héros, puis Rejoindre la table. L’onglet Ce soir résume la soirée.',
       badge: 'Joueur',
       link: '/campaigns',
       linkLabel: 'Mes campagnes',
@@ -427,17 +459,17 @@ export const GUIDE_CAMPAIGN_MJ_FLOW = [
     'Scénario ou campagne vide',
     'Inviter amis',
     'Valider persos',
-    'Préparer donjon / docs',
+    'Préparer docs (optionnel : donjon)',
     'Planifier session',
-    'Entrer en session',
+    'Entrer en session · carte de soirée',
   ];
 
 export const GUIDE_CAMPAIGN_PLAYER_FLOW = [
     'Accepter invite',
     'Proposer perso',
     'Notif MJ → validation',
-    'Résumé (XP, sessions)',
-    'Lire documents',
+    'Ce soir (table, récit, docs)',
+    'Rejoindre la table',
     'Saisir initiative',
   ];
 
@@ -473,29 +505,29 @@ export const GUIDE_NOTIFICATION_EVENTS = [
   ];
 
 export const GUIDE_TABLE_PLAY_STEPS: GuideLabeledFlowStep[] = [
-    { label: 'Session', detail: 'Entrer en session' },
-    { label: 'Notes live', detail: 'Sauvegardées auto' },
-    { label: 'Import party', detail: 'PJ approuvés' },
-    { label: 'Tracker', detail: 'Init · PV · tours' },
-    { label: 'Terminer', detail: 'Historique + notes' },
+    { label: 'Ouvrir', detail: 'MJ : Entrer en session. Joueurs : Rejoindre la table ou Ce soir.' },
+    { label: 'Carte', detail: 'MJ : Générer ou choisir un donjon sans quitter. Les héros se posent dessus.' },
+    { label: 'Présence', detail: 'On voit qui est connecté et qui est vraiment à la table.' },
+    { label: 'Combat', detail: 'Import party, initiative, tours — la carte reste visible.' },
+    { label: 'Terminer', detail: 'Fin de combat puis Terminer la session.' },
   ];
 
 export const GUIDE_DUNGEON_GEN_STEPS: GuideStep[] = [
     {
-      title: 'Ouvrir l’onglet',
-      body: 'Campagne → Préparation → Donjons (MJ uniquement). Plusieurs cartes possibles par campagne.',
+      title: 'Pendant la soirée',
+      body: 'À la table : Générer ou Importer — vous ne quittez pas la session. La première carte créée devient celle de tout le monde.',
       badge: 'MJ',
       link: '/campaigns',
       linkLabel: 'Mes campagnes',
     },
     {
-      title: 'Nouveau donjon',
-      body: 'Bouton Nouveau donjon → nom, thème (suggéré depuis la région Eana), curseurs grille / salles / couloirs.',
+      title: 'Ou plus tôt',
+      body: 'Campagne → Préparation → Donjons. Plusieurs cartes possibles. Bouton Nouveau donjon : nom, thème, taille.',
       badge: 'MJ',
     },
     {
-      title: 'Générer',
-      body: 'Salles + couloirs connectés, portes automatiques, rencontres aléatoires cohérentes avec le thème.',
+      title: 'Gravure',
+      body: 'Choisissez un thème et une taille, puis Gravure. Salles, couloirs et portes se dessinent tout seuls.',
       badge: 'MJ',
     },
     {
@@ -543,15 +575,29 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-donjon',
       question: 'Où générer un donjon pour ma campagne ?',
       answer:
-        'MJ : ouvrez votre campagne → onglet Préparation → Donjons → Nouveau donjon. Ajustez les curseurs (taille grille, nombre de salles, densité des couloirs), choisissez un thème, puis Générer. Éditez, exportez en PNG/PDF ou créez un document brouillon.',
+        'Le plus simple : ouvrez la table (Entrer en session) → Générer. Vous restez avec vos joueurs. Vous pouvez aussi préparer plus tôt : campagne → Préparation → Donjons → Nouveau donjon. Thème, taille, puis Gravure. La première carte créée pendant la table devient celle de la soirée.',
       audience: 'dm',
     },
     {
-      id: 'faq-handout-carte',
-      question: 'Les joueurs voient-ils la carte tout de suite ?',
+      id: 'faq-carte-soiree',
+      question: 'Où est la carte pendant la session ?',
       answer:
-        'Non tant que le document n’est pas publié. Le bouton Document (éditeur de donjon) crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles révélées — invisible pour les joueurs tant qu’il reste en brouillon. Activez le fog of war dans l’éditeur, révélez les salles une par une, puis regénérez le document avant publication.',
+        'Sur la table, pour tout le monde, pas seulement pendant un combat. Le MJ choisit ou génère un donjon ; les héros approuvés apparaissent dessus. Le MJ déplace les pions. Les joueurs voient la carte et qui est à la table. Un document « Carte » publié, c’est autre chose : une image à lire dans Documents, même hors session.',
+      audience: 'all',
+    },
+    {
+      id: 'faq-handout-carte',
+      question: 'Les joueurs voient-ils tout de suite un document carte ?',
+      answer:
+        'Un document « Carte » (image dans Documents) reste invisible tant qu’il n’est pas publié. Ce n’est pas la carte de soirée de la table. Pour le brouillard d’un document : activez-le dans l’éditeur, révélez les salles, puis publiez.',
       audience: 'dm',
+    },
+    {
+      id: 'faq-google-mdp',
+      question: 'Je me connecte avec Google : comment changer de mot de passe ou supprimer le compte ?',
+      answer:
+        'Paramètres → Sécurité : vous pouvez choisir un mot de passe sans en connaître un actuel. Pour supprimer le compte : Paramètres → Données, tapez votre e-mail. Un compte e-mail et un compte Google avec la même adresse, c’est le même compte. Deux adresses différentes, ce sont deux comptes.',
+      audience: 'all',
     },
     {
       id: 'faq-campagne-vide',
@@ -654,7 +700,12 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
   ];
 
 export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
-    { term: 'Table', definition: 'Espace de jeu en direct du MJ : notes, rencontres, tracker de combat.' },
+    { term: 'Table', definition: 'Espace de jeu en direct : carte de soirée, présence, notes, combat. MJ et joueurs y sont ensemble.' },
+    {
+      term: 'Carte de la soirée',
+      definition:
+        'Le donjon affiché pendant la session, pour tout le monde. Le MJ le génère ou le choisit à la table, et déplace les héros.',
+    },
     { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ pour l’aventure ; consultation / usage table sans appropriation obligatoire.' },
     {
       term: 'Archive (campagne)',
@@ -671,7 +722,7 @@ export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
     {
       term: 'Donjon',
       definition:
-        'Layout procédural MJ (salles, couloirs, marqueurs) dans Préparation → Donjons. Export PNG/PDF ou document brouillon.',
+        'Carte de salles et couloirs. On la génère à la table ou dans Préparation → Donjons. Export image / PDF possible.',
     },
     {
       term: 'Collecte d’initiative',
@@ -701,7 +752,8 @@ export const GUIDE_FEATURE_INDEX: GuideIndexItem[] = [
     { label: 'Arsenal de départ', description: 'Équipement et choix d’armes', sectionId: 'personnage', audience: 'all', href: '/equipments' },
     { label: 'Bestiaire / créatures', description: 'Préparation MJ et PDF', sectionId: 'scenario', audience: 'dm', href: '/creatures' },
     { label: 'Campagnes', description: 'Création, joueurs, sessions', sectionId: 'scenario', audience: 'all', href: '/campaigns' },
-    { label: 'Préparation → Donjons', description: 'Génération procédurale MJ', sectionId: 'donjons', audience: 'dm', href: '/campaigns' },
+    { label: 'Préparation → Donjons', description: 'Préparer une carte avant la soirée', sectionId: 'donjons', audience: 'dm', href: '/campaigns' },
+    { label: 'Carte de la soirée', description: 'Donjon visible à toute la table', sectionId: 'table', audience: 'all', href: '/campaigns' },
     { label: 'Collecte d’initiative', description: 'Jets joueurs synchronisés', sectionId: 'initiative', audience: 'all', href: '/combat-actions' },
     { label: 'Documents', description: 'Publication markdown', sectionId: 'documents', audience: 'all', href: '/campaigns' },
     { label: 'Fiche personnage PDF', description: 'Export & sauvegarde', sectionId: 'pdf', audience: 'all', href: '/characters' },
@@ -711,7 +763,7 @@ export const GUIDE_FEATURE_INDEX: GuideIndexItem[] = [
     { label: 'One-shot type', description: 'Scénario de session complète', sectionId: 'oneshot-parcours', audience: 'all', href: '/guide/oneshot' },
     { label: 'Pré-tirés', description: 'Héros assignables', sectionId: 'scenario', audience: 'all', href: '/campaigns' },
     { label: 'Proposition de personnage', description: 'Propose → push → valider', sectionId: 'scenario', audience: 'all', href: '/campaigns' },
-    { label: 'Table de jeu', description: 'Session live MJ + feedback', sectionId: 'table', audience: 'dm', href: '/campaigns' },
+    { label: 'Table de jeu', description: 'Session live, carte, présence, combat', sectionId: 'table', audience: 'all', href: '/campaigns' },
     { label: 'Validation de personnage', description: 'Voir fiche → accepter / refuser', sectionId: 'scenario', audience: 'dm', href: '/campaigns' },
     { label: 'Paramètres compte', description: 'Onglets profil, notifs, sécurité, données', sectionId: 'compte', audience: 'all', href: '/settings' },
     { label: 'Centre notifications', description: 'Filtres, masquage, préférences', sectionId: 'notifications', audience: 'all', href: '/notifications' },

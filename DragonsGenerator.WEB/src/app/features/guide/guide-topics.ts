@@ -77,8 +77,8 @@ function contentFor(id: string): Pick<
     case 'demarrage':
       return {
         paragraphs: [
-          'Dragons Generator couvre la création de personnages Dragons, les campagnes en ligne et la table de jeu (notes, combat, documents).',
-          'Commencez par un compte, forgez un héros, puis créez ou rejoignez une campagne. Le combat et la table plein écran n’existent qu’en session active.',
+          'Dragons Generator sert à forger un héros, tenir une campagne, et jouer une soirée à la même table : carte, présence, dés, combat.',
+          'Compte, héros, puis campagne. La table (carte de soirée, combat) n’existe que quand une session est ouverte.',
         ],
         steps: GUIDE_START_STEPS,
         links: [
@@ -94,20 +94,20 @@ function contentFor(id: string): Pick<
     case 'parcours':
       return {
         paragraphs: [
-          'Deux parcours complémentaires : le MJ prépare et anime ; le joueur forge, propose et joue.',
-          'Filtrez ce guide avec MJ / Joueur pour ne voir que votre rôle. Les fiches « tous » restent visibles.',
+          'Deux parcours : le MJ prépare et ouvre la table ; le joueur forge un héros, le propose, puis rejoint la soirée.',
+          'Filtrez MJ / Joueur en haut du guide. La fiche « La table » décrit la soirée pour les deux.',
         ],
         steps: [
           {
             title: 'Parcours MJ',
-            body: 'Campagne → inviter → valider persos → préparer (docs / donjons) → planifier → session → combat.',
+            body: 'Campagne → inviter → valider les héros → (docs) → planifier → Entrer en session → carte de soirée → combat.',
             badge: 'MJ',
             link: '/campaigns',
             linkLabel: 'Campagnes',
           },
           {
             title: 'Parcours joueur',
-            body: 'Héros → accepter invite → proposer fiche → lire docs → saisir initiative en combat.',
+            body: 'Héros → accepter l’invite → proposer la fiche → Ce soir / Rejoindre la table → initiative.',
             badge: 'Joueur',
             link: '/create',
             linkLabel: 'Créer un héros',
@@ -198,7 +198,7 @@ function contentFor(id: string): Pick<
       return {
         paragraphs: [
           'Créez une campagne via l’assistant scénario ou « Campagne vide ». Invitez des amis, validez les personnages proposés.',
-          'Les joueurs voient XP et sessions dans Résumé. Les MJ préparent docs, cartes et rencontres.',
+          'Les joueurs ont « Ce soir » : table ouverte, dernier récit, documents et héros. Les MJ préparent docs, cartes et rencontres — la carte peut aussi se créer pendant la session.',
         ],
         steps: [
           {
@@ -229,13 +229,14 @@ function contentFor(id: string): Pick<
     case 'table':
       return {
         paragraphs: [
-          'En session active, le MJ dispose de notes live (widgets calepins), import party, tracker et fin de session.',
-          'Les notes de calepins sont fusionnées dans les notes archivées à la fin.',
+          'Une session ouverte, c’est la table : tout le monde voit la carte de soirée, qui est connecté, et le combat quand il y en a un.',
+          'MJ : Entrer en session, puis Générer ou choisir un donjon sans quitter. Glissez les héros. Notes et tracker restent là.',
+          'Joueur : Rejoindre la table (accueil ou Ce soir). Vous voyez la carte ; le MJ déplace les pions. Initiative via le bandeau.',
         ],
         steps: GUIDE_TABLE_PLAY_STEPS.map((s) => ({
           title: s.label,
           body: s.detail,
-          badge: 'MJ' as const,
+          badge: (s.label === 'Carte' ? 'MJ' : 'Tous') as 'MJ' | 'Tous',
           link: '/campaigns',
           linkLabel: 'Ouvrir une campagne',
         })),
@@ -249,8 +250,8 @@ function contentFor(id: string): Pick<
     case 'donjons':
       return {
         paragraphs: [
-          'Préparation → Donjons (MJ) : générer, éditer, exporter, ou publier en document.',
-          'Attribuez une carte à une session pour l’avoir sous la main à la table.',
+          'Le plus simple : générer le donjon pendant la table (bouton Générer). La première carte devient celle de la soirée.',
+          'Vous pouvez aussi préparer plus tôt dans Préparation → Donjons, puis attribuer la carte. Un document « Carte » publié, c’est une image à lire hors table.',
         ],
         steps: GUIDE_DUNGEON_GEN_STEPS,
         links: [
@@ -435,7 +436,7 @@ function contentFor(id: string): Pick<
     case 'compte':
       return {
         paragraphs: [
-          'Compte, profil (bio, avatar emoji, accent), paramètres et préférences guide.',
+          'Compte, profil, paramètres. Connexion e-mail ou Google : même adresse = même compte.',
         ],
         steps: [
           {
@@ -446,7 +447,7 @@ function contentFor(id: string): Pick<
           },
           {
             title: 'Paramètres',
-            body: 'Sécurité, notifications, préférences.',
+            body: 'Sécurité (mot de passe même après Google), notifications, données du compte.',
             link: '/settings',
             linkLabel: 'Paramètres',
           },

@@ -522,7 +522,7 @@ export const GUIDE_RULEBOOK_MJ_ONLINE: GuideRulebook = {
           id: 'caption-table',
           title: 'Table MJ (pas de capture figée)',
           paragraphs: [
-            'Aucune capture d’écran figée ici — l’UI évolue. Pour voir la vraie Table : Campagnes → votre campagne → Entrer en session → onglet Table (notes, party, tracker).',
+            'Pas de capture figée — l’écran change. Pour la vraie table : Campagnes → votre campagne → Entrer en session. Vous y voyez la carte de soirée, la présence, les notes et le combat.',
           ],
           bullets: [
             'Lien direct : /campaigns → ouvrir la campagne active.',
@@ -667,7 +667,7 @@ export const GUIDE_RULEBOOK_JOUEUR_ONLINE: GuideRulebook = {
           id: 'caption-session',
           title: 'Session & bandeau (pas de capture figée)',
           paragraphs: [
-            'Pas d’image figée ici. Pour la vraie UI joueur : Campagnes → votre campagne → Entrer en session (bandeau initiative, documents, table).',
+            'Pas d’image figée. Joueur : Campagnes → votre campagne → Ce soir, ou Rejoindre la table. Vous voyez la carte, qui est là, les documents et le bandeau d’initiative.',
           ],
           bullets: [
             'Lien : /campaigns → ouvrir la campagne.',

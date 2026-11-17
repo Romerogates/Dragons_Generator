@@ -48,6 +48,16 @@ describe('guide-topics', () => {
     expect(getGuideTopic('captures')).toBeUndefined();
   });
 
+  it('explique la carte de soirée aux MJ et aux joueurs', () => {
+    const table = getGuideTopic('table');
+    expect(table?.audience).toBe('all');
+    expect(table?.paragraphs.some((p) => p.toLowerCase().includes('carte'))).toBe(true);
+    const faq = getGuideTopic('faq');
+    expect(faq?.steps.some((s) => s.title.includes('carte pendant la session'))).toBe(true);
+    const donjons = getGuideTopic('donjons');
+    expect(donjons?.paragraphs.some((p) => p.includes('sans quitter') || p.includes('pendant la table'))).toBe(true);
+  });
+
   it('exposes deep links for demarrage', () => {
     const t = getGuideTopic('demarrage');
     expect(t?.links.some((l) => l.path === '/create')).toBe(true);

@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.474',
+    date: '2026-11-17',
+    title: 'Guide : la soirée plus claire',
+    player: [
+      'Le guide explique comment ouvrir une table, afficher la carte de soirée, et où générer un donjon sans quitter le jeu.',
+      'Une fiche FAQ répond aussi au compte Google (mot de passe, suppression) et à « où est la carte pendant la session ».',
+    ],
+    tech: [
+      '`guide-content` 1.6 (17 nov. 2026) : table audience all, FAQ `faq-carte-soiree` / `faq-google-mdp`, journal `news-carte-soiree`.',
+      'Livrets en ligne : aperçus Table / Ce soir mis à jour.',
+    ],
+  },
+  {
     version: '1.473',
     date: '2026-11-17',
     title: 'Donjon depuis la table',
