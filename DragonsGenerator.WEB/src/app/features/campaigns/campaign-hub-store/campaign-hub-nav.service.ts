@@ -96,7 +96,7 @@ export class CampaignHubNavService {
           queryParamsHandling: 'merge',
           replaceUrl: true,
         });
-        setTimeout(() => this.mapsAutoAction.set(null), 1500);
+        setTimeout(() => this.mapsAutoAction.set(null), 8000);
         return;
       case 'primary':
         this.setTab(intent.tab);
@@ -127,7 +127,9 @@ export class CampaignHubNavService {
   }
 
   setTab(t: CampaignHubTabTarget): void {
-    const owner = this.hooks?.campaign()?.isOwner === true;
+    const campaign = this.hooks?.campaign();
+    // Campagne pas encore chargée : ne pas traiter le MJ comme un joueur (sinon maps → pré-tirés).
+    const owner = campaign ? campaign.isOwner === true : true;
 
     if (t === 'activity') {
       if (this.isOnMapsView()) this.hooks?.flushMaps();
@@ -139,7 +141,7 @@ export class CampaignHubNavService {
 
     if (t === 'prep' || isCampaignPrepSub(t)) {
       const c = this.hooks?.campaign();
-      if (c && playerPrepTabBlocked(owner, c.data.pregenCharacters?.length ?? 0)) {
+      if (c && playerPrepTabBlocked(c.isOwner === true, c.data.pregenCharacters?.length ?? 0)) {
         this.tab.set('overview');
         this.syncTabQueryParams();
         return;

@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.473',
+    date: '2026-11-17',
+    title: 'Donjon depuis la table',
+    player: [
+      'Le MJ peut générer ou importer un donjon sans quitter la table de jeu.',
+      'La première carte créée devient celle de la soirée, visible pour tout le monde.',
+    ],
+    tech: [
+      'Hub : `setTab(maps)` si campagne pas encore chargée (plus de fallback pré-tirés).',
+      '`openPlayMapStudio` + `app-campaign-dungeon-maps` toujours sur l’onglet Donjon `/play`.',
+      'Nouveau donjon : `assignSessionMap` auto si `activeMapId` vide. `mapsAutoAction` 8 s.',
+    ],
+  },
+  {
     version: '1.472',
     date: '2026-11-17',
     title: 'Carte de la soirée',

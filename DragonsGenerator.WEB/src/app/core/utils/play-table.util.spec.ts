@@ -17,6 +17,7 @@ import {
   toggleTableReadyUserIds,
   initialHandoutOverlayId,
   nextPlannedSession,
+  mapIdToAssignAfterCreate,
   openFightHint,
   PLAY_SESSION_TABS,
   playerNeedsInitiative,
@@ -192,5 +193,12 @@ describe('play-table.util', () => {
     expect(initialHandoutOverlayId('h1', [{ id: 'h1' }, { id: 'h2' }])).toBe('h1');
     expect(initialHandoutOverlayId('h9', [{ id: 'h1' }])).toBeNull();
     expect(initialHandoutOverlayId(null, [{ id: 'h1' }])).toBeNull();
+  });
+
+  it('assigns a newly created map only when the session has none', () => {
+    expect(mapIdToAssignAfterCreate(0, [{ id: 'm1' }], null)).toBe('m1');
+    expect(mapIdToAssignAfterCreate(1, [{ id: 'm1' }, { id: 'm2' }], null)).toBe('m2');
+    expect(mapIdToAssignAfterCreate(1, [{ id: 'm1' }], null)).toBeNull();
+    expect(mapIdToAssignAfterCreate(0, [{ id: 'm1' }], 'keep')).toBeNull();
   });
 });

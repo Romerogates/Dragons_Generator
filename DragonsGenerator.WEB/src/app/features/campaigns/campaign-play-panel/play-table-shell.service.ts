@@ -13,6 +13,7 @@ import { ensureSessionPlayPads, sessionPlayPadsPreview } from '@core/utils/noteb
 import { buildPlayerRecapTemplate } from '@core/utils/player-recap-template.util';
 import {
   formatSceneTimerDisplay,
+  mapIdToAssignAfterCreate,
   remainingSceneTimerSec,
   type PlaySessionView,
 } from '@core/utils/play-table.util';
@@ -44,6 +45,7 @@ export class PlayTableShellService {
   readonly sessionView = signal<PlaySessionView>('resume');
   readonly secretPanelOpen = signal(false);
   readonly dungeonPickerOpen = signal(false);
+  readonly playMapsAutoAction = signal<'generate' | 'import' | null>(null);
   readonly advancedToolsOpen = signal(false);
   readonly zenMode = signal(
     readPlayZenMode(typeof localStorage === 'undefined' ? null : localStorage),
@@ -216,6 +218,11 @@ export class PlayTableShellService {
     this.sessionView.set('dungeon');
   }
 
+  openPlayMapStudio(action: 'generate' | 'import' | null = null): void {
+    this.sessionView.set('dungeon');
+    this.playMapsAutoAction.set(action);
+  }
+
   openSessionHistory(): void {
     this.sessionView.set('history');
   }
@@ -245,7 +252,14 @@ export class PlayTableShellService {
   }
 
   onDungeonMapsDataChange(patch: Partial<CampaignData>): void {
+    const prevCount = this.playStore.campaign()?.data.dungeonMaps?.length ?? 0;
     this.playStore.saveData(patch);
+    const assignId = mapIdToAssignAfterCreate(
+      prevCount,
+      this.playStore.campaign()?.data.dungeonMaps,
+      this.playStore.activeSession()?.activeMapId,
+    );
+    if (assignId) this.assignSessionMap(assignId);
   }
 
   onSessionTimelineChange(timeline: SessionTimelineItem[]): void {

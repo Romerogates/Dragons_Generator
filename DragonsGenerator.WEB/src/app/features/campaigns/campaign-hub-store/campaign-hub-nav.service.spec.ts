@@ -89,6 +89,17 @@ describe('CampaignHubNavService', () => {
     expect(svc.mapsAutoAction()).toBe('import');
   });
 
+  it('mapsAction avant chargement campagne reste sur Cartes, pas Pré-tirés', () => {
+    current = null;
+    svc.applyDeepLink('prep', null, null, null, null, 'generate', 'maps');
+    expect(svc.tab()).toBe('prep');
+    expect(svc.prepSub()).toBe('maps');
+    expect(svc.mapsAutoAction()).toBe('generate');
+    current = campaign();
+    svc.clampAfterLoad(true, 0);
+    expect(svc.prepSub()).toBe('maps');
+  });
+
   it('clampAfterLoad ramène le joueur hors des sous-onglets MJ', () => {
     svc.tab.set('prep');
     svc.prepSub.set('creatures');

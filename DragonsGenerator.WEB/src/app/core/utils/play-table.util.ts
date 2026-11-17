@@ -230,3 +230,15 @@ export function nextPlannedSession<T extends { status: string; scheduledAt: stri
     null
   );
 }
+
+/** Première carte créée pendant la table → à poser comme carte de soirée. */
+export function mapIdToAssignAfterCreate(
+  prevCount: number,
+  maps: { id: string }[] | null | undefined,
+  activeMapId: string | null | undefined,
+): string | null {
+  if (activeMapId) return null;
+  const list = maps ?? [];
+  if (list.length <= prevCount) return null;
+  return list[list.length - 1]?.id ?? null;
+}

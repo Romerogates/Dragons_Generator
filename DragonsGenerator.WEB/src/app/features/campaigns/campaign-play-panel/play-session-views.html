@@ -31,13 +31,31 @@
           <p class="mt-1 text-xs text-slate-400">
             Choisissez un donjon pour l’afficher à toute la table, avec les héros dessus.
           </p>
-          <button
-            type="button"
-            class="mt-2 min-h-11 px-3 rounded-xl text-[10px] font-black uppercase bg-sky-800 text-white hover:bg-sky-700"
-            (click)="shell.setSessionView('dungeon')"
-          >
-            Choisir une carte
-          </button>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="min-h-11 px-3 rounded-xl text-[10px] font-black uppercase bg-sky-800 text-white hover:bg-sky-700"
+              (click)="shell.openPlayMapStudio()"
+            >
+              Choisir une carte
+            </button>
+            <button
+              type="button"
+              class="min-h-11 px-3 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-200 hover:border-sky-500/60"
+              data-testid="evening-map-generate"
+              (click)="shell.openPlayMapStudio('generate')"
+            >
+              Générer
+            </button>
+            <button
+              type="button"
+              class="min-h-11 px-3 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-200 hover:border-sky-500/60"
+              data-testid="evening-map-import"
+              (click)="shell.openPlayMapStudio('import')"
+            >
+              Importer
+            </button>
+          </div>
         </div>
       } @else {
         <p class="text-[10px] text-slate-500" data-testid="evening-map-waiting">
@@ -163,41 +181,14 @@
                 }
               </div>
             </div>
-          } @else {
-            <app-play-empty-hint
-              tone="sky"
-              title="Aucun donjon dans cette campagne."
-              detail="Générez une carte ou importez un lien live depuis Mes Donjons."
-            >
-              <div class="flex flex-wrap justify-center gap-2 pt-1">
-                <a
-                  [routerLink]="['/campaigns', c.id]"
-                  [queryParams]="{ tab: 'prep', sub: 'maps', mapsAction: 'generate' }"
-                  class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
-                  data-testid="play-dungeon-generate"
-                >
-                  Générer
-                </a>
-                <a
-                  [routerLink]="['/campaigns', c.id]"
-                  [queryParams]="{ tab: 'prep', sub: 'maps', mapsAction: 'import' }"
-                  class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-300 hover:border-sky-500/60"
-                  data-testid="play-dungeon-import"
-                >
-                  Importer Mes Donjons
-                </a>
-              </div>
-            </app-play-empty-hint>
           }
         }
 
-        @if (combat.state.activeSessionMap(); as map) {
-          <app-campaign-dungeon-maps
-            [campaign]="c"
-            [focusMapId]="map.id"
-            (dataChange)="shell.onDungeonMapsDataChange($event)"
-          />
-        }
+        <app-campaign-dungeon-maps
+          [campaign]="c"
+          [focusMapId]="combat.state.activeSessionMap()?.id ?? null"
+          (dataChange)="shell.onDungeonMapsDataChange($event)"
+        />
       </section>
     }
 

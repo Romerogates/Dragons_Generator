@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  effect,
+  inject,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { CampaignSessionNotes } from '../campaign-session-notes/campaign-session-notes';
@@ -32,4 +40,18 @@ export class PlaySessionViews {
   readonly combat = inject(PlayCombatFacade);
   readonly shell = inject(PlayTableShellService);
   readonly playImport = inject(PlayImportService);
+  private readonly playMaps = viewChild(CampaignDungeonMaps);
+
+  constructor() {
+    effect(() => {
+      const action = this.shell.playMapsAutoAction();
+      const maps = this.playMaps();
+      if (!action || !maps) return;
+      untracked(() => {
+        if (action === 'generate') maps.workspace.gen.openGenerator();
+        else maps.workspace.openLibraryPicker();
+        this.shell.playMapsAutoAction.set(null);
+      });
+    });
+  }
 }
