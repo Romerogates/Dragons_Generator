@@ -47,6 +47,15 @@ public class HttpRequestMetricsTests
     }
 
     [Fact]
+    public void ParseLoadavg_reads_three_windows()
+    {
+        var (a, b, c) = HostResourceSampler.ParseLoadavg("0.52 0.61 0.70 1/234 99");
+        Assert.Equal(0.52, a);
+        Assert.Equal(0.61, b);
+        Assert.Equal(0.70, c);
+    }
+
+    [Fact]
     public void Host_snapshot_reports_process_memory()
     {
         var sampler = new HostResourceSampler();

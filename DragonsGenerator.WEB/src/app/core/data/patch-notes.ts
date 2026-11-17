@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.467',
+    date: '2026-11-17',
+    title: 'Admin : disque, charge et file support',
+    player: [],
+    tech: [
+      'Stats : `hostDisk*` + `load1/5/15`, `supportDesk` (à traiter / attente joueur / catégories / plus ancien).',
+      'Desk tickets : file « À traiter » par défaut, recherche, tri du plus ancien, pastille d’attente, tickets > 48 h en orange.',
+      '`GET /admin/support/tickets` : `lastFromStaff`. `SupportDeskStats` + `/proc/loadavg` / `DriveInfo("/")`.',
+    ],
+  },
+  {
     version: '1.466',
     date: '2026-11-17',
     title: 'Admin : observabilité serveur et IA',

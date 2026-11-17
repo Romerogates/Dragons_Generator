@@ -37,6 +37,8 @@ public class AdminStatsIntegrationTests
         Assert.True(json.GetProperty("totalTokens").GetInt64() >= 0);
         Assert.True(json.GetProperty("server").GetProperty("workingSetBytes").GetInt64() > 0);
         Assert.True(json.GetProperty("server").TryGetProperty("hostMemoryTotalBytes", out _));
+        Assert.True(json.GetProperty("server").TryGetProperty("hostDiskTotalBytes", out _));
+        Assert.True(json.GetProperty("supportDesk").GetProperty("waitingOnStaff").GetInt32() >= 0);
         Assert.True(json.GetProperty("http").GetProperty("requestsSinceStart").GetInt32() >= 1);
         Assert.True(json.GetProperty("generationsByKind").ValueKind is JsonValueKind.Array);
         Assert.True(json.GetProperty("generationsByProvider").ValueKind is JsonValueKind.Array);

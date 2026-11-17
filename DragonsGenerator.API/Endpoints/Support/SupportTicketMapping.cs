@@ -8,7 +8,8 @@ internal static class SupportTicketMapping
         SupportTicket t,
         string? email,
         int messageCount,
-        string? assignedStaffName = null) =>
+        string? assignedStaffName = null,
+        bool? lastFromStaff = null) =>
         new(
             t.Id,
             t.Subject,
@@ -27,6 +28,7 @@ internal static class SupportTicketMapping
             t.CampaignName,
             string.IsNullOrWhiteSpace(t.Category) ? "autre" : t.Category,
             t.AssignedStaffUserId,
-            assignedStaffName
+            assignedStaffName,
+            lastFromStaff
         );
 }

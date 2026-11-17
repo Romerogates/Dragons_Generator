@@ -81,7 +81,7 @@
       </div>
 
       <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Serveur</p>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
           <p class="text-[10px] uppercase tracking-widest text-slate-500">RAM VPS</p>
           @if (s.server.hostMemoryTotalBytes; as total) {
@@ -123,6 +123,36 @@
           }
         </div>
         <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Disque VPS</p>
+          @if (s.server.hostDiskTotalBytes; as total) {
+            <p class="text-2xl font-serif text-amber-400">{{ diskPercent(s) === null ? formatBytes(total) : diskPercent(s) + ' %' }}</p>
+            <p class="text-[10px] text-slate-500">
+              {{ formatBytes(diskUsed(s)) }} / {{ formatBytes(total) }}
+              @if (s.server.hostDiskAvailableBytes; as free) {
+                · {{ formatBytes(free) }} libres
+              }
+            </p>
+            @if (diskPercent(s); as pct) {
+              <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full" [class.bg-red-400]="pct >= 85" [class.bg-amber-500]="pct < 85" [style.width.%]="pct"></div>
+              </div>
+            }
+          } @else {
+            <p class="text-2xl font-serif text-amber-400">—</p>
+            <p class="text-[10px] text-slate-500">Indisponible hors Linux.</p>
+          }
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Charge (load)</p>
+          @if (s.server.load1 !== null && s.server.load1 !== undefined) {
+            <p class="text-2xl font-serif text-amber-400">{{ s.server.load1 }}</p>
+            <p class="text-[10px] text-slate-500">5 min {{ s.server.load5 }} · 15 min {{ s.server.load15 }} · {{ s.server.processorCount }} cœurs</p>
+          } @else {
+            <p class="text-2xl font-serif text-amber-400">—</p>
+            <p class="text-[10px] text-slate-500">Indisponible hors Linux.</p>
+          }
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
           <p class="text-[10px] uppercase tracking-widest text-slate-500">CPU process</p>
           <p class="text-2xl font-serif text-amber-400">{{ s.server.cpuProcessPercent }} %</p>
           <p class="text-[10px] text-slate-500">{{ s.server.processorCount }} cœurs · {{ s.server.threadCount }} threads</p>
@@ -135,6 +165,52 @@
           </p>
         </div>
       </div>
+
+      <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Support</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">À traiter</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.supportDesk.waitingOnStaff) }}</p>
+          <p class="text-[10px] text-slate-500">plus ancien {{ oldestWaitingLabel(s.supportDesk.oldestWaitingHours) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Attente joueur</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.supportDesk.waitingOnPlayer) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Ouverts / en cours</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.supportDesk.open) }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.supportDesk.inProgress }} en cours · {{ s.supportDesk.closed }} fermés</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Tickets</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.supportTickets) }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.supportMessages }} msgs</p>
+        </div>
+      </div>
+      @if (s.supportDesk.byCategory.length) {
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300 mb-6">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Par catégorie</p>
+          <table class="w-full text-left">
+            <thead class="text-[10px] uppercase tracking-widest text-slate-500">
+              <tr>
+                <th class="py-1">Catégorie</th>
+                <th class="py-1">Total</th>
+                <th class="py-1">À traiter</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of s.supportDesk.byCategory; track c.category) {
+                <tr class="border-t border-slate-800">
+                  <td class="py-2">{{ categoryLabel(c.category) }}</td>
+                  <td class="py-2">{{ c.total }}</td>
+                  <td class="py-2" [class.text-amber-300]="c.waitingOnStaff > 0">{{ c.waitingOnStaff }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
       <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Appels API</p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
@@ -528,8 +604,18 @@
   }
 
   @if (tab() === 'tickets') {
-    <p class="text-sm text-slate-300 mb-3">Clique un ticket pour ouvrir la conversation <span class="text-amber-300 font-semibold">plein écran</span>.</p>
+    <p class="text-sm text-slate-300 mb-3">Clique un ticket pour ouvrir la conversation <span class="text-amber-300 font-semibold">plein écran</span>. File triée du plus ancien, « À traiter » d’abord.</p>
     <div class="flex flex-wrap gap-2 mb-3">
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="ticketQueueFilter()"
+        (ngModelChange)="ticketQueueFilter.set($event)"
+        name="ticketQueueFilter"
+      >
+        <option value="staff">À traiter</option>
+        <option value="player">En attente du joueur</option>
+        <option value="all">Toute la file</option>
+      </select>
       <select
         class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
         [ngModel]="ticketStatusFilter()"
@@ -556,6 +642,14 @@
         <input type="checkbox" [ngModel]="ticketMineOnly()" (ngModelChange)="ticketMineOnly.set($event)" name="ticketMine" />
         À moi
       </label>
+      <input
+        type="search"
+        class="min-w-[12rem] flex-1 rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        placeholder="Recherche (sujet, mail, id)"
+        [ngModel]="ticketSearch()"
+        (ngModelChange)="ticketSearch.set($event)"
+        name="ticketSearch"
+      />
     </div>
     <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
       @for (t of filteredTickets(); track t.id) {
@@ -563,14 +657,20 @@
           type="button"
           class="text-left bg-[#1b2028] border-2 rounded-xl p-3 hover:border-amber-400"
           [class.border-amber-400]="selectedId() === t.id"
-          [class.border-slate-700]="selectedId() !== t.id"
+          [class.border-orange-500]="selectedId() !== t.id && isStale(t)"
+          [class.border-slate-700]="selectedId() !== t.id && !isStale(t)"
           (click)="openTicket(t.id)"
         >
           <div class="flex justify-between gap-2">
             <span class="font-bold text-amber-300 text-sm">{{ t.subject }}</span>
-            <span [class]="statusBadgeClass(t.status)">{{ statusLabel(t.status) }}</span>
+            <span class="flex flex-wrap gap-1 justify-end">
+              <span [class]="statusBadgeClass(t.status)">{{ statusLabel(t.status) }}</span>
+            </span>
           </div>
-          <p class="text-[11px] text-slate-300 mt-1">{{ categoryLabel(t.category) }} · {{ t.userEmail }} · {{ t.createdAt | date: 'short' }} · {{ t.messageCount || 0 }} msg</p>
+          <p class="text-[11px] mt-1" [class.text-amber-300]="waitingLabel(t) === 'À traiter'" [class.text-slate-400]="waitingLabel(t) !== 'À traiter'">
+            {{ waitingLabel(t) }} · {{ formatTicketAge(t.updatedAt || t.createdAt) }}
+          </p>
+          <p class="text-[11px] text-slate-300 mt-1">{{ categoryLabel(t.category) }} · {{ t.userEmail }} · {{ t.messageCount || 0 }} msg</p>
           <span class="mt-2 inline-block text-[10px] font-bold uppercase tracking-wide text-sky-300">Ouvrir la conversation</span>
           <button
             type="button"
@@ -581,7 +681,7 @@
           </button>
         </button>
       } @empty {
-        <p class="text-xs text-slate-500">Aucun ticket.</p>
+        <p class="text-xs text-slate-500">Aucun ticket dans cette file — élargis les filtres ou cherche autrement.</p>
       }
     </div>
     @if (diagnostic()) {

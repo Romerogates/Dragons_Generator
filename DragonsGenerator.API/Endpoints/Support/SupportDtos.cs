@@ -18,7 +18,8 @@ public record TicketDto(
     string? CampaignName = null,
     string Category = "autre",
     Guid? AssignedStaffUserId = null,
-    string? AssignedStaffName = null
+    string? AssignedStaffName = null,
+    bool? LastFromStaff = null
 );
 
 public record TicketMessageDto(

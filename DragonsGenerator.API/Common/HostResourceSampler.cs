@@ -19,7 +19,12 @@ public sealed record HostResourceSnapshot(
     long? ContainerMemoryBytes,
     long? ContainerMemoryLimitBytes,
     long? HostMemoryTotalBytes,
-    long? HostMemoryAvailableBytes);
+    long? HostMemoryAvailableBytes,
+    long? HostDiskTotalBytes,
+    long? HostDiskAvailableBytes,
+    double? Load1,
+    double? Load5,
+    double? Load15);
 
 public sealed class HostResourceSampler
 {
@@ -36,6 +41,8 @@ public sealed class HostResourceSampler
         var gc = GC.GetGCMemoryInfo();
         var (cgroupUsed, cgroupLimit) = ReadCgroupMemory();
         var (hostTotal, hostAvailable) = ReadHostMemory();
+        var (diskTotal, diskFree) = ReadHostDisk();
+        var (load1, load5, load15) = ReadLoadavg();
         var available = gc.TotalAvailableMemoryBytes > 0 ? gc.TotalAvailableMemoryBytes : (long?)null;
 
         return new HostResourceSnapshot(
@@ -54,7 +61,12 @@ public sealed class HostResourceSampler
             cgroupUsed,
             cgroupLimit,
             hostTotal,
-            hostAvailable);
+            hostAvailable,
+            diskTotal,
+            diskFree,
+            load1,
+            load5,
+            load15);
     }
 
     private double SampleCpu(Process process)
@@ -75,6 +87,72 @@ public sealed class HostResourceSampler
 
             return Math.Round(_cpuPercent, 1);
         }
+    }
+
+    internal static (long? Total, long? Available) ReadHostDisk()
+    {
+        try
+        {
+            if (OperatingSystem.IsLinux())
+            {
+                var root = new DriveInfo("/");
+                if (root.IsReady && root.TotalSize > 0)
+                    return (root.TotalSize, root.AvailableFreeSpace);
+            }
+
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (!drive.IsReady || drive.TotalSize <= 0) continue;
+                return (drive.TotalSize, drive.AvailableFreeSpace);
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+        catch (ArgumentException)
+        {
+        }
+
+        return (null, null);
+    }
+
+    internal static (double? Load1, double? Load5, double? Load15) ReadLoadavg()
+    {
+        if (!File.Exists("/proc/loadavg")) return (null, null, null);
+        try
+        {
+            return ParseLoadavg(File.ReadAllText("/proc/loadavg"));
+        }
+        catch (IOException)
+        {
+            return (null, null, null);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return (null, null, null);
+        }
+    }
+
+    internal static (double? Load1, double? Load5, double? Load15) ParseLoadavg(string text)
+    {
+        var parts = text.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 3) return (null, null, null);
+        if (!TryLoad(parts[0], out var a) || !TryLoad(parts[1], out var b) || !TryLoad(parts[2], out var c))
+            return (null, null, null);
+        return (a, b, c);
+    }
+
+    private static bool TryLoad(string raw, out double value)
+    {
+        value = 0;
+        if (!double.TryParse(raw, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var n)
+            || n < 0)
+            return false;
+        value = Math.Round(n, 2);
+        return true;
     }
 
     internal static (long? Total, long? Available) ReadHostMemory()

@@ -34,14 +34,17 @@ public class AdminListTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<
                 .ToDictionary(x => x.Key, x => x.Count);
 
         var staffNames = await SupportInboxHelper.StaffNamesAsync(db, tickets, ct);
+        var lastFromStaff = await SupportInboxHelper.LastFromStaffByTicketAsync(db, ids, ct);
         await Send.OkAsync(
             tickets
-                .OrderByDescending(t => t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt)
+                .OrderBy(t => SupportTicketRules.WaitingOnStaff(t.Status, lastFromStaff.GetValueOrDefault(t.Id)) ? 0 : 1)
+                .ThenBy(t => t.UpdatedAt == default ? t.CreatedAt : t.UpdatedAt)
                 .Select(t => SupportTicketMapping.ToDto(
                     t,
                     emailById.GetValueOrDefault(t.UserId),
                     counts.GetValueOrDefault(t.Id),
-                    t.AssignedStaffUserId is { } sid ? staffNames.GetValueOrDefault(sid) : null))
+                    t.AssignedStaffUserId is { } sid ? staffNames.GetValueOrDefault(sid) : null,
+                    lastFromStaff.GetValueOrDefault(t.Id)))
                 .ToList(),
             ct
         );

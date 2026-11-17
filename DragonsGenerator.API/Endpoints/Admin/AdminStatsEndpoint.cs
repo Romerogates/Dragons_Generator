@@ -1,5 +1,7 @@
 using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Endpoints.Support;
 using DragonsGenerator.API.Persistence;
+using DragonsGenerator.API.Services;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +28,12 @@ public record AdminServerDto(
     long? ContainerMemoryBytes,
     long? ContainerMemoryLimitBytes,
     long? HostMemoryTotalBytes,
-    long? HostMemoryAvailableBytes);
+    long? HostMemoryAvailableBytes,
+    long? HostDiskTotalBytes,
+    long? HostDiskAvailableBytes,
+    double? Load1,
+    double? Load5,
+    double? Load15);
 
 public record AdminHttpPathDto(string Path, int Count, int Errors, int AvgDurationMs);
 
@@ -40,6 +47,17 @@ public record AdminHttpDto(
     int InFlight,
     List<AdminHttpPathDto> TopPaths,
     List<AdminHttpRecentDto> Recent);
+
+public record AdminSupportCategoryDto(string Category, int Total, int WaitingOnStaff);
+
+public record AdminSupportDeskDto(
+    int Open,
+    int InProgress,
+    int Closed,
+    int WaitingOnStaff,
+    int WaitingOnPlayer,
+    int? OldestWaitingHours,
+    List<AdminSupportCategoryDto> ByCategory);
 
 public record AdminStatsDto(
     int Users,
@@ -71,7 +89,8 @@ public record AdminStatsDto(
     List<AdminStatsKindDto> GenerationsByKind,
     List<AdminStatsProviderDto> GenerationsByProvider,
     AdminServerDto Server,
-    AdminHttpDto Http
+    AdminHttpDto Http,
+    AdminSupportDeskDto SupportDesk
 );
 
 public class AdminStatsEndpoint(
@@ -111,6 +130,18 @@ public class AdminStatsEndpoint(
             .OrderByDescending(g => g.Count())
             .Select(g => new AdminStatsProviderDto(g.Key, g.Count(), g.Count(x => x.Ok), g.Sum(x => (long)x.TotalTokens)))
             .ToList();
+
+        var ticketRows = await db.SupportTickets.AsNoTracking()
+            .Select(t => new { t.Id, t.Status, t.Category, t.CreatedAt, t.UpdatedAt })
+            .ToListAsync(ct);
+        var tickets = ticketRows
+            .Select(t => new SupportDeskTicketRow(t.Id, t.Status, t.Category, t.CreatedAt, t.UpdatedAt))
+            .ToList();
+        var lastFromStaff = await SupportInboxHelper.LastFromStaffByTicketAsync(
+            db,
+            tickets.Select(t => t.Id).ToList(),
+            ct);
+        var desk = SupportDeskStats.From(tickets, lastFromStaff, now);
 
         var snap = host.Capture();
         var http = httpMetrics.Snapshot();
@@ -162,7 +193,12 @@ public class AdminStatsEndpoint(
                     snap.ContainerMemoryBytes,
                     snap.ContainerMemoryLimitBytes,
                     snap.HostMemoryTotalBytes,
-                    snap.HostMemoryAvailableBytes),
+                    snap.HostMemoryAvailableBytes,
+                    snap.HostDiskTotalBytes,
+                    snap.HostDiskAvailableBytes,
+                    snap.Load1,
+                    snap.Load5,
+                    snap.Load15),
                 new AdminHttpDto(
                     http.RequestsSinceStart,
                     http.Status2xx,
@@ -170,7 +206,15 @@ public class AdminStatsEndpoint(
                     http.Status5xx,
                     http.InFlight,
                     http.TopPaths.Select(p => new AdminHttpPathDto(p.Path, p.Count, p.Errors, p.AvgDurationMs)).ToList(),
-                    http.Recent.Select(r => new AdminHttpRecentDto(r.Method, r.Path, r.Status, r.DurationMs, r.At)).ToList())
+                    http.Recent.Select(r => new AdminHttpRecentDto(r.Method, r.Path, r.Status, r.DurationMs, r.At)).ToList()),
+                new AdminSupportDeskDto(
+                    desk.Open,
+                    desk.InProgress,
+                    desk.Closed,
+                    desk.WaitingOnStaff,
+                    desk.WaitingOnPlayer,
+                    desk.OldestWaitingHours,
+                    desk.ByCategory.Select(c => new AdminSupportCategoryDto(c.Category, c.Total, c.WaitingOnStaff)).ToList())
             ),
             ct);
     }

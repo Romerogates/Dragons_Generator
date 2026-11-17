@@ -341,6 +341,10 @@ public class FriendSupportIntegrationTests
         using var adminReq = ApiTestAuth.Authed(HttpMethod.Get, "/admin/support/tickets", adminToken);
         var adminResponse = await _client.SendAsync(adminReq);
         adminResponse.EnsureSuccessStatusCode();
+        var listed = await adminResponse.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(JsonValueKind.Array, listed.ValueKind);
+        if (listed.GetArrayLength() > 0)
+            Assert.True(listed[0].TryGetProperty("lastFromStaff", out _));
     }
 
     [Fact]

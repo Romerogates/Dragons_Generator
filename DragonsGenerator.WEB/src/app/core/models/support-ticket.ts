@@ -12,6 +12,7 @@ export interface SupportTicket {
   category?: string;
   assignedStaffUserId?: string;
   assignedStaffName?: string;
+  lastFromStaff?: boolean | null;
   createdAt: string;
   updatedAt?: string;
   userEmail?: string;

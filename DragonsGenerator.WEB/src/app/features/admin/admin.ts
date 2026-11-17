@@ -19,7 +19,14 @@ import { NotificationService } from '@core/services/notification.service';
 import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
 import { SUPPORT_CATEGORIES, supportCategoryLabel } from '@core/utils/support-category.util';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
-import { supportStatusBadgeClass, supportStatusLabel } from '@core/utils/support-status.util';
+import { supportStatusBadgeClass, supportStatusLabel, supportWaitingLabel } from '@core/utils/support-status.util';
+import {
+  filterAdminTickets,
+  formatTicketAge,
+  ticketIsStale,
+  ticketQueue,
+  type TicketQueueFilter,
+} from './admin-tickets.filter';
 import {
   SupportConversation,
   SupportReplyPayload,
@@ -136,6 +143,11 @@ interface AdminServer {
   containerMemoryLimitBytes: number | null;
   hostMemoryTotalBytes: number | null;
   hostMemoryAvailableBytes: number | null;
+  hostDiskTotalBytes: number | null;
+  hostDiskAvailableBytes: number | null;
+  load1: number | null;
+  load5: number | null;
+  load15: number | null;
 }
 
 interface AdminHttpPath {
@@ -194,6 +206,23 @@ interface AdminStats {
   generationsByProvider: AdminStatsProvider[];
   server: AdminServer;
   http: AdminHttp;
+  supportDesk: AdminSupportDesk;
+}
+
+interface AdminSupportCategory {
+  category: string;
+  total: number;
+  waitingOnStaff: number;
+}
+
+interface AdminSupportDesk {
+  open: number;
+  inProgress: number;
+  closed: number;
+  waitingOnStaff: number;
+  waitingOnPlayer: number;
+  oldestWaitingHours: number | null;
+  byCategory: AdminSupportCategory[];
 }
 
 type AdminTab =
@@ -238,8 +267,11 @@ export class AdminPage implements OnInit, OnDestroy {
   readonly formatBytes = formatAdminBytes;
   readonly formatDuration = formatAdminDuration;
   readonly formatCount = formatAdminCount;
+  readonly formatTicketAge = formatTicketAge;
   readonly ticketStatusFilter = signal<'all' | 'open' | 'in_progress' | 'closed'>('all');
   readonly ticketCategoryFilter = signal<'all' | string>('all');
+  readonly ticketQueueFilter = signal<TicketQueueFilter>('staff');
+  readonly ticketSearch = signal('');
   readonly ticketMineOnly = signal(false);
   readonly categories = SUPPORT_CATEGORIES;
 
@@ -254,18 +286,16 @@ export class AdminPage implements OnInit, OnDestroy {
   readonly inboxMails = signal<InboxMail[]>([]);
   readonly thread = signal<TicketThread | null>(null);
   readonly selectedId = computed(() => this.thread()?.ticket?.id ?? null);
-  readonly filteredTickets = computed(() => {
-    const status = this.ticketStatusFilter();
-    const category = this.ticketCategoryFilter();
-    const mine = this.ticketMineOnly();
-    const mineId = this.auth.user()?.id;
-    return this.tickets().filter((t) => {
-      if (status !== 'all' && t.status !== status) return false;
-      if (category !== 'all' && (t.category ?? 'autre') !== category) return false;
-      if (mine && t.assignedStaffUserId !== mineId) return false;
-      return true;
-    });
-  });
+  readonly filteredTickets = computed(() =>
+    filterAdminTickets(this.tickets(), {
+      status: this.ticketStatusFilter(),
+      category: this.ticketCategoryFilter(),
+      queue: this.ticketQueueFilter(),
+      mine: this.ticketMineOnly(),
+      mineId: this.auth.user()?.id,
+      search: this.ticketSearch(),
+    }),
+  );
   readonly diagnostic = signal<string>('');
   readonly message = signal<string | null>(null);
   readonly error = signal<string | null>(null);
@@ -430,6 +460,30 @@ export class AdminPage implements OnInit, OnDestroy {
 
   vpsRamPercent(s: AdminStats): number | null {
     return adminRamPercent(this.vpsRamUsed(s), s.server.hostMemoryTotalBytes);
+  }
+
+  diskUsed(s: AdminStats): number | null {
+    const total = s.server.hostDiskTotalBytes;
+    const free = s.server.hostDiskAvailableBytes;
+    if (total == null || free == null) return null;
+    return Math.max(0, total - free);
+  }
+
+  diskPercent(s: AdminStats): number | null {
+    return adminRamPercent(this.diskUsed(s), s.server.hostDiskTotalBytes);
+  }
+
+  waitingLabel(ticket: AdminTicket): string {
+    return supportWaitingLabel(ticketQueue(ticket), 'staff');
+  }
+
+  isStale(ticket: AdminTicket): boolean {
+    return ticketIsStale(ticket);
+  }
+
+  oldestWaitingLabel(hours: number | null): string {
+    if (hours == null) return '—';
+    return formatAdminDuration(hours * 3600);
   }
 
   statusTone(status: number): string {
