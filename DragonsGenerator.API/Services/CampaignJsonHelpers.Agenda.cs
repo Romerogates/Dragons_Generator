@@ -5,6 +5,38 @@ namespace DragonsGenerator.API.Services;
 
 public static partial class CampaignJsonHelpers
 {
+    /// <summary>Titre de la session live (`activeSessionId`), ou null.</summary>
+    public static string? ActiveSessionTitleFromJson(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("activeSessionId", out var idEl))
+                return null;
+            var activeId = idEl.GetString();
+            if (string.IsNullOrWhiteSpace(activeId))
+                return null;
+            if (!root.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
+                return "Table ouverte";
+
+            foreach (var session in sessions.EnumerateArray())
+            {
+                var sid = session.TryGetProperty("id", out var sidEl) ? sidEl.GetString() : null;
+                if (!string.Equals(sid, activeId, StringComparison.Ordinal))
+                    continue;
+                var title = session.TryGetProperty("title", out var t) ? t.GetString() : null;
+                return string.IsNullOrWhiteSpace(title) ? "Table ouverte" : title;
+            }
+
+            return "Table ouverte";
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static DateTimeOffset? NextSessionFromJson(string json)
     {
         try

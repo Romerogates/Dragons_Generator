@@ -229,6 +229,16 @@ export class PlayTableActionsService {
     this.shell.setFeedback('ok', 'Message épinglé en haut du fil.');
   }
 
+  announceSceneBeat(body: string): void {
+    if (!this.state.isDm()) return;
+    const session = this.state.activeSession();
+    if (!session) return;
+    const patch = applyTablePin(session, body);
+    if (!patch.tablePin) return;
+    this.playStore.patchSession(patch, { immediate: true });
+    this.shell.setFeedback('ok', 'La table voit l’événement.');
+  }
+
   clearTablePin(): void {
     if (!this.state.isDm()) return;
     const session = this.state.activeSession();

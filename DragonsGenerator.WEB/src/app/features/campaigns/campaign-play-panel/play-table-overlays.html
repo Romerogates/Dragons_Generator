@@ -12,7 +12,11 @@
         {{ nextSession.title }} · {{ combat.state.formatSessionDate(nextSession.scheduledAt) }}
       </p>
       <p class="text-xs text-slate-500 mt-2 max-w-md">
-        Entrez en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
+        @if (combat.state.isDm()) {
+          Ouvrez la table pour que tout le monde voie la scène.
+        } @else {
+          Sablier : le MJ n’a pas encore ouvert la table. Restez dans le coin, ça arrive.
+        }
       </p>
       @if (combat.state.isDm()) {
         <a
@@ -59,7 +63,7 @@
       {{
         combat.state.isDm()
           ? 'Créez une session dans le hub, puis « Entrer en session » pour ouvrir la table.'
-          : 'Le MJ doit ouvrir une session — en attendant, proposez votre héros depuis le hub.'
+          : 'Sablier : le MJ doit ouvrir une session. En attendant, proposez votre héros depuis le hub.'
       }}
     </p>
     @if (combat.state.isDm()) {

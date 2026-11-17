@@ -12,8 +12,11 @@ function base(over: Partial<HubNextActionInput> = {}): HubNextActionInput {
 }
 
 describe('hub-next-action.util', () => {
-  it('skips owners', () => {
-    expect(resolveHubNextAction(base({ isOwner: true }))).toBeNull();
+  it('sends the GM to the open table', () => {
+    expect(resolveHubNextAction(base({ isOwner: true, hasActiveSession: true }))?.cta).toBe('play');
+    expect(resolveHubNextAction(base({ isOwner: true, hasPlannedSession: true }))?.kind).toBe(
+      'wait_session',
+    );
   });
 
   it('guides player propose → wait → play', () => {

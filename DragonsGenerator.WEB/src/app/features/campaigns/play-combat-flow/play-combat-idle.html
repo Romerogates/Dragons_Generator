@@ -136,8 +136,18 @@
           }
         </div>
 } @else {
-        <div class="space-y-3">
-          <p class="text-sm text-slate-500 italic">En attente que le MJ lance un combat…</p>
+        <div class="space-y-3 rounded-2xl border border-amber-900/30 bg-amber-950/15 p-5 text-center">
+          <div class="flex justify-center gap-3" aria-hidden="true">
+            @for (p of h.state.approvedPlayers().slice(0, 4); track p.id) {
+              <app-play-pawn [pawnId]="p.id" side="ally" pose="wait" />
+            } @empty {
+              <app-play-pawn pawnId="table" side="ally" pose="wait" />
+            }
+          </div>
+          <p class="flex items-center justify-center gap-2 text-sm text-amber-100 font-serif">
+            <iconify-icon icon="fluent-emoji:hourglass-not-done" class="text-xl"></iconify-icon>
+            Le MJ pose le décor…
+          </p>
           @if (!h.state.isDm()) {
             <p class="text-xs text-slate-600">
               En attendant, ouvrez vos

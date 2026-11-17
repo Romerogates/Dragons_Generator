@@ -13,7 +13,8 @@ public record HomeSummaryDto(
     int PendingCampaignInvites,
     int CampaignCount,
     HomeCampaignPreviewDto? RecentCampaign,
-    HomeSessionPreviewDto? NextSession);
+    HomeSessionPreviewDto? NextSession,
+    HomeLiveTableDto? LiveTable);
 
 public record HomeCampaignPreviewDto(Guid Id, string Title, string Role, DateTimeOffset UpdatedAt);
 
@@ -22,6 +23,12 @@ public record HomeSessionPreviewDto(
     string CampaignTitle,
     string SessionTitle,
     DateTimeOffset ScheduledAt);
+
+public record HomeLiveTableDto(
+    Guid CampaignId,
+    string CampaignTitle,
+    string SessionTitle,
+    string Role);
 
 public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpoint> logger)
     : EndpointWithoutRequest<HomeSummaryDto>
@@ -100,8 +107,15 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
             .ToList();
 
         HomeSessionPreviewDto? nextSession = null;
+        HomeLiveTableDto? liveTable = null;
         foreach (var c in allCampaigns)
         {
+            if (liveTable is null)
+            {
+                var liveTitle = CampaignJsonHelpers.ActiveSessionTitleFromJson(c.JsonData);
+                if (liveTitle is not null)
+                    liveTable = new HomeLiveTableDto(c.Id, c.Title, liveTitle, c.Role);
+            }
             var when = CampaignJsonHelpers.NextSessionFromJson(c.JsonData);
             if (when is null) continue;
             if (nextSession is null || when < nextSession.ScheduledAt)
@@ -162,7 +176,8 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
             pendingInvites,
             allCampaigns.Count,
             recentDto,
-            nextSession);
+            nextSession,
+            liveTable);
     }
 
     private static string SessionTitleFromJson(string json, DateTimeOffset when)

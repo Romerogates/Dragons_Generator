@@ -791,6 +791,49 @@ iconify-icon {
   }
 }
 
+.dg-pawn {
+  width: 3rem;
+  height: 3rem;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.dg-pawn-idle {
+  animation: dg-pawn-bob 1.4s ease-in-out infinite;
+}
+
+.dg-pawn-wait {
+  animation: dg-pawn-bob 2.2s ease-in-out infinite;
+  opacity: 0.85;
+  filter: grayscale(0.15);
+}
+
+.dg-pawn-slash {
+  animation: dg-pawn-slash 0.45s ease-in-out;
+}
+
+@keyframes dg-pawn-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes dg-pawn-slash {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  35% {
+    transform: translateX(8px) rotate(10deg);
+  }
+}
+
 @keyframes dg-hint-pulse {
   0%,
   40% {

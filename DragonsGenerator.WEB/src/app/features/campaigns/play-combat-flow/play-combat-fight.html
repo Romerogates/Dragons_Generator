@@ -174,13 +174,20 @@
                 (click)="h.ctrl.selectTarget(cb.id)"
               >
                 <div class="flex justify-between gap-2">
-                  <div class="min-w-0">
+                  <div class="min-w-0 flex items-center gap-2">
+                    <app-play-pawn
+                      [pawnId]="cb.id"
+                      side="ally"
+                      [pose]="h.state.isCurrentTurn(cb.id) ? 'attack' : 'idle'"
+                    />
+                    <span>
                     <span class="font-serif text-sky-100" [class.line-through]="h.state.isCombatantDefeated(cb)">{{
                       cb.name || 'Sans nom'
                     }}</span>
                     @if (h.state.playerDisplayName(cb); as playerName) {
                       <span class="ml-1.5 text-[10px] text-slate-500">· {{ playerName }}</span>
                     }
+                    </span>
                   </div>
                   <span class="text-[9px] uppercase text-slate-500 shrink-0">{{ h.state.combatantKindLabels[cb.kind] }}</span>
                 </div>
@@ -449,9 +456,14 @@
                 (click)="h.ctrl.selectTarget(cb.id)"
               >
                 <div class="flex justify-between gap-2">
-                  <span class="font-serif text-red-100" [class.line-through]="h.state.isCombatantDefeated(cb)">{{
-                    cb.name || 'Sans nom'
-                  }}</span>
+                  <span class="font-serif text-red-100 flex items-center gap-2" [class.line-through]="h.state.isCombatantDefeated(cb)">
+                    <app-play-pawn
+                      [pawnId]="cb.id"
+                      side="enemy"
+                      [pose]="h.state.isCurrentTurn(cb.id) ? 'attack' : 'idle'"
+                    />
+                    {{ cb.name || 'Sans nom' }}
+                  </span>
                 </div>
                 <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-300">
                   <span>PV {{ cb.currentHp ?? '—' }}/{{ cb.maxHp ?? '—' }}</span>

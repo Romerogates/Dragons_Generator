@@ -37,7 +37,36 @@ export interface HubNextActionInput {
 }
 
 export function resolveHubNextAction(input: HubNextActionInput): HubNextAction | null {
-  if (input.isOwner) return null;
+  if (input.isOwner) {
+    if (input.hasActiveSession) {
+      return {
+        kind: 'enter_play',
+        title: 'La table est ouverte',
+        detail: 'Rejoignez la scène — les joueurs vous y attendent.',
+        ctaLabel: 'Ouvrir la table',
+        cta: 'play',
+        tone: 'emerald',
+      };
+    }
+    if (input.hasPlannedSession) {
+      return {
+        kind: 'wait_session',
+        title: 'Ouvrez la table',
+        detail: 'La soirée est planifiée. Entrez en session pour que tout le monde voie la scène.',
+        ctaLabel: 'Voir les sessions',
+        cta: 'sessions',
+        tone: 'amber',
+      };
+    }
+    return {
+      kind: 'idle',
+      title: 'Préparez la soirée',
+      detail: 'Planifiez une session, puis ouvrez la table quand le groupe est là.',
+      ctaLabel: 'Sessions',
+      cta: 'sessions',
+      tone: 'slate',
+    };
+  }
   if (input.isSpectator) {
     return {
       kind: 'spectator',
@@ -80,7 +109,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
     return {
       kind: 'enter_play',
       title: 'Étape 3 — La table est ouverte',
-      detail: 'Rejoignez /play, marquez-vous prêt, puis suivez le bandeau « prochaine action ».',
+      detail: 'Rejoignez la scène, marquez-vous prêt, puis suivez le bandeau.',
       ctaLabel: 'Entrer à la table',
       cta: 'play',
       tone: 'emerald',

@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.469',
+    date: '2026-11-17',
+    title: 'La table en ligne devient une scène',
+    player: [
+      'En session en ligne, un bandeau dit ce qu’il faut faire, avec un sablier quand vous attendez.',
+      'Un fil « Ce qui se passe » raconte la scène, les coups et les messages — le MJ peut annoncer un événement.',
+      'Petits bonhommes pixel sur la table (pack Kenney, libre). L’accueil propose « Rejoindre la table » si une soirée est ouverte.',
+    ],
+    tech: [
+      'Table online : `stageEvents`, sablier `waitingOnTable`, `announceSceneBeat` via `tablePin`.',
+      'Sprites CC0 Kenney Tiny Dungeon `public/sprites/kenney-tiny-dungeon/`. `GET /me/home-summary` + `liveTable`.',
+      'Hub : prochaine action aussi pour le MJ. Copy joueur sans jargon `/play`.',
+    ],
+  },
+  {
     version: '1.468',
     date: '2026-11-17',
     title: 'Rechargement franc après une mise à jour',

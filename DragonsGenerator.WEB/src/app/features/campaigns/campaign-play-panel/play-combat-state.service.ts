@@ -29,6 +29,7 @@ import {
   resolvePlayNextAction,
   type PlayNextAction,
 } from '@core/utils/play-next-action.util';
+import { buildPlayStageEvents, isWaitingPlayKind } from '@core/utils/play-event-feed.util';
 import {
   normalizeSessionMode,
   sessionModeHint,
@@ -243,6 +244,19 @@ export class PlayCombatState {
   readonly combatLogLines = computed(() =>
     [...(this.activeSession()?.combatLog ?? [])].slice().reverse().slice(0, 12),
   );
+
+  readonly isOnlineStage = computed(() => this.sessionMode() === 'online');
+
+  readonly waitingOnTable = computed(() => isWaitingPlayKind(this.nextAction()?.kind));
+
+  readonly stageEvents = computed(() => {
+    const session = this.activeSession();
+    return buildPlayStageEvents({
+      pin: session?.tablePin,
+      combatLog: session?.combatLog,
+      chat: session?.tableChat,
+    });
+  });
 
   readonly currentTurn = computed(() => {
     const combat = this.activeCombat();

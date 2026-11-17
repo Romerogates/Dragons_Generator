@@ -51,6 +51,7 @@ export class Home implements OnInit {
       s.pendingFriendRequests > 0 ||
       s.pendingCampaignInvites > 0 ||
       !!s.nextSession ||
+      !!s.liveTable ||
       this.guideNewsCount() > 0
     );
   });

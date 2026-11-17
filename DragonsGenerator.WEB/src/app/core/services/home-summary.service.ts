@@ -18,6 +18,13 @@ export interface HomeSessionPreview {
   scheduledAt: string;
 }
 
+export interface HomeLiveTable {
+  campaignId: string;
+  campaignTitle: string;
+  sessionTitle: string;
+  role: string;
+}
+
 export interface HomeSummary {
   savedCharactersCount: number;
   unreadChatCount: number;
@@ -26,6 +33,7 @@ export interface HomeSummary {
   campaignCount: number;
   recentCampaign: HomeCampaignPreview | null;
   nextSession: HomeSessionPreview | null;
+  liveTable?: HomeLiveTable | null;
 }
 
 @Injectable({ providedIn: 'root' })

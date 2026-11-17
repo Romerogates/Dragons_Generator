@@ -214,13 +214,13 @@ export function hubNextActionForPlayer(
   planned: CampaignSession | null,
   pendingRsvp: { eventId: string; title: string; whenLabel: string } | null,
 ): HubNextAction | null {
-  if (!campaign || campaign.isOwner) return null;
+  if (!campaign) return null;
   let heroStatus: 'none' | 'pending' | 'rejected' | 'approved' = 'none';
   if (mine?.proposalStatus === 'approved' && mine.approvedCharacterId) heroStatus = 'approved';
   else if (mine?.proposalStatus === 'pending') heroStatus = 'pending';
   else if (mine?.proposalStatus === 'rejected') heroStatus = 'rejected';
   return resolveHubNextAction({
-    isOwner: false,
+    isOwner: !!campaign.isOwner,
     isSpectator: campaign.role === 'spectator',
     heroStatus,
     hasActiveSession: !!campaign.data.activeSessionId,

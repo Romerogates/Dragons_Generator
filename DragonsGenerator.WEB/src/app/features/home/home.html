@@ -228,7 +228,27 @@
     </button>
   </section>
 
-  <!-- Soft personal pulse (not dashboard cards) -->
+  @if (isLoggedIn() && summary(); as s) {
+    @if (s.liveTable; as live) {
+      <section class="relative border-y border-emerald-900/40 bg-emerald-950/20" data-testid="home-tonight">
+        <div class="max-w-3xl mx-auto px-4 py-8 flex flex-wrap items-center justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-1">Ce soir</p>
+            <h2 class="text-2xl font-serif text-emerald-50">{{ live.campaignTitle }}</h2>
+            <p class="text-sm text-emerald-100/80 mt-1">Table ouverte · {{ live.sessionTitle }}</p>
+          </div>
+          <a
+            [routerLink]="['/campaigns', live.campaignId, 'play']"
+            class="shrink-0 min-h-12 inline-flex items-center px-5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
+          >
+            {{ live.role === 'dm' ? 'Ouvrir la table' : 'Rejoindre la table' }}
+          </a>
+        </div>
+      </section>
+    }
+  }
+
+  <!-- Soft personal pulse -->
   @if (isLoggedIn() && summaryLoading()) {
     <section class="relative border-y border-slate-800/60 bg-[#12161c]/90">
       <div class="max-w-3xl mx-auto px-4 py-5 text-center text-xs text-slate-600 tracking-widest uppercase">

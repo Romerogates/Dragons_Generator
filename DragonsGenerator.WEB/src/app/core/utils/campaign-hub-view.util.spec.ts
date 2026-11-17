@@ -255,8 +255,8 @@ describe('campaign-hub-view.util', () => {
         undefined,
         null,
         null,
-      ),
-    ).toBeNull();
+      )?.kind,
+    ).toBe('idle');
     const action = hubNextActionForPlayer(
       campaign(),
       member({ proposalStatus: 'rejected' }),

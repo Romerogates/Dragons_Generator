@@ -157,8 +157,8 @@ function resolvePlayerNextAction(input: PlayNextActionInput): PlayNextAction {
 
   return {
     kind: 'wait_table',
-    title: 'Table prête',
-    detail: 'Le MJ lance la scène ou le combat. Restez à l’écoute.',
+    title: 'Le MJ pose le décor',
+    detail: 'Sablier : une scène ou un combat arrive. Restez à l’écoute.',
     ctaLabel: input.publishedHandoutCount > 0 ? 'Documents' : undefined,
     cta: input.publishedHandoutCount > 0 ? 'handouts' : undefined,
     tone: 'emerald',
