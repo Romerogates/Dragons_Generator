@@ -133,7 +133,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
       next: (c) => {
         this.campaign.set(c);
         this.loading.set(false);
-        void this.live.watch(c.id);
+        void this.live.watch(c.id, 'play');
         this.liveSub = this.live.updates(c.id).subscribe(() => this.softReload());
         this.startSoftPoll(c);
         this.consumeCodexImportQuery();
@@ -170,7 +170,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.stopSoftPoll();
     this.liveSub?.unsubscribe();
-    void this.live.unwatch();
+    void this.live.unwatch('play');
   }
 
   onCampaignChange(updated: CampaignDetailModel): void {

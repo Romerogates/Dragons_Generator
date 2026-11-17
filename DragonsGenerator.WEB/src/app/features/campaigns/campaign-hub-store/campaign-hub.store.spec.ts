@@ -196,6 +196,7 @@ describe('CampaignHubStore', () => {
           provide: CampaignLiveService,
           useValue: {
             connected: () => false,
+            presence: () => [],
             watch: liveWatch,
             unwatch: () => Promise.resolve(),
             updates: () => NEVER,

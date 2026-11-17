@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.471',
+    date: '2026-11-17',
+    title: 'Présence, soirée et portraits',
+    player: [
+      'Pendant une session, vous voyez qui est connecté et qui est vraiment à la table.',
+      'Côté joueur, la page de campagne devient « Ce soir » : table ouverte, dernier récit, documents et héros.',
+      'Si votre personnage a un portrait, il apparaît sur le pion à la table.',
+    ],
+    tech: [
+      'SignalR `presenceUpdated` + `JoinCampaign(campaignId, surface play|hub)`.',
+      'Hub joueur : onglets Ce soir / Documents / Héros ; `lastPlayerRecap`.',
+      'Import party copie `tokenImageUrl`/`portraitImageUrl` sur le combatant ; `app-play-pawn` imageUrl.',
+    ],
+  },
+  {
     version: '1.470',
     date: '2026-11-17',
     title: 'Compte Google : mot de passe et suppression',

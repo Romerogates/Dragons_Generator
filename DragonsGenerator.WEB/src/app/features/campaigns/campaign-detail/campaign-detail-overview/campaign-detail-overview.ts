@@ -3,9 +3,11 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   computed,
+  inject,
   input,
   output,
 } from '@angular/core';
+import { CampaignLiveService } from '@core/services/campaign-live.service';
 import type { CampaignMember, CampaignSession } from '@core/models/Campaign/campaign';
 import type { CampaignActivityItem } from '@core/services/campaign-cloud.service';
 import { CampaignDetailStats, type CampaignStatsNav } from '../campaign-detail-stats/campaign-detail-stats';
@@ -39,6 +41,8 @@ import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-vie
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CampaignDetailOverview {
+  private readonly live = inject(CampaignLiveService);
+  readonly presence = this.live.presence;
   readonly isOwner = input.required<boolean>();
   readonly liveSession = input<CampaignSession | null>(null);
   readonly nextSession = input<CampaignSession | null>(null);
@@ -75,6 +79,7 @@ export class CampaignDetailOverview {
 
   readonly myPlayerMember = input<CampaignMember | null>(null);
   readonly lastHandoutTitle = input<string | null>(null);
+  readonly lastRecap = input<{ title: string; recap: string; at: string } | null>(null);
   readonly publishedHandoutsCount = input(0);
   readonly campaignId = input.required<string>();
 

@@ -11,7 +11,7 @@
     ></div>
 
     <p class="relative text-[10px] font-black uppercase tracking-[0.2em] text-violet-400/90 mb-4">
-      Page de garde
+      {{ isOwner() ? 'Page de garde' : 'Ce soir' }}
     </p>
     <h2 class="relative text-2xl md:text-3xl font-serif text-slate-100 leading-snug max-w-2xl">
       @if (liveSession(); as live) {
@@ -21,7 +21,7 @@
       } @else if (nextSchedule(); as sched) {
         Prochaine table — {{ sched.title }}
       } @else {
-        Bienvenue sur le hub de campagne
+        {{ isOwner() ? 'Bienvenue sur le hub de campagne' : 'Bienvenue à la table' }}
       }
     </h2>
     <p class="relative mt-4 text-sm text-slate-400 max-w-xl leading-relaxed">
@@ -61,7 +61,7 @@
           Suivez Première session ci-dessous (Héros → Inviter → Session → Table) — vous pouvez
           préparer des pré-tirés avant d’inviter.
         } @else {
-          Consultez Sessions et Documents ; la table s'ouvre quand le MJ lance la session.
+          Le MJ ouvrira la table pour la prochaine soirée. En attendant, votre héros et les documents sont ici.
         }
       }
     </p>
@@ -156,7 +156,39 @@
         </button>
       }
     </div>
+
+    @if (presence().length) {
+      <ul class="relative mt-6 flex flex-wrap gap-1.5" data-testid="hub-presence" aria-label="Connectés">
+        @for (seat of presence(); track seat.userId) {
+          <li
+            class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px]"
+            [class]="
+              seat.atPlay
+                ? 'border-emerald-700/50 bg-emerald-950/30 text-emerald-100'
+                : 'border-slate-700 bg-slate-900/50 text-slate-300'
+            "
+          >
+            <span class="h-1.5 w-1.5 rounded-full" [class]="seat.atPlay ? 'bg-emerald-400' : 'bg-slate-500'"></span>
+            {{ seat.displayName }}
+            @if (seat.atPlay) {
+              <span class="normal-case tracking-normal text-emerald-300/80">à la table</span>
+            }
+          </li>
+        }
+      </ul>
+    }
   </header>
+
+  @if (lastRecap(); as recap) {
+    <article
+      class="rounded-2xl border border-emerald-900/40 bg-emerald-950/15 px-5 py-5"
+      data-testid="hub-last-recap"
+    >
+      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Dernière soirée</p>
+      <h3 class="mt-1 font-serif text-lg text-emerald-100">{{ recap.title }}</h3>
+      <pre class="mt-3 whitespace-pre-wrap text-sm text-slate-300 font-sans">{{ recap.recap }}</pre>
+    </article>
+  }
 
   @if (isOwner() && rosterFeedback(); as fb) {
     <div
@@ -178,6 +210,7 @@
 
   <!-- Sommaire -->
   <div class="space-y-7">
+    @if (isOwner()) {
     <div class="max-w-2xl">
       <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 mb-3">Sommaire</p>
       <h3 class="text-xl font-serif text-slate-100">Comment utiliser ce hub</h3>
@@ -192,7 +225,9 @@
         }
       </p>
     </div>
+    }
 
+    @if (isOwner()) {
     <app-campaign-detail-stats
       [isOwner]="isOwner()"
       [creatureCount]="creatureCount()"
@@ -206,6 +241,7 @@
       [approvedCharacterName]="approvedCharacterName()"
       (navigate)="statsNavigate.emit($event)"
     />
+    }
 
     @if (!isOwner()) {
       <app-campaign-player-sheet

@@ -79,8 +79,8 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
   if (input.heroStatus === 'none') {
     return {
       kind: 'propose_hero',
-      title: 'Étape 1 — Proposez un héros',
-      detail: 'Sans personnage approuvé, vous ne pourrez pas jouer à la table.',
+      title: 'Ce soir — Proposez un héros',
+      detail: 'Sans personnage validé par le MJ, vous ne pourrez pas rejoindre la table.',
       ctaLabel: 'Proposer un héros',
       cta: 'players',
       tone: 'sky',
@@ -99,8 +99,8 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
   if (input.heroStatus === 'pending') {
     return {
       kind: 'wait_approval',
-      title: 'Étape 2 — En attente du MJ',
-      detail: 'Votre héros est proposé. Vous pourrez entrer en table dès validation.',
+      title: 'Ce soir — En attente du MJ',
+      detail: 'Votre héros est proposé. Dès qu’il est validé, vous pourrez rejoindre la table.',
       tone: 'amber',
     };
   }
@@ -108,7 +108,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
   if (input.hasActiveSession) {
     return {
       kind: 'enter_play',
-      title: 'Étape 3 — La table est ouverte',
+      title: 'Ce soir — La table est ouverte',
       detail: 'Rejoignez la scène, marquez-vous prêt, puis suivez le bandeau.',
       ctaLabel: 'Entrer à la table',
       cta: 'play',
@@ -131,8 +131,8 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
   if (input.hasPlannedSession) {
     return {
       kind: 'wait_session',
-      title: 'Héros prêt — en attente de session',
-      detail: 'Le MJ doit entrer en session. Surveillez l’onglet Sessions.',
+      title: 'Héros prêt — en attente de soirée',
+      detail: 'Le MJ ouvrira la table. Restez sur « Ce soir » pour la rejoindre.',
       ctaLabel: 'Voir les sessions',
       cta: 'sessions',
       tone: 'amber',
@@ -142,7 +142,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
   return {
     kind: 'idle',
     title: 'Héros prêt',
-    detail: 'Aucune session planifiée pour l’instant — le MJ va en créer une.',
+    detail: 'Aucune soirée planifiée pour l’instant — le MJ va en ouvrir une.',
     ctaLabel: 'Voir les sessions',
     cta: 'sessions',
     tone: 'slate',

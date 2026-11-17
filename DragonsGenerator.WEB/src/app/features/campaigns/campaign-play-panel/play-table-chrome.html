@@ -28,6 +28,33 @@
         <p class="text-[10px] text-slate-500 mt-1 max-w-xl">
           {{ combat.state.sessionModeHint(playSession.mode) }}
         </p>
+        @if (combat.presence().length) {
+          <ul
+            class="mt-2 flex flex-wrap gap-1.5"
+            data-testid="play-presence"
+            aria-label="À la table"
+          >
+            @for (seat of combat.presence(); track seat.userId) {
+              <li
+                class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px]"
+                [class]="
+                  seat.atPlay
+                    ? 'border-emerald-700/50 bg-emerald-950/30 text-emerald-100'
+                    : 'border-slate-700 bg-slate-900/40 text-slate-400'
+                "
+              >
+                <span
+                  class="h-1.5 w-1.5 rounded-full"
+                  [class]="seat.atPlay ? 'bg-emerald-400' : 'bg-slate-500'"
+                ></span>
+                {{ seat.displayName }}
+                @if (seat.role === 'mj') {
+                  <span class="uppercase tracking-widest text-[8px] opacity-70">MJ</span>
+                }
+              </li>
+            }
+          </ul>
+        }
       </div>
       <div class="flex flex-wrap gap-2">
         @if (!combat.state.isDm() && !combat.state.isSpectator()) {
@@ -384,9 +411,10 @@
               (click)="playImport.openMemberSheet(p, p.approvedCharacterName || p.displayName)"
             >
               <app-play-pawn
-                [pawnId]="p.id"
+                [pawnId]="p.userId || p.id"
                 side="ally"
                 [pose]="combat.state.isPlayerTableReady(p.userId) ? 'idle' : 'wait'"
+                [imageUrl]="combat.state.tokenImageForMember(p.userId)"
               />
               <span>
               <span class="font-serif block">{{ p.approvedCharacterName }}</span>

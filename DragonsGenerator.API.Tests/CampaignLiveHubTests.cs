@@ -47,7 +47,7 @@ public class CampaignLiveHubTests
 
         hub.On<JsonElement>("campaignUpdated", payload => tcs.TrySetResult(payload));
         await hub.StartAsync();
-        await hub.InvokeAsync("JoinCampaign", campaignId);
+        await hub.InvokeAsync("JoinCampaign", campaignId, "hub");
 
         using (var put = ApiTestAuth.Authed(HttpMethod.Put, $"/me/campaigns/{campaignId}", token))
         {
@@ -65,6 +65,46 @@ public class CampaignLiveHubTests
         var evt = await tcs.Task;
         Assert.Equal(campaignId.ToString("D"), evt.GetProperty("campaignId").GetString());
         Assert.Equal("campaign", evt.GetProperty("reason").GetString());
+
+        await hub.InvokeAsync("LeaveCampaign", campaignId);
+        await hub.StopAsync();
+    }
+
+    [Fact]
+    public async Task JoinCampaign_BroadcastsPresence_ForPlaySurface()
+    {
+        var (_, token, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "livepres");
+
+        Guid campaignId;
+        using (var create = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", token))
+        {
+            create.Content = JsonContent.Create(new { title = "Présence", data = new { } });
+            var created = await _client.SendAsync(create);
+            created.EnsureSuccessStatusCode();
+            campaignId = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        }
+
+        var tcs = new TaskCompletionSource<JsonElement>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var hub = new HubConnectionBuilder()
+            .WithUrl(new Uri(_factory.Server.BaseAddress!, "/hubs/campaign-live"), o =>
+            {
+                o.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
+                o.AccessTokenProvider = () => Task.FromResult<string?>(token);
+            })
+            .Build();
+
+        hub.On<JsonElement>("presenceUpdated", payload => tcs.TrySetResult(payload));
+        await hub.StartAsync();
+        await hub.InvokeAsync("JoinCampaign", campaignId, "play");
+
+        var completed = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(8)));
+        Assert.Same(tcs.Task, completed);
+        var evt = await tcs.Task;
+        Assert.Equal(campaignId.ToString("D"), evt.GetProperty("campaignId").GetString());
+        var users = evt.GetProperty("users");
+        Assert.Equal(1, users.GetArrayLength());
+        Assert.True(users[0].GetProperty("atPlay").GetBoolean());
+        Assert.Equal("mj", users[0].GetProperty("role").GetString());
 
         await hub.InvokeAsync("LeaveCampaign", campaignId);
         await hub.StopAsync();
@@ -94,7 +134,7 @@ public class CampaignLiveHubTests
             .Build();
 
         await hub.StartAsync();
-        var ex = await Assert.ThrowsAsync<HubException>(() => hub.InvokeAsync("JoinCampaign", campaignId));
+        var ex = await Assert.ThrowsAsync<HubException>(() => hub.InvokeAsync("JoinCampaign", campaignId, "hub"));
         Assert.Contains("introuvable", ex.Message, StringComparison.OrdinalIgnoreCase);
         await hub.StopAsync();
     }

@@ -183,6 +183,7 @@ export function clampHubTabsForViewer(
   let nextSub = prepSub;
   if (pregenCount === 0 && tab === 'prep') nextTab = 'overview';
   else if (tab === 'prep' && prepSub !== 'pregens') nextSub = 'pregens';
+  if (tab === 'sessions' || tab === 'calendar') nextTab = 'overview';
   if (
     nextSub === 'creatures' ||
     nextSub === 'encounters' ||
@@ -201,15 +202,24 @@ export function visibleCampaignHubTabs(
   isOwner: boolean,
   pregenCount: number,
 ): CampaignHubTabDef[] {
+  if (!isOwner) {
+    const tabs: CampaignHubTabDef[] = [
+      { id: 'overview', label: 'Ce soir', icon: 'fluent-emoji:fire' },
+      { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+      { id: 'players', label: 'Héros', icon: 'fluent-emoji:busts-in-silhouette' },
+    ];
+    if (pregenCount > 0) {
+      tabs.splice(2, 0, { id: 'prep', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
+    }
+    return tabs;
+  }
   const tabs: CampaignHubTabDef[] = [
     { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
     { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
     { id: 'calendar', label: 'Calendrier', icon: 'fluent-emoji:spiral-calendar' },
     { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
   ];
-  if (isOwner || pregenCount > 0) {
-    tabs.push({ id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' });
-  }
+  tabs.push({ id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' });
   tabs.push({ id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' });
   return tabs;
 }

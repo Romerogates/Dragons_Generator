@@ -507,6 +507,8 @@ export class PlayImportService {
       typeof character.defense?.armorClass === 'number'
         ? character.defense.armorClass
         : undefined;
+    const token =
+      character.tokenImageUrl?.trim() || character.portraitImageUrl?.trim() || null;
     return createCombatant({
       name: character.name || 'Sans nom',
       kind: 'player',
@@ -517,6 +519,7 @@ export class PlayImportService {
       attacks: snapshotAttacksFromCharacter(character.attacks),
       characterId: (character as { id?: string }).id ?? null,
       memberUserId: memberUserId ?? null,
+      tokenImageUrl: token,
     });
   }
 }

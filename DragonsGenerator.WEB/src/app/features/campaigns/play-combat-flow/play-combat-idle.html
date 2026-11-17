@@ -139,7 +139,12 @@
         <div class="space-y-3 rounded-2xl border border-amber-900/30 bg-amber-950/15 p-5 text-center">
           <div class="flex justify-center gap-3" aria-hidden="true">
             @for (p of h.state.approvedPlayers().slice(0, 4); track p.id) {
-              <app-play-pawn [pawnId]="p.id" side="ally" pose="wait" />
+              <app-play-pawn
+                [pawnId]="p.userId || p.id"
+                side="ally"
+                pose="wait"
+                [imageUrl]="h.state.tokenImageForMember(p.userId)"
+              />
             } @empty {
               <app-play-pawn pawnId="table" side="ally" pose="wait" />
             }

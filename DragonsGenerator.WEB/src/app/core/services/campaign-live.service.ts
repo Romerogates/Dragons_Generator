@@ -12,11 +12,19 @@ import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
 
 export type CampaignLiveReason = 'campaign' | 'initiative' | 'combat' | 'xp' | string;
+export type CampaignLiveSurface = 'play' | 'hub';
 
 export interface CampaignLiveUpdate {
   campaignId: string;
   updatedAt: string;
   reason: CampaignLiveReason;
+}
+
+export interface CampaignPresenceUser {
+  userId: string;
+  displayName: string;
+  role: string;
+  atPlay: boolean;
 }
 
 /** Factory injectable pour les tests (mock HubConnection). */
@@ -36,13 +44,15 @@ export class CampaignLiveService implements OnDestroy {
 
   private connection: HubConnection | null = null;
   private watchId: string | null = null;
-  /** Ref-count (detail + /play + dock peuvent coexister). */
-  private watchRefs = 0;
+  private hubRefs = 0;
+  private playRefs = 0;
   private startPromise: Promise<void> | null = null;
   private readonly updatesSubject = new Subject<CampaignLiveUpdate>();
 
   /** Connexion hub établie (poll peut ralentir). */
   readonly connected = signal(false);
+  /** Sièges connectés à la campagne actuellement watchée. */
+  readonly presence = signal<CampaignPresenceUser[]>([]);
 
   constructor() {
     effect(() => {
@@ -62,34 +72,48 @@ export class CampaignLiveService implements OnDestroy {
   }
 
   /** Rejoint le groupe campagne ; reconnect auto via SignalR. */
-  async watch(campaignId: string): Promise<void> {
+  async watch(campaignId: string, surface: CampaignLiveSurface = 'hub'): Promise<void> {
     if (!campaignId || !this.auth.isLoggedIn()) return;
     if (this.watchId && this.watchId !== campaignId) {
       await this.forceLeave();
     }
-    this.watchRefs += 1;
+    if (surface === 'play') this.playRefs += 1;
+    else this.hubRefs += 1;
     this.watchId = campaignId;
     await this.ensureConnected();
-    if (this.connection?.state === HubConnectionState.Connected) {
-      try {
-        await this.connection.invoke('JoinCampaign', campaignId);
-      } catch {
-        this.connected.set(false);
-      }
-    }
+    await this.invokeJoin();
   }
 
-  async unwatch(): Promise<void> {
-    if (this.watchRefs <= 0) return;
-    this.watchRefs -= 1;
-    if (this.watchRefs > 0) return;
+  async unwatch(surface: CampaignLiveSurface = 'hub'): Promise<void> {
+    if (surface === 'play') this.playRefs = Math.max(0, this.playRefs - 1);
+    else this.hubRefs = Math.max(0, this.hubRefs - 1);
+    if (this.playRefs + this.hubRefs > 0) {
+      await this.invokeJoin();
+      return;
+    }
     await this.forceLeave();
+  }
+
+  private currentSurface(): CampaignLiveSurface {
+    return this.playRefs > 0 ? 'play' : 'hub';
+  }
+
+  private async invokeJoin(): Promise<void> {
+    const id = this.watchId;
+    if (!id || this.connection?.state !== HubConnectionState.Connected) return;
+    try {
+      await this.connection.invoke('JoinCampaign', id, this.currentSurface());
+    } catch {
+      this.connected.set(false);
+    }
   }
 
   private async forceLeave(): Promise<void> {
     const id = this.watchId;
     this.watchId = null;
-    this.watchRefs = 0;
+    this.hubRefs = 0;
+    this.playRefs = 0;
+    this.presence.set([]);
     if (id && this.connection?.state === HubConnectionState.Connected) {
       try {
         await this.connection.invoke('LeaveCampaign', id);
@@ -131,15 +155,23 @@ export class CampaignLiveService implements OnDestroy {
         });
       });
 
+      this.connection.on(
+        'presenceUpdated',
+        (payload: { campaignId?: string; users?: CampaignPresenceUser[] }) => {
+          if (!payload?.campaignId || payload.campaignId !== this.watchId) return;
+          this.presence.set(Array.isArray(payload.users) ? payload.users : []);
+        },
+      );
+
       this.connection.onreconnecting(() => this.connected.set(false));
       this.connection.onreconnected(() => {
         this.connected.set(true);
-        const id = this.watchId;
-        if (id) {
-          void this.connection?.invoke('JoinCampaign', id).catch(() => this.connected.set(false));
-        }
+        void this.invokeJoin();
       });
-      this.connection.onclose(() => this.connected.set(false));
+      this.connection.onclose(() => {
+        this.connected.set(false);
+        this.presence.set([]);
+      });
     }
 
     if (this.connection.state === HubConnectionState.Disconnected) {
@@ -154,7 +186,9 @@ export class CampaignLiveService implements OnDestroy {
 
   private async teardown(): Promise<void> {
     this.watchId = null;
-    this.watchRefs = 0;
+    this.hubRefs = 0;
+    this.playRefs = 0;
+    this.presence.set([]);
     this.connected.set(false);
     const conn = this.connection;
     this.connection = null;

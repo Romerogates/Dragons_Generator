@@ -87,7 +87,7 @@ describe('CampaignLiveService', () => {
   it('watch joins hub and emits filtered updates', async () => {
     await service.watch('camp-1');
     expect(startSpy).toHaveBeenCalled();
-    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1');
+    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1', 'hub');
     expect(service.connected()).toBe(true);
     expect(service.fallbackPollMs(4_000)).toBe(30_000);
 
@@ -147,7 +147,7 @@ describe('CampaignLiveService', () => {
     expect(service.connected()).toBe(false);
     handlers['onreconnected']?.();
     expect(service.connected()).toBe(true);
-    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1');
+    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1', 'hub');
     handlers['onclose']?.();
     expect(service.connected()).toBe(false);
   });
@@ -162,7 +162,7 @@ describe('CampaignLiveService', () => {
     await service.watch('camp-1');
     await service.watch('camp-2');
     expect(invokeSpy).toHaveBeenCalledWith('LeaveCampaign', 'camp-1');
-    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-2');
+    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-2', 'hub');
     await service.watch('');
   });
 
@@ -211,11 +211,26 @@ describe('CampaignLiveService', () => {
     expect(invokeSpy).not.toHaveBeenCalled();
   });
 
+  it('joins play surface and stores presence', async () => {
+    await service.watch('camp-1', 'play');
+    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1', 'play');
+    handlers['presenceUpdated']?.({
+      campaignId: 'camp-1',
+      users: [{ userId: 'u1', displayName: 'Aude', role: 'mj', atPlay: true }],
+    });
+    expect(service.presence()[0]?.displayName).toBe('Aude');
+    handlers['presenceUpdated']?.({ campaignId: 'other', users: [] });
+    expect(service.presence().length).toBe(1);
+    await service.unwatch('play');
+    expect(invokeSpy).toHaveBeenCalledWith('LeaveCampaign', 'camp-1');
+    expect(service.presence()).toEqual([]);
+  });
+
   it('already connected watch rejoins without restart', async () => {
     await service.watch('camp-1');
     startSpy.calls.reset();
     await service.watch('camp-1');
     expect(startSpy).not.toHaveBeenCalled();
-    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1');
+    expect(invokeSpy).toHaveBeenCalledWith('JoinCampaign', 'camp-1', 'hub');
   });
 });

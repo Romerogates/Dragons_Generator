@@ -25,6 +25,7 @@ import {
   otherPlayers,
   ownerActiveSession,
   pastSessions,
+  lastPlayerRecap,
   pdfSheetMembers,
   pdfUnassignedPregens,
   pendingHubRsvp,
@@ -160,6 +161,12 @@ describe('campaign-hub-view.util', () => {
     const b = session({ id: 'b', scheduledAt: '2026-10-05T19:00:00.000Z', status: 'played' });
     const c = session({ id: 'c', scheduledAt: '2026-11-01T19:00:00.000Z' });
     expect(pastSessions([a, b]).map((s) => s.id)).toEqual(['b']);
+    expect(lastPlayerRecap([a, b])).toBeNull();
+    expect(
+      lastPlayerRecap([
+        session({ status: 'played', playerRecap: '  Victoire  ', title: 'Cave' }),
+      ]),
+    ).toEqual({ title: 'Cave', recap: 'Victoire', at: '2026-10-20T19:00:00.000Z' });
     expect(upcomingPlannedSessions([c, a]).map((s) => s.id)).toEqual(['a', 'c']);
     expect(sortedSessionsByDate([c, a]).map((s) => s.id)).toEqual(['a', 'c']);
     expect(nextPlannedSession([a, c], now)?.id).toBe('a');

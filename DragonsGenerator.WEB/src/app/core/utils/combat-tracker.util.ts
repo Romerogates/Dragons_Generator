@@ -303,6 +303,7 @@ export function duplicateCombatant(source: Combatant): Combatant {
     attacks: source.attacks ? source.attacks.map((a) => ({ ...a })) : undefined,
     characterId: source.characterId,
     memberUserId: undefined,
+    tokenImageUrl: source.tokenImageUrl,
     conditions: source.conditions ? [...source.conditions] : undefined,
     defeated: false,
   });

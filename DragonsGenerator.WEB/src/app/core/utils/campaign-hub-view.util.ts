@@ -89,6 +89,18 @@ export function pastSessions(sessions: CampaignSession[] | undefined): CampaignS
     .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
 }
 
+export function lastPlayerRecap(
+  sessions: CampaignSession[] | undefined,
+): { title: string; recap: string; at: string } | null {
+  const withRecap = pastSessions(sessions).find((s) => !!s.playerRecap?.trim());
+  if (!withRecap?.playerRecap?.trim()) return null;
+  return {
+    title: withRecap.title,
+    recap: withRecap.playerRecap.trim(),
+    at: withRecap.scheduledAt,
+  };
+}
+
 export function upcomingPlannedSessions(sessions: CampaignSession[] | undefined): CampaignSession[] {
   return [...(sessions ?? [])]
     .filter((s) => s.status === 'planned')

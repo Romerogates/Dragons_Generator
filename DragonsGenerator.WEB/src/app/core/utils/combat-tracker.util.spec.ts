@@ -109,9 +109,11 @@ describe('combat-tracker.util', () => {
       maxHp: 22,
       currentHp: 18,
       initiativeBonus: 2,
+      tokenImageUrl: 'https://cdn.example/t.png',
     });
     const copy = duplicateCombatant(src);
     expect(copy.name).toBe('Espion (copie)');
+    expect(copy.tokenImageUrl).toBe('https://cdn.example/t.png');
     expect(copy.armorClass).toBe(15);
     expect(copy.maxHp).toBe(22);
     expect(copy.currentHp).toBe(22);

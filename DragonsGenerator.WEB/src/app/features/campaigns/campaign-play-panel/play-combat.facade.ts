@@ -37,6 +37,7 @@ export class PlayCombatFacade implements PlayCombatHost {
   private fullscreen!: InputSignal<boolean>;
 
   readonly liveConnected = this.live.connected;
+  readonly presence = this.live.presence;
 
   get ctrl(): PlayCombatController {
     return this.combatCtrl;

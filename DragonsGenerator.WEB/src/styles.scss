@@ -800,6 +800,12 @@ iconify-icon {
   pointer-events: none;
 }
 
+.dg-pawn-portrait {
+  object-fit: cover;
+  border-radius: 9999px;
+  image-rendering: auto;
+}
+
 .dg-pawn-idle {
   animation: dg-pawn-bob 1.4s ease-in-out infinite;
 }

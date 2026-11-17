@@ -120,6 +120,7 @@ export class CampaignHubViewService {
   readonly myPlayerMember = computed(() => hubView.findPlayerMember(this.players(), this.auth.user()?.id));
   readonly myXpEarned = computed(() => this.myPlayerMember()?.xpEarnedInCampaign ?? 0);
   readonly pastSessions = computed(() => hubView.pastSessions(this.hub.campaign()?.data.sessions));
+  readonly lastPlayerRecap = computed(() => hubView.lastPlayerRecap(this.hub.campaign()?.data.sessions));
 
   readonly showOverviewRoster = computed(() => {
     const c = this.hub.campaign();

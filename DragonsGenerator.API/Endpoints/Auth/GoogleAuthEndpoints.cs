@@ -55,8 +55,11 @@ public class GoogleLoginEndpoint(
             return;
         }
 
+        var googleEmail = (profile.Email ?? "").Trim();
         var user = await db.Users.FirstOrDefaultAsync(u => u.GoogleSubject == profile.Subject, ct)
-            ?? await db.Users.FirstOrDefaultAsync(u => u.Email == profile.Email, ct);
+            ?? await db.Users.FirstOrDefaultAsync(
+                u => u.Email.ToLower() == googleEmail.ToLower(),
+                ct);
 
         if (user is null)
         {
@@ -86,7 +89,7 @@ public class GoogleLoginEndpoint(
 
             user = new AppUser
             {
-                Email = profile.Email,
+                Email = googleEmail,
                 PasswordHash = AuthHelpers.HashPassword(Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))),
                 DisplayName = normalized,
                 EmailConfirmed = true,

@@ -176,9 +176,10 @@
                 <div class="flex justify-between gap-2">
                   <div class="min-w-0 flex items-center gap-2">
                     <app-play-pawn
-                      [pawnId]="cb.id"
+                      [pawnId]="cb.memberUserId || cb.characterId || cb.id"
                       side="ally"
                       [pose]="h.state.isCurrentTurn(cb.id) ? 'attack' : 'idle'"
+                      [imageUrl]="cb.tokenImageUrl ?? null"
                     />
                     <span>
                     <span class="font-serif text-sky-100" [class.line-through]="h.state.isCombatantDefeated(cb)">{{
@@ -458,9 +459,10 @@
                 <div class="flex justify-between gap-2">
                   <span class="font-serif text-red-100 flex items-center gap-2" [class.line-through]="h.state.isCombatantDefeated(cb)">
                     <app-play-pawn
-                      [pawnId]="cb.id"
+                      [pawnId]="cb.memberUserId || cb.characterId || cb.id"
                       side="enemy"
                       [pose]="h.state.isCurrentTurn(cb.id) ? 'attack' : 'idle'"
+                      [imageUrl]="cb.tokenImageUrl ?? null"
                     />
                     {{ cb.name || 'Sans nom' }}
                   </span>

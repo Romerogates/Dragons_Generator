@@ -302,6 +302,12 @@ export class PlayCombatState {
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
 
+  tokenImageForMember(userId: string | null | undefined): string | null {
+    if (!userId) return null;
+    const url = this.activeCombat()?.combatants.find((c) => c.memberUserId === userId)?.tokenImageUrl;
+    return url?.trim() || null;
+  }
+
   readonly tableReadyCount = computed(() => {
     const ready = new Set(this.activeSession()?.tableReadyUserIds ?? []);
     return this.approvedPlayers().filter((p) => ready.has(p.userId)).length;
