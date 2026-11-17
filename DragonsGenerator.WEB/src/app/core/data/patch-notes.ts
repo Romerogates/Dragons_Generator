@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.468',
+    date: '2026-11-17',
+    title: 'Rechargement franc après une mise à jour',
+    player: [
+      'Quand le site a été mis à jour, une bannière propose de recharger — vous n’êtes plus coincé sur une ancienne page.',
+      '« Plus tard » masque la bannière une heure ; elle revient ensuite si la nouvelle version est toujours là.',
+    ],
+    tech: [
+      '`PwaLifecycleService` : `checkForUpdate` toutes les 5 min + onglet visible ; `unrecoverable` → reload.',
+      'Recharger : `activateUpdate` puis `clearAppCaches` (unregister SW + Cache Storage) avant `location.reload`.',
+      'Snooze 1 h `localStorage` `dg-pwa-update-snooze`. SW `registerWhenStable:5000`.',
+    ],
+  },
+  {
     version: '1.467',
     date: '2026-11-17',
     title: 'Admin : disque, charge et file support',
