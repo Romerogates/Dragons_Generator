@@ -3,7 +3,6 @@ import {
   Component,
   input,
 } from '@angular/core';
-import { PlayBattleMap } from '../play-battle-map/play-battle-map';
 import { PlayTableChat } from '../play-table-chat/play-table-chat';
 import type { PlayCombatHost } from './play-combat-host';
 import { PlayCombatHeader } from './play-combat-header';
@@ -20,7 +19,6 @@ import { PlayCombatIdle } from './play-combat-idle';
   selector: 'app-play-combat-flow',
   standalone: true,
   imports: [
-    PlayBattleMap,
     PlayTableChat,
     PlayCombatHeader,
     PlayCombatTracker,

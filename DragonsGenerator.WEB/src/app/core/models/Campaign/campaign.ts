@@ -69,6 +69,17 @@ export interface CombatantEncounterLink {
   unitIndex: number;
 }
 
+/** Jeton héros sur la carte de soirée. */
+export interface SessionTablePawn {
+  id: string;
+  memberUserId?: string | null;
+  characterId?: string | null;
+  name: string;
+  mapX: number;
+  mapY: number;
+  tokenImageUrl?: string | null;
+}
+
 /** Snapshot d'attaque pour le tracker (import party / créature). */
 export interface CombatantAttack {
   name: string;
@@ -202,6 +213,8 @@ export interface CampaignSession {
   combatLog?: string[];
   /** Donjon de campagne consulté pendant cette session (id dans data.dungeonMaps). */
   activeMapId?: string | null;
+  /** Pions de la carte de soirée (hors combat, ou positions de départ). */
+  tablePawns?: SessionTablePawn[];
   /** Fil de table minimal (MJ + joueurs) — sync live via blob campagne. */
   tableChat?: TableChatMessage[];
   /** Message épinglé en haut du fil (objectif de scène / indice). */

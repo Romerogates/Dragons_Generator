@@ -490,6 +490,22 @@ describe('mergeRemoteLiveTable', () => {
     expect(mergedOmit.data.sessions![0].activeCombat!.flowPhase).toBe('fight');
     expect(mergedOmit.data.sessions![0].tableReadyUserIds).toEqual(['keep']);
   });
+
+  it('merges tablePawns and activeMapId from remote', () => {
+    const local = baseCampaign();
+    local.data.sessions![0].activeMapId = 'old-map';
+    local.data.sessions![0].tablePawns = [
+      { id: 'pawn-u1', name: 'Aria', mapX: 1, mapY: 1, memberUserId: 'u1' },
+    ];
+    const remote = baseCampaign();
+    remote.data.sessions![0].activeMapId = 'm-live';
+    remote.data.sessions![0].tablePawns = [
+      { id: 'pawn-u1', name: 'Aria', mapX: 4, mapY: 2, memberUserId: 'u1' },
+    ];
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions![0].activeMapId).toBe('m-live');
+    expect(merged.data.sessions![0].tablePawns?.[0].mapX).toBe(4);
+  });
 });
 
 describe('stripTableChatForPersist', () => {

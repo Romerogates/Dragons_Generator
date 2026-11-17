@@ -157,6 +157,7 @@ public class CampaignJsonHelpersTests
                 "prepChecklist": "secret checklist",
                 "playerRecap": "Vous avez vaincu le dragon.",
                 "activeMapId": "map-1",
+                "tablePawns": [{ "id": "pawn-u1", "name": "Aria", "mapX": 2, "mapY": 3 }],
                 "notes": "mj only"
               }]
             }
@@ -169,6 +170,7 @@ public class CampaignJsonHelpersTests
         Assert.Equal("", session.GetProperty("prepChecklist").GetString());
         Assert.Equal("Vous avez vaincu le dragon.", session.GetProperty("playerRecap").GetString());
         Assert.Equal("map-1", session.GetProperty("activeMapId").GetString());
+        Assert.Equal("pawn-u1", session.GetProperty("tablePawns")[0].GetProperty("id").GetString());
         Assert.Equal("", session.GetProperty("notes").GetString());
     }
 

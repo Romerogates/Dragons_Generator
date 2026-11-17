@@ -33,6 +33,12 @@ import {
   pixelToTile,
 } from '@core/utils/dungeon-battle.util';
 import {
+  eveningPawnId,
+  eveningPawnsToTokens,
+  findEveningPawnAtTile,
+  isEveningTileOccupied,
+} from '@core/utils/evening-map.util';
+import {
   isCorridorCellRevealedOnMap,
   isRoomRevealedOnMap,
   withAllRoomsRevealed,
@@ -74,8 +80,8 @@ export class PlayBattleMap implements OnDestroy {
 
   readonly showBattleMap = computed(() => {
     if (!this.activeSessionMap()) return false;
-    if (!this.isDm()) return true;
-    return this.sessionView() === 'combat' || !!this.activeCombat();
+    if (this.isDm() && this.sessionView() === 'dungeon') return false;
+    return true;
   });
 
   readonly myCombatant = computed(() => {
@@ -89,16 +95,45 @@ export class PlayBattleMap implements OnDestroy {
   readonly selectedTokenCombatant = computed(() => {
     const id = this.selectedTokenCombatantId();
     if (!id) return null;
-    return this.activeCombat()?.combatants.find((c) => c.id === id) ?? null;
+    const fromCombat = this.activeCombat()?.combatants.find((c) => c.id === id);
+    if (fromCombat) return fromCombat;
+    const pawn = this.eveningPawns().find((p) => p.id === id);
+    if (!pawn) return null;
+    return {
+      id: pawn.id,
+      name: pawn.name,
+      kind: 'player' as const,
+      initiativeBonus: 0,
+      memberUserId: pawn.memberUserId,
+      characterId: pawn.characterId,
+      mapX: pawn.mapX,
+      mapY: pawn.mapY,
+      tokenImageUrl: pawn.tokenImageUrl,
+    };
   });
 
-  readonly battleMapTokens = computed(() =>
-    combatantsToTokens(this.combatTurnOrder(), {
-      currentId: this.currentTurn()?.id ?? null,
-      myId: this.myCombatant()?.id ?? null,
+  readonly eveningPawns = computed(() => this.store.activeSession()?.tablePawns ?? []);
+  readonly tokenRoster = computed(() => {
+    const combat = this.activeCombat();
+    if (combat) return combat.combatants.filter((c) => !isCombatantDefeated(c));
+    return this.eveningPawns();
+  });
+
+  readonly battleMapTokens = computed(() => {
+    const combat = this.activeCombat();
+    if (combat) {
+      return combatantsToTokens(combat.combatants, {
+        currentId: this.currentTurn()?.id ?? null,
+        myId: this.myCombatant()?.id ?? null,
+        selectedId: this.selectedTokenCombatantId(),
+      });
+    }
+    const userId = this.auth.user()?.id;
+    return eveningPawnsToTokens(this.eveningPawns(), {
+      myId: userId ? eveningPawnId(userId) : null,
       selectedId: this.selectedTokenCombatantId(),
-    }),
-  );
+    });
+  });
 
   /** Légende joueur : masque les jetons hors FoW. */
   readonly playerVisibleTokens = computed(() => {
@@ -117,9 +152,14 @@ export class PlayBattleMap implements OnDestroy {
     | { combatantId: string; pointerId: number; moved: boolean }
     | null = null;
 
-  protected readonly isCombatantDefeated = isCombatantDefeated;
-
   constructor() {
+    effect(() => {
+      const map = this.activeSessionMap();
+      const n = this.store.approvedPlayers().length;
+      if (map && this.isDm() && n >= 0) {
+        untracked(() => this.store.ensureEveningPawns());
+      }
+    });
     effect(() => {
       const map = this.activeSessionMap();
       const canvasRef = this.liveDungeonCanvas();
@@ -166,7 +206,7 @@ export class PlayBattleMap implements OnDestroy {
         this.tokenImageError.set('Image trop lourde — essayez un PNG/JPEG plus léger.');
         return;
       }
-      this.store.updateCombatant(combatantId, { tokenImageUrl: dataUrl }, { immediate: true });
+      this.applyTokenImage(combatantId, dataUrl);
     } catch {
       this.tokenImageError.set('Image illisible — essayez un PNG/JPEG plus léger.');
     }
@@ -174,7 +214,7 @@ export class PlayBattleMap implements OnDestroy {
 
   async updateTokenImageUrl(combatantId: string, url: string | null): Promise<void> {
     if (!url) {
-      this.store.updateCombatant(combatantId, { tokenImageUrl: null }, { immediate: true });
+      this.applyTokenImage(combatantId, null);
       return;
     }
     this.tokenImageError.set(null);
@@ -184,7 +224,11 @@ export class PlayBattleMap implements OnDestroy {
       this.tokenImageError.set('URL rejetée — http(s) ou image compressée uniquement.');
       return;
     }
-    this.store.updateCombatant(combatantId, { tokenImageUrl: safe }, { immediate: true });
+    this.applyTokenImage(combatantId, safe);
+  }
+
+  private applyTokenImage(tokenId: string, url: string | null): void {
+    this.store.updateEveningPawn(tokenId, { tokenImageUrl: url }, { immediate: true });
   }
 
   onBattleMapPointerDown(event: PointerEvent): void {
@@ -208,6 +252,22 @@ export class PlayBattleMap implements OnDestroy {
       }
 
       const placeId = this.selectedTokenCombatantId() ?? this.currentTurn()?.id ?? null;
+      if (placeId) {
+        const clamped = clampTokenToFloor(map, tile.x, tile.y);
+        if (!clamped) return;
+        this.placeCombatantOnMap(placeId, clamped.x, clamped.y);
+        return;
+      }
+    } else {
+      const occupant = findEveningPawnAtTile(this.eveningPawns(), tile.x, tile.y);
+      if (occupant) {
+        this.selectedTokenCombatantId.set(occupant.id);
+        this.tokenDrag = { combatantId: occupant.id, pointerId: event.pointerId, moved: false };
+        canvas.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        return;
+      }
+      const placeId = this.selectedTokenCombatantId();
       if (placeId) {
         const clamped = clampTokenToFloor(map, tile.x, tile.y);
         if (!clamped) return;
@@ -241,7 +301,9 @@ export class PlayBattleMap implements OnDestroy {
     this.tokenDrag = null;
     if (drag.moved) {
       const combat = this.activeCombat();
-      const c = combat?.combatants.find((x) => x.id === drag.combatantId);
+      const c =
+        combat?.combatants.find((x) => x.id === drag.combatantId) ??
+        this.eveningPawns().find((x) => x.id === drag.combatantId);
       if (c && typeof c.mapX === 'number' && typeof c.mapY === 'number') {
         this.placeCombatantOnMap(drag.combatantId, c.mapX, c.mapY, { immediate: true });
       }
@@ -321,18 +383,18 @@ export class PlayBattleMap implements OnDestroy {
     y: number,
     options?: { immediate?: boolean; silentOccupancy?: boolean },
   ): void {
+    if (!this.isDm()) return;
     const combat = this.activeCombat();
-    if (!combat || !this.isDm()) return;
-    if (isTileOccupied(combat.combatants, x, y, combatantId)) {
+    const occupied = combat
+      ? isTileOccupied(combat.combatants, x, y, combatantId)
+      : isEveningTileOccupied(this.eveningPawns(), x, y, combatantId);
+    if (occupied) {
       if (!options?.silentOccupancy) {
         this.store.setFeedback('err', 'Case déjà occupée.');
       }
       return;
     }
-    const combatants = combat.combatants.map((c) =>
-      c.id === combatantId ? { ...c, mapX: x, mapY: y } : c,
-    );
-    this.store.patchCombat({ ...combat, combatants }, { immediate: options?.immediate !== false });
+    this.store.placeEveningToken(combatantId, x, y, { immediate: options?.immediate !== false });
   }
 
   private bindLiveDungeonCanvas(

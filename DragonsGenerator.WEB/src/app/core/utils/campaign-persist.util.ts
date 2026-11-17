@@ -97,6 +97,9 @@ export function mergeRemoteLiveTable(
               remoteSession.tablePin !== undefined ? remoteSession.tablePin : ls.tablePin,
             tablePinHistory: remoteSession.tablePinHistory ?? ls.tablePinHistory,
             tableMacros: remoteSession.tableMacros ?? ls.tableMacros,
+            tablePawns: remoteSession.tablePawns ?? ls.tablePawns,
+            activeMapId:
+              remoteSession.activeMapId !== undefined ? remoteSession.activeMapId : ls.activeMapId,
           }
         : ls;
     }
@@ -120,6 +123,9 @@ export function mergeRemoteLiveTable(
         initiativeRoll: rc.initiativeRoll ?? lc.initiativeRoll,
         playerSubmitted: rc.playerSubmitted || lc.playerSubmitted,
         armorClass: rc.armorClass ?? lc.armorClass,
+        mapX: rc.mapX ?? lc.mapX,
+        mapY: rc.mapY ?? lc.mapY,
+        tokenImageUrl: rc.tokenImageUrl ?? lc.tokenImageUrl,
       };
     });
     for (const rc of remoteCombat.combatants) {
@@ -150,6 +156,9 @@ export function mergeRemoteLiveTable(
       tablePinHistory:
         remoteSession?.tablePinHistory ?? ls.tablePinHistory,
       tableMacros: remoteSession?.tableMacros ?? ls.tableMacros,
+      tablePawns: remoteSession?.tablePawns ?? ls.tablePawns,
+      activeMapId:
+        remoteSession?.activeMapId !== undefined ? remoteSession.activeMapId : ls.activeMapId,
     };
   });
 
@@ -162,6 +171,7 @@ export function mergeRemoteLiveTable(
     return {
       ...lm,
       revealedRoomIds: rm.revealedRoomIds ?? lm.revealedRoomIds,
+      revealedCorridorCells: rm.revealedCorridorCells ?? lm.revealedCorridorCells,
       fogOfWarEnabled: rm.fogOfWarEnabled ?? lm.fogOfWarEnabled,
     };
   });

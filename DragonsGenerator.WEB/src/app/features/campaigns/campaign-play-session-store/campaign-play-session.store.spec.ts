@@ -293,6 +293,60 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
     expect(update).toHaveBeenCalled();
   });
 
+  it('ensureEveningPawns et placeEveningToken posent les héros sur la carte', async () => {
+    const c = campaign('dm');
+    c.members = [
+      {
+        id: 'mem1',
+        userId: 'u2',
+        displayName: 'Lila',
+        role: 'player',
+        proposalStatus: 'approved',
+        approvedCharacterId: 'ch-lila',
+        approvedCharacterName: 'Lila',
+        xpEarnedInCampaign: 0,
+      },
+    ];
+    c.data.dungeonMaps = [
+      {
+        id: 'm1',
+        name: 'Cave',
+        theme: 'cave',
+        gridWidth: 4,
+        gridHeight: 3,
+        tiles: [
+          ['wall', 'wall', 'wall', 'wall'],
+          ['wall', 'floor', 'floor', 'wall'],
+          ['wall', 'wall', 'wall', 'wall'],
+        ],
+        rooms: [],
+        markers: [],
+        createdAt: '',
+        updatedAt: '',
+      },
+    ];
+    c.data.sessions[0].activeCombat = null;
+    store.bindCampaign(c);
+    store.assignSessionMap('m1');
+    await new Promise((r) => setTimeout(r, 0));
+    const pawn = store.activeSession()?.tablePawns?.[0];
+    expect(pawn?.id).toBe('pawn-u2');
+    expect(pawn?.mapX).toBe(1);
+    store.placeEveningToken(pawn!.id, 2, 1, { immediate: true });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(store.activeSession()?.tablePawns?.[0].mapX).toBe(2);
+    store.updateEveningPawn(pawn!.id, { tokenImageUrl: 'https://img.example/p.png' }, { immediate: true });
+    expect(store.activeSession()?.tablePawns?.[0].tokenImageUrl).toBe('https://img.example/p.png');
+  });
+
+  it('ensureEveningPawns et placeEveningToken sont no-op pour un spectateur', () => {
+    store.bindCampaign(campaign('spectator'));
+    store.ensureEveningPawns();
+    store.placeEveningToken('pawn-x', 1, 1);
+    store.updateEveningPawn('pawn-x', { name: 'nope' });
+    expect(update).not.toHaveBeenCalled();
+  });
+
   it('togglePlayerTableReady est no-op pour un spectateur', () => {
     store.bindCampaign(campaign('spectator'));
     expect(store.togglePlayerTableReady('u1')).toBeFalse();

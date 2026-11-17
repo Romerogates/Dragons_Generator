@@ -9,6 +9,7 @@ import {
   CampaignData,
   CampaignSession,
   Combatant,
+  SessionTablePawn,
   EncounterGroup,
   type CampaignDetail as CampaignDetailModel,
   type CampaignHandout,
@@ -17,6 +18,12 @@ import {
 } from '@core/models/Campaign/campaign';
 import { encounterTotalXp } from '@core/models/Campaign/campaign';
 import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
+import {
+  applyEveningPawnPatch,
+  eveningPawnId,
+  placeEveningPawn,
+  seedEveningPawns,
+} from '@core/utils/evening-map.util';
 import { campaignDataAfterDmDamage } from '@core/utils/play-combat-mutations.util';
 import { sessionPatchAfterPlayEnd } from '@core/utils/play-combat-session.util';
 import { withFogToggled } from '@core/utils/dungeon-fog.util';
@@ -440,6 +447,94 @@ export class CampaignPlaySessionStore {
   assignSessionMap(mapId: string | null): void {
     if (!this.isDm() || !this.activeSession()) return;
     this.patchSession({ activeMapId: mapId }, { immediate: true });
+    if (mapId) this.ensureEveningPawns();
+  }
+
+  ensureEveningPawns(): void {
+    if (!this.isDm()) return;
+    const map = this.activeSessionMap();
+    const session = this.activeSession();
+    if (!map || !session) return;
+    const next = seedEveningPawns({
+      map,
+      players: this.approvedPlayers(),
+      existing: session.tablePawns,
+      combatants: session.activeCombat?.combatants,
+    });
+    if (!next) return;
+    this.patchSession({ tablePawns: next }, { immediate: true });
+  }
+
+  placeEveningToken(
+    tokenId: string,
+    x: number,
+    y: number,
+    options?: { immediate?: boolean },
+  ): void {
+    if (!this.isDm()) return;
+    const session = this.activeSession();
+    if (!session) return;
+    const combat = session.activeCombat;
+    const memberUserId =
+      combat?.combatants.find((c) => c.id === tokenId)?.memberUserId ??
+      session.tablePawns?.find((p) => p.id === tokenId)?.memberUserId ??
+      null;
+    const pawns = placeEveningPawn(session.tablePawns, tokenId, x, y).map((p) =>
+      memberUserId && p.memberUserId === memberUserId ? { ...p, mapX: x, mapY: y } : p,
+    );
+    let combatants = combat?.combatants;
+    if (combatants) {
+      combatants = combatants.map((c) => {
+        const match =
+          c.id === tokenId ||
+          (c.memberUserId && eveningPawnId(c.memberUserId) === tokenId) ||
+          (!!memberUserId && c.memberUserId === memberUserId);
+        return match ? { ...c, mapX: x, mapY: y } : c;
+      });
+    }
+    this.patchSession(
+      {
+        tablePawns: pawns,
+        ...(combat && combatants ? { activeCombat: { ...combat, combatants } } : {}),
+      },
+      options,
+    );
+  }
+
+  updateEveningPawn(
+    pawnId: string,
+    patch: Partial<SessionTablePawn>,
+    options?: { immediate?: boolean },
+  ): void {
+    if (!this.isDm()) return;
+    const session = this.activeSession();
+    if (!session) return;
+    const combat = session.activeCombat;
+    const memberUserId =
+      combat?.combatants.find((c) => c.id === pawnId)?.memberUserId ??
+      session.tablePawns?.find((p) => p.id === pawnId)?.memberUserId ??
+      null;
+    let pawns = applyEveningPawnPatch(session.tablePawns, pawnId, patch);
+    if (memberUserId) {
+      pawns = pawns.map((p) => (p.memberUserId === memberUserId ? { ...p, ...patch } : p));
+    }
+    let combatants = combat?.combatants;
+    if (combatants && patch.tokenImageUrl !== undefined) {
+      combatants = combatants.map((c) =>
+        c.id === pawnId ||
+        eveningPawnId(c.memberUserId ?? '') === pawnId ||
+        (!!memberUserId && c.memberUserId === memberUserId)
+          ? { ...c, tokenImageUrl: patch.tokenImageUrl }
+          : c,
+      );
+    }
+    this.patchSession(
+      {
+        tablePawns: pawns,
+        ...(combat && combatants ? { activeCombat: { ...combat, combatants } } : {}),
+      },
+      options,
+    );
   }
 
   setSessionResume(page: NotebookPage): void {

@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.472',
+    date: '2026-11-17',
+    title: 'Carte de la soirée',
+    player: [
+      'Pendant la table, le donjon choisi pour la soirée s’affiche pour tout le monde, pas seulement pendant un combat.',
+      'Le MJ pose et déplace les héros (avec leur portrait) sur cette carte.',
+      'Si aucune carte n’est encore choisie, le MJ a un raccourci pour en afficher une.',
+    ],
+    tech: [
+      '`CampaignSession.tablePawns` + `activeMapId` ; `ensureEveningPawns` / `placeEveningToken`.',
+      '`app-play-battle-map` hors onglet Combat ; tokens hors combat depuis tablePawns.',
+      '`mergeRemoteLiveTable` sync tablePawns ; FilterForPlayerView conserve tablePawns.',
+    ],
+  },
+  {
     version: '1.471',
     date: '2026-11-17',
     title: 'Présence, soirée et portraits',

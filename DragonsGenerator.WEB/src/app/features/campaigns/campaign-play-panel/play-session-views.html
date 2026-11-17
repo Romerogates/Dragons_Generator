@@ -19,6 +19,33 @@
       <app-play-session-dock />
     }
 
+    @if (shell.sessionView() !== 'dungeon') {
+      @if (combat.state.activeSessionMap()) {
+        <app-play-battle-map [sessionView]="shell.sessionView()" />
+      } @else if (combat.state.isDm()) {
+        <div
+          class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3"
+          data-testid="evening-map-cta"
+        >
+          <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Carte de la soirée</p>
+          <p class="mt-1 text-xs text-slate-400">
+            Choisissez un donjon pour l’afficher à toute la table, avec les héros dessus.
+          </p>
+          <button
+            type="button"
+            class="mt-2 min-h-11 px-3 rounded-xl text-[10px] font-black uppercase bg-sky-800 text-white hover:bg-sky-700"
+            (click)="shell.setSessionView('dungeon')"
+          >
+            Choisir une carte
+          </button>
+        </div>
+      } @else {
+        <p class="text-[10px] text-slate-500" data-testid="evening-map-waiting">
+          Le MJ n’a pas encore affiché de carte pour cette soirée.
+        </p>
+      }
+    }
+
     @if (combat.state.isDm() && shell.sessionView() === 'notes') {
       <app-campaign-session-notes
         [session]="playSession"

@@ -28,6 +28,20 @@
         <p class="text-[10px] text-slate-500 mt-1 max-w-xl">
           {{ combat.state.sessionModeHint(playSession.mode) }}
         </p>
+        @if (combat.state.activeSessionMap(); as eveningMap) {
+          <p class="mt-1 text-[10px] font-semibold text-sky-300/90" data-testid="evening-map-chip">
+            Carte de la soirée · {{ eveningMap.name }}
+          </p>
+        } @else if (combat.state.isDm()) {
+          <button
+            type="button"
+            class="mt-1 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300"
+            data-testid="evening-map-chip-cta"
+            (click)="shell.setSessionView('dungeon')"
+          >
+            Carte de la soirée · choisir
+          </button>
+        }
         @if (combat.presence().length) {
           <ul
             class="mt-2 flex flex-wrap gap-1.5"
