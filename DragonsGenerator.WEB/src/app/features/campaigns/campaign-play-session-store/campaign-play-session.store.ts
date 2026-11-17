@@ -24,6 +24,10 @@ import {
   placeEveningPawn,
   seedEveningPawns,
 } from '@core/utils/evening-map.util';
+import {
+  isLiveTableSessionPatch,
+  liveTablePersistBody,
+} from '@core/utils/live-table-persist.util';
 import { campaignDataAfterDmDamage } from '@core/utils/play-combat-mutations.util';
 import { sessionPatchAfterPlayEnd } from '@core/utils/play-combat-session.util';
 import { withFogToggled } from '@core/utils/dungeon-fog.util';
@@ -290,21 +294,37 @@ export class CampaignPlaySessionStore {
     );
     this.patchCampaign({ ...c.data, sessions });
 
+    const tablePatch = isLiveTableSessionPatch(patch);
+    const flush = () => {
+      const latest = this._campaign();
+      if (!latest) return;
+      if (tablePatch) {
+        const session = (latest.data.sessions ?? []).find((s) => s.id === sessionId);
+        const snapshot: Partial<CampaignSession> = {
+          activeMapId: session?.activeMapId ?? null,
+        };
+        if (session?.tablePawns) snapshot.tablePawns = session.tablePawns;
+        if (session?.activeCombat) snapshot.activeCombat = session.activeCombat;
+        const body = session ? liveTablePersistBody(sessionId, snapshot) : null;
+        if (body) this.persistLiveTable(body);
+        return;
+      }
+      this.saveData({ sessions: latest.data.sessions ?? [] });
+    };
+
     if (options?.immediate) {
       if (this.sessionSaveTimer) {
         clearTimeout(this.sessionSaveTimer);
         this.sessionSaveTimer = null;
       }
-      this.saveData({ sessions });
+      flush();
       return;
     }
 
     if (this.sessionSaveTimer) clearTimeout(this.sessionSaveTimer);
     this.sessionSaveTimer = setTimeout(() => {
       this.sessionSaveTimer = null;
-      const latest = this._campaign();
-      if (!latest) return;
-      this.saveData({ sessions: latest.data.sessions ?? [] });
+      flush();
     }, 700);
   }
 
@@ -320,6 +340,35 @@ export class CampaignPlaySessionStore {
     const next = { ...c, data };
     this._campaign.set(next);
     this.campaignChanged$.next(next);
+  }
+
+  private persistLiveTable(
+    body: NonNullable<ReturnType<typeof liveTablePersistBody>>,
+    onSuccess?: () => void,
+  ): void {
+    const c = this.requireCampaign();
+    const campaignId = c.id;
+    const seq = ++this.persistSeq;
+    this.saving.set(true);
+    this.persistTail = this.persistTail
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const summary = await firstValueFrom(this.campaigns.patchLiveTable(campaignId, body));
+          if (seq !== this.persistSeq) return;
+          const current = this.requireCampaign();
+          const next = { ...current, updatedAt: summary.updatedAt };
+          this._campaign.set(next);
+          this.campaignChanged$.next(next);
+          this.saving.set(false);
+          onSuccess?.();
+        } catch {
+          if (seq === this.persistSeq) {
+            this.saving.set(false);
+            this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', { ttlMs: 6000 });
+          }
+        }
+      });
   }
 
   private persist(title: string, data: CampaignData, onSuccess?: () => void): void {

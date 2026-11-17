@@ -22,6 +22,7 @@ import {
   peekPendingGoogleIdToken,
   storePendingGoogleIdToken,
 } from '@core/utils/pending-google.util';
+import { withGoogleLoginHint } from '@core/utils/auth-google-hint.util';
 
 @Component({
   selector: 'app-login',
@@ -95,7 +96,7 @@ export class LoginPage implements OnInit {
           this.enterGoogleSignup(idToken);
           return;
         }
-        this.error.set(reason || 'Connexion Google impossible.');
+        this.error.set(withGoogleLoginHint(reason || 'Connexion Google impossible.'));
       },
     });
   }
@@ -193,7 +194,7 @@ export class LoginPage implements OnInit {
           this.error.set('Ce compte a été désactivé. Contacte le support si tu penses que c’est une erreur.');
           return;
         }
-        this.error.set(reason || 'Connexion impossible.');
+        this.error.set(withGoogleLoginHint(reason || 'Connexion impossible.'));
       },
     });
   }

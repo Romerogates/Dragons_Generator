@@ -33,11 +33,12 @@ export const GUIDE_TIPS: string[] = [
       'Vous pouvez aussi préparer les donjons plus tôt dans Préparation → Donjons.',
       'document brouillon carte : image PNG + légende — les joueurs ne voient qu’après publication.',
       'Paramètres → onglet Notifications : filtrez amis, campagnes et push par type.',
+      'Même adresse e-mail et Google = un seul compte. Une autre adresse Google = un autre compte.',
 ];
 
 export const GUIDE_UPDATED_AT = '17 novembre 2026';
 
-export const GUIDE_VERSION = '1.6';
+export const GUIDE_VERSION = '1.7';
 
 export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
@@ -596,7 +597,7 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-google-mdp',
       question: 'Je me connecte avec Google : comment changer de mot de passe ou supprimer le compte ?',
       answer:
-        'Paramètres → Sécurité : vous pouvez choisir un mot de passe sans en connaître un actuel. Pour supprimer le compte : Paramètres → Données, tapez votre e-mail. Un compte e-mail et un compte Google avec la même adresse, c’est le même compte. Deux adresses différentes, ce sont deux comptes.',
+        'Paramètres → Sécurité : vous pouvez choisir un mot de passe sans en connaître un actuel. Pour supprimer le compte : Paramètres → Données, tapez votre e-mail. Un compte e-mail et un compte Google avec la même adresse, c’est le même compte. Deux adresses différentes, ce sont deux comptes. Si Google propose de créer un compte alors que vous jouez déjà, connectez-vous avec l’ancienne adresse.',
       audience: 'all',
     },
     {

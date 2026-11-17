@@ -67,6 +67,9 @@
           Avec Google : <span class="text-amber-300">pas de mot de passe</span>, juste un pseudo et le RGPD.
         </p>
         <app-google-sign-in (credential)="onGoogle($event)" />
+        <p class="text-[10px] text-slate-500 text-center leading-relaxed">
+          Même adresse e-mail + Google = le même compte. Une autre adresse Google, c’est un autre compte.
+        </p>
         <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
           Pseudo
           <input

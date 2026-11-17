@@ -13,6 +13,22 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.475',
+    date: '2026-11-17',
+    title: 'Table hors sync, pions légers, Google et guide',
+    player: [
+      'Si la synchro live coupe, la table continue de se mettre à jour toute seule, aussi pour le MJ.',
+      'Déplacer un pion n’alourdit plus toute la soirée.',
+      'Connexion : un e-mail Google différent de votre compte, c’est un autre compte — le site le dit clairement.',
+      'Le guide a une fiche pour chaque peuple jouable, chaque classe, et plus de voies (sous-classes).',
+    ],
+    tech: [
+      '`playSoftPollMs` / `hubSoftPollMs` : poll MJ si SignalR down.',
+      '`PATCH /me/campaigns/{id}/live-table` + `TryPatchLiveTable` (pions / carte / positions combat).',
+      'Hint Google deux comptes (`GOOGLE_TWO_ACCOUNT_HINT`). Guide 1.7 : 9 espèces, sous-classes par classe.',
+    ],
+  },
+  {
     version: '1.474',
     date: '2026-11-17',
     title: 'Guide : la soirée plus claire',

@@ -52,6 +52,7 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
   let store: CampaignPlaySessionStore;
   let postTableChat: jasmine.Spy;
   let update: jasmine.Spy;
+  let patchLiveTable: jasmine.Spy;
   let awardXp: jasmine.Spy;
   let proposeCharacter: jasmine.Spy;
   let charList: jasmine.Spy;
@@ -60,6 +61,9 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
   beforeEach(() => {
     postTableChat = jasmine.createSpy('postTableChat').and.returnValue(of({}));
     update = jasmine.createSpy('update').and.returnValue(of({ id: 'c1', updatedAt: '2026-02-01T00:00:00Z' }));
+    patchLiveTable = jasmine
+      .createSpy('patchLiveTable')
+      .and.returnValue(of({ id: 'c1', updatedAt: '2026-02-01T00:00:00Z' }));
     awardXp = jasmine.createSpy('awardXp').and.returnValue(of({ xpEarnedInCampaign: 10 }));
     proposeCharacter = jasmine.createSpy('proposeCharacter').and.returnValue(of(undefined));
     charList = jasmine.createSpy('list').and.returnValue(of([{ id: 'ch1', name: 'Aria', updatedAt: '' }]));
@@ -74,6 +78,7 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
           provide: CampaignCloudService,
           useValue: {
             update,
+            patchLiveTable,
             postTableChat,
             awardXp,
             proposeCharacter,
@@ -337,6 +342,8 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
     expect(store.activeSession()?.tablePawns?.[0].mapX).toBe(2);
     store.updateEveningPawn(pawn!.id, { tokenImageUrl: 'https://img.example/p.png' }, { immediate: true });
     expect(store.activeSession()?.tablePawns?.[0].tokenImageUrl).toBe('https://img.example/p.png');
+    expect(patchLiveTable).toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
   });
 
   it('ensureEveningPawns et placeEveningToken sont no-op pour un spectateur', () => {

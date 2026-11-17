@@ -8,6 +8,7 @@ import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { isRemoteNewer } from '@core/utils/campaign-remote-newer.util';
+import { hubSoftPollMs } from '@core/utils/play-soft-poll.util';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 import { CampaignHubStore } from './campaign-hub.store';
 
@@ -212,9 +213,8 @@ export class CampaignHubSyncService {
     const session = sessionId
       ? (c.data.sessions ?? []).find((s) => s.id === sessionId)
       : undefined;
-    const liveTable =
-      !c.isOwner && !!(sessionId || session?.activeCombat?.combatants?.length);
-    const nextMs = liveTable ? 4_000 : 12_000;
+    const liveTable = !!(sessionId || session?.activeCombat?.combatants?.length);
+    const nextMs = hubSoftPollMs(false, liveTable, c.isOwner) ?? 12_000;
     if (this.softPollIntervalMs === nextMs && this.softPollTimer) return;
     this.softPollIntervalMs = nextMs;
     this.clearSoftPollTimer();

@@ -107,6 +107,102 @@ export const GUIDE_SPECIES_PLAYBOOKS: GuideSpeciesPlaybook[] = [
       'Jouer uniquement le cliché « mineur grincheux » sans lire la fiche Eana.',
     ],
   ),
+  speciesTip(
+    'sp-halfelin',
+    'Halfelin',
+    [
+      'Petits, discrets, agiles : DEX, Discrétion, souvent chance ou ruse selon la lignée.',
+      'Pieds-légers (médiateurs) et pieds-sûrs (nomades) ne se jouent pas pareil — lisez la fiche.',
+    ],
+    [
+      'Annoncez Discrétion / escamotage hors combat, c’est votre force.',
+      'En combat : mobilité et distance, pas le tanking.',
+    ],
+    [
+      'Rester au contact comme un nain sans les PV / armure.',
+      'Oublier la sous-espèce choisie à la forge.',
+    ],
+  ),
+  speciesTip(
+    'sp-gnome',
+    'Gnome',
+    [
+      'INT, inventions, curiosité : outils, magie légère, mécaniques.',
+      'Les gnomes des roches et svirfnebelins changent le ton — fiche Codex.',
+    ],
+    [
+      'Proposez des solutions d’enquête, d’artisanat ou d’astuce, pas seulement des sorts.',
+      'En combat : restez à l’abri, cantrips / arbalète selon classe.',
+    ],
+    [
+      'Jouer uniquement le clown explosif sans lire les traits.',
+      'Se placer au front « pour voir le mécanisme ».',
+    ],
+  ),
+  speciesTip(
+    'sp-drakeide',
+    'Drakéide',
+    [
+      'Écailles, souffle, CHAR / FOR : fierté draconique et présence.',
+      'La teinte d’écaille oriente souffle et affinités — elle est sur la fiche.',
+    ],
+    [
+      'Annoncez le souffle (zone, type de dégâts) avant de le lancer.',
+      'Hors combat : CHA pour impressionner, parfois savoirs anciens.',
+    ],
+    [
+      'Oublier le souffle toute la soirée « pour plus tard ».',
+      'Ignorer la teinte et les résistances listées.',
+    ],
+  ),
+  speciesTip(
+    'sp-tieffelin',
+    'Tieffelin',
+    [
+      'Héritage fiélon : CHA / INT, résistance, sorts mineurs selon la lignée.',
+      'Le rapport à l’humanité et au géniteur est un levier de rôle, pas une obligation de « méchant ».',
+    ],
+    [
+      'Utilisez vision dans le noir et traits magiques hors combat.',
+      'CHA pour l’influence — INT si votre build y va.',
+    ],
+    [
+      'Jouer uniquement le cliché diabolique sans la fiche Eana (Xonim, stérilité, langue).',
+      'Oublier les sorts raciaux déjà inscrits sur la feuille.',
+    ],
+  ),
+  speciesTip(
+    'sp-melesse',
+    'Melessë',
+    [
+      'Ancêtres elfes et humains : CHA, aisance sociale, longévité. Sur Eana on dit melessë, pas « demi-elfe ».',
+      'Chaque visage est un métissage unique — appuyez-vous sur l’historique.',
+    ],
+    [
+      'CHA et compétences sociales : négociation, spectacle, médiation.',
+      'Vision dans le noir et traits listés : vérifiez la fiche avant de les inventer.',
+    ],
+    [
+      'Employer « demi-elfe » à la table si votre table suit le vocabulaire Eana.',
+      'Jouer un elfe ou un humain générique sans les traits CHA.',
+    ],
+  ),
+  speciesTip(
+    'sp-merosis',
+    'Merosis',
+    [
+      'Héritage orc : FOR / CON, intensité de vivre. Sur Eana on dit merosis, pas « demi-orc ».',
+      'Gloire, défis, philosophies de clan kaani — un levier de rôle, pas seulement de la rage.',
+    ],
+    [
+      'FOR / Athlétisme et endurance : annoncez-les hors combat.',
+      'En combat : frontline selon classe, pas forcément barbare.',
+    ],
+    [
+      'Jouer uniquement le brute sans relire les traits (relance, ténacité…).',
+      'Employer « demi-orc » si la table suit le vocabulaire Eana.',
+    ],
+  ),
 ];
 
 export function getGuideSpeciesPlaybook(

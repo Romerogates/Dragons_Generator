@@ -85,6 +85,9 @@
           {{ loading() ? 'Connexion…' : 'Se connecter' }}
         </button>
         <app-google-sign-in (credential)="onGoogle($event)" />
+        <p class="text-[10px] text-slate-500 text-center leading-relaxed">
+          Même adresse e-mail + Google = le même compte. Une autre adresse Google, c’est un autre compte.
+        </p>
       </form>
 
       <div class="mt-4 flex flex-col gap-2 text-center text-xs text-slate-400">

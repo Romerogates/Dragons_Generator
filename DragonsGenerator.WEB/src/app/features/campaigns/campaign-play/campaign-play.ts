@@ -34,6 +34,7 @@ import {
   mjTableShortcutFromKey,
   playShortcutBlockedByOverlay,
 } from '@core/utils/play-keyboard.util';
+import { playSoftPollMs } from '@core/utils/play-soft-poll.util';
 
 @Component({
   selector: 'app-campaign-play',
@@ -87,7 +88,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
       this.live.connected();
       const c = this.campaign();
       untracked(() => {
-        if (c && !c.isOwner) this.startSoftPoll(c);
+        if (c) this.startSoftPoll(c);
       });
     });
   }
@@ -179,14 +180,13 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   }
 
   /**
-   * Poll de secours uniquement si hub déconnecté.
-   * MJ : pas de poll (écrit déjà) mais reste abonné au hub pour jets d’init joueurs.
+   * Poll de secours si hub déconnecté — joueurs et MJ (jets d’init, pions distants).
    */
   private startSoftPoll(c: CampaignDetailModel): void {
     this.stopSoftPoll();
-    if (c.isOwner) return;
-    if (this.live.connected()) return;
-    this.softPollTimer = setInterval(() => this.softReload(), 4_000);
+    const ms = playSoftPollMs(this.live.connected(), c.isOwner);
+    if (ms == null) return;
+    this.softPollTimer = setInterval(() => this.softReload(), ms);
   }
 
   private stopSoftPoll(): void {

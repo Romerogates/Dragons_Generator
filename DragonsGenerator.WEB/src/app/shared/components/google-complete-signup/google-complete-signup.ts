@@ -16,6 +16,10 @@ import { RouterLink } from '@angular/router';
       @if (emailHint()) {
         <p class="text-xs text-slate-500 text-center">{{ emailHint() }}</p>
       }
+      <p class="text-[10px] text-slate-500 text-center leading-relaxed">
+        Cette adresse n’est pas encore liée. Si vous avez déjà un compte avec une autre adresse,
+        connectez-vous avec celle-là : ce seront deux comptes séparés.
+      </p>
       <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
         Pseudo
         <input

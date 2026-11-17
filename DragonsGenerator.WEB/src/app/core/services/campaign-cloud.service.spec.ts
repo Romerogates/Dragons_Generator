@@ -94,6 +94,20 @@ describe('CampaignCloudService', () => {
     req.flush([]);
   });
 
+  it('patches live table pawns', () => {
+    service
+      .patchLiveTable('c1', {
+        sessionId: 's1',
+        tablePawns: [{ id: 'pawn-u1', name: 'Aria', mapX: 2, mapY: 3 }],
+        activeMapId: 'm1',
+      })
+      .subscribe();
+    const req = http.expectOne(`${environment.apiUrl}/me/campaigns/c1/live-table`);
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body.sessionId).toBe('s1');
+    req.flush({ id: 'c1', updatedAt: '2026-11-17T00:00:00Z' });
+  });
+
   it('joins as spectator', () => {
     service.joinAsSpectator('tok').subscribe();
     const req = http.expectOne(`${environment.apiUrl}/me/join/tok/spectator`);

@@ -153,6 +153,49 @@ public class CharacterCampaignIntegrationTests
     }
 
     [Fact]
+    public async Task Patch_live_table_updates_pawns_without_full_put()
+    {
+        var token = await ApiTestAuth.LoginAdminAsync(_client);
+        ApiTestAuth.UseBearer(_client, token);
+
+        var create = await _client.PostAsJsonAsync(
+            "/me/campaigns",
+            new
+            {
+                title = "Table live patch",
+                data = JsonDocument.Parse(
+                    """
+                    {
+                      "activeSessionId": "ses-1",
+                      "sessions": [{
+                        "id": "ses-1",
+                        "title": "Soirée",
+                        "scheduledAt": "2026-11-17T20:00:00Z",
+                        "status": "planned"
+                      }]
+                    }
+                    """).RootElement,
+            });
+        Assert.True(create.IsSuccessStatusCode, await create.Content.ReadAsStringAsync());
+        var id = JsonDocument.Parse(await create.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetGuid();
+
+        var patch = await _client.PatchAsJsonAsync(
+            $"/me/campaigns/{id}/live-table",
+            new
+            {
+                sessionId = "ses-1",
+                tablePawns = new[] { new { id = "pawn-u1", name = "Aria", mapX = 3, mapY = 2 } },
+                activeMapId = "map-cave",
+            });
+        Assert.True(patch.IsSuccessStatusCode, await patch.Content.ReadAsStringAsync());
+
+        var detail = await _client.GetFromJsonAsync<JsonElement>($"/me/campaigns/{id}");
+        var session = detail.GetProperty("data").GetProperty("sessions")[0];
+        Assert.Equal("map-cave", session.GetProperty("activeMapId").GetString());
+        Assert.Equal(3, session.GetProperty("tablePawns")[0].GetProperty("mapX").GetInt32());
+    }
+
+    [Fact]
     public async Task Campaign_invites_list_is_empty_for_new_dm()
     {
         var token = await ApiTestAuth.LoginAdminAsync(_client);

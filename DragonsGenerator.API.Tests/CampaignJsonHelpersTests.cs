@@ -489,4 +489,51 @@ public class CampaignJsonHelpersTests
         Assert.Equal(2, chat.Count);
         Assert.Equal("m2", chat[1]!["id"]!.GetValue<string>());
     }
+
+    [Fact]
+    public void TryPatchLiveTable_updates_pawns_map_and_combatant_xy()
+    {
+        const string stored = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeMapId": "old",
+                "tablePawns": [{ "id": "pawn-u1", "name": "Aria", "mapX": 1, "mapY": 1 }],
+                "activeCombat": { "combatants": [{ "id": "pawn-u1", "mapX": 1, "mapY": 1 }] }
+              }]
+            }
+            """;
+        using var pawns = System.Text.Json.JsonDocument.Parse(
+            """[{ "id": "pawn-u1", "name": "Aria", "mapX": 4, "mapY": 5 }]""");
+        var json = CampaignJsonHelpers.TryPatchLiveTable(
+            stored,
+            "ses-1",
+            pawns.RootElement,
+            [new LiveTableCombatantPosition("pawn-u1", 4, 5, "https://img/p.png")],
+            "map-2",
+            clearActiveMapId: false,
+            out var error);
+        Assert.Null(error);
+        var session = JsonNode.Parse(json!)!["sessions"]![0]!;
+        Assert.Equal("map-2", session["activeMapId"]!.GetValue<string>());
+        Assert.Equal(4, session["tablePawns"]![0]!["mapX"]!.GetValue<int>());
+        Assert.Equal(4, session["activeCombat"]!["combatants"]![0]!["mapX"]!.GetValue<int>());
+        Assert.Equal("https://img/p.png", session["activeCombat"]!["combatants"]![0]!["tokenImageUrl"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void TryPatchLiveTable_rejects_unknown_session()
+    {
+        using var pawns = System.Text.Json.JsonDocument.Parse("[]");
+        var json = CampaignJsonHelpers.TryPatchLiveTable(
+            """{"sessions":[{"id":"ses-1"}]}""",
+            "ses-missing",
+            pawns.RootElement,
+            null,
+            null,
+            false,
+            out var error);
+        Assert.Null(json);
+        Assert.Equal("Session introuvable.", error);
+    }
 }

@@ -10,6 +10,7 @@ import {
   CampaignSummary,
   emptyCampaignData,
   normalizeHandoutKind,
+  type SessionTablePawn,
 } from '../models/Campaign/campaign';
 
 /** Limite serveur CreateCampaignEndpoint.MaxCampaignsPerUser */
@@ -123,6 +124,25 @@ export class CampaignCloudService {
       title,
       data,
     });
+  }
+
+  /** Pions / carte de soirée uniquement — évite un PUT de toute la campagne. */
+  patchLiveTable(
+    id: string,
+    body: {
+      sessionId: string;
+      tablePawns?: SessionTablePawn[];
+      combatantPositions?: {
+        id: string;
+        mapX?: number | null;
+        mapY?: number | null;
+        tokenImageUrl?: string | null;
+      }[];
+      activeMapId?: string | null;
+      clearActiveMapId?: boolean;
+    },
+  ): Observable<CampaignSummary> {
+    return this.http.patch<CampaignSummary>(`${this.api}/me/campaigns/${id}/live-table`, body);
   }
 
   delete(id: string): Observable<void> {

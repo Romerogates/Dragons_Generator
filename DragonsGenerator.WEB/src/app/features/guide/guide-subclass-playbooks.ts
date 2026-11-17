@@ -156,6 +156,186 @@ export const GUIDE_SUBCLASS_PLAYBOOKS: GuideSubclassPlaybook[] = [
       'Oublier de préparer des utilitaires (contrôle, détection).',
     ],
   ),
+  subclassTip(
+    'subcls-tueur-de-mages',
+    'Tueur de mages',
+    'cls-barbare',
+    'Barbare',
+    [
+      'Rage tournée contre les lanceurs : interruption, poursuite, résistance magique selon progression.',
+      'Vous restez un barbare de front — la cible prioritaire change.',
+    ],
+    [
+      'Identifiez les lanceurs ennemis et fermez la distance.',
+      'Gardez une Rage pour le mage, pas le premier sbire.',
+    ],
+    [
+      'Chasser le mage en laissant le groupe sans tank.',
+      'Ignorer le guide Barbare (Rage, position).',
+    ],
+  ),
+  subclassTip(
+    'subcls-voie-de-la-paume',
+    'Voie de la paume',
+    'cls-moine',
+    'Moine',
+    [
+      'Ki pour enchaîner frappes et contrôle au contact.',
+      'Mobilité d’abord : vous n’êtes pas un guerrier lourd.',
+    ],
+    [
+      'Gardez du ki pour le pic du combat.',
+      'Annoncez clairement chaque dépense de ki.',
+    ],
+    [
+      'Vider le ki au round 1 sur un sbire.',
+      'Rester immobile au milieu de la mêlée.',
+    ],
+  ),
+  subclassTip(
+    'subcls-voleur-roublard',
+    'Voleur',
+    'cls-roublard',
+    'Roublard',
+    [
+      'Escalade, crochetage, second-story : l’exploration est votre terrain.',
+      'La sournoise reste la règle d’or en combat.',
+    ],
+    [
+      'Préparez Discrétion avant d’ouvrir une porte.',
+      'Cherchez avantage ou allié au contact pour la sournoise.',
+    ],
+    [
+      'Ouvrir toutes les serrures « pour voir » sans plan de fuite.',
+      'Attaquer seul au front sans condition de sournoise.',
+    ],
+  ),
+  subclassTip(
+    'subcls-chasseur',
+    'Chasseur',
+    'cls-rodeur',
+    'Rôdeur',
+    [
+      'Cibles marquées, options contre horde ou gros monstre.',
+      'Distance et pistage : vous orientez le groupe dans la nature.',
+    ],
+    [
+      'Choisissez la bonne option de chasseur selon l’ennemi.',
+      'Concentration : un sort à la fois.',
+    ],
+    [
+      'Rester collé au mage ennemi avec un arc à la main.',
+      'Oublier Survie / Nature hors combat.',
+    ],
+  ),
+  subclassTip(
+    'subcls-serment-de-devotion',
+    'Serment de dévotion',
+    'cls-paladin',
+    'Paladin',
+    [
+      'Protection, serments lumineux, smite ciblé.',
+      'Vous êtes le filet du groupe autant que le DPS sacré.',
+    ],
+    [
+      'Smite le boss, pas le premier gobelin.',
+      'Tenez-vous près des alliés pour les auras.',
+    ],
+    [
+      'Jouer un barbare sacré loin du groupe.',
+      'Vider tous les emplacements au premier round.',
+    ],
+  ),
+  subclassTip(
+    'subcls-college-conteurs',
+    'Collège des conteurs',
+    'cls-barde',
+    'Barde',
+    [
+      'Récits, inspiration, contrôle social et buffs.',
+      'CHA partout : hors combat vous menez la scène.',
+    ],
+    [
+      'Gardez de l’inspiration pour les jets qui comptent.',
+      'Un seul sort de concentration à la fois.',
+    ],
+    [
+      'Tout dépenser au premier jet « pour tester ».',
+      'Aller au contact sans repli.',
+    ],
+  ),
+  subclassTip(
+    'subcls-cercle-de-la-terre',
+    'Cercle de la terre',
+    'cls-druide',
+    'Druide',
+    [
+      'Sorts de terrain, récupération, identité liée au biome.',
+      'SAG pour les sorts — la forme sauvage n’est pas obligatoire.',
+    ],
+    [
+      'Préparez selon le lieu de la soirée (forêt, pierre, marais…).',
+      'Concentration : ne la cassez pas en changeant de sort.',
+    ],
+    [
+      'N’avoir que des sorts de dégâts.',
+      'Se transformer trop tôt et perdre la forme avant le pic.',
+    ],
+  ),
+  subclassTip(
+    'subcls-lignee-draconique',
+    'Lignée draconique',
+    'cls-ensorceleur',
+    'Ensorceleur',
+    [
+      'Sang de dragon : résistance, présence, sorts plus « élémentaires ».',
+      'Peu de sorts connus : ils doivent coller à votre teinte.',
+    ],
+    [
+      'Métamagie + emplacements = pic, pas le round 1 entier.',
+      'CHA pour DD et attaques.',
+    ],
+    [
+      'Vider sorcellerie dès le premier monstre.',
+      'Oublier la résistance / origine draconique sur la fiche.',
+    ],
+  ),
+  subclassTip(
+    'subcls-seigneur-fielon',
+    'Seigneur fiélon',
+    'cls-sorcier',
+    'Sorcier',
+    [
+      'Pacte infernal : cantrip fort, emplacements au repos court, tentations de rôle.',
+      'Chaque sort compte — vous n’êtes pas un magicien.',
+    ],
+    [
+      'Cantrip principal presque chaque tour.',
+      'Relisez invocations et pacte avant la session.',
+    ],
+    [
+      'Garder les emplacements « précieux » et ne jamais les lancer (ils reviennent).',
+      'Imiter un prêtre soigneur sans en avoir les outils.',
+    ],
+  ),
+  subclassTip(
+    'subcls-alchimie',
+    'Alchimie',
+    'cls-lettre',
+    'Lettré',
+    [
+      'Savoirs, préparations, outils d’érudit : l’enquête et les objets.',
+      'INT d’abord — le combat n’est qu’un des terrains.',
+    ],
+    [
+      'Annoncez vos outils / préparations hors combat.',
+      'Vérifiez sur la fiche si vous avez vraiment des sorts.',
+    ],
+    [
+      'Rester muet pendant l’enquête.',
+      'Tanking au front sans PV / armure.',
+    ],
+  ),
 ];
 
 export function getGuideSubclassPlaybook(

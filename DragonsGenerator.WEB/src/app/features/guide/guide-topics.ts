@@ -436,7 +436,7 @@ function contentFor(id: string): Pick<
     case 'compte':
       return {
         paragraphs: [
-          'Compte, profil, paramètres. Connexion e-mail ou Google : même adresse = même compte.',
+          'Compte, profil, paramètres. E-mail ou Google : même adresse = même compte. Une autre adresse Google, c’est un autre compte.',
         ],
         steps: [
           {

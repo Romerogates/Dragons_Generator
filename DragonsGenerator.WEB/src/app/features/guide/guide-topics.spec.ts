@@ -207,14 +207,15 @@ describe('guide-class-playbooks', () => {
 
 describe('guide subclass + species playbooks', () => {
   it('ships a few subclass tips (template pattern)', () => {
-    expect(GUIDE_SUBCLASS_PLAYBOOKS.length).toBeGreaterThanOrEqual(3);
+    expect(GUIDE_SUBCLASS_PLAYBOOKS.length).toBeGreaterThanOrEqual(13);
     expect(getGuideSubclassPlaybook('subcls-berserker')?.classId).toBe('cls-barbare');
     expect(getGuideSubclassPlaybook('subcls-inconnu')).toBeNull();
   });
 
   it('ships a few species tips', () => {
-    expect(GUIDE_SPECIES_PLAYBOOKS.length).toBeGreaterThanOrEqual(2);
+    expect(GUIDE_SPECIES_PLAYBOOKS.length).toBe(9);
     expect(getGuideSpeciesPlaybook('sp-humain')?.speciesName).toBe('Humain');
+    expect(getGuideSpeciesPlaybook('sp-merosis')?.speciesName).toBe('Merosis');
     expect(getGuideSpeciesPlaybook('sp-inconnu')).toBeNull();
   });
 });
