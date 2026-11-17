@@ -221,6 +221,7 @@ public sealed class OpenAiChatClient
         }
 
         httpRequest.Content = JsonContent.Create(groqRequest);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
 
         HttpResponseMessage response;
         try
@@ -230,7 +231,7 @@ public sealed class OpenAiChatClient
         catch (Exception ex)
         {
             _logger.LogError(ex, "Échec d'appel LLM utilisateur ({Provider}, {Endpoint})", credentials.Provider, endpoint);
-            return new GroqChatResult(false, null, "Impossible de joindre votre fournisseur IA. Vérifiez la clé et le modèle.");
+            return Fail("Impossible de joindre votre fournisseur IA. Vérifiez la clé et le modèle.", credentials.Model, sw);
         }
 
         if (!response.IsSuccessStatusCode)
@@ -255,7 +256,7 @@ public sealed class OpenAiChatClient
                 >= 500 => "Erreur temporaire chez votre fournisseur IA.",
                 _ => "Votre fournisseur IA a renvoyé une erreur.",
             };
-            return new GroqChatResult(false, null, message, rateLimited, retryable, ParseRetryAfterMs(response));
+            return Fail(message, credentials.Model, sw, rateLimited, retryable, ParseRetryAfterMs(response));
         }
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
@@ -263,15 +264,17 @@ public sealed class OpenAiChatClient
         var text = ExtractMessageText(groqMessage);
         if (string.IsNullOrWhiteSpace(text))
         {
-            return new GroqChatResult(
+            return FromResponse(
                 false,
                 null,
                 "Votre IA n'a renvoyé aucun texte exploitable.",
-                Retryable: true
-            );
+                result,
+                credentials.Model,
+                sw,
+                retryable: true);
         }
 
-        return new GroqChatResult(true, text, null);
+        return FromResponse(true, text, null, result, credentials.Model, sw);
     }
 
     private async Task<GroqChatResult> SendChatOnceAsync(
@@ -314,6 +317,7 @@ public sealed class OpenAiChatClient
         if (!string.IsNullOrWhiteSpace(apiKey))
             httpRequest.Headers.Add("Authorization", $"Bearer {apiKey}");
         httpRequest.Content = JsonContent.Create(groqRequest);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
 
         HttpResponseMessage response;
         try
@@ -323,7 +327,7 @@ public sealed class OpenAiChatClient
         catch (Exception ex)
         {
             _logger.LogError(ex, "Échec d'appel au backend IA ({Section}, {Endpoint})", _configSection, endpoint);
-            return new GroqChatResult(false, null, "Impossible de joindre le service de génération IA.");
+            return Fail("Impossible de joindre le service de génération IA.", model, sw);
         }
 
         if (!response.IsSuccessStatusCode)
@@ -345,7 +349,7 @@ public sealed class OpenAiChatClient
                 _ => "Le service de génération IA a renvoyé une erreur."
             };
 
-            return new GroqChatResult(false, null, message, rateLimited, retryable, retryAfterMs);
+            return Fail(message, model, sw, rateLimited, retryable, retryAfterMs);
         }
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
@@ -358,14 +362,17 @@ public sealed class OpenAiChatClient
                 "{Section}/{Model}: réponse vide (content et reasoning absents après nettoyage)",
                 _configSection,
                 model);
-            return new GroqChatResult(
+            return FromResponse(
                 false,
                 null,
                 "La génération IA n'a renvoyé aucun texte en français.",
-                Retryable: true);
+                result,
+                model,
+                sw,
+                retryable: true);
         }
 
-        return new GroqChatResult(true, text, null);
+        return FromResponse(true, text, null, result, model, sw);
     }
 
     private static string? ExtractMessageText(GroqMessage? message)
@@ -380,6 +387,45 @@ public sealed class OpenAiChatClient
         return GroqChatClient.SanitizeModelOutput(message.Reasoning?.Trim());
     }
 
+    private static GroqChatResult FromResponse(
+        bool ok,
+        string? text,
+        string? error,
+        GroqResponse? result,
+        string? model,
+        System.Diagnostics.Stopwatch sw,
+        bool retryable = false)
+    {
+        var usage = result?.Usage;
+        var prompt = Math.Max(0, usage?.PromptTokens ?? 0);
+        var completion = Math.Max(0, usage?.CompletionTokens ?? 0);
+        var total = usage is null ? 0 : Math.Max(0, usage.TotalTokens);
+        if (total <= 0) total = prompt + completion;
+        var resolved = string.IsNullOrWhiteSpace(result?.Model) ? model : result!.Model;
+        return new GroqChatResult(
+            ok,
+            text,
+            error,
+            Retryable: retryable,
+            PromptTokens: prompt,
+            CompletionTokens: completion,
+            TotalTokens: total,
+            Model: resolved,
+            LatencyMs: ElapsedMs(sw));
+    }
+
+    private static GroqChatResult Fail(
+        string message,
+        string? model,
+        System.Diagnostics.Stopwatch sw,
+        bool rateLimited = false,
+        bool retryable = false,
+        int? retryAfterMs = null) =>
+        new GroqChatResult(false, null, message, rateLimited, retryable, retryAfterMs, Model: model, LatencyMs: ElapsedMs(sw));
+
+    private static int ElapsedMs(System.Diagnostics.Stopwatch sw) =>
+        (int)Math.Min(int.MaxValue, sw.ElapsedMilliseconds);
+
     private static int? ParseRetryAfterMs(HttpResponseMessage response)
     {
         if (!response.Headers.TryGetValues("Retry-After", out var values))
@@ -392,9 +438,13 @@ public sealed class OpenAiChatClient
         return null;
     }
 
-    private sealed record GroqResponse(List<GroqChoice>? Choices);
+    private sealed record GroqResponse(List<GroqChoice>? Choices, GroqUsage? Usage, string? Model);
     private sealed record GroqChoice(GroqMessage? Message);
     private sealed record GroqMessage(
         [property: JsonPropertyName("content")] string? Content,
         [property: JsonPropertyName("reasoning")] string? Reasoning);
+    private sealed record GroqUsage(
+        [property: JsonPropertyName("prompt_tokens")] int PromptTokens,
+        [property: JsonPropertyName("completion_tokens")] int CompletionTokens,
+        [property: JsonPropertyName("total_tokens")] int TotalTokens);
 }

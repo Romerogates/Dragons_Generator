@@ -255,7 +255,7 @@ public sealed class HybridAiService
 
     private GroqChatResult Done(string kind, string provider, GroqChatResult result)
     {
-        _telemetry.Record(kind, result.Ok, provider);
+        _telemetry.Record(kind, result.Ok, provider, result);
         return result;
     }
 

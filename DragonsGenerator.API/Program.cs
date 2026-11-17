@@ -150,6 +150,8 @@ builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
 builder.Services.AddSingleton<AiGenerationTelemetry>();
+builder.Services.AddSingleton<HttpRequestMetrics>();
+builder.Services.AddSingleton<HostResourceSampler>();
 builder.Services.AddSingleton<HybridAiService>();
 builder.Services.AddSingleton<UserAiSecretProtector>();
 builder.Services.AddScoped<UserAiCredentialResolver>();
@@ -230,6 +232,7 @@ var app = builder.Build();
 
 await DbSeeder.SeedAsync(app.Services);
 
+app.UseMiddleware<HttpRequestMetricsMiddleware>();
 app.UseExceptionHandler(errApp =>
 {
     errApp.Run(async ctx =>

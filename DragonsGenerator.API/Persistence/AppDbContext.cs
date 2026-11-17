@@ -261,6 +261,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.Kind, x.CreatedAt });
             e.Property(x => x.Kind).HasMaxLength(32);
             e.Property(x => x.Provider).HasMaxLength(64);
+            e.Property(x => x.Model).HasMaxLength(128);
         });
 
         modelBuilder.Entity<SiteAnnouncement>(e =>

@@ -74,9 +74,213 @@
   @if (tab() === 'stats') {
     @if (stats(); as s) {
       <div class="flex items-center justify-between mb-4">
-        <p class="text-xs text-slate-500">Compteurs live — produit, IA, social, support.</p>
+        <p class="text-xs text-slate-500">
+          Serveur, appels API (depuis le dernier redémarrage), tokens IA et compteurs produit — rafraîchi toutes les 12 s.
+        </p>
         <button type="button" class="text-xs text-amber-400 hover:underline" (click)="loadStats()">Actualiser</button>
       </div>
+
+      <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Serveur</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">RAM VPS</p>
+          @if (s.server.hostMemoryTotalBytes; as total) {
+            <p class="text-2xl font-serif text-amber-400">{{ vpsRamPercent(s) === null ? formatBytes(total) : vpsRamPercent(s) + ' %' }}</p>
+            <p class="text-[10px] text-slate-500">
+              {{ formatBytes(vpsRamUsed(s)) }} / {{ formatBytes(total) }}
+              @if (s.server.hostMemoryAvailableBytes; as free) {
+                · {{ formatBytes(free) }} libres
+              }
+            </p>
+            @if (vpsRamPercent(s); as pct) {
+              <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full bg-amber-500" [style.width.%]="pct"></div>
+              </div>
+            }
+          } @else {
+            <p class="text-2xl font-serif text-amber-400">—</p>
+            <p class="text-[10px] text-slate-500">Indisponible hors Linux (lu depuis la machine hôte).</p>
+          }
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Mémoire process</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatBytes(s.server.workingSetBytes) }}</p>
+          <p class="text-[10px] text-slate-500">privé {{ formatBytes(s.server.privateMemoryBytes) }} · tas {{ formatBytes(s.server.gcHeapBytes) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">RAM API (plafond)</p>
+          <p class="text-2xl font-serif text-amber-400">{{ ramPercent(s) === null ? formatBytes(ramUsed(s)) : ramPercent(s) + ' %' }}</p>
+          <p class="text-[10px] text-slate-500">
+            {{ formatBytes(ramUsed(s)) }}
+            @if (ramLimit(s); as lim) {
+              / {{ formatBytes(lim) }}
+            }
+          </p>
+          @if (ramPercent(s); as pct) {
+            <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <div class="h-full bg-amber-500" [style.width.%]="pct"></div>
+            </div>
+          }
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">CPU process</p>
+          <p class="text-2xl font-serif text-amber-400">{{ s.server.cpuProcessPercent }} %</p>
+          <p class="text-[10px] text-slate-500">{{ s.server.processorCount }} cœurs · {{ s.server.threadCount }} threads</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Uptime</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatDuration(s.server.uptimeSeconds) }}</p>
+          <p class="text-[10px] text-slate-500 truncate" [title]="s.server.osDescription">
+            {{ s.server.environmentName }} · {{ s.server.framework }}
+          </p>
+        </div>
+      </div>
+
+      <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Appels API</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Requêtes</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.http.requestsSinceStart) }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.http.inFlight }} en cours</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">2xx / 3xx</p>
+          <p class="text-2xl font-serif text-emerald-400">{{ formatCount(s.http.status2xx) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">4xx</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.http.status4xx) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">5xx</p>
+          <p class="text-2xl font-serif text-red-400">{{ formatCount(s.http.status5xx) }}</p>
+        </div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-3 mb-6">
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300 overflow-x-auto">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Routes les plus appelées</p>
+          @if (s.http.topPaths.length) {
+            <table class="w-full text-left">
+              <thead class="text-[10px] uppercase tracking-widest text-slate-500">
+                <tr>
+                  <th class="py-1 pr-2">Route</th>
+                  <th class="py-1 pr-2">N</th>
+                  <th class="py-1 pr-2">Err</th>
+                  <th class="py-1">ms</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of s.http.topPaths; track p.path) {
+                  <tr class="border-t border-slate-800">
+                    <td class="py-1.5 font-mono text-[11px]">{{ p.path }}</td>
+                    <td class="py-1.5">{{ p.count }}</td>
+                    <td class="py-1.5" [class.text-red-400]="p.errors > 0">{{ p.errors }}</td>
+                    <td class="py-1.5">{{ p.avgDurationMs }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <p class="text-slate-500">Aucun appel enregistré depuis le démarrage.</p>
+          }
+        </div>
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300 overflow-x-auto">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Derniers appels</p>
+          @if (s.http.recent.length) {
+            <ul class="space-y-1 max-h-64 overflow-y-auto">
+              @for (r of s.http.recent; track r.at + r.path + r.status) {
+                <li class="flex gap-2 font-mono text-[11px]">
+                  <span class="text-slate-500 w-10 shrink-0">{{ r.method }}</span>
+                  <span class="truncate flex-1">{{ r.path }}</span>
+                  <span class="shrink-0" [class]="statusTone(r.status)">{{ r.status }}</span>
+                  <span class="text-slate-500 w-10 text-right shrink-0">{{ r.durationMs }}ms</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="text-slate-500">En attente de trafic.</p>
+          }
+        </div>
+      </div>
+
+      <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">IA</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Appels IA</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.generations) }}</p>
+          <p class="text-[10px] text-slate-500">{{ s.generationsOk }} OK · {{ s.generationsLast24h }} / 24 h · {{ s.generationsLast7Days }} / 7 j</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Tokens total</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.totalTokens) }}</p>
+          <p class="text-[10px] text-slate-500">{{ formatCount(s.tokensLast24h) }} / 24 h · {{ formatCount(s.tokensLast7Days) }} / 7 j</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Prompt</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.promptTokens) }}</p>
+        </div>
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500">Complétion</p>
+          <p class="text-2xl font-serif text-amber-400">{{ formatCount(s.completionTokens) }}</p>
+        </div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-3 mb-6">
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Par type</p>
+          @if (s.generationsByKind.length) {
+            <table class="w-full text-left">
+              <thead class="text-[10px] uppercase tracking-widest text-slate-500">
+                <tr>
+                  <th class="py-1">Type</th>
+                  <th class="py-1">Appels</th>
+                  <th class="py-1">OK</th>
+                  <th class="py-1">Tokens</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (k of s.generationsByKind; track k.kind) {
+                  <tr class="border-t border-slate-800">
+                    <td class="py-2 font-mono">{{ k.kind }}</td>
+                    <td class="py-2">{{ k.total }}</td>
+                    <td class="py-2 text-emerald-400">{{ k.ok }}</td>
+                    <td class="py-2">{{ formatCount(k.tokens) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <p class="text-slate-500">Aucune génération journalisée pour l’instant.</p>
+          }
+        </div>
+        <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Par fournisseur</p>
+          @if (s.generationsByProvider.length) {
+            <table class="w-full text-left">
+              <thead class="text-[10px] uppercase tracking-widest text-slate-500">
+                <tr>
+                  <th class="py-1">Fournisseur</th>
+                  <th class="py-1">Appels</th>
+                  <th class="py-1">OK</th>
+                  <th class="py-1">Tokens</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of s.generationsByProvider; track p.provider) {
+                  <tr class="border-t border-slate-800">
+                    <td class="py-2 font-mono">{{ p.provider }}</td>
+                    <td class="py-2">{{ p.total }}</td>
+                    <td class="py-2 text-emerald-400">{{ p.ok }}</td>
+                    <td class="py-2">{{ formatCount(p.tokens) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <p class="text-slate-500">Les tokens s’accumulent à chaque génération (Groq, Gemini, clé perso).</p>
+          }
+        </div>
+      </div>
+
       <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Produit</p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
@@ -88,11 +292,6 @@
           <p class="text-[10px] uppercase tracking-widest text-slate-500">Aventures / campagnes</p>
           <p class="text-2xl font-serif text-amber-400">{{ s.campaigns }}</p>
           <p class="text-[10px] text-slate-500">{{ s.campaignsActive }} actives · +{{ s.campaignsLast7Days }} / 7 j</p>
-        </div>
-        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
-          <p class="text-[10px] uppercase tracking-widest text-slate-500">Générations IA</p>
-          <p class="text-2xl font-serif text-amber-400">{{ s.generations }}</p>
-          <p class="text-[10px] text-slate-500">{{ s.generationsOk }} OK · {{ s.generationsLast24h }} / 24 h · {{ s.generationsLast7Days }} / 7 j</p>
         </div>
         <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
           <p class="text-[10px] uppercase tracking-widest text-slate-500">Comptes</p>
@@ -118,31 +317,6 @@
           <p class="text-2xl font-serif text-amber-400">{{ s.supportTickets }}</p>
           <p class="text-[10px] text-slate-500">{{ s.supportMessages }} msgs · {{ s.guideComments }} commentaires</p>
         </div>
-      </div>
-      <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
-        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-3">Générations par type</p>
-        @if (s.generationsByKind.length) {
-          <table class="w-full text-left">
-            <thead class="text-[10px] uppercase tracking-widest text-slate-500">
-              <tr>
-                <th class="py-1">Type</th>
-                <th class="py-1">Total</th>
-                <th class="py-1">OK</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (k of s.generationsByKind; track k.kind) {
-                <tr class="border-t border-slate-800">
-                  <td class="py-2 font-mono">{{ k.kind }}</td>
-                  <td class="py-2">{{ k.total }}</td>
-                  <td class="py-2 text-emerald-400">{{ k.ok }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        } @else {
-          <p class="text-slate-500">Aucune génération journalisée pour l’instant (le compteur démarre maintenant).</p>
-        }
       </div>
     } @else {
       <p class="text-sm text-slate-500">Chargement des stats…</p>

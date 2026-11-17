@@ -325,6 +325,11 @@ public class AiGenerationLog
     public string Kind { get; set; } = "";
     public bool Ok { get; set; }
     public string? Provider { get; set; }
+    public string? Model { get; set; }
+    public int PromptTokens { get; set; }
+    public int CompletionTokens { get; set; }
+    public int TotalTokens { get; set; }
+    public int LatencyMs { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 

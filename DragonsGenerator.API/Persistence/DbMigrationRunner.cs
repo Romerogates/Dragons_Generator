@@ -47,6 +47,7 @@ public static class DbMigrationRunner
         new("023_support_category_assign", Apply023SupportCategoryAssignAsync),
         new("024_user_disabled", Apply024UserDisabledAsync),
         new("025_site_announcements", Apply025SiteAnnouncementsAsync),
+        new("026_ai_generation_tokens", Apply026AiGenerationTokensAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -475,6 +476,15 @@ public static class DbMigrationRunner
     private static async Task Apply024UserDisabledAsync(AppDbContext db, CancellationToken ct)
     {
         await TryAddColumnAsync(db, "Users", "Disabled", "INTEGER NOT NULL DEFAULT 0", ct);
+    }
+
+    private static async Task Apply026AiGenerationTokensAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "AiGenerationLogs", "PromptTokens", "INTEGER NOT NULL DEFAULT 0", ct);
+        await TryAddColumnAsync(db, "AiGenerationLogs", "CompletionTokens", "INTEGER NOT NULL DEFAULT 0", ct);
+        await TryAddColumnAsync(db, "AiGenerationLogs", "TotalTokens", "INTEGER NOT NULL DEFAULT 0", ct);
+        await TryAddColumnAsync(db, "AiGenerationLogs", "LatencyMs", "INTEGER NOT NULL DEFAULT 0", ct);
+        await TryAddColumnAsync(db, "AiGenerationLogs", "Model", "TEXT NULL", ct);
     }
 
     private static async Task Apply025SiteAnnouncementsAsync(AppDbContext db, CancellationToken ct)

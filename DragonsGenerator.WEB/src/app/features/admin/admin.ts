@@ -26,6 +26,12 @@ import {
 } from '@shared/components/support-conversation/support-conversation';
 import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-list';
 import { AdminAnnouncements } from './admin-announcements/admin-announcements';
+import {
+  adminRamPercent,
+  formatAdminBytes,
+  formatAdminCount,
+  formatAdminDuration,
+} from './admin-stats.format';
 
 interface AdminUser {
   id: string;
@@ -102,6 +108,59 @@ interface AdminStatsKind {
   kind: string;
   total: number;
   ok: number;
+  tokens: number;
+}
+
+interface AdminStatsProvider {
+  provider: string;
+  total: number;
+  ok: number;
+  tokens: number;
+}
+
+interface AdminServer {
+  machineName: string;
+  framework: string;
+  osDescription: string;
+  environmentName: string;
+  startedAt: string;
+  uptimeSeconds: number;
+  cpuProcessPercent: number;
+  threadCount: number;
+  processorCount: number;
+  workingSetBytes: number;
+  privateMemoryBytes: number;
+  gcHeapBytes: number;
+  availableMemoryBytes: number | null;
+  containerMemoryBytes: number | null;
+  containerMemoryLimitBytes: number | null;
+  hostMemoryTotalBytes: number | null;
+  hostMemoryAvailableBytes: number | null;
+}
+
+interface AdminHttpPath {
+  path: string;
+  count: number;
+  errors: number;
+  avgDurationMs: number;
+}
+
+interface AdminHttpRecent {
+  method: string;
+  path: string;
+  status: number;
+  durationMs: number;
+  at: string;
+}
+
+interface AdminHttp {
+  requestsSinceStart: number;
+  status2xx: number;
+  status4xx: number;
+  status5xx: number;
+  inFlight: number;
+  topPaths: AdminHttpPath[];
+  recent: AdminHttpRecent[];
 }
 
 interface AdminStats {
@@ -126,7 +185,15 @@ interface AdminStats {
   generationsOk: number;
   generationsLast24h: number;
   generationsLast7Days: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  tokensLast24h: number;
+  tokensLast7Days: number;
   generationsByKind: AdminStatsKind[];
+  generationsByProvider: AdminStatsProvider[];
+  server: AdminServer;
+  http: AdminHttp;
 }
 
 type AdminTab =
@@ -167,6 +234,10 @@ export class AdminPage implements OnInit, OnDestroy {
   private readonly api = environment.apiUrl;
   private readonly convo = viewChild(SupportConversation);
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+  private statsPoll: ReturnType<typeof setInterval> | null = null;
+  readonly formatBytes = formatAdminBytes;
+  readonly formatDuration = formatAdminDuration;
+  readonly formatCount = formatAdminCount;
   readonly ticketStatusFilter = signal<'all' | 'open' | 'in_progress' | 'closed'>('all');
   readonly ticketCategoryFilter = signal<'all' | string>('all');
   readonly ticketMineOnly = signal(false);
@@ -222,7 +293,7 @@ export class AdminPage implements OnInit, OnDestroy {
     this.loadOverview();
     if (this.tab() === 'mails') this.loadMails();
     if (this.tab() === 'ops') this.loadHostBackups();
-    if (this.tab() === 'stats') this.loadStats();
+    if (this.tab() === 'stats') this.startStatsPoll();
   }
 
   setTab(tab: AdminTab): void {
@@ -231,7 +302,8 @@ export class AdminPage implements OnInit, OnDestroy {
     if (tab === 'overview' || tab === 'ops') this.loadOverview();
     if (tab === 'ops') this.loadHostBackups();
     if (tab === 'mails') this.loadMails();
-    if (tab === 'stats') this.loadStats();
+    if (tab === 'stats') this.startStatsPoll();
+    else this.stopStatsPoll();
   }
 
   loadMails(): void {
@@ -334,6 +406,49 @@ export class AdminPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopPoll();
+    this.stopStatsPoll();
+  }
+
+  ramPercent(s: AdminStats): number | null {
+    return adminRamPercent(this.ramUsed(s), this.ramLimit(s));
+  }
+
+  ramUsed(s: AdminStats): number {
+    return s.server.containerMemoryBytes ?? s.server.workingSetBytes;
+  }
+
+  ramLimit(s: AdminStats): number | null {
+    return s.server.containerMemoryLimitBytes;
+  }
+
+  vpsRamUsed(s: AdminStats): number | null {
+    const total = s.server.hostMemoryTotalBytes;
+    const available = s.server.hostMemoryAvailableBytes;
+    if (total == null || available == null) return null;
+    return Math.max(0, total - available);
+  }
+
+  vpsRamPercent(s: AdminStats): number | null {
+    return adminRamPercent(this.vpsRamUsed(s), s.server.hostMemoryTotalBytes);
+  }
+
+  statusTone(status: number): string {
+    if (status >= 500) return 'text-red-400';
+    if (status >= 400) return 'text-amber-400';
+    return 'text-emerald-400';
+  }
+
+  private startStatsPoll(): void {
+    this.loadStats();
+    if (this.statsPoll) return;
+    this.statsPoll = setInterval(() => this.loadStats(), 12_000);
+  }
+
+  private stopStatsPoll(): void {
+    if (this.statsPoll) {
+      clearInterval(this.statsPoll);
+      this.statsPoll = null;
+    }
   }
 
   categoryLabel(category: string | undefined): string {

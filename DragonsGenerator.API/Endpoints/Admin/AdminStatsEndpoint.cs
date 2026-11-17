@@ -1,10 +1,45 @@
+using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Persistence;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Admin;
 
-public record AdminStatsKindDto(string Kind, int Total, int Ok);
+public record AdminStatsKindDto(string Kind, int Total, int Ok, long Tokens);
+
+public record AdminStatsProviderDto(string Provider, int Total, int Ok, long Tokens);
+
+public record AdminServerDto(
+    string MachineName,
+    string Framework,
+    string OsDescription,
+    string EnvironmentName,
+    DateTimeOffset StartedAt,
+    int UptimeSeconds,
+    double CpuProcessPercent,
+    int ThreadCount,
+    int ProcessorCount,
+    long WorkingSetBytes,
+    long PrivateMemoryBytes,
+    long GcHeapBytes,
+    long? AvailableMemoryBytes,
+    long? ContainerMemoryBytes,
+    long? ContainerMemoryLimitBytes,
+    long? HostMemoryTotalBytes,
+    long? HostMemoryAvailableBytes);
+
+public record AdminHttpPathDto(string Path, int Count, int Errors, int AvgDurationMs);
+
+public record AdminHttpRecentDto(string Method, string Path, int Status, int DurationMs, DateTimeOffset At);
+
+public record AdminHttpDto(
+    int RequestsSinceStart,
+    int Status2xx,
+    int Status4xx,
+    int Status5xx,
+    int InFlight,
+    List<AdminHttpPathDto> TopPaths,
+    List<AdminHttpRecentDto> Recent);
 
 public record AdminStatsDto(
     int Users,
@@ -28,10 +63,22 @@ public record AdminStatsDto(
     int GenerationsOk,
     int GenerationsLast24h,
     int GenerationsLast7Days,
-    List<AdminStatsKindDto> GenerationsByKind
+    long PromptTokens,
+    long CompletionTokens,
+    long TotalTokens,
+    long TokensLast24h,
+    long TokensLast7Days,
+    List<AdminStatsKindDto> GenerationsByKind,
+    List<AdminStatsProviderDto> GenerationsByProvider,
+    AdminServerDto Server,
+    AdminHttpDto Http
 );
 
-public class AdminStatsEndpoint(AppDbContext db) : EndpointWithoutRequest<AdminStatsDto>
+public class AdminStatsEndpoint(
+    AppDbContext db,
+    HttpRequestMetrics httpMetrics,
+    HostResourceSampler host,
+    IHostEnvironment env) : EndpointWithoutRequest<AdminStatsDto>
 {
     public override void Configure()
     {
@@ -56,8 +103,17 @@ public class AdminStatsEndpoint(AppDbContext db) : EndpointWithoutRequest<AdminS
         var byKind = gens
             .GroupBy(g => string.IsNullOrWhiteSpace(g.Kind) ? "autre" : g.Kind)
             .OrderBy(g => g.Key)
-            .Select(g => new AdminStatsKindDto(g.Key, g.Count(), g.Count(x => x.Ok)))
+            .Select(g => new AdminStatsKindDto(g.Key, g.Count(), g.Count(x => x.Ok), g.Sum(x => (long)x.TotalTokens)))
             .ToList();
+
+        var byProvider = gens
+            .GroupBy(g => string.IsNullOrWhiteSpace(g.Provider) ? "inconnu" : g.Provider)
+            .OrderByDescending(g => g.Count())
+            .Select(g => new AdminStatsProviderDto(g.Key, g.Count(), g.Count(x => x.Ok), g.Sum(x => (long)x.TotalTokens)))
+            .ToList();
+
+        var snap = host.Capture();
+        var http = httpMetrics.Snapshot();
 
         await Send.OkAsync(
             new AdminStatsDto(
@@ -82,7 +138,39 @@ public class AdminStatsEndpoint(AppDbContext db) : EndpointWithoutRequest<AdminS
                 gens.Count(g => g.Ok),
                 gens.Count(g => g.CreatedAt >= d1),
                 gens.Count(g => g.CreatedAt >= d7),
-                byKind
+                gens.Sum(g => (long)g.PromptTokens),
+                gens.Sum(g => (long)g.CompletionTokens),
+                gens.Sum(g => (long)g.TotalTokens),
+                gens.Where(g => g.CreatedAt >= d1).Sum(g => (long)g.TotalTokens),
+                gens.Where(g => g.CreatedAt >= d7).Sum(g => (long)g.TotalTokens),
+                byKind,
+                byProvider,
+                new AdminServerDto(
+                    snap.MachineName,
+                    snap.Framework,
+                    snap.OsDescription,
+                    env.EnvironmentName,
+                    snap.StartedAt,
+                    snap.UptimeSeconds,
+                    snap.CpuProcessPercent,
+                    snap.ThreadCount,
+                    snap.ProcessorCount,
+                    snap.WorkingSetBytes,
+                    snap.PrivateMemoryBytes,
+                    snap.GcHeapBytes,
+                    snap.AvailableMemoryBytes,
+                    snap.ContainerMemoryBytes,
+                    snap.ContainerMemoryLimitBytes,
+                    snap.HostMemoryTotalBytes,
+                    snap.HostMemoryAvailableBytes),
+                new AdminHttpDto(
+                    http.RequestsSinceStart,
+                    http.Status2xx,
+                    http.Status4xx,
+                    http.Status5xx,
+                    http.InFlight,
+                    http.TopPaths.Select(p => new AdminHttpPathDto(p.Path, p.Count, p.Errors, p.AvgDurationMs)).ToList(),
+                    http.Recent.Select(r => new AdminHttpRecentDto(r.Method, r.Path, r.Status, r.DurationMs, r.At)).ToList())
             ),
             ct);
     }

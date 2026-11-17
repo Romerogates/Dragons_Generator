@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.466',
+    date: '2026-11-17',
+    title: 'Admin : observabilité serveur et IA',
+    player: [],
+    tech: [
+      'Admin Statistiques : RAM VPS (`/proc/meminfo`), RAM cgroup API, CPU, uptime, trafic HTTP (depuis restart), tokens IA persistés.',
+      '`GET /admin/stats` : `server` (`hostMemoryTotalBytes`/`hostMemoryAvailableBytes`, `http`, tokens). Migration `026_ai_generation_tokens`.',
+      '`HttpRequestMetricsMiddleware` + `HostResourceSampler` ; `AiGenerationLogs` colonnes tokens/modèle/latence.',
+    ],
+  },
+  {
     version: '1.465',
     date: '2026-11-17',
     title: 'Support : pastilles de statut alignées',

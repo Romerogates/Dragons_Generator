@@ -8,7 +8,12 @@ public sealed record GroqChatResult(
     string? Error,
     bool RateLimited = false,
     bool Retryable = false,
-    int? RetryAfterMs = null);
+    int? RetryAfterMs = null,
+    int PromptTokens = 0,
+    int CompletionTokens = 0,
+    int TotalTokens = 0,
+    string? Model = null,
+    int LatencyMs = 0);
 
 public static class GroqChatClient
 {
