@@ -19,7 +19,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
 import { SUPPORT_CATEGORIES, supportCategoryLabel } from '@core/utils/support-category.util';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
-import { supportStatusLabel } from '@core/utils/support-status.util';
+import { supportStatusBadgeClass, supportStatusLabel } from '@core/utils/support-status.util';
 import {
   SupportConversation,
   SupportReplyPayload,
@@ -551,5 +551,9 @@ export class AdminPage implements OnInit, OnDestroy {
 
   statusLabel(status: string): string {
     return supportStatusLabel(status, 'staff');
+  }
+
+  statusBadgeClass(status: string): string {
+    return supportStatusBadgeClass(status);
   }
 }

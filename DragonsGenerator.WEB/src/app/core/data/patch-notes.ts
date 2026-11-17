@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.465',
+    date: '2026-11-17',
+    title: 'Support : pastilles de statut alignées',
+    player: [
+      'Sur Support, les étiquettes Ouvert / En cours / Fermé ont le même format — plus de « Le support consulte » en gros bandeau.',
+    ],
+    tech: [
+      '`supportStatusLabel` : `in_progress` → « En cours » (joueur et desk). `supportStatusBadgeClass` chips outline identiques.',
+    ],
+  },
+  {
     version: '1.464',
     date: '2026-11-17',
     title: 'Barre : plus de doublons de création',

@@ -20,7 +20,7 @@ import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignSummary } from '@core/models/Campaign/campaign';
 import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
-import { supportStatusLabel } from '@core/utils/support-status.util';
+import { supportStatusBadgeClass, supportStatusLabel } from '@core/utils/support-status.util';
 import {
   SUPPORT_CATEGORIES,
   normalizeSupportCategory,
@@ -112,6 +112,10 @@ export class SupportPage implements OnInit, OnDestroy {
 
   statusLabel(status: string): string {
     return supportStatusLabel(status, 'player');
+  }
+
+  statusBadgeClass(status: string): string {
+    return supportStatusBadgeClass(status);
   }
 
   reload(openId?: string | null): void {
