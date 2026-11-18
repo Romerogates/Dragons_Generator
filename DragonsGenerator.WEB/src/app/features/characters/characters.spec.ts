@@ -288,7 +288,7 @@ describe('Characters', () => {
       expect(
         component.getCharSpecies({
           ...sampleCharacter(),
-          species: 'Nain' as unknown as Character['species'],
+          species: 'Nain',
         }),
       ).toBe('Nain');
       expect(
@@ -411,9 +411,11 @@ describe('Characters', () => {
       component.deleteConfirmName.set('Aria');
       expect(component.canConfirmDelete()).toBe(true);
 
-      component.onDeleteConfirmNameInput({
-        target: { value: ' Aria ' },
-      } as unknown as Event);
+      const input = document.createElement('input');
+      input.value = ' Aria ';
+      const inputEv = new Event('input');
+      Object.defineProperty(inputEv, 'target', { value: input });
+      component.onDeleteConfirmNameInput(inputEv);
       expect(component.deleteConfirmName()).toBe(' Aria ');
       expect(component.canConfirmDelete()).toBe(true);
 

@@ -120,7 +120,7 @@ describe('PwaLifecycleService', () => {
 
   it('applyUpdate clears snooze and reloads', async () => {
     const pwa = setup();
-    const reload = spyOn(pwa as unknown as { reloadFresh: () => Promise<void> }, 'reloadFresh').and.resolveTo();
+    const reload = spyOn(pwa, 'reloadFresh').and.resolveTo();
     snoozeUpdate();
     pwa.applyUpdate();
     expect(isUpdateSnoozed()).toBeFalse();

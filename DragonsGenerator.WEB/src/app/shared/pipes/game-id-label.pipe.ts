@@ -13,7 +13,7 @@ export class GameIdLabelPipe implements PipeTransform {
 @Pipe({ name: 'gameIdLabels', standalone: true, pure: true })
 export class GameIdLabelsPipe implements PipeTransform {
   transform(
-    ids: readonly string[] | null | undefined,
+    ids: readonly string[] | string | null | undefined,
     separator = ', ',
     empty = '—',
   ): string {

@@ -18,7 +18,7 @@ import {
   type SecondaryClassSelection,
 } from '../../../../../core/services/character-builder.service';
 import type { CharacterClass, Subclass } from '../../../../../core/models/CharacterClasses/character-class';
-import { listSubclassOptions } from '@core/utils/character-class-features.util';
+import { listSubclassOptions, subclassUnlockLevel } from '@core/utils/character-class-features.util';
 import { buildSecondaryClassSelection } from '@core/utils/class-spellcasting.util';
 import {
   collectProgressionPicksFromAnswers,
@@ -144,8 +144,7 @@ export class MulticlassPanel implements OnInit {
   private subclassBlockFor(cls: CharacterClass): { options: Subclass[]; levelUnlocked: number } | null {
     if (!cls.data.subclasses) return null;
     const options = listSubclassOptions(cls.data);
-    const raw = cls.data.subclasses as unknown as { level_unlocked?: number; unlocked_at_level?: number };
-    return { options, levelUnlocked: raw.level_unlocked ?? raw.unlocked_at_level ?? 3 };
+    return { options, levelUnlocked: subclassUnlockLevel(cls.data.subclasses) };
   }
 
   private buildSelectionFor(

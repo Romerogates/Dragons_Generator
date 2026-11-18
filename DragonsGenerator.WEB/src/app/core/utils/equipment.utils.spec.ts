@@ -8,6 +8,7 @@ import {
   normalizeEquipmentType,
   normalizeEquipmentSubtype,
   resolveEquipmentRefId,
+  equipmentDataBag,
 } from './equipment.utils';
 
 describe('equipment.utils', () => {
@@ -74,19 +75,19 @@ describe('equipment.utils', () => {
         type: 'weapon',
         subtype: 'simple_melee',
         data: { damage_dice: '1d4', damage_type: 'perforant', properties: ['prop-finesse'] },
-      } as any,
+      },
     ]);
     expect(items[0].type).toBe('WEAPON');
-    const data = items[0].data as unknown as Record<string, unknown>;
+    const data = equipmentDataBag(items[0].data);
     expect(data['dmg_d']).toBe('1d4');
     expect(data['props']).toEqual(jasmine.arrayContaining(['prop-finesse']));
   });
 
   it('normalizeEquipments defaults missing data to an empty object', () => {
     const items = normalizeEquipments([
-      { id: 'gr-corde', name: 'Corde', type: 'gear', subtype: null } as any,
+      { id: 'gr-corde', name: 'Corde', type: 'gear', subtype: null },
     ]);
-    const data = items[0].data as unknown as Record<string, unknown>;
+    const data = equipmentDataBag(items[0].data);
     expect(data['dmg_d']).toBeNull();
     expect(data['props']).toEqual([]);
   });

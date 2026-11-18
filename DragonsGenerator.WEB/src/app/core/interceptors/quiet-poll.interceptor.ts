@@ -7,7 +7,7 @@ const EMPTY_NOTIFICATIONS = {
   friendsActionCount: 0,
   campaignsActionCount: 0,
   totalCount: 0,
-  notifications: [] as unknown[],
+  notifications: [],
   supportInboxCount: 0,
 };
 

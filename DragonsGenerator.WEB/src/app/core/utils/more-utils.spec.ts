@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { labelForGameId, labelForItemRef, registerGameLabel } from './game-id-labels';
 import { getEanaMapCoordinates, EANA_MAP_COORDS } from './eana-map';
@@ -20,7 +21,7 @@ describe('game-id-labels extras', () => {
 
 describe('progression-choices.util', () => {
   it('counts ASI slots from progression features', () => {
-    const cls = {
+    const cls = testClass({
       id: 'cls-test',
       name: 'Test',
       data: {
@@ -29,7 +30,7 @@ describe('progression-choices.util', () => {
           { level: 8, features: ['feat-augmentation-de-caracteristique'] },
         ],
       },
-    } as unknown as CharacterClass;
+    });
     expect(countAsiSlots(cls, 8)).toBe(2);
     expect(countAsiSlots(cls, 3)).toBe(0);
   });

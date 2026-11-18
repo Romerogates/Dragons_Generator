@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.478',
+    date: '2026-11-18',
+    title: 'Types JSON sans casts',
+    player: [],
+    tech: [
+      'Plus de `as any` / `as unknown` : factories `testClass`/`testSpell`/`testLanguage`/`testCharacter`, `ClassChoicePool` sur `CharacterClassData`, catalogue équipement `toEquipmentCatalogRows`, adapters JSON via `Array.isArray` / `isRecord`.',
+      'Build prod Docker : `gameIdLabels` accepte `string | string[]`, statut de session optionnel, templates catalogue (classe / historique) en chaînage optionnel.',
+      'CI : jobs API / web / e2e en parallèle, PR sans deploy, images GHCR puis pull VPS (fallback `--build`). Deploy SSH non annulé. Docker web : `npm ci`.',
+    ],
+  },
+  {
     version: '1.477',
     date: '2026-11-18',
     title: 'Connexion plus claire, tests et e2e',

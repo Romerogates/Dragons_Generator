@@ -309,14 +309,11 @@ describe('schedule-ics.util', () => {
   });
 
   it('downloads an .ics file via blob link', () => {
-    const click = jasmine.createSpy('click');
     const revoke = spyOn(URL, 'revokeObjectURL');
     spyOn(URL, 'createObjectURL').and.returnValue('blob:ics');
-    spyOn(document, 'createElement').and.returnValue({
-      href: '',
-      download: '',
-      click,
-    } as unknown as HTMLAnchorElement);
+    const anchor = document.createElement('a');
+    const click = spyOn(anchor, 'click');
+    spyOn(document, 'createElement').and.returnValue(anchor);
 
     downloadIcsFile('agenda', 'BEGIN:VCALENDAR');
     expect(click).toHaveBeenCalled();

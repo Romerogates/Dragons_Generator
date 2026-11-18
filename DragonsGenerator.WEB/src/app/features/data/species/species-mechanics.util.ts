@@ -185,9 +185,8 @@ export function buildOptionGroupBlocks(groups: unknown): { name: string; blocks:
 }
 
 function parseBreathWeapon(mech: Record<string, unknown>): MechanicsBlock {
-  const progression = Array.isArray(mech['damage_progression'] ?? mech['damageProgression'])
-    ? (mech['damage_progression'] ?? mech['damageProgression']) as unknown[]
-    : [];
+  const progressionRaw = mech['damage_progression'] ?? mech['damageProgression'];
+  const progression = Array.isArray(progressionRaw) ? progressionRaw : [];
 
   const progLines = progression.map((step) => {
     const s = asRecord(step);
@@ -207,9 +206,8 @@ function parseBreathWeapon(mech: Record<string, unknown>): MechanicsBlock {
 }
 
 function parseInnateSpellcasting(mech: Record<string, unknown>): MechanicsBlock {
-  const spells = Array.isArray(mech['innate_spells'] ?? mech['innateSpells'])
-    ? (mech['innate_spells'] ?? mech['innateSpells']) as unknown[]
-    : [];
+  const spellsRaw = mech['innate_spells'] ?? mech['innateSpells'];
+  const spells = Array.isArray(spellsRaw) ? spellsRaw : [];
 
   return block('Magie innée', [
     row('Caractéristique', abilityLabel(String(mech['spellcasting_ability'] ?? mech['spellcastingAbility'] ?? ''))),

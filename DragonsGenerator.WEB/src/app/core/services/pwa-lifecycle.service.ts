@@ -99,7 +99,7 @@ export class PwaLifecycleService {
     this.updateReady.set(true);
   }
 
-  private async reloadFresh(): Promise<void> {
+  async reloadFresh(): Promise<void> {
     try {
       if (this.swUpdate?.isEnabled) {
         await this.swUpdate.activateUpdate();

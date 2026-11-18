@@ -13,17 +13,17 @@ export function formatSessionDate(iso: string): string {
   });
 }
 
-export function sessionStatusLabel(status: CampaignSessionStatus): string {
+export function sessionStatusLabel(status?: CampaignSessionStatus | null): string {
   const labels: Record<CampaignSessionStatus, string> = {
     planned: 'Planifiée',
     played: 'Jouée',
     cancelled: 'Annulée',
   };
-  return labels[status];
+  return labels[status ?? 'planned'];
 }
 
-export function sessionStatusChipClass(status: CampaignSessionStatus): string {
-  switch (status) {
+export function sessionStatusChipClass(status?: CampaignSessionStatus | null): string {
+  switch (status ?? 'planned') {
     case 'played':
       return 'border-emerald-800/50 text-emerald-300 bg-emerald-950/30';
     case 'cancelled':

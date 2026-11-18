@@ -24,9 +24,11 @@ describe('CampaignHubRosterService', () => {
     data: emptyCampaignData(),
   });
   let askConfirm: jasmine.Spy;
+  let inviteFriend: jasmine.Spy;
 
   beforeEach(() => {
     askConfirm = jasmine.createSpy('askConfirm');
+    inviteFriend = jasmine.createSpy('inviteFriend');
     TestBed.configureTestingModule({
       providers: [
         ...zonelessTestProviders,
@@ -48,7 +50,7 @@ describe('CampaignHubRosterService', () => {
           useValue: {
             rotateJoinLink: () => undefined,
             revokeJoinLink: () => undefined,
-            inviteFriend: jasmine.createSpy('inviteFriend'),
+            inviteFriend,
             loadPendingInvites: () => undefined,
             rejectMember: () => undefined,
           },
@@ -84,8 +86,7 @@ describe('CampaignHubRosterService', () => {
   });
 
   it('inviteFriend envoie le nom ami si la liste est vide', () => {
-    const members = TestBed.inject(CampaignHubMembersService) as unknown as { inviteFriend: jasmine.Spy };
     svc.inviteFriend('u9');
-    expect(members.inviteFriend).toHaveBeenCalledWith('u9', 'ami', jasmine.any(Object));
+    expect(inviteFriend).toHaveBeenCalledWith('u9', 'ami', jasmine.any(Object));
   });
 });

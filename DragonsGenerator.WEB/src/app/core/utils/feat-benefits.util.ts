@@ -236,7 +236,7 @@ export function featResistanceOptions(feat: RawFeatData | undefined): { id: stri
     if (!b || typeof b !== 'object') continue;
     const rec = b as Record<string, unknown>;
     if (rec['type'] !== 'damage_resistance' || !Array.isArray(rec['choose_from'])) continue;
-    return (rec['choose_from'] as unknown[])
+    return rec['choose_from']
       .filter((w): w is string => typeof w === 'string')
       .map((word) => ({ id: DAMAGE_WORD_TO_ID[word.toLowerCase().trim()] ?? word, label: word }))
       .filter((o) => !!o.id);

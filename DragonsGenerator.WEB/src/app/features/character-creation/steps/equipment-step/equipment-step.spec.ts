@@ -21,7 +21,7 @@ function mockEquipment(
     subtype: subtype as Equipment['subtype'],
     cost: { v: 1, u: 'po' },
     wKg: 1,
-    data: data as unknown as Equipment['data'],
+    data: { desc: null, ...data },
   };
 }
 

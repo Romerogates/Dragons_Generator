@@ -1,3 +1,4 @@
+import { testSpell } from '@testing/typed-fixtures';
 import { buildAutoSpeciesSelection, CLASS_SPELLCASTING } from '../character-auto-build.util';
 import { makeElfSpecies, makeDrakeideLikeSpecies } from './spec-helpers';
 import type { Species, Spell } from './spec-helpers';
@@ -11,8 +12,8 @@ describe('buildAutoSpeciesSelection', () => {
       spyOn(Math, 'random').and.returnValue(0);
       const species = makeElfSpecies();
       const spells: Spell[] = [
-        { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Une petite lumière.' } as unknown as Spell,
-        { id: 'spl-invisibilite', name: 'Invisibilité', level: 2, description: '...' } as unknown as Spell,
+        testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Une petite lumière.' }),
+        testSpell({ id: 'spl-invisibilite', name: 'Invisibilité', level: 2, description: '...' }),
       ];
       const sel = buildAutoSpeciesSelection(species, 1, spells);
 
@@ -42,8 +43,8 @@ describe('buildAutoSpeciesSelection', () => {
       spyOn(Math, 'random').and.returnValue(0);
       const species = makeElfSpecies();
       const spells: Spell[] = [
-        { id: 'spl-lueur', name: 'Lueur', level: 0, description: '' } as unknown as Spell,
-        { id: 'spl-invisibilite', name: 'Invisibilité', level: 2, description: '' } as unknown as Spell,
+        testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: '' }),
+        testSpell({ id: 'spl-invisibilite', name: 'Invisibilité', level: 2, description: '' }),
       ];
       const sel = buildAutoSpeciesSelection(species, 5, spells);
       expect(sel.innateSpells.length).toBe(4);
@@ -259,7 +260,7 @@ describe('buildAutoSpeciesSelection — object option ids', () => {
           },
         ];
         const sel = buildAutoSpeciesSelection(species, 1, [
-          { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.' } as unknown as Spell,
+          testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.' }),
         ]);
         expect(sel.size).toBe('M');
         expect(sel.languages).toContain('lg-gnome');
@@ -276,7 +277,7 @@ describe('buildAutoSpeciesSelection — object option ids', () => {
         species.subspecies = [];
         species.traits = [species.traits.find((t) => t.id === 'trait-sorts-innes')!];
         const sel = buildAutoSpeciesSelection(species, 1, [
-          { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Une lumière utile en caverne.' } as unknown as Spell,
+          testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Une lumière utile en caverne.' }),
         ]);
         expect(sel.innateSpells[0]?.effectSummary).toContain('Une lumière utile');
       });

@@ -431,8 +431,8 @@ describe('notebook.util', () => {
 
   it('ensurePadsHaveLayouts assigns order from index when missing', () => {
     const pads = ensurePadsHaveLayouts([
-      { id: 'a', kind: 'note', title: 'A', widgetSize: 'half' } as unknown as SessionPlayPad,
-      { id: 'b', kind: 'checklist', title: 'B', widgetSize: 'half', items: [] } as unknown as SessionPlayPad,
+      { id: 'a', kind: 'note', title: 'A', widgetSize: 'half' },
+      { id: 'b', kind: 'checklist', title: 'B', widgetSize: 'half', items: [] },
     ]);
     expect(pads[0]!.order).toBe(0);
     expect(pads[1]!.order).toBe(1);

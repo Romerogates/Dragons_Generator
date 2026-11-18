@@ -1,11 +1,12 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { HubConnection, HubConnectionState } from '@microsoft/signalr';
+import { HubConnectionState } from '@microsoft/signalr';
 import { firstValueFrom, take } from 'rxjs';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { AuthService } from './auth.service';
 import {
   CAMPAIGN_LIVE_HUB_FACTORY,
+  CampaignLiveHub,
   CampaignLiveService,
   CampaignLiveUpdate,
 } from './campaign-live.service';
@@ -20,7 +21,7 @@ describe('CampaignLiveService', () => {
   let loggedIn = true;
   const userSignal = signal<{ id: string } | null>({ id: 'u1' });
 
-  function buildMockHub(): HubConnection {
+  function buildMockHub(): CampaignLiveHub {
     handlers = {};
     invokeSpy = jasmine.createSpy('invoke').and.resolveTo(undefined);
     startSpy = jasmine.createSpy('start').and.callFake(async () => {
@@ -50,7 +51,7 @@ describe('CampaignLiveService', () => {
       start: () => startSpy(),
       stop: () => stopSpy(),
       invoke: (method: string, ...args: unknown[]) => invokeSpy(method, ...args),
-    } as unknown as HubConnection;
+    };
   }
 
   beforeEach(() => {

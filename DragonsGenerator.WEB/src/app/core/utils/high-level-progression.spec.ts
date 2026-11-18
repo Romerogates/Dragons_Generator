@@ -8,6 +8,7 @@ import {
   countAsiSlots,
   spellProgressionMilestones,
 } from './progression-choices.util';
+import { testClass } from '@testing/typed-fixtures';
 import { normalizeCharacterClass } from './class-data.adapter';
 
 /** Prêtre niv. 10 — emplacements JSON non-SRD. */
@@ -39,7 +40,7 @@ describe('High-level progression (6–20)', () => {
           { level: 19, features: ['feat-asi-niv19'] },
         ],
       },
-    } as any);
+    });
     expect(countAsiSlots(cls, 5)).toBe(1);
     expect(countAsiSlots(cls, 20)).toBe(5);
   });
@@ -75,7 +76,7 @@ describe('High-level progression (6–20)', () => {
         ],
         progression: [{ level: 1, features: [] }],
       },
-    } as any);
+    });
 
     const weapons = extractWeaponProficiencyChoices(lettre, 1);
     const tools = extractToolProficiencyChoices(lettre, 1);
@@ -105,7 +106,7 @@ describe('High-level progression (6–20)', () => {
         ],
         progression: [{ level: 1, features: [] }],
       },
-    } as any);
+    });
     expect(classBonusLanguageCount(pretre, 1)).toBe(1);
     expect(classRootRequiredExoticLanguageCount(pretre, 1)).toBe(1);
 
@@ -124,7 +125,7 @@ describe('High-level progression (6–20)', () => {
         ],
         progression: [{ level: 1, features: [] }],
       },
-    } as any);
+    });
     expect(classRootRequiredExoticLanguageCount(magicien, 1)).toBe(1);
   });
 
@@ -144,7 +145,7 @@ describe('High-level progression (6–20)', () => {
         ],
         progression: [{ level: 1, features: [] }],
       },
-    } as any);
+    });
     expect(classBonusLanguageCount(barde, 1)).toBe(2);
     expect(classRootRequiredBaseLanguageCount(barde, 1)).toBe(2);
     expect(classRootRequiredExoticLanguageCount(barde, 1)).toBe(0);
@@ -156,16 +157,16 @@ describe('High-level progression (6–20)', () => {
   });
 
   it('lists spell progression milestones up to target level', () => {
-    const cls = {
+    const cls = testClass({
       id: 'cls-sorcier',
       name: 'Sorcier',
       data: {
         progression: [
-          { level: 6, spell_choices: [{ count: 1, label: 'Sort occulte' }] },
-          { level: 11, choice_pools_active: [{ type: 'spell_known', quantity: 1, label: 'Arcane' }] },
+          { level: 6, prof_bonus: 3, features: [], spell_choices: [{ count: 1, label: 'Sort occulte' }] },
+          { level: 11, prof_bonus: 4, features: [], choice_pools_active: [{ type: 'spell_known', quantity: 1, label: 'Arcane' }] },
         ],
       },
-    } as unknown as import('@core/models/CharacterClasses/character-class').CharacterClass;
+    });
     expect(spellProgressionMilestones(cls, 10)).toEqual([
       { level: 6, count: 1, label: 'Sort occulte' },
     ]);

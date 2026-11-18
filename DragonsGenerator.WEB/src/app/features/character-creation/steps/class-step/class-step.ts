@@ -19,6 +19,7 @@ import { DataService } from '../../../../core/services/data.service';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import type { CharacterClass } from '../../../../core/models/CharacterClasses/character-class';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import { subclassUnlockLevel } from '@core/utils/character-class-features.util';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatGameIds, labelForGameId } from '@core/utils/game-id-labels';
 import { metamagicLabel } from '@core/data/metamagic-labels.data';
@@ -137,12 +138,32 @@ export class ClassStep implements OnInit {
   readonly subclassesConfig = computed<SubclassesConfig | null>(() => {
     const cls = this.selectedClass();
     if (!cls?.data.subclasses) return null;
-    const raw = cls.data.subclasses as unknown as SubclassesConfig & {
-      unlocked_at_level?: number;
-    };
+    const raw = cls.data.subclasses;
+    const list = Array.isArray(raw) ? raw : (raw.options ?? []);
     return {
-      ...raw,
-      level_unlocked: raw.level_unlocked ?? raw.unlocked_at_level ?? 3,
+      name: '',
+      options: list.map((o) => ({
+        id: o.id,
+        name: o.name ?? o.id,
+        desc: o.desc ?? '',
+        features: (o.features ?? []).map((f) => ({
+          id: f.id,
+          name: f.name ?? '',
+          desc: f.desc ?? '',
+          level: f.level ?? 1,
+        })),
+        sub_choices: o.sub_choices?.map((sc) => ({
+          id: sc.id ?? '',
+          type: sc.type ?? '',
+          count: sc.count ?? 1,
+          level_required: sc.level_required ?? 1,
+          label: sc.label ?? '',
+          options: (sc.options ?? []).map(String),
+          option_labels: sc.option_labels,
+          option_descs: sc.option_descs,
+        })),
+      })),
+      level_unlocked: subclassUnlockLevel(raw),
     };
   });
 
@@ -803,7 +824,7 @@ export class ClassStep implements OnInit {
   }
 
   /** Construit et pousse la sélection de classe vers le builder (sans avancer d'étape). */
-  private applySelectionToBuilder(): boolean {
+  applySelectionToBuilder(): boolean {
     try {
       const cls = this.selectedClass();
       if (!cls || !this.selectionComplete()) return false;
@@ -869,11 +890,16 @@ export class ClassStep implements OnInit {
       CLASS_SPELLCASTING[cls.id] || cls.data.spellcasting
         ? 'Maîtrise les arts arcaniques ou divins. '
         : 'Spécialiste des aptitudes martiales ou physiques. ';
-    const weapons = cls.data.proficiencies?.weapons?.length
+    const weaponList = Array.isArray(cls.data.proficiencies?.weapons)
+      ? cls.data.proficiencies.weapons
+      : typeof cls.data.proficiencies?.weapons === 'string' && cls.data.proficiencies.weapons
+        ? [cls.data.proficiencies.weapons]
+        : [];
+    const weapons = weaponList.length
       ? `Manie : ${
-          cls.data.proficiencies.weapons.length > 2
+          weaponList.length > 2
             ? 'Diverses armes martiales et courantes'
-            : formatGameIds(cls.data.proficiencies.weapons)
+            : formatGameIds(weaponList)
         }.`
       : '';
     return `${spell}${weapons}`;
@@ -882,13 +908,14 @@ export class ClassStep implements OnInit {
   private inferSpellcasting(
     cls: CharacterClass,
   ): { kind: SpellcastingKind; ability: Ability } | null {
-    const abilityRaw = cls.data.spellcasting?.ability as string | undefined;
+    const abilityRaw = cls.data.spellcasting?.ability;
+    const abilityKey = typeof abilityRaw === 'string' ? abilityRaw : '';
     const abilityMap: Record<string, Ability> = {
       cha: 'Charisme',
       wis: 'Sagesse',
       int: 'Intelligence',
     };
-    const ability = abilityRaw ? abilityMap[abilityRaw.toLowerCase()] : undefined;
+    const ability = abilityKey ? abilityMap[abilityKey.toLowerCase()] : undefined;
     const kind = CLASS_SPELLCASTING[cls.id]?.kind;
     if (kind && ability) return { kind, ability };
     return null;

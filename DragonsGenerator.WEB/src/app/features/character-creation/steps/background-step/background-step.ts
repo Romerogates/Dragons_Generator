@@ -293,8 +293,10 @@ export class BackgroundStep implements OnInit {
   rollOnTable(tableType: PersonalityTableKey): void {
     const table = this.getTable(tableType);
     if (!table) return;
-    const idx = Math.floor(Math.random() * table.entries.length);
-    this.setRolledValue(tableType, table.entries[idx].text);
+    const entries = table.entries ?? [];
+    if (!entries.length) return;
+    const idx = Math.floor(Math.random() * entries.length);
+    this.setRolledValue(tableType, entries[idx].text);
   }
 
   pickEntry(tableType: PersonalityTableKey, text: string): void {

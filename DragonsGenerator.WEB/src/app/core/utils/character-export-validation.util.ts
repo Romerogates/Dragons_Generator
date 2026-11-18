@@ -34,8 +34,22 @@ function isUnresolvedProficiencyId(id: string, kind: 'weapon' | 'tool'): boolean
   return false;
 }
 
+/** Personnage complet ou brouillon d’export (champs imbriqués partiels). */
+export type CharacterExportCandidate = Character | Partial<Character> | {
+  schemaVersion?: number;
+  name?: string;
+  species?: { id?: string; label?: string };
+  classes?: Array<{ classId?: string; classLabel?: string; level?: number; subclassId?: string }>;
+  totalLevel?: number;
+  proficiencies?: Partial<Character['proficiencies']>;
+  equipment?: Array<{ refId?: string; name?: string; qty?: number }>;
+  spellcasting?: { kind?: string; deityId?: string; deity?: string } | null;
+  knownSpells?: Array<{ refId?: string; name?: string; level?: number }>;
+  asiChoices?: Array<{ mode?: string; featId?: string; primary?: string; secondary?: string }>;
+};
+
 /** Bloque la sauvegarde cloud si l'export contient des placeholders non résolus. */
-export function validateCharacterExport(character: Character): CharacterExportValidation {
+export function validateCharacterExport(character: CharacterExportCandidate): CharacterExportValidation {
   const errors: string[] = [];
 
   if (character.schemaVersion !== CURRENT_SCHEMA_VERSION) {
@@ -85,7 +99,7 @@ export function validateCharacterExport(character: Character): CharacterExportVa
     const leveled = (character.knownSpells ?? []).filter((s) => (s.level ?? 0) > 0);
     const kind = character.spellcasting.kind;
     const primaryLevel =
-      character.classes.find((c) => c.classId === character.classes[0]?.classId)?.level ??
+      character.classes?.find((c) => c.classId === character.classes?.[0]?.classId)?.level ??
       character.totalLevel ??
       1;
     if (kind) {
@@ -109,10 +123,10 @@ export function validateCharacterExport(character: Character): CharacterExportVa
       }
     }
     if (kind === 'cleric') {
-      const deity =
-        (character.spellcasting as { deityId?: string; deity?: string }).deityId ||
-        (character.spellcasting as { deity?: string }).deity;
-      if (!deity) {
+      const sc = character.spellcasting;
+      const deityId = sc && 'deityId' in sc && typeof sc.deityId === 'string' ? sc.deityId : '';
+      const deityName = sc && 'deity' in sc && typeof sc.deity === 'string' ? sc.deity : '';
+      if (!deityId && !deityName) {
         errors.push('Divinité manquante pour le prêtre.');
       }
     }

@@ -1,3 +1,4 @@
+import { testSpecies, testSubspecies } from '@testing/typed-fixtures';
 import type { Species, Subspecies, Trait } from '@core/models/Species/species';
 import {
   resolveLineageDamageType,
@@ -60,7 +61,7 @@ describe('speciesTraitBonusProficiencies', () => {
 });
 
 describe('resolveLineageDamageType', () => {
-  const species = {
+  const species = testSpecies({
     creationChoices: [
       {
         id: 'choice-lignee-draconique',
@@ -70,7 +71,7 @@ describe('resolveLineageDamageType', () => {
         options: [{ id: 'drag-rouge', name: 'Rouge', damage_type: 'damage-feu' }, 'drag-bleu'],
       },
     ],
-  } as unknown as Species;
+  });
 
   it('resolves the damage type for a matching lineage option', () => {
     expect(resolveLineageDamageType(species, null, 'drag-rouge')).toBe('damage-feu');
@@ -85,7 +86,7 @@ describe('resolveLineageDamageType', () => {
   });
 
   it('returns null when no matching choice exists', () => {
-    const empty = { creationChoices: [] } as unknown as Species;
+    const empty = testSpecies({ creationChoices: [] });
     expect(resolveLineageDamageType(empty, null, 'drag-rouge')).toBeNull();
   });
 
@@ -94,7 +95,7 @@ describe('resolveLineageDamageType', () => {
   });
 
   it('falls back to subspecies creation choices', () => {
-    const sub = {
+    const sub = testSubspecies({
       creationChoices: [
         {
           id: 'choice-heritage-draconique',
@@ -104,14 +105,14 @@ describe('resolveLineageDamageType', () => {
           options: [{ id: 'drag-vert', name: 'Vert', damage_type: 'damage-poison' }],
         },
       ],
-    } as unknown as Subspecies;
-    const emptySpecies = { creationChoices: [] } as unknown as Species;
+    });
+    const emptySpecies = testSpecies({ creationChoices: [] });
     expect(resolveLineageDamageType(emptySpecies, sub, 'drag-vert')).toBe('damage-poison');
   });
 });
 
 describe('speciesResistancesFromTraits', () => {
-  const species = {
+  const species = testSpecies({
     creationChoices: [
       {
         id: 'choice-lignee-draconique',
@@ -121,7 +122,7 @@ describe('speciesResistancesFromTraits', () => {
         options: [{ id: 'drag-rouge', name: 'Rouge', damage_type: 'damage-feu' }],
       },
     ],
-  } as unknown as Species;
+  });
 
   it('collects plain string resistances', () => {
     const traits: Trait[] = [

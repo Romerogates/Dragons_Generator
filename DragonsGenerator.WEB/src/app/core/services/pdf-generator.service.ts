@@ -79,7 +79,7 @@ export class PdfGeneratorService {
     return pdf;
   }
 
-  private async loadBackgroundImages(): Promise<string[]> {
+  async loadBackgroundImages(): Promise<string[]> {
     const urls = [
       '/images/sheets/sheet-page1.jpg',
       '/images/sheets/sheet-page2.jpg',
@@ -89,7 +89,7 @@ export class PdfGeneratorService {
     return Promise.all(urls.map((u) => this.loadImage(u)));
   }
 
-  private loadImage(url: string): Promise<string> {
+  loadImage(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';

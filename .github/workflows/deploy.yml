@@ -1,95 +1,225 @@
-name: Deploy production
+name: CI and production
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
+# PRs : on annule l’ancien run. Sur main : jamais, pour ne pas tuer un deploy SSH.
 concurrency:
-  group: deploy-production
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  test:
+  changes:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'DragonsGenerator.WEB/**'
+              - 'DragonsGenerator.API/**'
+              - 'DragonsGenerator.API.Tests/**'
+              - 'scripts/**'
+              - 'docker-compose*.yml'
+              - '.github/**'
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+  test-api:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '9.0.x'
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: DragonsGenerator.WEB/package-lock.json
-
       - name: Restore API solution
         run: dotnet restore DragonsGenerator.API.sln
-
       - name: Validate class JSON data
         run: node scripts/validate-class-json.mjs
-
       - name: API tests
         run: >
           dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj
           -c Release --no-restore
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v2
-
+  test-web:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: DragonsGenerator.WEB/package-lock.json
+      - uses: browser-actions/setup-chrome@v2
       - name: Install WEB deps
         working-directory: DragonsGenerator.WEB
         run: npm ci
-
       - name: Angular tests
         working-directory: DragonsGenerator.WEB
         run: npm test
-
       - name: Angular lint
         working-directory: DragonsGenerator.WEB
         run: npm run lint
 
-  # Parallel with `test` and with each other — deploy gates on all three.
   e2e-forge:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: E2E forge / compte
         uses: ./.github/actions/e2e-run
         with:
           suite: forge
 
   e2e-table:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: E2E table / session
         uses: ./.github/actions/e2e-run
         with:
           suite: table
 
-  deploy:
-    needs: [test, e2e-forge, e2e-table]
+  ci:
+    name: CI
+    needs: [changes, test-api, test-web, e2e-forge, e2e-table]
+    if: always()
     runs-on: ubuntu-24.04
+    steps:
+      - name: Gate
+        env:
+          APP: ${{ needs.changes.outputs.app }}
+          API: ${{ needs.test-api.result }}
+          WEB: ${{ needs.test-web.result }}
+          FORGE: ${{ needs.e2e-forge.result }}
+          TABLE: ${{ needs.e2e-table.result }}
+        run: |
+          set -euo pipefail
+          if [ "$APP" != "true" ]; then
+            echo "Pas de changement app — CI ok"
+            exit 0
+          fi
+          echo "test-api=$API test-web=$WEB e2e-forge=$FORGE e2e-table=$TABLE"
+          test "$API" = success
+          test "$WEB" = success
+          test "$FORGE" = success
+          test "$TABLE" = success
+
+  publish-images:
+    needs: [changes, test-api, test-web]
+    if: >
+      needs.changes.outputs.app == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      owner: ${{ steps.meta.outputs.owner }}
+      count: ${{ steps.meta.outputs.count }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Image metadata
+        id: meta
+        run: |
+          set -euo pipefail
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          count="$(git rev-list --count HEAD)"
+          echo "owner=$owner" >> "$GITHUB_OUTPUT"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          context: ./DragonsGenerator.API
+          file: ./DragonsGenerator.API/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-api:${{ github.sha }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-api:1.${{ steps.meta.outputs.count }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-api:latest
+          cache-from: type=gha,scope=dragons-api
+          cache-to: type=gha,mode=min,scope=dragons-api
+      - name: Build and push web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./DragonsGenerator.WEB
+          file: ./DragonsGenerator.WEB/Dockerfile
+          push: true
+          build-args: |
+            APP_BUILD_COUNT=${{ steps.meta.outputs.count }}
+            NGINX_CONF=nginx.conf
+          tags: |
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-web:${{ github.sha }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-web:1.${{ steps.meta.outputs.count }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/dragons-web:latest
+          cache-from: type=gha,scope=dragons-web
+          cache-to: type=gha,mode=min,scope=dragons-web
+
+  deploy:
+    needs: [changes, test-api, test-web, e2e-forge, e2e-table, publish-images]
+    if: >
+      always() &&
+      needs.changes.outputs.app == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      needs.test-api.result == 'success' &&
+      needs.test-web.result == 'success' &&
+      needs.e2e-forge.result == 'success' &&
+      needs.e2e-table.result == 'success'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
+          DRAGONS_API_IMAGE: ghcr.io/${{ needs.publish-images.outputs.owner }}/dragons-api:${{ github.sha }}
+          DRAGONS_WEB_IMAGE: ghcr.io/${{ needs.publish-images.outputs.owner }}/dragons-web:${{ github.sha }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script_stop: true
           command_timeout: 30m
+          envs: GHCR_TOKEN,GHCR_USER,DRAGONS_API_IMAGE,DRAGONS_WEB_IMAGE
           script: |
             set -euo pipefail
             touch /tmp/dragons-deploy.lock
@@ -173,7 +303,26 @@ jobs:
               ./scripts/backup-sqlite.sh || echo "WARN: premier backup échoué"
             fi
             docker image prune -f >/dev/null 2>&1 || true
-            compose_up dragons-api dragons-web autoheal
+
+            pulled=0
+            if [ -n "${GHCR_TOKEN:-}" ] && [ -n "${DRAGONS_API_IMAGE:-}" ] && [ -n "${DRAGONS_WEB_IMAGE:-}" ]; then
+              echo "Pulling GHCR images"
+              if printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin \
+                && docker pull "$DRAGONS_API_IMAGE" \
+                && docker pull "$DRAGONS_WEB_IMAGE"; then
+                export DRAGONS_API_IMAGE DRAGONS_WEB_IMAGE
+                if docker compose -f docker-compose.prod.yml up -d --no-build --pull never --force-recreate dragons-api dragons-web autoheal; then
+                  pulled=1
+                fi
+              else
+                echo "WARN: GHCR pull/login failed — building on VPS"
+              fi
+              docker logout ghcr.io >/dev/null 2>&1 || true
+            fi
+            if [ "$pulled" -ne 1 ]; then
+              unset DRAGONS_API_IMAGE DRAGONS_WEB_IMAGE || true
+              compose_up dragons-api dragons-web autoheal
+            fi
 
             for i in $(seq 1 60); do
               if docker compose -f docker-compose.prod.yml exec -T dragons-api curl -sf http://localhost:8080/health >/dev/null \

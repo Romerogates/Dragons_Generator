@@ -24,7 +24,7 @@ export function speciesTraitBonusProficiencies(traits: Trait[]): SpeciesTraitBon
   for (const trait of traits) {
     const mech = trait.mechanics as Record<string, unknown> | undefined;
     if (!mech) continue;
-    const grants = Array.isArray(mech['grants']) ? (mech['grants'] as unknown[]) : [];
+    const grants = Array.isArray(mech['grants']) ? mech['grants'] : [];
     const ids = grants.filter((g): g is string => typeof g === 'string' && g.trim().length > 0);
 
     if (mech['type'] === 'skill_proficiency') {
@@ -87,10 +87,10 @@ export function speciesResistancesFromTraits(
     };
 
     if (Array.isArray(mech['damage_resistance'])) {
-      (mech['damage_resistance'] as unknown[]).forEach(pushMaybeLineage);
+      mech['damage_resistance'].forEach(pushMaybeLineage);
     }
     if (Array.isArray(mech['resistances'])) {
-      (mech['resistances'] as unknown[]).forEach(pushMaybeLineage);
+      mech['resistances'].forEach(pushMaybeLineage);
     }
     if (mech['type'] === 'damage_resistance' && mech['damage_type_from'] === 'heritage_draconique') {
       const dmg = resolveLineageDamageType(species, sub, lineageOptionId);

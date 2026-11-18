@@ -1,3 +1,4 @@
+import { testClass, testSpell } from '@testing/typed-fixtures';
 import { autoCompleteRemainingCreation } from './character-auto-complete.util';
 import type { CharacterCreation } from '@core/models/Character/character';
 import { INITIAL_CREATION_STATE } from '@core/models/Character/character-builder.types';
@@ -5,7 +6,7 @@ import type { CharacterClass } from '@core/models/CharacterClasses/character-cla
 import type { Spell } from '@core/models/Spells/spell';
 
 function base(partial: Partial<CharacterCreation>): CharacterCreation {
-  return { ...INITIAL_CREATION_STATE, ...partial } as CharacterCreation;
+  return { ...INITIAL_CREATION_STATE, ...partial };
 }
 
 const LANGS = [
@@ -157,7 +158,7 @@ describe('character-auto-complete.util', () => {
   });
 
   it('merges empty cantrips/spells from auto-build when caster', () => {
-    const classJson = {
+    const classJson = testClass({
       id: 'cls-magicien',
       name: 'Magicien',
       data: {
@@ -167,15 +168,15 @@ describe('character-auto-complete.util', () => {
           spells_known: [{ level: 1, count: 2 }],
         },
       },
-    } as unknown as CharacterClass;
+    });
 
     const spells = [
-      { id: 'spl-a', name: 'A', level: 0, school: 'évocation', classes: ['cls-magicien'] },
-      { id: 'spl-b', name: 'B', level: 0, school: 'évocation', classes: ['cls-magicien'] },
-      { id: 'spl-c', name: 'C', level: 0, school: 'évocation', classes: ['cls-magicien'] },
-      { id: 'spl-d', name: 'D', level: 1, school: 'évocation', classes: ['cls-magicien'] },
-      { id: 'spl-e', name: 'E', level: 1, school: 'évocation', classes: ['cls-magicien'] },
-    ] as unknown as Spell[];
+      testSpell({ id: 'spl-a', name: 'A', level: 0, school: 'évocation', classes: ['cls-magicien'] }),
+      testSpell({ id: 'spl-b', name: 'B', level: 0, school: 'évocation', classes: ['cls-magicien'] }),
+      testSpell({ id: 'spl-c', name: 'C', level: 0, school: 'évocation', classes: ['cls-magicien'] }),
+      testSpell({ id: 'spl-d', name: 'D', level: 1, school: 'évocation', classes: ['cls-magicien'] }),
+      testSpell({ id: 'spl-e', name: 'E', level: 1, school: 'évocation', classes: ['cls-magicien'] }),
+    ];
 
     const { creation: next, filled } = autoCompleteRemainingCreation(
       base({
@@ -196,7 +197,7 @@ describe('character-auto-complete.util', () => {
   });
 
   it('does not overwrite existing cantrips/spells', () => {
-    const classJson = {
+    const classJson = testClass({
       id: 'cls-magicien',
       name: 'Magicien',
       data: {
@@ -205,7 +206,7 @@ describe('character-auto-complete.util', () => {
           cantrips_known: [{ level: 1, count: 3 }],
         },
       },
-    } as unknown as CharacterClass;
+    });
 
     const { creation: next, filled } = autoCompleteRemainingCreation(
       base({
@@ -254,7 +255,7 @@ describe('character-auto-complete.util', () => {
   });
 
   it('fills cleric deity when missing', () => {
-    const classJson = {
+    const classJson = testClass({
       id: 'cls-pretre',
       name: 'Prêtre',
       data: {
@@ -264,7 +265,7 @@ describe('character-auto-complete.util', () => {
           prepared: true,
         },
       },
-    } as unknown as CharacterClass;
+    });
 
     const { filled } = autoCompleteRemainingCreation(
       base({

@@ -36,7 +36,7 @@ describe('class-data.adapter', () => {
         },
         features_details: [],
       },
-    } as any);
+    });
 
     expect(normalized.data.hit_die).toBe(8);
     expect(normalized.data.proficiencies.saving_throws).toContain('Intelligence');
@@ -82,7 +82,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const sub = (normalized.data.subclasses as { options: { sub_choices?: { options: string[] }[] }[] })
       .options[0];
@@ -132,7 +132,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const sub = (
       normalized.data.subclasses as {
@@ -191,7 +191,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const sub = (normalized.data.subclasses as {
       options: { sub_choices?: { id: string; options: string[]; option_labels?: Record<string, string> }[] }[];
@@ -260,7 +260,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const options = (normalized.data.subclasses as { options: { id: string; sub_choices?: { id: string; options: string[] }[] }[] })
       .options;
@@ -308,7 +308,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const sub = (normalized.data.subclasses as { options: { sub_choices?: unknown[] }[] }).options[0];
     expect(sub.sub_choices?.length ?? 0).toBe(0);
@@ -349,7 +349,7 @@ describe('class-data.adapter', () => {
           ],
         },
       },
-    } as any);
+    });
 
     const sub = (normalized.data.subclasses as { options: { sub_choices?: unknown[] }[] }).options[0];
     // Aucune carte de choix générée à l'étape Classe : le pool "any" est différé (déjà proposé
@@ -376,7 +376,7 @@ describe('class-data.adapter', () => {
         ],
         starting_equipment: { fixed: [], choice_pools: [] },
       },
-    } as any);
+    });
 
     expect(normalized.data.starting_equipment.length).toBe(1);
     expect(normalized.data.starting_equipment[0].alternatives?.length).toBe(2);
@@ -429,7 +429,7 @@ describe('background-data.adapter', () => {
         equipment: { fixed: [], choose: [], currency: { or: 5 } },
         privilege: { id: 'priv-test', name: 'Test', desc: 'x' },
       },
-    } as any);
+    });
 
     const choose = bg.data.proficiencies.tools.choose;
     expect(choose?.length).toBe(1);
@@ -462,7 +462,7 @@ describe('background-data.adapter', () => {
           },
         ],
       },
-    } as any);
+    });
     const subs = normalized.data.subclasses;
     expect(Array.isArray(subs)).toBeTrue();
     expect((subs as { id: string }[])[0]?.id).toBe('sub-a');

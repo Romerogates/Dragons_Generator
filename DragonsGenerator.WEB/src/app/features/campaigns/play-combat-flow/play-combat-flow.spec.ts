@@ -17,7 +17,7 @@ describe('PlayCombatFlow', () => {
     component = fixture.componentInstance;
     fixture.componentRef.setInput('host', {
       state: { isDm: () => true, sessionView: () => 'resume' },
-    } as unknown as PlayCombatHost);
+    } as PlayCombatHost);
   });
 
   it('binds a PlayCombatHost contract, not the panel type alias', () => {

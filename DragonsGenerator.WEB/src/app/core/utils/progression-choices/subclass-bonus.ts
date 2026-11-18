@@ -139,7 +139,7 @@ export function subclassBonusProficiencies(
 
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
+    const featLevel = featureUnlockLevel(feat);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
 
@@ -255,10 +255,10 @@ export function subclassBonusResistances(
   const result = new Set<string>();
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
+    const featLevel = featureUnlockLevel(feat);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
-    const raw = (mech['resistances'] ?? feat['resistances']) as unknown;
+    const raw = mech['resistances'] ?? feat['resistances'];
     if (!Array.isArray(raw)) continue;
     for (const entry of raw) {
       if (entry && typeof entry === 'object') {
@@ -336,7 +336,7 @@ export function extractSubclassSkillProficiencyChoices(
 
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
+    const featLevel = featureUnlockLevel(feat);
     if (featLevel > level) continue;
     const featId = String(feat['id'] ?? 'feat');
     const mech = feat.mechanics ?? {};

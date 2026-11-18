@@ -133,7 +133,7 @@ function extractSubclassToolProficiencyChoices(
 
   const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
   for (const feat of feats) {
-    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
+    const featLevel = featureUnlockLevel(feat);
     if (featLevel > effective) continue;
     const choice = feat.mechanics?.['grants_tool_proficiency_choice'] as
       | { type?: string; pool?: unknown[]; quantity?: number }
@@ -307,7 +307,7 @@ export function subclassFixedToolProficiencies(
   const tools: string[] = [];
   const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
   for (const feat of feats) {
-    if (featureUnlockLevel(feat as Record<string, unknown>) > level) continue;
+    if (featureUnlockLevel(feat) > level) continue;
     const granted = feat.mechanics?.['grants_tool_proficiencies'];
     if (Array.isArray(granted)) {
       for (const id of granted) {

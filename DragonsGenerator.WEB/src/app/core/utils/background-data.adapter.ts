@@ -225,7 +225,7 @@ function normalizeProficiencies(raw: RawBackgroundProficiencies | undefined): Ba
   const skills = normalizeSkills(raw?.skills);
   const toolsRaw = raw?.tools ?? {};
   const tools = {
-    fixed: ((toolsRaw.fixed ?? []) as unknown[]).map(mapToolRef),
+    fixed: (toolsRaw.fixed ?? []).map(mapToolRef),
     choose: normalizeToolChoose(toolsRaw.choose),
   };
 
@@ -257,8 +257,12 @@ function normalizeEquipment(raw: RawBackgroundEquipment | undefined): Background
 }
 
 /** Adapte le schema 2.0 API (snake_case + choose.count) vers le modèle wizard. */
-export function normalizeBackground(bg: Background): Background {
-  const raw = bg.data as RawBackgroundData;
+function isRawBackgroundData(v: unknown): v is RawBackgroundData {
+  return typeof v === 'object' && v !== null;
+}
+
+export function normalizeBackground(bg: { id: string; name: string; data: unknown }): Background {
+  const raw: RawBackgroundData = isRawBackgroundData(bg.data) ? bg.data : {};
 
   // Déjà normalisé
   if (raw?.proficiencies?.skills && 'chooseCount' in (raw.proficiencies.skills ?? {})) {
@@ -271,7 +275,7 @@ export function normalizeBackground(bg: Background): Background {
         } as BackgroundData,
       };
     }
-    return bg;
+    return { id: bg.id, name: bg.name, data: raw as BackgroundData };
   }
 
   const flavor = raw?.flavor ?? {};
@@ -300,6 +304,6 @@ export function normalizeBackground(bg: Background): Background {
   return { ...bg, data };
 }
 
-export function normalizeBackgrounds(backgrounds: Background[]): Background[] {
+export function normalizeBackgrounds(backgrounds: { id: string; name: string; data: unknown }[]): Background[] {
   return backgrounds.map(normalizeBackground);
 }

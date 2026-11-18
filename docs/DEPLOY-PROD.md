@@ -127,11 +127,18 @@ Dans le navigateur :
 
 Workflow : [.github/workflows/deploy.yml](../.github/workflows/deploy.yml)
 
-Sur push `main` (ou `workflow_dispatch`) :
+**Pull request** vers `main` : tests API, Angular, lint, e2e. Pas de deploy.
 
-1. Tests API + Angular + lint  
-2. E2E Playwright  
-3. SSH → `git reset --hard origin/main` + `docker compose … up --build -d` + health check
+**Push `main`** (ou `workflow_dispatch` sur `main`) :
+
+1. Même CI, en parallèle (API / web / e2e forge / e2e table)
+2. Images API + web poussées sur GHCR (`ghcr.io/<owner>/dragons-api` et `dragons-web`)
+3. SSH → `git reset --hard origin/main`, **pull GHCR** puis `compose up --no-build`. Si le pull échoue, fallback `compose up --build` sur le VPS
+4. Health check `/api/health`
+
+Un push qui ne touche que `docs/` ou `.cursor/` ne lance pas la CI lourde ni le deploy.
+
+Le job **deploy** n’est jamais annulé par un second push (pas de `cancel-in-progress` sur le SSH).
 
 Secrets GitHub (Settings → Secrets and variables → Actions) :
 
@@ -140,6 +147,8 @@ Secrets GitHub (Settings → Secrets and variables → Actions) :
 | `DEPLOY_HOST` | `37.59.110.227` (ou le domaine) |
 | `DEPLOY_USER` | `debian` |
 | `DEPLOY_SSH_KEY` | clé privée SSH autorisée sur le VPS |
+
+Pas de secret GHCR à ajouter : le job utilise `GITHUB_TOKEN` (permission `packages: write`).
 
 La clé publique correspondante doit être dans `~/.ssh/authorized_keys` du user `debian`.
 

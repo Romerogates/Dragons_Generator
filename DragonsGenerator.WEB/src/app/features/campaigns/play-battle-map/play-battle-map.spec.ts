@@ -90,11 +90,7 @@ describe('PlayBattleMap', () => {
     expect(cmp.battleMapTokens()[0].id).toBe('pawn-u1');
     cmp.selectTokenForPlacement('pawn-u1');
     expect(cmp.selectedTokenCombatant()?.name).toBe('Aria');
-    (cmp as unknown as { placeCombatantOnMap: (id: string, x: number, y: number) => void }).placeCombatantOnMap(
-      'pawn-u1',
-      2,
-      1,
-    );
+    cmp.placeCombatantOnMap('pawn-u1', 2, 1);
     expect(placeEveningToken).toHaveBeenCalledWith('pawn-u1', 2, 1, { immediate: true });
   });
 
@@ -133,11 +129,7 @@ describe('PlayBattleMap', () => {
   });
 
   it('refuse une case occupée hors combat', () => {
-    (cmp as unknown as { placeCombatantOnMap: (id: string, x: number, y: number) => void }).placeCombatantOnMap(
-      'other',
-      1,
-      1,
-    );
+    cmp.placeCombatantOnMap('other', 1, 1);
     expect(setFeedback).toHaveBeenCalled();
     expect(placeEveningToken).not.toHaveBeenCalled();
   });
@@ -149,9 +141,7 @@ describe('PlayBattleMap', () => {
       { id: 'pawn-u2', name: 'Lila', mapX: 2, mapY: 1, memberUserId: 'u2' },
     ]);
     fixture.detectChanges();
-    const place = (
-      cmp as unknown as { placeCombatantOnMap: (id: string, x: number, y: number) => void }
-    ).placeCombatantOnMap.bind(cmp);
+    const place = cmp.placeCombatantOnMap.bind(cmp);
     place('pawn-u2', 1, 1);
     expect(placeEveningToken).not.toHaveBeenCalled();
     place('pawn-u1', 2, 1);

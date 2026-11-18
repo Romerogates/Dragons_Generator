@@ -1,3 +1,4 @@
+import { testLanguage } from '@testing/typed-fixtures';
 import { pickBonusLanguages, normalizeEquipmentCatalog, createSkillMapFromList, pickPlayableSpecies, pickPresetBackgrounds, CLASS_SPELLCASTING } from '../character-auto-build.util';
 import { makeElfSpecies, makeErudBackground, SKILLS } from './spec-helpers';
 import type { Species, Language } from './spec-helpers';
@@ -10,20 +11,20 @@ describe('pickBonusLanguages', () => {
     it('excludes locked, extinct and non-base languages', () => {
       spyOn(Math, 'random').and.returnValue(0);
       const languages: Language[] = [
-        { id: 'lg-commun', name: 'Commun', category: 'base', speakers: { primary: [], regions: [] } } as unknown as Language,
-        {
+        testLanguage({ id: 'lg-commun', name: 'Commun', category: 'base', speakers: { primary: [], regions: [] } }),
+        testLanguage({
           id: 'lg-orc',
           name: 'Orc',
           category: 'base',
           speakers: { primary: [], regions: [], isExtinct: true },
-        } as unknown as Language,
-        { id: 'lg-elfique', name: 'Elfique', category: 'exotique', speakers: { primary: [], regions: [] } } as unknown as Language,
-        {
+        }),
+        testLanguage({ id: 'lg-elfique', name: 'Elfique', category: 'exotique', speakers: { primary: [], regions: [] } }),
+        testLanguage({
           id: 'lg-ancien',
           name: 'Ancien',
           category: 'base',
           speakers: { primary: [], regions: [], isExtinct: false },
-        } as unknown as Language,
+        }),
       ];
       const picked = pickBonusLanguages(languages, new Set(['Commun']), 2);
       expect(picked).toEqual(['Ancien']);

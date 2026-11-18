@@ -124,6 +124,7 @@ describe('SummaryStep', () => {
   let cloudSaveSpy: jasmine.Spy;
   let queueSaveSpy: jasmine.Spy;
   let resetSpy: jasmine.Spy;
+  let goToStepSpy: jasmine.Spy;
   let isOnlineSignal: ReturnType<typeof signal<boolean>>;
   let isLoggedInSignal: ReturnType<typeof signal<boolean>>;
 
@@ -133,7 +134,7 @@ describe('SummaryStep', () => {
     resetSpy = jasmine.createSpy('reset');
     isOnlineSignal = signal(true);
     isLoggedInSignal = signal(true);
-    const goToStepSpy = jasmine.createSpy('goToStep');
+    goToStepSpy = jasmine.createSpy('goToStep');
 
     await TestBed.configureTestingModule({
       imports: [SummaryStep],
@@ -281,9 +282,6 @@ describe('SummaryStep', () => {
     expect(steps.some((s) => s.title === 'Récapitulatif')).toBeFalse();
 
     component.goToStep(2);
-    const builder = TestBed.inject(CharacterBuilderService) as unknown as {
-      goToStep: jasmine.Spy;
-    };
-    expect(builder.goToStep).toHaveBeenCalledWith(2);
+    expect(goToStepSpy).toHaveBeenCalledWith(2);
   });
 });

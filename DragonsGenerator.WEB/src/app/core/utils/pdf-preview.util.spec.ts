@@ -85,16 +85,14 @@ describe('pdf-preview.util', () => {
       const appendChild = spyOn(document.body, 'appendChild').and.callFake(
         <T extends Node>(node: T) => node,
       );
+      const nativeCreate = Document.prototype.createElement.bind(document);
       spyOn(document, 'createElement').and.callFake((tag: string) => {
-        if (tag !== 'a') return document.createElement(tag);
-        return {
-          href: '',
-          download: '',
-          rel: '',
-          style: { display: '' },
-          click,
-          remove,
-        } as unknown as HTMLAnchorElement;
+        const el = nativeCreate(tag);
+        if (tag === 'a') {
+          spyOn(el, 'click').and.callFake(click);
+          spyOn(el, 'remove').and.callFake(remove);
+        }
+        return el;
       });
 
       downloadBlobUrl('blob:test', 'fiche.pdf');

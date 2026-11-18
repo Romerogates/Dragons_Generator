@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import {
   asChoicePools,
@@ -11,7 +12,7 @@ import {
 } from './class-step-combat.util';
 
 function cls(id: string, data: Record<string, unknown> = {}): CharacterClass {
-  return {
+  return testClass({
     id,
     name: 'X',
     data: {
@@ -22,7 +23,7 @@ function cls(id: string, data: Record<string, unknown> = {}): CharacterClass {
       progression: [],
       ...data,
     },
-  } as unknown as CharacterClass;
+  });
 }
 
 describe('class-step-combat.util', () => {

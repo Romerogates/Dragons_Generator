@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import {
   buildClassProgressionChoicesFromWizard,
@@ -6,7 +7,7 @@ import {
 } from './class-step-apply.util';
 
 function guerrier(): CharacterClass {
-  return {
+  return testClass({
     id: 'cls-guerrier',
     name: 'Guerrier',
     data: {
@@ -24,7 +25,7 @@ function guerrier(): CharacterClass {
       progression: [{ level: 1, prof_bonus: 2, features: ['feat-second-souffle'], resources: {} }],
       features_details: [{ id: 'feat-second-souffle', name: 'Second souffle', desc: 'Reprend son souffle.', level: 1 }],
     },
-  } as unknown as CharacterClass;
+  });
 }
 
 describe('class-step-apply.util', () => {

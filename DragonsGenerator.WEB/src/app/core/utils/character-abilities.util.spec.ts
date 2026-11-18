@@ -1,3 +1,4 @@
+import { testSpell } from '@testing/typed-fixtures';
 import type { AbilityScores, AsiChoiceSlot } from '@core/models/Character/character';
 import {
   aggregateAsiChoices,
@@ -177,7 +178,7 @@ describe('character-abilities.util', () => {
 
   it('aggregateAsiChoices applies every "Talent" (flexible_points) spend type', () => {
     const feats = new Map([['don-talent', { benefits: [{ type: 'flexible_points', total: 4 }] }]]);
-    const spells = new Map([['spl-lueur', { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Un sort.' } as any]]);
+    const spells = new Map([['spl-lueur', testSpell({ id: 'spl-lueur', name: 'Lueur', description: 'Un sort.' })]]);
     const result = aggregateAsiChoices(
       [
         {

@@ -188,29 +188,105 @@ export function normalizeEquipmentSubtype(subtype: string | null | undefined): E
   return subtype.toUpperCase() as EquipmentSubtype;
 }
 
-export function normalizeEquipment(item: Equipment): Equipment {
-  const raw = (item.data ?? {}) as Record<string, unknown>;
+function asStringOrNull(v: unknown): string | null {
+  if (typeof v === 'string') return v;
+  if (v == null) return null;
+  return String(v);
+}
+
+function asNumberOrNull(v: unknown): number | null {
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
+}
+
+function asStringList(v: unknown): string[] {
+  return Array.isArray(v) ? v.map(String) : [];
+}
+
+export function equipmentDataBag(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  return { ...data };
+}
+
+export interface EquipmentCatalogRow {
+  id: string;
+  name: string;
+  type: string;
+  subtype: string | null;
+  cost: { v: number | null; u: string };
+  wKg: number | null;
+  data: Record<string, unknown>;
+}
+
+export function toEquipmentCatalogRow(item: Equipment): EquipmentCatalogRow {
+  const eq = normalizeEquipment(item);
+  return {
+    id: eq.id,
+    name: eq.name,
+    type: eq.type,
+    subtype: eq.subtype,
+    cost: eq.cost,
+    wKg: eq.wKg,
+    data: equipmentDataBag(eq.data),
+  };
+}
+
+export function toEquipmentCatalogRows(items: Equipment[]): EquipmentCatalogRow[] {
+  return items.map(toEquipmentCatalogRow);
+}
+
+export type EquipmentInput = Pick<Equipment, 'id' | 'name'> & {
+  type: string;
+  subtype?: string | null;
+  wKg?: number | null;
+  cost?: Equipment['cost'] | { value?: number | null; unit?: string; v?: number | null; u?: string };
+  data?: Equipment['data'] | Record<string, unknown> | null;
+};
+
+export function normalizeEquipment(item: EquipmentInput): Equipment {
+  const raw = equipmentDataBag(item.data);
   const data = {
     ...raw,
-    dmg_d: (raw['dmg_d'] ?? raw['damage_dice'] ?? null) as string | null,
-    dmg_t: (raw['dmg_t'] ?? raw['damage_type'] ?? null) as string | null,
-    props: (raw['props'] ?? raw['properties'] ?? []) as string[],
-    ac: (raw['ac'] ?? raw['ac_base'] ?? null) as number | null,
+    dmg_d: asStringOrNull(raw['dmg_d'] ?? raw['damage_dice']),
+    dmg_t: asStringOrNull(raw['dmg_t'] ?? raw['damage_type']),
+    props: asStringList(raw['props'] ?? raw['properties']),
+    ac: asNumberOrNull(raw['ac'] ?? raw['ac_base']),
     stealth_dis: Boolean(raw['stealth_dis'] ?? raw['stealth_disadvantage'] ?? false),
-    desc: (raw['desc'] ?? raw['description'] ?? null) as string | null,
+    desc: asStringOrNull(raw['desc'] ?? raw['description']),
     dex_modifier: raw['dex_modifier'],
     max_dex_bonus: raw['max_dex_bonus'] ?? null,
     str_req: raw['str_req'] ?? raw['str_required'] ?? null,
   };
 
+  const costIn = item.cost;
+  const costV =
+    costIn == null
+      ? null
+      : 'v' in costIn && costIn.v != null
+        ? costIn.v
+        : 'value' in costIn
+          ? (costIn.value ?? null)
+          : null;
+  const costU =
+    costIn == null
+      ? 'po'
+      : 'u' in costIn && costIn.u
+        ? costIn.u
+        : 'unit' in costIn && costIn.unit
+          ? costIn.unit
+          : 'po';
+  const cost = { v: costV, u: costU };
+
   return {
-    ...item,
+    id: item.id,
+    name: item.name,
+    wKg: item.wKg ?? null,
+    cost,
     type: normalizeEquipmentType(item.type),
     subtype: normalizeEquipmentSubtype(item.subtype),
-    data: data as Equipment['data'],
+    data,
   };
 }
 
-export function normalizeEquipments(items: Equipment[]): Equipment[] {
+export function normalizeEquipments(items: EquipmentInput[]): Equipment[] {
   return items.map(normalizeEquipment);
 }

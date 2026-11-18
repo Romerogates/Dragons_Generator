@@ -1,3 +1,4 @@
+import { testCreation } from '@testing/typed-fixtures';
 import { buildCharacterFromCreation } from './character-build.util';
 import type { AbilityScores, CharacterCreation, EquipmentInstance } from '@core/models/Character/character';
 import {
@@ -136,12 +137,12 @@ describe('character-combat.util', () => {
   });
 
   it('computeCharacterWalkSpeed adds monk bonus without armor', () => {
-    const c = {
+    const c = testCreation({
       speciesSpeed: 9,
       classId: 'cls-moine',
       classFeatures: [],
       classProgressionResources: { unarmored_movement_bonus_m: 3 },
-    } as unknown as CharacterCreation;
+    });
     expect(computeCharacterWalkSpeed(c, [])).toBe(12);
   });
 
@@ -185,32 +186,32 @@ describe('character-combat.util', () => {
 
 describe('character-spellcasting.util', () => {
   it('buildKnownSpellsFromCreation maps cantrips and spells', () => {
-    const c = {
+    const c = testCreation({
       selectedEquipment: [],
       backgroundEquipment: [],
       spellcastingDetails: {
         cantrips: [{ refId: 'spl-a', name: 'Flamme', level: 0, prepared: true }],
         spells: [{ refId: 'spl-b', name: 'Bouclier', level: 1, prepared: false }],
       },
-    } as unknown as CharacterCreation;
+    });
     const list = buildKnownSpellsFromCreation(c);
     expect(list.length).toBe(2);
     expect(list[1].prepared).toBeFalse();
   });
 
   it('detectSpellcastingFocus finds arcane focus in equipment', () => {
-    const c = {
+    const c = testCreation({
       selectedEquipment: [{ refId: 'eq-focus', name: 'Baguette arcanique', qty: 1 }],
       backgroundEquipment: [],
-    } as unknown as CharacterCreation;
+    });
     expect(detectSpellcastingFocus(c)).toBe('Baguette arcanique');
   });
 
   it('detectSpellcastingFocus finds holy symbol keyword', () => {
-    const c = {
+    const c = testCreation({
       selectedEquipment: [{ refId: 'eq-sym', name: 'Symbole sacré en argent', qty: 1 }],
       backgroundEquipment: [],
-    } as unknown as CharacterCreation;
+    });
     expect(detectSpellcastingFocus(c)).toBe('Symbole sacré en argent');
   });
 
@@ -220,7 +221,7 @@ describe('character-spellcasting.util', () => {
   });
 
   it('buildCharacterSpellcasting attaches pact slots for multiclass warlock secondary', () => {
-    const c = {
+    const c = testCreation({
       hasSpellcasting: true,
       spellcastingKind: 'wizard',
       spellcastingAbility: 'Intelligence',
@@ -233,7 +234,7 @@ describe('character-spellcasting.util', () => {
         { level: 1, max: 4 },
         { level: 2, max: 2 },
       ],
-    } as unknown as CharacterCreation;
+    });
     const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 7, warlockLevel: 2 });
     expect(sc?.kind).toBe('wizard');
     expect(sc?.spellSlots?.length).toBeGreaterThan(0);
@@ -247,7 +248,7 @@ describe('character-spellcasting.util', () => {
   });
 
   it('buildCharacterSpellcasting builds wizard block', () => {
-    const c = {
+    const c = testCreation({
       hasSpellcasting: true,
       spellcastingKind: 'wizard',
       spellcastingAbility: 'Intelligence',
@@ -262,7 +263,7 @@ describe('character-spellcasting.util', () => {
         spellMastery: [{ spellLevel: 2, spellId: 'spl-magic-missile', spellName: 'Projectile magique' }],
       },
       classProgressionResources: {},
-    } as unknown as CharacterCreation;
+    });
     const sc = buildCharacterSpellcasting(c, mods);
     expect(sc?.kind).toBe('wizard');
     expect(sc?.spellSaveDC).toBe(8 + 3 + mods.intelligence);
@@ -278,7 +279,7 @@ describe('character-spellcasting.util', () => {
   });
 
   it('buildCharacterSpellcasting builds sorcerer metamagic labels', () => {
-    const c = {
+    const c = testCreation({
       hasSpellcasting: true,
       spellcastingKind: 'sorcerer',
       spellcastingAbility: 'Charisme',
@@ -289,7 +290,7 @@ describe('character-spellcasting.util', () => {
       backgroundEquipment: [],
       spellcastingDetails: { cantrips: [] },
       classProgressionResources: { arcane_points: 3 },
-    } as unknown as CharacterCreation;
+    });
     const sc = buildCharacterSpellcasting(c, mods);
     expect(sc?.kind).toBe('sorcerer');
     expect((sc as { metamagic?: string[] }).metamagic).toEqual(['Sort discret']);
@@ -660,7 +661,7 @@ describe('character-build.util', () => {
   });
 
   it('buildCharacterSpellcasting attaches pactSlots when a warlock is mixed with another caster', () => {
-    const c = {
+    const c = testCreation({
       hasSpellcasting: true,
       spellcastingKind: 'wizard',
       spellcastingAbility: 'Intelligence',
@@ -669,14 +670,14 @@ describe('character-build.util', () => {
       backgroundEquipment: [],
       spellcastingDetails: { cantrips: [] },
       classProgressionResources: {},
-    } as unknown as CharacterCreation;
+    });
     const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 8, warlockLevel: 5 });
     expect(sc?.spellSaveDC).toBe(8 + 3 + mods.intelligence);
     expect(sc?.pactSlots).toEqual([{ level: 3, max: 2, used: 0 }]);
   });
 
   it('buildCharacterSpellcasting does not duplicate pactSlots on a pure warlock', () => {
-    const c = {
+    const c = testCreation({
       hasSpellcasting: true,
       spellcastingKind: 'warlock',
       spellcastingAbility: 'Charisme',
@@ -685,7 +686,7 @@ describe('character-build.util', () => {
       backgroundEquipment: [],
       spellcastingDetails: { cantrips: [], patron: 'Fiélon' },
       classProgressionResources: {},
-    } as unknown as CharacterCreation;
+    });
     const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 5, warlockLevel: 5 });
     expect(sc?.kind).toBe('warlock');
     expect(sc?.pactSlots).toBeUndefined();

@@ -1,3 +1,4 @@
+import { testCharacter } from '@testing/typed-fixtures';
 import {
   extractPactSlotsFromResources,
   extractScalarResources,
@@ -51,7 +52,7 @@ describe('coverage 85 — feature-uses.util branches', () => {
 
   it('extracts spell slots and pact slots', () => {
     expect(extractSpellSlotsFromResources(undefined)).toEqual([]);
-    expect(extractSpellSlotsFromResources({ spell_slots: [] as unknown as object })).toEqual([]);
+    expect(extractSpellSlotsFromResources({ spell_slots: [] })).toEqual([]);
     expect(
       extractSpellSlotsFromResources({ spell_slots: { '0': 1, '1': 2, 'x': 3 } }),
     ).toEqual([{ level: 1, max: 2 }]);
@@ -209,7 +210,7 @@ describe('coverage 85 — aura-range.util branches', () => {
 });
 
 describe('coverage 85 — character-export-validation branches', () => {
-  const base = {
+  const base = testCharacter({
     schemaVersion: CURRENT_SCHEMA_VERSION,
     name: 'Hero',
     species: { id: 'sp-humain', label: 'Humain' },
@@ -217,19 +218,19 @@ describe('coverage 85 — character-export-validation branches', () => {
     totalLevel: 1,
     proficiencies: { weapons: ['wp-epee-longue'], tools: [], armor: [], languages: [] },
     equipment: [],
-  } as unknown as Character;
+  });
 
   it('collects structural validation errors', () => {
     expect(validateCharacterExport({ ...base, schemaVersion: 0 } as Character).valid).toBeFalse();
     expect(validateCharacterExport({ ...base, name: '  ' } as Character).errors).toContain(
       'Le personnage doit avoir un nom.',
     );
-    expect(validateCharacterExport({ ...base, classes: [] } as unknown as Character).valid).toBeFalse();
+    expect(validateCharacterExport(testCharacter({ ...base, classes: [] })).valid).toBeFalse();
     expect(
-      validateCharacterExport({
+      validateCharacterExport(testCharacter({
         ...base,
         classes: [{ classId: ' ', classLabel: 'X', level: 1, hitDie: 8 }],
-      } as unknown as Character).valid,
+      })).valid,
     ).toBeFalse();
     expect(
       validateCharacterExport({ ...base, species: { id: '', label: '' } } as Character).valid,
@@ -238,16 +239,16 @@ describe('coverage 85 — character-export-validation branches', () => {
   });
 
   it('rejects unresolved tools and blank equipment refs', () => {
-    const toolBroken = {
+    const toolBroken = testCharacter({
       ...base,
       proficiencies: { ...base.proficiencies, tools: ['tool-any'] },
-    } as unknown as Character;
+    });
     expect(validateCharacterExport(toolBroken).errors.some((e) => e.includes('outil'))).toBeTrue();
 
-    const eqBroken = {
+    const eqBroken = testCharacter({
       ...base,
       equipment: [{ refId: '  ', name: 'Objet', qty: 1 }],
-    } as unknown as Character;
+    });
     expect(validateCharacterExport(eqBroken).errors.some((e) => e.includes('référence'))).toBeTrue();
   });
 
@@ -362,7 +363,7 @@ describe('coverage 85 — spell-grimoire and export edge cases', () => {
   });
 
   it('accepts resolved tool category proficiencies on export', () => {
-    const ok = {
+    const ok = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Barde',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -375,12 +376,12 @@ describe('coverage 85 — spell-grimoire and export edge cases', () => {
         languages: [],
       },
       equipment: [],
-    } as unknown as Character;
+    });
     expect(validateCharacterExport(ok).valid).toBeTrue();
   });
 
   it('rejects unresolved weapon placeholders on export', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Hero',
       species: { id: 'sp-humain', label: 'Humain' },
@@ -388,7 +389,7 @@ describe('coverage 85 — spell-grimoire and export edge cases', () => {
       totalLevel: 1,
       proficiencies: { weapons: ['wp-cat-unknown'], tools: [], armor: [], languages: [] },
       equipment: [],
-    } as unknown as Character;
+    });
     expect(validateCharacterExport(broken).valid).toBeFalse();
   });
 });

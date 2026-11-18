@@ -1,5 +1,8 @@
 name: Production watchdog
 
+permissions:
+  contents: read
+
 on:
   schedule:
     - cron: '*/15 * * * *'

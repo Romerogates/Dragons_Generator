@@ -86,7 +86,7 @@ export function extractSpellSlotsFromResources(
 ): { level: number; max: number }[] {
   const raw = resources?.['spell_slots'];
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
-  return Object.entries(raw as Record<string, unknown>)
+  return Object.entries(raw)
     .map(([lvl, max]) => ({ level: parseInt(lvl, 10), max: Number(max) }))
     .filter((s) => !Number.isNaN(s.level) && s.level >= 1 && s.max > 0)
     .sort((a, b) => a.level - b.level);

@@ -149,8 +149,8 @@ describe('combat-creature-import.util', () => {
 
     const noAbilities = combatantFromCreature(
       goblinFixture({
-        abilities: undefined as unknown as Creature['abilities'],
-        hitPoints: undefined as unknown as string,
+        abilities: undefined,
+        hitPoints: undefined,
       }),
       'Neutre',
     );
@@ -189,7 +189,7 @@ describe('combat-creature-import.util', () => {
     ).toBeNull();
     expect(
       appendCreatureCombatantToSession(
-        { ...empty, sessions: undefined as unknown as typeof empty.sessions },
+        { ...empty, sessions: [] },
         combatant,
       ),
     ).toBeNull();

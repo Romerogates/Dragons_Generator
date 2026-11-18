@@ -12,8 +12,8 @@ import { DataService } from '../../../../core/services/data.service';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import {
   CATEGORY_FILTERS,
-  normalizeEquipments,
   resolveEquipmentRefId,
+  toEquipmentCatalogRows,
   isMasteredProficiencyChoice,
   masteredProficiencyChoiceLabel,
 } from '@core/utils/equipment.utils';
@@ -177,7 +177,7 @@ export class EquipmentStep implements OnInit {
   ngOnInit(): void {
     this.dataService.getEquipments().subscribe({
       next: (items) => {
-        const normalized = normalizeEquipments(items) as unknown as EquipmentRaw[];
+        const normalized = toEquipmentCatalogRows(items);
         this.catalog.set(normalized);
         registerGameLabels(normalized.map((e) => [e.id, e.name]));
         this.restorePicksFromBuilder();

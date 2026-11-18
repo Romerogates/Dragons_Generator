@@ -275,7 +275,7 @@ export function advanceTurn(
 
   const len = order.length;
   let turnIndex = combat.turnIndex + direction;
-  let round = combat.round;
+  let round = combat.round ?? 1;
 
   if (direction === 1) {
     if (turnIndex >= len) {
@@ -321,7 +321,8 @@ function nextDuplicateName(name: string): string {
 
 export function formatCombatArchiveSummary(combat: ActiveCombat): string {
   const label = combat.label?.trim() || 'Combat';
-  const lines = [`--- Fin combat : ${label} (${combat.round} manche${combat.round > 1 ? 's' : ''}) ---`];
+  const round = combat.round ?? 1;
+  const lines = [`--- Fin combat : ${label} (${round} manche${round > 1 ? 's' : ''}) ---`];
 
   for (const cb of sortedTurnOrder(combat)) {
     const name = cb.name?.trim() || 'Sans nom';
@@ -344,7 +345,7 @@ export function createCombatHistoryEntry(combat: ActiveCombat): CombatHistoryEnt
     endedAt: new Date().toISOString(),
     label: combat.label,
     encounterId: combat.encounterId,
-    round: combat.round,
+    round: combat.round ?? 1,
     summary: formatCombatArchiveSummary(combat),
   };
 }

@@ -132,17 +132,17 @@ export type EquipmentLocation =
 
 export interface EquipmentInstance {
   /** UUID local, pour éditer/supprimer sans ambiguïté quand plusieurs instances du même item coexistent. */
-  instanceId: string;
+  instanceId?: string;
   /** ID dans le catalogue Equipment. */
   refId: string;
   /** Nom dénormalisé (affichage autonome). */
   name: string;
   qty: number;
-  location: EquipmentLocation;
+  location?: EquipmentLocation;
   /** Actuellement dégainé / porté activement. */
-  equipped: boolean;
+  equipped?: boolean;
   /** Poids unitaire en kg, dénormalisé de Equipment.wKg. */
-  wKg: number | null;
+  wKg?: number | null;
   /** Notes de table (inscription sur l'épée, état de l'objet…). */
   notes?: string;
 

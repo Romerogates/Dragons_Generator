@@ -58,7 +58,7 @@ describe('formatFeatureSheetLabel', () => {
     expect(formatFeatureSheetLabel({ name: '  ', refId: 'feat-ennemi-jure' })).toMatch(/ennemi|jurer|juré/i);
     expect(formatFeatureSheetLabel({ name: '', refId: '' })).toBe('');
     expect(formatFeatureSheetLabel({ name: 'Sans ref' })).toBe('Sans ref');
-    expect(formatFeatureSheetLabel({ name: undefined as unknown as string, refId: undefined })).toBe('');
+    expect(formatFeatureSheetLabel({ refId: undefined })).toBe('');
   });
 });
 

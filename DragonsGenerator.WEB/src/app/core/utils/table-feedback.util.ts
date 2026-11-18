@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
 /** Feedback soft optionnel (critique, tour, XP) — désactivable via prefs locales. */
 
 const PREF_KEY = 'dg.tableSoftFeedback';
@@ -38,10 +44,7 @@ export function softTablePulse(kind: SoftFeedbackKind = 'dice'): void {
   }
   try {
     const Ctx =
-      typeof window !== 'undefined'
-        ? window.AudioContext ||
-          (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-        : undefined;
+      typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : undefined;
     if (!Ctx) return;
     const ctx = new Ctx();
     const osc = ctx.createOscillator();

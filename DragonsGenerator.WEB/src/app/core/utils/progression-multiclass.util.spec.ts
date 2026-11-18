@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import {
   multiclassPrerequisitesMet,
   multiclassPrerequisiteLabel,
@@ -27,11 +28,11 @@ function makeMulticlassCls(
   multiclass_prerequisites?: unknown,
   multiclass_proficiencies?: unknown,
 ): CharacterClass {
-  return {
+  return testClass({
     id,
     name: id,
-    data: { multiclass_prerequisites, multiclass_proficiencies } as any,
-  } as unknown as CharacterClass;
+    data: { multiclass_prerequisites, multiclass_proficiencies },
+  });
 }
 
 describe('multiclassPrerequisitesMet', () => {

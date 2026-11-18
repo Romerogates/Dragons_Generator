@@ -30,6 +30,7 @@ import {
   normalizeSkillId,
 } from './skill.utils';
 import {
+  equipmentDataBag,
   isEquipmentCategoryId,
   masteredProficiencyChoiceLabel,
   normalizeEquipment,
@@ -243,8 +244,8 @@ describe('branch coverage — ability-mapping & skill.utils', () => {
 
   it('builds skill map and resolves unknown ids', () => {
     const map = buildSkillMap([
-      { id: 'ski-athletisme', name: 'Athlétisme', ability: 'FOR' } as any,
-      { id: 'skill-custom', name: 'Custom', ability: 'unknown' } as any,
+      { id: 'ski-athletisme', name: 'Athlétisme', ability: 'FOR' },
+      { id: 'skill-custom', name: 'Custom', ability: 'unknown' },
     ]);
     expect(normalizeSkillId('ski-perception')).toBe('skill-perception');
     expect(map['skill-athletisme'].ability).toBe('Force');
@@ -274,15 +275,15 @@ describe('branch coverage — aura-range & equipment.utils', () => {
       name: 'Bouclier',
       type: 'armor',
       subtype: 'shield',
-      cost: { value: 10, unit: 'po' } as any,
+      cost: { value: 10, unit: 'po' },
       wKg: null,
       data: {
         ac_base: 2,
         stealth_disadvantage: true,
         str_required: null,
       },
-    } as any);
+    });
     expect(normalized.subtype).toBe('SHIELD');
-    expect((normalized.data as unknown as Record<string, unknown>)['stealth_dis']).toBeTrue();
+    expect(equipmentDataBag(normalized.data)['stealth_dis']).toBeTrue();
   });
 });

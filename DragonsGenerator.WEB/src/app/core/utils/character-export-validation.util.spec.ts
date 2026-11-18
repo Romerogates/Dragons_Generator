@@ -1,3 +1,4 @@
+import { testCharacter } from '@testing/typed-fixtures';
 import { TestBed } from '@angular/core/testing';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
@@ -36,7 +37,7 @@ describe('character-export-validation.util', () => {
   });
 
   it('accepts weapon category proficiencies on export', () => {
-    const ok = {
+    const ok = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Guerrier',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -49,14 +50,14 @@ describe('character-export-validation.util', () => {
         languages: ['Commun'],
       },
       equipment: [{ refId: 'wp-epee-longue', name: 'Épée longue', qty: 1 }],
-    } as unknown as Character;
+    });
 
     const result = validateCharacterExport(ok);
     expect(result.valid).toBeTrue();
   });
 
   it('rejects mastered-choice placeholders in proficiencies and equipment', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Tyrolienne',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -64,7 +65,7 @@ describe('character-export-validation.util', () => {
       totalLevel: 1,
       proficiencies: { weapons: ['wp-mastered-choice'], tools: [], armor: [], languages: ['Commun'] },
       equipment: [{ refId: 'wp-dague', name: 'Dague', qty: 1 }],
-    } as unknown as Character;
+    });
 
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
@@ -72,7 +73,7 @@ describe('character-export-validation.util', () => {
   });
 
   it('rejects category equipment ids', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Test',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -80,7 +81,7 @@ describe('character-export-validation.util', () => {
       totalLevel: 1,
       proficiencies: { weapons: ['wp-epee-longue'], tools: [], armor: [], languages: ['Commun'] },
       equipment: [{ refId: 'wp-cat-martial', name: 'Arme', qty: 1 }],
-    } as unknown as Character;
+    });
 
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
@@ -100,7 +101,7 @@ describe('character-export-validation.util', () => {
   });
 
   it('reports every structural error at once (schema version, name, classes, species, level)', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION - 1,
       name: '   ',
       species: { id: '', label: '' },
@@ -113,7 +114,7 @@ describe('character-export-validation.util', () => {
         languages: [],
       },
       equipment: [{ refId: '   ', name: '', qty: 1 }],
-    } as unknown as Character;
+    });
 
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
@@ -126,7 +127,7 @@ describe('character-export-validation.util', () => {
   });
 
   it('accepts an empty classes array without a "classe sans identifiant" error but flags the missing class', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Test',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -134,7 +135,7 @@ describe('character-export-validation.util', () => {
       totalLevel: 1,
       proficiencies: { weapons: [], tools: [], armor: [], languages: [] },
       equipment: [],
-    } as unknown as Character;
+    });
     const result = validateCharacterExport(broken);
     expect(result.errors).toContain('Au moins une classe est requise.');
   });

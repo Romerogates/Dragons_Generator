@@ -50,7 +50,9 @@ const SKILL_ICONS: Record<string, string> = {
   'skill-tromperie': 'fluent-emoji:joker',
 };
 
-export function buildSkillMap(skills: Skill[]): Record<string, SkillInfo> {
+export function buildSkillMap(
+  skills: Array<Pick<Skill, 'id' | 'name' | 'ability'>>,
+): Record<string, SkillInfo> {
   const map: Record<string, SkillInfo> = {};
   for (const skill of skills) {
     const id = normalizeSkillId(skill.id);

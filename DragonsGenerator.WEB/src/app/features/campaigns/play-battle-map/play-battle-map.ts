@@ -389,7 +389,7 @@ export class PlayBattleMap implements OnDestroy {
     });
   }
 
-  private placeCombatantOnMap(
+  placeCombatantOnMap(
     combatantId: string,
     x: number,
     y: number,

@@ -908,7 +908,7 @@ export class MagicStep implements OnInit {
     this.builder.creation.update((c) => ({
       ...c,
       speciesChoiceAnswers: { ...(c.speciesChoiceAnswers ?? {}), ...persisted.speciesChoiceAnswersPatch },
-      spellcastingDetails: persisted.details as unknown as Record<string, unknown>,
+      spellcastingDetails: { ...persisted.details },
       mysticArcanumPicks: persisted.mysticArcanumPicks,
       spellMasteryPicks: persisted.spellMasteryPicks,
       signatureSpellIds: persisted.signatureSpellIds,

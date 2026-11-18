@@ -1,9 +1,72 @@
 import {
   CURRENT_SCHEMA_VERSION,
+  type Ability,
   type Character,
+  type CharacterProficiencies,
   type CharacterSpellcasting,
   type SpellInstance,
+  type SpellSlotPool,
 } from '@core/models/Character/character';
+
+export type CharacterFixtureOverrides = Omit<
+  Partial<Character>,
+  'proficiencies' | 'spellcasting' | 'knownSpells' | 'personality'
+> & {
+  personality?: Partial<Character['personality']>;
+  proficiencies?: Partial<CharacterProficiencies>;
+  spellcasting?: Character['spellcasting'] | {
+    kind?: NonNullable<Character['spellcasting']>['kind'];
+    ability?: Ability | string;
+    deity?: string;
+    deityId?: string;
+  } | null;
+  knownSpells?: Array<Partial<SpellInstance> & Pick<SpellInstance, 'refId' | 'name' | 'level'>>;
+};
+
+function fixtureAbility(raw: Ability | string | undefined): Ability {
+  const v = (raw ?? '').toLowerCase();
+  if (v === 'sagesse' || v === 'wis' || v === 'wisdom') return 'Sagesse';
+  if (v === 'charisme' || v === 'cha') return 'Charisme';
+  if (v === 'force' || v === 'str') return 'Force';
+  if (v === 'dextérité' || v === 'dex') return 'Dextérité';
+  if (v === 'constitution' || v === 'con') return 'Constitution';
+  return 'Intelligence';
+}
+
+function isFullSpellcasting(raw: object): raw is CharacterSpellcasting {
+  return 'spellSaveDC' in raw && 'spellSlots' in raw && 'kind' in raw && 'ability' in raw;
+}
+
+function fixtureSpellcasting(
+  raw: NonNullable<CharacterFixtureOverrides['spellcasting']>,
+): CharacterSpellcasting {
+  if (raw && typeof raw === 'object' && isFullSpellcasting(raw)) return raw;
+  const ability = fixtureAbility('ability' in raw ? raw.ability : undefined);
+  const common = {
+    ability,
+    spellSaveDC: 13,
+    spellAttackBonus: 5,
+    focus: null as string | null,
+    spellSlots: [] as SpellSlotPool[],
+    cantrips: { max: 0, used: 0 },
+  };
+  if (raw.kind === 'cleric') {
+    return {
+      ...common,
+      kind: 'cleric',
+      deity: ('deity' in raw && raw.deity) || ('deityId' in raw && raw.deityId) || '',
+      domain: '',
+      divineChannels: [],
+    };
+  }
+  return {
+    ...common,
+    kind: 'wizard',
+    arcaneTradition: '',
+    spellMastery: [],
+    signatureSpells: [],
+  };
+}
 
 const DEFAULT_ABILITIES = {
   force: 10,
@@ -40,7 +103,7 @@ function makeSpellInstances(count: number, startId = 1): SpellInstance[] {
 }
 
 /** Personnage minimal valide pour export PDF / validation. */
-export function createMinimalCharacter(overrides: Partial<Character> = {}): Character {
+export function createMinimalCharacter(overrides: CharacterFixtureOverrides = {}): Character {
   const base: Character = {
     id: 'test-char-1',
     schemaVersion: CURRENT_SCHEMA_VERSION,
@@ -171,7 +234,25 @@ export function createMinimalCharacter(overrides: Partial<Character> = {}): Char
     },
   };
 
-  return { ...base, ...overrides };
+  const { spellcasting, knownSpells, proficiencies, personality, ...rest } = overrides;
+  return {
+    ...base,
+    ...rest,
+    proficiencies: { ...base.proficiencies, ...proficiencies },
+    personality: { ...base.personality, ...personality },
+    knownSpells: knownSpells
+      ? knownSpells.map((s) => ({
+          prepared: false,
+          ...s,
+        }))
+      : base.knownSpells,
+    spellcasting:
+      spellcasting === undefined
+        ? base.spellcasting
+        : spellcasting === null
+          ? null
+          : fixtureSpellcasting(spellcasting),
+  };
 }
 
 export function createClericPdfCharacter(spellCount = 20): Character {

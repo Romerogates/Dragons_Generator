@@ -29,12 +29,8 @@ describe('PdfGeneratorService', () => {
     });
 
     service = TestBed.inject(PdfGeneratorService);
-    const internal = service as unknown as {
-      loadImage: (url: string) => Promise<string>;
-      loadBackgroundImages: () => Promise<string[]>;
-    };
-    spyOn(internal, 'loadImage').and.returnValue(Promise.resolve(TINY_JPEG_DATA_URL));
-    spyOn(internal, 'loadBackgroundImages').and.returnValue(
+    spyOn(service, 'loadImage').and.returnValue(Promise.resolve(TINY_JPEG_DATA_URL));
+    spyOn(service, 'loadBackgroundImages').and.returnValue(
       Promise.resolve([
         TINY_JPEG_DATA_URL,
         TINY_JPEG_DATA_URL,

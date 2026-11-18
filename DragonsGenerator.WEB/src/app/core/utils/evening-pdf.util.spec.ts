@@ -1,11 +1,12 @@
-import { createCampaignHandout, type CampaignSession } from '@core/models/Campaign/campaign';
+import { createCampaignHandout } from '@core/models/Campaign/campaign';
 import {
   exportEveningPdf,
   exportUnifiedEveningPack,
   renderEveningPdf,
+  type EveningPdfSession,
 } from './evening-pdf.util';
 
-function session(over: Partial<CampaignSession> = {}): CampaignSession {
+function session(over: Partial<EveningPdfSession> = {}): EveningPdfSession {
   return {
     id: 's1',
     title: 'Soirée 1',
@@ -40,10 +41,10 @@ describe('evening-pdf.util', () => {
       'Hub',
       session({
         scheduledAt: {
-          toString() {
+          toString(): string {
             throw new Error('bad-date');
           },
-        } as unknown as string,
+        },
       }),
       [],
     );

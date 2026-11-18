@@ -97,7 +97,7 @@ describe('ClassStep (Lettré)', () => {
     );
     fixture.detectChanges();
 
-    const ok = (component as unknown as { applySelectionToBuilder: () => boolean }).applySelectionToBuilder();
+    const ok = component.applySelectionToBuilder();
     expect(ok).toBeTrue();
     expect(setClassSpy).toHaveBeenCalledTimes(1);
 
@@ -166,7 +166,7 @@ describe('ClassStep (Lettré)', () => {
         progression: [{ level: 1, prof_bonus: 2, features: [] }],
         starting_equipment: { fixed: [{ id: 'wp-dague', qty: 2 }], choice_pools: [] },
       },
-    } as any);
+    });
     const clearClass = jasmine.createSpy('clearClass');
     await TestBed.configureTestingModule({
       imports: [ClassStep],
@@ -266,7 +266,7 @@ describe('ClassStep (Lettré)', () => {
         ],
         starting_equipment: [],
       },
-    } as any);
+    });
     const clearClass = jasmine.createSpy('clearClass');
     await TestBed.configureTestingModule({
       imports: [ClassStep],
@@ -347,7 +347,7 @@ describe('ClassStep (Lettré)', () => {
         progression: [{ level: 1, prof_bonus: 2, features: ['feat-style-de-combat'] }],
         starting_equipment: [],
       },
-    } as any);
+    });
     const clearClass = jasmine.createSpy('clearClass');
     await TestBed.configureTestingModule({
       imports: [ClassStep],

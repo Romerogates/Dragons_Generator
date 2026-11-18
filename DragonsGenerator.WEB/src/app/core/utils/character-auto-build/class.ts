@@ -1,5 +1,5 @@
 import type { Ability, FeatureInstance } from '@core/models/Character/character';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import type { CharacterClass, Subclass } from '@core/models/CharacterClasses/character-class';
 import type { ClassSelection } from '@core/services/character-builder.service';
 import { annotateAuraDesc } from '@core/utils/aura-range.util';
 import { coerceEquipmentSlots } from '@core/utils/class-data.adapter';
@@ -19,38 +19,16 @@ import { pickRandom } from '@core/utils/pregen-random.util';
 import { proficiencyBonusForLevel } from '@core/services/character-builder.service';
 import { pickRandomSubset } from './random';
 import { SAVE_CODE_TO_LABEL, isFightingStylePool, resolveSpellcasting } from './shared';
-
-interface AutoSubclassOption {
-  id: string;
-  name: string;
-  desc?: string;
-  features?: { id: string; name: string; desc: string; level?: number; [k: string]: unknown }[];
-  sub_choices?: {
-    id: string;
-    type: string;
-    count?: number;
-    level_required?: number;
-    label?: string;
-    options?: string[];
-    option_labels?: Record<string, string>;
-    option_descs?: Record<string, string>;
-  }[];
-}
+import { listSubclassOptions, subclassUnlockLevel } from '@core/utils/character-class-features.util';
 
 function pickAutoSubclass(
   cls: CharacterClass,
   level: number,
-): { sub: AutoSubclassOption | null; classChoiceAnswers: Record<string, string[]> } {
-  const raw = cls.data.subclasses as unknown;
+): { sub: Subclass | null; classChoiceAnswers: Record<string, string[]> } {
+  const raw = cls.data.subclasses;
   if (!raw) return { sub: null, classChoiceAnswers: {} };
-  const options = (Array.isArray(raw) ? raw : ((raw as { options?: unknown[] }).options ?? [])) as AutoSubclassOption[];
-  const levelUnlocked = Array.isArray(raw)
-    ? 1
-    : Number(
-        (raw as { level_unlocked?: number; unlocked_at_level?: number }).level_unlocked ??
-          (raw as { unlocked_at_level?: number }).unlocked_at_level ??
-          3,
-      );
+  const options = listSubclassOptions(cls.data);
+  const levelUnlocked = subclassUnlockLevel(raw);
   if (!options.length || level < levelUnlocked) return { sub: null, classChoiceAnswers: {} };
 
   const sub = pickRandom(options);
@@ -60,7 +38,8 @@ function pickAutoSubclass(
   for (const sc of sub.sub_choices ?? []) {
     if ((sc.level_required ?? 1) > level) continue;
     if (!sc.options?.length) continue;
-    classChoiceAnswers[sc.id] = pickRandomSubset(sc.options, sc.count || 1);
+    if (!sc.id) continue;
+    classChoiceAnswers[sc.id] = pickRandomSubset((sc.options ?? []).map(String), sc.count || 1);
   }
 
   return { sub, classChoiceAnswers };
@@ -83,8 +62,8 @@ function resolveClassFeature(
   }
   return {
     refId: feat.id,
-    name: feat.name,
-    desc: annotateAuraDesc(feat as never, level),
+    name: feat.name ?? feat.id,
+    desc: annotateAuraDesc(feat, level),
     source: 'class',
     sourceDetail: cls.name,
     level: feat.level ?? level,
@@ -93,15 +72,13 @@ function resolveClassFeature(
 }
 
 function pickCombatStyles(cls: CharacterClass, level: number): FeatureInstance[] {
-  const pools = ((cls.data as { choice_pools?: Record<string, unknown>[] }).choice_pools ?? []) as Record<
-    string,
-    unknown
-  >[];
+  const pools = cls.data.choice_pools ?? [];
   const pool = pools.find((p) => isFightingStylePool(p));
   if (!pool) return [];
   const unlock = 1;
   if (unlock > level) return [];
-  const styleIds = (pool['pool'] as string[]) ?? [];
+  const rawPool = pool.pool;
+  const styleIds = Array.isArray(rawPool) ? rawPool.map(String) : [];
   const picked = pickRandomSubset(styleIds, 1);
   const details = cls.data.features_details ?? [];
   return picked.map((id) => {
@@ -140,18 +117,18 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
   features.push(...pickCombatStyles(cls, level));
 
   const progAtLevel = progression.find((p) => p.level === level);
-  const data = cls.data as Record<string, unknown>;
+  const data = cls.data;
 
   const { sub, classChoiceAnswers: subChoiceAnswers } = pickAutoSubclass(cls, level);
   for (const feat of sub?.features ?? []) {
-    if (featureUnlockLevel(feat as Record<string, unknown>) > level) continue;
+    if (featureUnlockLevel(feat) > level) continue;
     features.push({
       refId: feat.id,
-      name: feat.name,
-      desc: annotateAuraDesc(feat as never, level),
+      name: feat.name ?? feat.id,
+      desc: annotateAuraDesc(feat, level),
       source: 'class',
       sourceDetail: `${cls.name} · ${sub!.name}`,
-      level: featureUnlockLevel(feat as Record<string, unknown>),
+      level: featureUnlockLevel(feat),
       uses: resolveFeatureUses(feat, cls, level, profBonus),
     });
   }
@@ -170,7 +147,7 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
         desc: feat?.desc ?? sc?.option_descs?.[pickId] ?? '',
         source: 'class',
         sourceDetail: `${cls.name} · ${sub?.name ?? ''}`,
-        level: feat ? featureUnlockLevel(feat as Record<string, unknown>) : (sc?.level_required ?? 1),
+        level: feat ? featureUnlockLevel(feat) : (sc?.level_required ?? 1),
         uses: feat ? resolveFeatureUses(feat, cls, level, profBonus) : undefined,
       });
     }
@@ -211,8 +188,8 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
       if (extraFeatures.some((f) => f.refId === fid)) continue;
       extraFeatures.push({
         refId: fid,
-        name: feat.name,
-        desc: feat.desc,
+        name: feat.name ?? fid,
+        desc: feat.desc ?? '',
         source: 'class',
         sourceDetail: `${cls.name} · ${choice.label}`,
         level: feat.level ?? 1,
@@ -227,10 +204,21 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
   const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
   const bonusSaveCodes = [...subBonus.savingThrows, ...classRootSavingThrowGrants(cls, level)];
   const savingThrows = [
-    ...new Set([
-      ...(prof.saving_throws ?? []),
-      ...bonusSaveCodes.map((code) => SAVE_CODE_TO_LABEL[code]).filter((a): a is Ability => !!a),
-    ]),
+    ...new Set(
+      [
+        ...(prof.saving_throws ?? []).map((s) => String(s)),
+        ...bonusSaveCodes.map((code) => SAVE_CODE_TO_LABEL[code] ?? String(code)),
+      ]
+        .map((token) => SAVE_CODE_TO_LABEL[token] ?? SAVE_CODE_TO_LABEL[token.toLowerCase()] ?? token)
+        .filter((a): a is Ability =>
+          a === 'Force' ||
+          a === 'Dextérité' ||
+          a === 'Constitution' ||
+          a === 'Intelligence' ||
+          a === 'Sagesse' ||
+          a === 'Charisme',
+        ),
+    ),
   ];
   const classResistances = subclassBonusResistances(cls, sub?.id, level);
   const classSenses = classBonusSenses(cls, sub?.id, level, []);

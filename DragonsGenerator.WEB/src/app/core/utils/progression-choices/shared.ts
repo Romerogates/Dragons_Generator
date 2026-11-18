@@ -7,20 +7,8 @@ import { labelForGameId } from '../game-id-labels';
 
 export const PROGRESSION_MAX_LEVEL = 20;
 
-export interface ClassChoicePool {
-  id?: string;
-  type?: string;
-  name?: string;
-  quantity?: number;
-  pool?: unknown[];
-  options?: unknown[];
-  unlocked_at_level?: number;
-  unlock_level?: number;
-  level_unlocked?: number;
-  unlocked_at_levels?: number[];
-  constraint_max_price_po?: number;
-  fixed_features?: string[];
-}
+export type { ClassChoicePool } from '@core/models/CharacterClasses/character-class';
+import type { ClassChoicePool } from '@core/models/CharacterClasses/character-class';
 
 interface ProgressionChoicePoolActive {
   type?: string;
@@ -72,11 +60,7 @@ interface LevelUpChoicePool extends ClassChoicePool {
   pool_ref?: string;
 }
 
-type ProgressionClassData = CharacterClass['data'] & {
-  choice_pools?: ClassChoicePool[];
-  progression?: ExtendedProgressionLevel[];
-  features_details?: FeatureDetail[];
-};
+type ProgressionClassData = CharacterClass['data'];
 
 interface MetamagicFeatureDetail extends FeatureDetail {
   mechanics?: {
@@ -90,7 +74,7 @@ interface MetamagicFeatureDetail extends FeatureDetail {
 }
 
 export function progressionData(cls: CharacterClass): ProgressionClassData {
-  return cls.data as ProgressionClassData;
+  return cls.data;
 }
 
 export interface ProgressionChoiceOption {
@@ -200,8 +184,10 @@ export function metamagicOptions(cls: CharacterClass): ProgressionChoiceOption[]
   return [];
 }
 
-export function featureUnlockLevel(feat: Record<string, unknown> | undefined | null): number {
-  const raw = (feat?.['level'] ?? feat?.['unlocks_at_level']) as unknown;
+export function featureUnlockLevel(
+  feat: { level?: unknown; unlocks_at_level?: unknown } | undefined | null,
+): number {
+  const raw = feat?.level ?? feat?.unlocks_at_level;
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : 1;
 }

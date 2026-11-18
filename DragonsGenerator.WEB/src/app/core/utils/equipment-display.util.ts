@@ -5,7 +5,7 @@ export interface EquipmentDisplayLike {
   subtype: string | null;
   cost?: { v: number | null; u: string };
   wKg?: number | null;
-  data: Record<string, unknown>;
+  data?: Record<string, unknown>;
 }
 
 const TYPE_LABELS: Record<string, string> = {

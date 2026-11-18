@@ -69,12 +69,14 @@ export function autoCompleteRemainingCreation(
     if (auto) {
       const merged = { ...details };
       let changed = false;
-      if ((!Array.isArray(details.cantrips) || details.cantrips.length === 0) && Array.isArray(auto['cantrips']) && (auto['cantrips'] as unknown[]).length) {
-        merged.cantrips = auto['cantrips'] as unknown[];
+      const autoCantrips = auto['cantrips'];
+      const autoSpells = auto['spells'];
+      if ((!Array.isArray(details.cantrips) || details.cantrips.length === 0) && Array.isArray(autoCantrips) && autoCantrips.length) {
+        merged.cantrips = autoCantrips;
         changed = true;
       }
-      if ((!Array.isArray(details.spells) || details.spells.length === 0) && Array.isArray(auto['spells']) && (auto['spells'] as unknown[]).length) {
-        merged.spells = auto['spells'] as unknown[];
+      if ((!Array.isArray(details.spells) || details.spells.length === 0) && Array.isArray(autoSpells) && autoSpells.length) {
+        merged.spells = autoSpells;
         changed = true;
       }
       if (next.spellcastingKind === 'cleric' && !(details.deityId || details.deity) && (auto['deityId'] || auto['deity'])) {

@@ -1,3 +1,5 @@
+import { testClass } from '@testing/typed-fixtures';
+import { normalizeCharacterClass } from '@core/utils/class-data.adapter';
 import {
   primaryAbilityKeys,
   buildStandardAbilityScores,
@@ -21,20 +23,20 @@ describe('primaryAbilityKeys', () => {
     });
 
     it('falls back to force/dexterite when nothing is declared', () => {
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-test-inconnu',
         name: 'Inconnu',
-        data: { primary_abilities: [] } as any,
-      } as unknown as CharacterClass;
+        data: { primary_abilities: [] },
+      });
       expect(primaryAbilityKeys(cls)).toEqual(['force', 'dexterite']);
     });
 
     it('does not resolve a spellcasting ability before the class unlocks it (Rôdeur niv. 1)', () => {
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-rodeur',
         name: 'Rôdeur',
-        data: { primary_abilities: ['Sagesse'] } as any,
-      } as unknown as CharacterClass;
+        data: { primary_abilities: ['Sagesse'] },
+      });
       expect(primaryAbilityKeys(cls)).toEqual(['sagesse']);
     });
   });
@@ -73,11 +75,16 @@ describe('buildStandardAbilityScores', () => {
         });
       });
     it('primaryAbilityKeys ignores unmapped ability labels', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = normalizeCharacterClass({
           id: 'cls-weird-ability',
           name: 'Weird',
-          data: { primary_abilities: ['UnknownStat', 'Force'] } as any,
-        } as unknown as CharacterClass;
+          data: {
+            hit_die: 8,
+            primary_abilities: ['UnknownStat', 'Force'],
+            proficiencies: {},
+            starting_equipment: [],
+          },
+        });
         expect(primaryAbilityKeys(cls)).toEqual(['force']);
       });
   });

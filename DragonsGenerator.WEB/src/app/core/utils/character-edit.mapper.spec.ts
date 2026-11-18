@@ -1,3 +1,4 @@
+import { testSpell } from '@testing/typed-fixtures';
 import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
 import {
   mapCharacterToEditState,
@@ -244,7 +245,7 @@ describe('character-edit.mapper', () => {
     });
     const feats = new Map([['don-talent', { benefits: [{ type: 'flexible_points', total: 4 }] }]]);
     const spells = new Map([
-      ['spl-lueur', { id: 'spl-lueur', name: 'Lueur', level: 0, description: '' } as any],
+      ['spl-lueur', testSpell({ id: 'spl-lueur', name: 'Lueur' })],
     ]);
 
     const { creation } = mapCharacterToEditState(saved, { feats, spells });

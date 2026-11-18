@@ -7,9 +7,11 @@ import type {
 import { normalizeDungeonTheme } from '@core/models/Campaign/dungeon-map';
 
 /** True when the map has an embedded tile grid (legacy or hydrated). */
-export function hasEmbeddedGeometry(map: CampaignDungeonMap | null | undefined): boolean {
+export function hasEmbeddedGeometry(
+  map: Pick<CampaignDungeonMap, 'tiles'> & Partial<Pick<CampaignDungeonMap, 'gridWidth' | 'gridHeight'>> | null | undefined,
+): boolean {
   if (!map || !map.tiles.length) return false;
-  return map.gridWidth > 0 && map.gridHeight > 0;
+  return (map.gridWidth ?? 0) > 0 && (map.gridHeight ?? 0) > 0;
 }
 
 /** True when geometry must be loaded from Mes Donjons. */

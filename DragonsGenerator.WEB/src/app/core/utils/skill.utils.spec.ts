@@ -9,8 +9,8 @@ import {
 
 describe('skill.utils', () => {
   const map = buildSkillMap([
-    { id: 'skill-athletisme', name: 'Athlétisme', ability: 'FOR' } as any,
-    { id: 'ski-perception', name: 'Perception', ability: 'SAG' } as any,
+    { id: 'skill-athletisme', name: 'Athlétisme', ability: 'FOR' },
+    { id: 'ski-perception', name: 'Perception', ability: 'SAG' },
   ]);
 
   it('normalizeSkillId converts ski- prefix', () => {

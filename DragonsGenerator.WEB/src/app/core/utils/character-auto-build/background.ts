@@ -15,7 +15,7 @@ function rollPersonalityTable(
 }
 
 export function buildAutoBackgroundSelection(
-  bg: Background,
+  bg: Pick<Background, 'id' | 'name'> & { data: Partial<Background['data']> & { preset?: boolean } },
   skillMap: Record<string, SkillInfo>,
 ): BackgroundSelection {
   const data = bg.data;
@@ -86,16 +86,16 @@ export function buildAutoBackgroundSelection(
       or: data.equipment?.currency?.or ?? 0,
       platine: 0,
     },
-    privilegeId: data.privilege.id,
-    privilegeName: data.privilege.name,
-    privilegeDesc: data.privilege.desc,
+    privilegeId: data.privilege?.id ?? null,
+    privilegeName: data.privilege?.name ?? null,
+    privilegeDesc: data.privilege?.desc ?? null,
     selectedHandicaps: [],
     handicapCompensationType: null,
     backgroundText: data.flavor?.summary ?? bg.name,
-    traits: rollPersonalityTable(data.personalityTables, 'traits'),
-    ideal: rollPersonalityTable(data.personalityTables, 'ideals'),
-    bonds: rollPersonalityTable(data.personalityTables, 'bonds'),
-    flaws: rollPersonalityTable(data.personalityTables, 'flaws'),
+    traits: rollPersonalityTable(data.personalityTables ?? null, 'traits'),
+    ideal: rollPersonalityTable(data.personalityTables ?? null, 'ideals'),
+    bonds: rollPersonalityTable(data.personalityTables ?? null, 'bonds'),
+    flaws: rollPersonalityTable(data.personalityTables ?? null, 'flaws'),
   };
 }
 

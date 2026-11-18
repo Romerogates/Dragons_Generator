@@ -106,7 +106,7 @@ export function classRootSavingThrowGrants(cls: CharacterClass, level: number): 
   const feats = (data.features_details ?? []) as SubclassFeatureLike[];
   const codes = new Set<string>();
   for (const feat of feats) {
-    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
+    const featLevel = featureUnlockLevel(feat);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
     const saveGrant = feat['grants_saving_throw_proficiency'] ?? mech['grants_saving_throw_proficiency'];

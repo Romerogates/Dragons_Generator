@@ -1,8 +1,9 @@
+import { testClass } from '@testing/typed-fixtures';
 import { extractSubclassBonusSpells } from './subclass-bonus-spells.util';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 
 describe('subclass-bonus-spells.util', () => {
-  const cls = {
+  const cls = testClass({
     id: 'cls-paladin',
     name: 'Paladin',
     data: {
@@ -20,7 +21,7 @@ describe('subclass-bonus-spells.util', () => {
         ],
       },
     },
-  } as unknown as CharacterClass;
+  });
 
   it('returns empty when subclass or level is insufficient', () => {
     expect(extractSubclassBonusSpells(null, 'subcls-serment-de-devotion', 5)).toEqual([]);
@@ -40,7 +41,7 @@ describe('subclass-bonus-spells.util', () => {
   });
 
   it('supports array subclasses and Map name resolution', () => {
-    const arrayCls = {
+    const arrayCls = testClass({
       id: 'cls-x',
       name: 'X',
       data: {
@@ -51,7 +52,7 @@ describe('subclass-bonus-spells.util', () => {
           },
         ],
       },
-    } as unknown as CharacterClass;
+    });
     const map = new Map([['spl-z', 'Zénith']]);
     expect(extractSubclassBonusSpells(arrayCls, 'sub-a', 3, map)).toEqual([
       { characterLevel: 3, spells: ['Zénith'] },

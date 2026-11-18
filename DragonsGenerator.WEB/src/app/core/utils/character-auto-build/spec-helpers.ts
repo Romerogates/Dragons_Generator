@@ -131,8 +131,8 @@ export function makeGuerrierCls(): CharacterClass {
           },
         ],
       },
-    } as any,
-  } as unknown as CharacterClass;
+    },
+  };
 }
 
 export function makeMagicienCls(): CharacterClass {
@@ -174,8 +174,8 @@ export function makeMagicienCls(): CharacterClass {
           quantity: 1,
         },
       ],
-    } as any,
-  } as unknown as CharacterClass;
+    },
+  };
 }
 
 export function makePretreLikeCls(): CharacterClass {
@@ -219,8 +219,8 @@ export function makePretreLikeCls(): CharacterClass {
           },
         ],
       },
-    } as any,
-  } as unknown as CharacterClass;
+    },
+  };
 }
 
 export function makeElfSpecies(): Species {
@@ -323,7 +323,7 @@ export function makeElfSpecies(): Species {
       },
     ],
     optionalRules: [],
-  } as unknown as Species;
+  };
 }
 
 export function makeDrakeideLikeSpecies(): Species {
@@ -366,7 +366,7 @@ export function makeDrakeideLikeSpecies(): Species {
     languages: { fixed: ['lg-commun', 'lg-draconique'], choiceCount: 0 },
     subspecies: [],
     optionalRules: [],
-  } as unknown as Species;
+  };
 }
 
 export function makeCivilisation(): Civilisation {
@@ -374,14 +374,24 @@ export function makeCivilisation(): Civilisation {
     id: 'civ-ajagar',
     name: 'Ajagar',
     randomization: { diceMin: 1, diceMax: 6 },
-    demographics: {} as never,
+    demographics: {
+      primarySpecies: [],
+      secondarySpecies: [],
+      isCosmopolitan: false,
+      cosmopolitanZones: [],
+      socialRoles: [],
+    },
     linguistics: {
       officialLanguages: [{ id: 'lg-commun', label: 'Commun' }],
       additionalLanguagesSpoken: true,
       writingSystems: [{ id: 'ws-runique', label: 'Runique' }],
     },
-    lore: {} as never,
-  } as unknown as Civilisation;
+    lore: {
+      fullDescription: '',
+      threatIds: [],
+      geographyTags: [],
+    },
+  };
 }
 
 export function makeErudBackground(): Background {
@@ -398,7 +408,7 @@ export function makeErudBackground(): Background {
           fixed: [],
           choose: [
             { chooseCount: 1, options: [{ type: 'instrument' }, { type: 'gameSet' }] },
-            { chooseCount: 1, options: [{ type: 'vehicle' }, { id: 'tl-des' }, { type: 'unknown' }] },
+            { chooseCount: 1, options: [{ type: 'vehicle' }, { type: 'gameSet', id: 'tl-des' }] },
           ],
         },
         languages: { choiceCount: 1 },
@@ -415,8 +425,8 @@ export function makeErudBackground(): Background {
         bonds: { die: 'd6', entries: [{ roll: 1, text: 'Ma bibliothèque.' }] },
         flaws: { die: 'd6', entries: [{ roll: 1, text: "Je m'égare dans mes recherches." }] },
       },
-    } as any,
-  } as unknown as Background;
+    },
+  };
 }
 
 export const SKILLS: Skill[] = [

@@ -946,7 +946,7 @@ export class SpeciesStep implements OnInit {
   }
 
   private rawChoiceOptions(choice: CreationChoice): unknown[] {
-    const opts = choice.options as unknown;
+    const opts = choice.options;
     if (Array.isArray(opts)) return opts;
     // JsonElement parfois sérialisé en objet { valueKind, ... } — rare
     return [];

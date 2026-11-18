@@ -1,3 +1,4 @@
+import { testClass, testSpell } from '@testing/typed-fixtures';
 import { buildAutoSpellcastingDetails, CLASS_SPELLCASTING } from '../character-auto-build.util';
 import { makeGuerrierCls, makeMagicienCls, evaluatePreparedFormula, resolveSpellQuota, spellPickCount, extractSubclassBonusSpells, featAsiAbilityOptions, featAsiNeedsAbilityChoice, featBonusArmorProficiencies, featBonusToolProficiencies, featDarkvisionRadius, featFlexiblePointsTotal, featIsFlexiblePoints, featNeedsResistanceChoice, featResistanceOptions, isTalentSpendComplete, resolveFeatAsiAbilityKey, talentSpendsTotalCost } from './spec-helpers';
 import type { CharacterClass, Spell } from './spec-helpers';
@@ -16,46 +17,46 @@ describe('buildAutoSpellcastingDetails', () => {
         kind: 'no-quota-kind',
         ability: 'Force',
       };
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-test-inconnu',
         name: 'Test',
-        data: {} as any,
-      } as unknown as CharacterClass;
+        data: {},
+      });
       expect(buildAutoSpellcastingDetails(cls, [], [], {})).toEqual({ cantrips: [], spells: [] });
     });
 
     it('builds cantrips/spells for a wizard-like class, merging racial cantrip grants', () => {
       spyOn(Math, 'random').and.returnValue(0);
       const spells: Spell[] = [
-        { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.', classes: ['cls-magicien'] } as unknown as Spell,
-        {
+        testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.', classes: ['cls-magicien'] }),
+        testSpell({
           id: 'spl-tour-de-magie-2',
           name: 'Tour de magie 2',
           level: 0,
           description: '...',
           classes: ['cls-magicien'],
-        } as unknown as Spell,
-        {
+        }),
+        testSpell({
           id: 'spl-tour-de-magie-3',
           name: 'Tour de magie 3',
           level: 0,
           description: '...',
           classes: ['cls-magicien'],
-        } as unknown as Spell,
-        {
+        }),
+        testSpell({
           id: 'spl-projectile-magique',
           name: 'Projectile magique',
           level: 1,
           description: '...',
           classes: ['cls-magicien'],
-        } as unknown as Spell,
-        {
+        }),
+        testSpell({
           id: 'spl-bouclier',
           name: 'Bouclier',
           level: 1,
           description: '...',
           classes: ['cls-magicien'],
-        } as unknown as Spell,
+        }),
       ];
       const racialGrants = [
         { choiceId: 'elf-cantrip', label: '', desc: '', pool: ['spl-lueur'], spellLevel: 0, spellcastingAbility: 'Intelligence' },
@@ -73,7 +74,7 @@ describe('buildAutoSpellcastingDetails — cas additionnels', () => {
     it('picks a random racial cantrip from the pool when no explicit species choice answer exists', () => {
       spyOn(Math, 'random').and.returnValue(0);
       const spells: Spell[] = [
-        { id: 'spl-lueur', name: 'Lueur', level: 0, description: '', classes: ['cls-magicien'] } as unknown as Spell,
+        testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: '', classes: ['cls-magicien'] }),
       ];
       const racialGrants = [
         { choiceId: 'elf-cantrip', label: '', desc: '', pool: ['spl-lueur'], spellLevel: 0, spellcastingAbility: 'Intelligence' },
@@ -87,7 +88,7 @@ describe('buildAutoSpellcastingDetails — cas additionnels', () => {
 describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
     it('includes subclass oath spell grants for paladins', () => {
       spyOn(Math, 'random').and.returnValue(0);
-      const paladin = {
+      const paladin = testClass({
         id: 'cls-paladin',
         name: 'Paladin',
         data: {
@@ -102,9 +103,9 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
             ],
           },
         },
-      } as unknown as CharacterClass;
+      });
       const spells: Spell[] = [
-        { id: 'spl-protection', name: 'Protection', level: 1, description: '', classes: ['cls-paladin'] } as unknown as Spell,
+        testSpell({ id: 'spl-protection', name: 'Protection', level: 1, description: '', classes: ['cls-paladin'] }),
       ];
       const details = buildAutoSpellcastingDetails(
         paladin,
@@ -122,8 +123,8 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
     it('buildAutoSpellcastingDetails leaves effectSummary empty when spell descriptions are missing', () => {
         spyOn(Math, 'random').and.returnValue(0);
         const spells: Spell[] = [
-          { id: 'spl-lueur', name: 'Lueur', level: 0, classes: ['cls-magicien'] } as unknown as Spell,
-          { id: 'spl-projectile-magique', name: 'Projectile magique', level: 1, classes: ['cls-magicien'] } as unknown as Spell,
+          testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, classes: ['cls-magicien'] }),
+          testSpell({ id: 'spl-projectile-magique', name: 'Projectile magique', level: 1, classes: ['cls-magicien'] }),
         ];
         const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}) as {
           cantrips: { effectSummary: string }[];
@@ -135,8 +136,8 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
     it('buildAutoSpellcastingDetails matches spells whose classes use a partial id', () => {
         spyOn(Math, 'random').and.returnValue(0);
         const spells: Spell[] = [
-          { id: 'spl-a', name: 'A', level: 0, classes: ['magicien'] } as unknown as Spell,
-          { id: 'spl-b', name: 'B', level: 1, classes: ['magicien'] } as unknown as Spell,
+          testSpell({ id: 'spl-a', name: 'A', level: 0, classes: ['magicien'] }),
+          testSpell({ id: 'spl-b', name: 'B', level: 1, classes: ['magicien'] }),
         ];
         const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}) as {
           cantrips: unknown[];
@@ -159,7 +160,7 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
         ];
         const details = buildAutoSpellcastingDetails(
           makeMagicienCls(),
-          [{ id: 'spl-projectile-magique', name: 'PM', level: 1, classes: ['cls-magicien'] } as unknown as Spell],
+          [testSpell({ id: 'spl-projectile-magique', name: 'PM', level: 1, classes: ['cls-magicien'] })],
           racialGrants as never,
           { 'grant-x': ['spl-missing'] },
           null,
@@ -262,7 +263,7 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
         ).toContain('connus');
 
         const bonus = extractSubclassBonusSpells(
-          {
+          testClass({
             id: 'cls-paladin',
             name: 'Paladin',
             data: {
@@ -278,7 +279,7 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
                 ],
               },
             },
-          } as unknown as CharacterClass,
+          }),
           'sub-devotion',
           5,
           { 'spl-shield': 'Bouclier de la foi' },
@@ -290,9 +291,9 @@ describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
     it('buildAutoSpellcastingDetails at level 3 requests higher-level slots', () => {
         spyOn(Math, 'random').and.returnValue(0);
         const spells: Spell[] = [
-          { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.', classes: ['cls-magicien'] } as unknown as Spell,
-          { id: 'spl-shield', name: 'Bouclier', level: 1, description: 'Protection.', classes: ['cls-magicien'] } as unknown as Spell,
-          { id: 'spl-misty', name: 'Brume', level: 2, description: 'Brume.', classes: ['cls-magicien'] } as unknown as Spell,
+          testSpell({ id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.', classes: ['cls-magicien'] }),
+          testSpell({ id: 'spl-shield', name: 'Bouclier', level: 1, description: 'Protection.', classes: ['cls-magicien'] }),
+          testSpell({ id: 'spl-misty', name: 'Brume', level: 2, description: 'Brume.', classes: ['cls-magicien'] }),
         ];
         const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}, null, { level: 3 }) as {
           cantrips: unknown[];

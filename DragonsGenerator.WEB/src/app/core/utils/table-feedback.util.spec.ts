@@ -83,10 +83,10 @@ describe('table-feedback.util', () => {
       }
     }
     const prev = window.AudioContext;
-    (window as unknown as { AudioContext: typeof FakeCtx }).AudioContext = FakeCtx;
+    Object.defineProperty(window, 'AudioContext', { configurable: true, writable: true, value: FakeCtx });
     setSoftFeedbackEnabled(true);
     expect(() => softTablePulse('ready')).not.toThrow();
     expect(() => softTablePulse('dice')).not.toThrow();
-    (window as unknown as { AudioContext: typeof AudioContext }).AudioContext = prev;
+    Object.defineProperty(window, 'AudioContext', { configurable: true, writable: true, value: prev });
   });
 });

@@ -48,7 +48,7 @@ export interface SessionPlayPad {
   id: string;
   kind: SessionPlayPadKind;
   title: string;
-  order: number;
+  order?: number;
   /** @deprecated Migrated to layout. */
   widgetSize?: SessionPlayPadWidgetSize;
   /** Grille aimantée (x,y,w,h en cellules). */

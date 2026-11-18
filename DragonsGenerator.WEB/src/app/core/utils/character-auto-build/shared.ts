@@ -1,5 +1,5 @@
 import type { Ability, AbilityKey, SpellcastingKind } from '@core/models/Character/character';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import type { CharacterClass, ClassChoicePool } from '@core/models/CharacterClasses/character-class';
 import { resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
 
 export const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8] as const;
@@ -22,9 +22,9 @@ export const SAVE_CODE_TO_LABEL: Record<string, Ability> = {
   cha: 'Charisme',
 };
 
-export function isFightingStylePool(pool: Record<string, unknown>): boolean {
-  const t = String(pool['type'] ?? '');
-  const id = String(pool['id'] ?? '');
+export function isFightingStylePool(pool: ClassChoicePool): boolean {
+  const t = String(pool.type ?? '');
+  const id = String(pool.id ?? '');
   return (
     t === 'fighting_style' ||
     /style.*combat|combat.*style|fighting.?style/i.test(id + t) ||

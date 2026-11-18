@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import {
   subclassBonusProficiencies,
   subclassBonusResistances,
@@ -7,15 +8,15 @@ import {
   extractProgressionChoices,
   collectProgressionPicksFromAnswers,
 } from '../progression-choices.util';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import type { CharacterClass, FeatureDetail } from '@core/models/CharacterClasses/character-class';
 import { createLettreClass } from '@testing/lettre-fixtures';
 
-function makeCls(subclasses: unknown): CharacterClass {
-  return {
+function makeCls(subclasses: CharacterClass['data']['subclasses']): CharacterClass {
+  return testClass({
     id: 'cls-pretre',
     name: 'Prêtre',
-    data: { subclasses } as any,
-  } as unknown as CharacterClass;
+    data: { subclasses },
+  });
 }
 
 const EMPTY_BONUS = {
@@ -273,16 +274,16 @@ describe('subclassBonusProficiencies', () => {
   });
 });
 describe('subclassBonusResistances', () => {
-  function makeClsWithFeature(feature: unknown): CharacterClass {
-    return {
+  function makeClsWithFeature(feature: FeatureDetail): CharacterClass {
+    return testClass({
       id: 'cls-druide',
       name: 'Druide',
       data: {
         subclasses: {
           options: [{ id: 'subcls-cercle-des-esprits', features: [feature] }],
         },
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
   }
 
   it('extracts a fixed damage_type resistance (Esprit solide, niv. 6, données API réelles : unlocks_at_level)', () => {
@@ -309,7 +310,7 @@ describe('classRootSavingThrowGrants', () => {
   it('returns saving throws granted by a root class feature unlocked at the target level (données API réelles : unlocks_at_level)', () => {
     // Forme réelle de l'API (cls-roublard.json "Esprit fuyant") : le champ s'appelle
     // `unlocks_at_level`, pas `level`. Sans fallback, ce bonus s'appliquait dès le niveau 1.
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-roublard',
       name: 'Roublard',
       data: {
@@ -320,8 +321,8 @@ describe('classRootSavingThrowGrants', () => {
             mechanics: { grants_saving_throw_proficiency: 'wis' },
           },
         ],
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classRootSavingThrowGrants(cls, 1)).toEqual([]);
     expect(classRootSavingThrowGrants(cls, 14)).toEqual([]);
@@ -329,15 +330,15 @@ describe('classRootSavingThrowGrants', () => {
   });
 
   it('still supports a pre-normalized `level` field', () => {
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-roublard',
       name: 'Roublard',
       data: {
         features_details: [
           { id: 'feat-esprit-fuyant', level: 15, mechanics: { grants_saving_throw_proficiency: 'wis' } },
         ],
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classRootSavingThrowGrants(cls, 14)).toEqual([]);
     expect(classRootSavingThrowGrants(cls, 15)).toEqual(['wis']);
@@ -345,7 +346,7 @@ describe('classRootSavingThrowGrants', () => {
 });
 describe('classBonusSenses', () => {
   it('reads blindsight from a root class feature (Rôdeur "Perception sauvage", niv. 18, unlocks_at_level)', () => {
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-rodeur',
       name: 'Rôdeur',
       data: {
@@ -356,8 +357,8 @@ describe('classBonusSenses', () => {
             mechanics: { blindsight_radius_m: 9 },
           },
         ],
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classBonusSenses(cls, null, 17)).toEqual({
       darkvisionRadius: 0,
@@ -372,7 +373,7 @@ describe('classBonusSenses', () => {
   });
 
   it('reads darkvision from a subclass feature (Rôdeur Ombre urbaine "Ombre mouvante", niv. 7)', () => {
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-rodeur',
       name: 'Rôdeur',
       data: {
@@ -390,8 +391,8 @@ describe('classBonusSenses', () => {
             },
           ],
         },
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classBonusSenses(cls, 'subcls-ombre-urbaine', 6).darkvisionRadius).toBe(0);
     expect(classBonusSenses(cls, 'subcls-ombre-urbaine', 7).darkvisionRadius).toBe(18);
@@ -399,7 +400,7 @@ describe('classBonusSenses', () => {
   });
 
   it('reads a `sense_type: blindsight` root feature (Roublard "Perception aveugle", niv. 14)', () => {
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-roublard',
       name: 'Roublard',
       data: {
@@ -410,8 +411,8 @@ describe('classBonusSenses', () => {
             mechanics: { sense_type: 'blindsight', range_m: 3 },
           },
         ],
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classBonusSenses(cls, null, 13).hasBlindsight).toBe(false);
     expect(classBonusSenses(cls, null, 14)).toEqual({
@@ -422,7 +423,7 @@ describe('classBonusSenses', () => {
   });
 
   it('only counts a choice-option sense grant (Rôdeur "Œil des profondeurs", niv. 15) if it was picked', () => {
-    const cls: CharacterClass = {
+    const cls: CharacterClass = testClass({
       id: 'cls-rodeur',
       name: 'Rôdeur',
       data: {
@@ -446,8 +447,8 @@ describe('classBonusSenses', () => {
             },
           ],
         },
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
 
     expect(classBonusSenses(cls, 'subcls-traqueur', 15, []).hasBlindsight).toBe(false);
     expect(classBonusSenses(cls, 'subcls-traqueur', 15, ['oeil-critique-redondant']).hasBlindsight).toBe(
@@ -459,16 +460,16 @@ describe('classBonusSenses', () => {
   });
 });
 describe('extractSubclassSkillProficiencyChoices', () => {
-  function makeClsWithFeature(feature: unknown): CharacterClass {
-    return {
+  function makeClsWithFeature(feature: FeatureDetail): CharacterClass {
+    return testClass({
       id: 'cls-rodeur',
       name: 'Rôdeur',
       data: {
         subclasses: {
           options: [{ id: 'subcls-ombre-urbaine', features: [feature] }],
         },
-      } as any,
-    } as unknown as CharacterClass;
+      },
+    });
   }
 
   it('extracts a skill_or_tool_proficiency pool nested in choice_pools', () => {

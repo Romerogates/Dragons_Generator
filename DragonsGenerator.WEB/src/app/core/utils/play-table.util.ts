@@ -217,15 +217,18 @@ export function formatPlaySessionDate(iso: string): string {
   });
 }
 
-export function nextPlannedSession<T extends { status: string; scheduledAt: string }>(
+export function nextPlannedSession<T extends { status?: string; scheduledAt?: string }>(
   sessions: T[],
   nowMs = Date.now(),
 ): T | null {
   return (
     sessions
       .filter((s) => s.status === 'planned')
-      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
-      .find((s) => new Date(s.scheduledAt).getTime() >= nowMs) ??
+      .sort(
+        (a, b) =>
+          new Date(a.scheduledAt ?? 0).getTime() - new Date(b.scheduledAt ?? 0).getTime(),
+      )
+      .find((s) => new Date(s.scheduledAt ?? 0).getTime() >= nowMs) ??
     sessions.find((s) => s.status === 'planned') ??
     null
   );

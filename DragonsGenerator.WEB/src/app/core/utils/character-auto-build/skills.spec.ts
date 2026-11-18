@@ -60,8 +60,8 @@ describe('autoResolveClassProficiencies', () => {
     it('autoResolveClassProficiencies ignores max price when the choice omits it', () => {
         spyOn(Math, 'random').and.returnValue(0);
         const cls = makeGuerrierCls();
-        ((cls.data as unknown as { choice_pools: { constraint_max_price_po?: number }[] }).choice_pools[1]).constraint_max_price_po =
-          undefined;
+        const pricedPool = cls.data.choice_pools?.[1];
+        if (pricedPool) delete pricedPool.constraint_max_price_po;
         const res = autoResolveClassProficiencies(
           cls,
           [{ id: 'wp-hallebarde', costPo: 60 }],

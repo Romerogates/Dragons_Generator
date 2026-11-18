@@ -17,7 +17,7 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
-import type { Character, SpeciesRef } from '@core/models/Character/character';
+import type { Character } from '@core/models/Character/character';
 import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
 
 /**
@@ -35,7 +35,8 @@ type LegacyListFields = {
 };
 
 /** Entrée liste : Character + tolérance lecture legacy. */
-type ListCharacter = Character & LegacyListFields;
+type ListCharacter = Omit<Character, 'species'> &
+  LegacyListFields & { species: Character['species'] | string };
 
 @Component({
   selector: 'app-characters',
@@ -142,7 +143,7 @@ export class Characters implements OnInit {
   }
 
   getCharSpecies(c: ListCharacter): string {
-    const species = c?.species as SpeciesRef | string | undefined;
+    const species = c?.species;
     // Nouveau format (SpeciesRef / CatalogRef)
     if (species && typeof species === 'object') return species.label || 'Espèce inconnue';
     // Ancien format (legacy)
@@ -219,8 +220,8 @@ export class Characters implements OnInit {
   }
 
   onDeleteConfirmNameInput(event: Event): void {
-    const value = (event.target as HTMLInputElement | null)?.value ?? '';
-    this.deleteConfirmName.set(value);
+    const t = event.target;
+    this.deleteConfirmName.set(t instanceof HTMLInputElement ? t.value : '');
   }
 
   // === ACTIONS ===

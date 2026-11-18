@@ -4,8 +4,8 @@ import {
   CATEGORY_FILTERS,
   isMasteredProficiencyChoice,
   masteredProficiencyChoiceLabel,
-  normalizeEquipments,
   resolveEquipmentRefId,
+  toEquipmentCatalogRows,
 } from '@core/utils/equipment.utils';
 import { pickRandom } from '@core/utils/pregen-random.util';
 import type { EquipmentCatalogItem } from './types';
@@ -167,5 +167,5 @@ export function buildAutoEquipment(
 }
 
 export function normalizeEquipmentCatalog(raw: Equipment[]): EquipmentCatalogItem[] {
-  return normalizeEquipments(raw) as unknown as EquipmentCatalogItem[];
+  return toEquipmentCatalogRows(raw);
 }

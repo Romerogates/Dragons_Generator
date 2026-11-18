@@ -46,6 +46,13 @@ function listSubclassOptions(data: CharacterClass['data']): Subclass[] {
   return raw.options ?? [];
 }
 
+/** Niveau d’accès sous-classe : tableau JSON = niv. 1, sinon `level_unlocked` / `unlocked_at_level` (défaut 3). */
+export function subclassUnlockLevel(subclasses: CharacterClass['data']['subclasses']): number {
+  if (!subclasses) return 3;
+  if (Array.isArray(subclasses)) return 1;
+  return subclasses.level_unlocked ?? subclasses.unlocked_at_level ?? 3;
+}
+
 export { listSubclassOptions };
 
 export function buildClassFeaturesForLevel(
@@ -65,7 +72,7 @@ export function buildClassFeaturesForLevel(
       if (!feat || features.some((f) => f.refId === feat.id)) continue;
       features.push({
         refId: feat.id,
-        name: feat.name,
+        name: feat.name ?? feat.id,
         desc: annotateAuraDesc(feat, targetLevel),
         source: 'class',
         sourceDetail: `${cls.name} ${prog.level}`,
@@ -84,7 +91,7 @@ export function buildClassFeaturesForLevel(
       if (features.some((f) => f.refId === feat.id)) continue;
       features.push({
         refId: feat.id,
-        name: feat.name,
+        name: feat.name ?? feat.id,
         desc: annotateAuraDesc(feat, targetLevel),
         source: 'subclass',
         sourceDetail: `${sub.name} ${feat.level ?? 1}`,

@@ -31,7 +31,10 @@ export function clearUpdateSnooze(storage?: KvStorage | null): void {
 }
 
 export async function clearAppCaches(
-  serviceWorker?: Pick<ServiceWorkerContainer, 'getRegistrations'> | null,
+  serviceWorker?:
+    | Pick<ServiceWorkerContainer, 'getRegistrations'>
+    | { getRegistrations(): Promise<{ unregister(): Promise<boolean> }[]> }
+    | null,
   cacheStorage?: Pick<CacheStorage, 'keys' | 'delete'> | null,
 ): Promise<void> {
   const sw = serviceWorker ?? (typeof navigator === 'undefined' ? null : navigator.serviceWorker);

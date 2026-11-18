@@ -53,7 +53,7 @@ export interface BackgroundSkillChoice {
 }
 
 export interface BackgroundToolChoice {
-  fixed: BackgroundToolRef[];
+  fixed?: BackgroundToolRef[];
   choose: BackgroundToolChooseGroup[];
 }
 
@@ -110,8 +110,8 @@ export interface BackgroundBudgetRules {
 export interface BackgroundEquipmentItem {
   id: string;
   name: string;
-  qty: number;
-  location: 'equipped' | 'backpack' | 'storage';
+  qty?: number;
+  location?: 'equipped' | 'backpack' | 'storage';
 }
 
 // ---------------------------------------------------------------------------
@@ -131,26 +131,26 @@ export interface BackgroundPrivilege {
 // ---------------------------------------------------------------------------
 
 export interface PersonalityTables {
-  traits: PersonalityTable;
-  ideals: PersonalityTableWithAlignment;
-  bonds: PersonalityTable;
-  flaws: PersonalityTable;
+  traits?: PersonalityTable;
+  ideals?: PersonalityTableWithAlignment;
+  bonds?: PersonalityTable;
+  flaws?: PersonalityTable;
 }
 
 export type PersonalityTableKey = keyof PersonalityTables;
 
 export interface PersonalityTable {
-  die: string;
-  entries: PersonalityEntry[];
+  die?: string;
+  entries?: PersonalityEntry[];
 }
 
 export interface PersonalityTableWithAlignment {
-  die: string;
-  entries: PersonalityEntryWithAlignment[];
+  die?: string;
+  entries?: PersonalityEntryWithAlignment[];
 }
 
 export interface PersonalityEntry {
-  roll: number;
+  roll?: number;
   text: string;
 }
 

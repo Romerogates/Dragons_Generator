@@ -70,7 +70,7 @@ export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[
         order: typeof p.order === 'number' ? p.order : i,
         title: p.title?.trim() || (p.kind === 'checklist' ? 'Liste' : p.page?.title || 'Notes'),
       }))
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     return ensurePadsHaveLayouts(sorted);
   }
 
@@ -99,7 +99,7 @@ export function sessionPlayPadsPreview(session: CampaignSession, maxLen = 280): 
 export function appendTextToFirstNotePad(pads: SessionPlayPad[], block: string): SessionPlayPad[] {
   const trimmed = block.trim();
   if (!trimmed) return pads;
-  const sorted = [...pads].sort((a, b) => a.order - b.order);
+  const sorted = [...pads].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const targetIdx = sorted.findIndex((p) => p.kind === 'note' && p.page);
   if (targetIdx < 0) {
     const created = createSessionPlayPad('note', 'Notes', sorted.length);
@@ -126,7 +126,7 @@ export function syncLegacyPlayNotesFromPads(pads: SessionPlayPad[]): {
   playNotes: string;
   playNotebook: NotebookPage | undefined;
 } {
-  const sorted = [...pads].sort((a, b) => a.order - b.order);
+  const sorted = [...pads].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const firstNote = sorted.find((p) => p.kind === 'note' && p.page);
   if (!firstNote?.page) {
     return { playNotes: '', playNotebook: undefined };
@@ -142,7 +142,7 @@ export function syncLegacyPlayNotesFromPads(pads: SessionPlayPad[]): {
 
 export function archivePlayPadsText(pads: SessionPlayPad[]): string {
   const blocks: string[] = [];
-  for (const pad of [...pads].sort((a, b) => a.order - b.order)) {
+  for (const pad of [...pads].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))) {
     const title = pad.title?.trim() || (pad.kind === 'checklist' ? 'Liste' : 'Notes');
     if (pad.kind === 'checklist') {
       const lines = (pad.items ?? [])

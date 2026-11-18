@@ -10,7 +10,7 @@ export function isRangerChoiceFeatureId(refId: string | undefined): 'enemy' | 't
   return null;
 }
 
-export function formatFeatureSheetLabel(feat: Pick<FeatureInstance, 'name' | 'refId'>): string {
+export function formatFeatureSheetLabel(feat: { name?: string | null; refId?: string }): string {
   const id = feat.refId ?? '';
   const style = COMBAT_STYLE_FALLBACK[id];
   if (style) return `Style : ${style.name}`;

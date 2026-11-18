@@ -163,7 +163,7 @@ export function createLettreClass(): CharacterClass {
         },
       ],
     },
-  } as any);
+  });
 }
 
 export const LETTRE_STARTING_SLOTS: EquipmentSlot[] = createLettreClass().data.starting_equipment;

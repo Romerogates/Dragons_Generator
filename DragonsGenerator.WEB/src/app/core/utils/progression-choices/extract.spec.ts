@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import {
   classBonusLanguageCount,
@@ -25,12 +26,12 @@ import {
 } from './shared';
 
 function cls(data: Record<string, unknown>): CharacterClass {
-  return { id: 'cls-test', name: 'Test', data } as unknown as CharacterClass;
+  return testClass({ id: 'cls-test', name: 'Test', data });
 }
 
 describe('progression-choices extract / deferred pools', () => {
   it('returns empty when the class has no data payload', () => {
-    expect(extractProgressionChoices({ id: 'x', name: 'x', data: null } as unknown as CharacterClass, 1)).toEqual([]);
+    expect(extractProgressionChoices({ id: 'x', name: 'x', data: undefined }, 1)).toEqual([]);
   });
 
   it('walks root pools, warlock lines, ASI and deferred skills', () => {

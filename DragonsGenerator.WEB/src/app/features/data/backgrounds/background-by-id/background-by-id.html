@@ -91,9 +91,9 @@
             <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
               Outils
             </p>
-            @if (bg.data.proficiencies.tools.fixed.length) {
+            @if (bg.data.proficiencies.tools.fixed?.length) {
               <ul class="space-y-1">
-                @for (t of bg.data.proficiencies.tools.fixed; track $index) {
+                @for (t of bg.data.proficiencies.tools.fixed ?? []; track $index) {
                   <li class="text-sm text-slate-300">
                     @if (t.id && !t.any) {
                       {{ t.id | gameIdLabel }}
@@ -116,12 +116,12 @@
         </h2>
         @if (bg.data.equipment.fixed.length) {
           <ul class="space-y-2 mb-4">
-            @for (item of bg.data.equipment.fixed; track item.id + item.qty) {
+            @for (item of bg.data.equipment.fixed; track item.id + (item.qty ?? 1)) {
               <li class="text-sm text-slate-300 flex gap-2">
                 <span class="text-teal-500/70 shrink-0">•</span>
                 <span>
                   {{ item.name || (item.id | gameIdLabel) }}
-                  @if (item.qty > 1) {
+                  @if ((item.qty ?? 1) > 1) {
                     <span class="text-slate-500"> ×{{ item.qty }}</span>
                   }
                 </span>
@@ -157,10 +157,14 @@
               <div>
                 <h3 class="text-xs font-black uppercase tracking-widest text-teal-500/80 mb-2">
                   {{ block.title }}
-                  <span class="text-slate-600 font-normal"> ({{ block.table.die }})</span>
+                  @if (block.table; as table) {
+                    @if (table.die) {
+                      <span class="text-slate-600 font-normal"> ({{ table.die }})</span>
+                    }
+                  }
                 </h3>
                 <ul class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  @for (entry of block.table.entries; track entry.roll) {
+                  @for (entry of block.table?.entries ?? []; track entry.roll ?? entry.text) {
                     <li class="text-xs text-slate-400 leading-snug">
                       <span class="text-slate-500 tabular-nums">{{ entry.roll }}.</span>
                       {{ entry.text }}

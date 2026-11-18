@@ -862,7 +862,8 @@ export class SkillsStep implements OnInit {
    */
   readonly classToolOptions = computed(() => {
     const choice = this.classToolChoices()[0];
-    const poolIds = ((choice?.meta?.['poolIds'] as unknown[]) ?? []).map(String);
+    const rawPool = choice?.meta?.['poolIds'];
+    const poolIds = Array.isArray(rawPool) ? rawPool.map(String) : [];
     if (poolIds.length === 0) return this.toolCatalog();
     const expanded = expandToolPoolIds(poolIds, this.toolCatalog(), this.toolGroups());
     if (expanded.size === 0) return this.toolCatalog();

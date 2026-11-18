@@ -107,10 +107,10 @@
           </div>
           <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
             <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
-              Compétences ({{ c.data.proficiencies.skills.count }} au choix)
+              Compétences ({{ c.data.proficiencies.skills?.count ?? 0 }} au choix)
             </p>
             <div class="flex flex-wrap gap-2">
-              @for (skillId of c.data.proficiencies.skills.options; track skillId) {
+              @for (skillId of c.data.proficiencies.skills?.options ?? []; track skillId) {
                 <a
                   [routerLink]="['/skills', skillId]"
                   class="bg-slate-900 text-sky-300/95 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider hover:border-sky-500/50 hover:text-sky-200 hover:underline underline-offset-2 transition-colors"
@@ -233,7 +233,7 @@
                   <td class="px-4 py-3 font-bold text-slate-200">{{ lvl.level }}</td>
                   <td class="px-4 py-3 text-emerald-400 font-bold">+{{ lvl.prof_bonus }}</td>
                   <td class="px-4 py-3 text-slate-300 whitespace-normal min-w-[160px]">
-                    @if (lvl.features.length) {
+                    @if (lvl.features?.length) {
                       {{ featureNames(lvl.features, c.data.features_details) }}
                     } @else {
                       <span class="opacity-30">—</span>

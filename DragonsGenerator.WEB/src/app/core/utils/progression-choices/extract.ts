@@ -9,7 +9,6 @@ import {
   poolActiveAtLevel,
   poolQuantityAtLevel,
   prettyId,
-  progressionData,
 } from './shared';
 
 const ROOT_SKIP_TYPES = new Set([
@@ -42,7 +41,7 @@ function isAsiFeatureId(id: string): boolean {
 
 /** Niveaux où la classe gagne un ASI (dans la progression ≤ level). */
 export function asiLevelsForClass(cls: CharacterClass, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number[] {
-  const data = progressionData(cls);
+  const data = cls.data;
   if (!data.progression) return [];
   const effective = Math.min(Math.max(1, level), maxLevel);
   const levels: number[] = [];
@@ -64,13 +63,14 @@ export function countAsiSlots(cls: CharacterClass, level: number, maxLevel = PRO
  * Choix interactifs de classe jusqu'à `maxLevel` (inclus), hors skills/équipement/style déjà gérés.
  */
 export function extractProgressionChoices(
-  cls: CharacterClass,
+  cls: Pick<CharacterClass, 'id' | 'name'> & { data?: CharacterClass['data'] | null },
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
   ctx?: { pactBoonId?: string | null },
 ): ProgressionChoiceDef[] {
-  const data = progressionData(cls);
-  if (!data) return [];
+  if (!cls.data) return [];
+  const data = cls.data;
+  const fullCls: CharacterClass = { id: cls.id, name: cls.name, data };
   const effective = Math.min(Math.max(1, level), maxLevel);
   const details = data.features_details ?? [];
   const choices: ProgressionChoiceDef[] = [];
@@ -149,8 +149,8 @@ export function extractProgressionChoices(
           typeof active.cumulative_total === 'number'
             ? active.cumulative_total
             : (active.quantity ?? 2);
-        const opts = metamagicOptions(cls).length
-          ? metamagicOptions(cls)
+        const opts = metamagicOptions(fullCls).length
+          ? metamagicOptions(fullCls)
           : optionsFromPoolIds(active.pool ?? [], details);
         const entry: ProgressionChoiceDef = {
           id: 'choice-metamagic-cumulative',
@@ -250,7 +250,7 @@ export function extractProgressionChoices(
   }
 
   // --- ASI deferred : un slot par niveau ASI ---
-  const asiLvls = asiLevelsForClass(cls, effective, maxLevel);
+  const asiLvls = asiLevelsForClass(fullCls, effective, maxLevel);
   if (asiLvls.length) {
     push({
       id: 'choice-asi-slots',

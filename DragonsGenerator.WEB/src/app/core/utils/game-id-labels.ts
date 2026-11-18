@@ -299,12 +299,13 @@ export function labelForGameId(id: string | null | undefined): string {
 
 /** Liste d’IDs → chaîne affichable. */
 export function formatGameIds(
-  ids: readonly string[] | null | undefined,
+  ids: readonly string[] | string | null | undefined,
   separator = ', ',
   empty = '—',
 ): string {
-  if (!ids?.length) return empty;
-  return ids.map((id) => labelForGameId(id)).join(separator);
+  const list = Array.isArray(ids) ? ids : typeof ids === 'string' && ids ? [ids] : [];
+  if (!list.length) return empty;
+  return list.map((id) => labelForGameId(id)).join(separator);
 }
 
 /** Ref équipement { id, qty } → "2× Dague". */

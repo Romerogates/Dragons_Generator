@@ -1,3 +1,4 @@
+import { testClass } from '@testing/typed-fixtures';
 import {
   deleteCustomBackgroundTemplate,
   listCustomBackgroundTemplates,
@@ -71,14 +72,14 @@ describe('custom-background-templates', () => {
 
   describe('subclass-bonus-spells', () => {
     it('covers empty options bag, missing names and level_unlocked defaults', () => {
-      const cls = {
+      const cls = testClass({
         id: 'cls-x',
         name: 'X',
         data: { subclasses: {} },
-      } as unknown as CharacterClass;
+      });
       expect(extractSubclassBonusSpells(cls, 'sub', 5)).toEqual([]);
 
-      const withGrant = {
+      const withGrant = testClass({
         id: 'cls-y',
         name: 'Y',
         data: {
@@ -94,7 +95,7 @@ describe('custom-background-templates', () => {
             ],
           },
         },
-      } as unknown as CharacterClass;
+      });
       const map = new Map<string, string>();
       expect(extractSubclassBonusSpells(withGrant, 'sub-a', 5, map)).toEqual([
         { characterLevel: 0, spells: ['spl-a'] },
@@ -104,7 +105,7 @@ describe('custom-background-templates', () => {
       ]);
       expect(
         extractSubclassBonusSpells(
-          {
+          testClass({
             id: 'cls-z',
             name: 'Z',
             data: {
@@ -117,7 +118,7 @@ describe('custom-background-templates', () => {
                 ],
               },
             },
-          } as unknown as CharacterClass,
+          }),
           'sub-z',
           99,
         ),

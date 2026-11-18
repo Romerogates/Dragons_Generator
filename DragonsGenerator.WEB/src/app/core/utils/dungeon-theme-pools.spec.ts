@@ -90,7 +90,7 @@ describe('dungeon-theme-pools', () => {
         value: undefined,
       });
       const group = encounterGroupFromRandomRoll(
-        { creatures: [{ name: '', quantity: 0, cr: undefined as unknown as string }] },
+        { creatures: [{ name: '', quantity: 0 }] },
         {
           roomLabel: 'Salle',
           mapName: 'Map',

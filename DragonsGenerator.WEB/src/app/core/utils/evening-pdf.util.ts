@@ -9,9 +9,13 @@ export interface EveningPackExtras {
 }
 
 /** Construit le PDF soirée (sans déclencher le téléchargement). */
+export type EveningPdfSession = Omit<CampaignSession, 'scheduledAt'> & {
+  scheduledAt?: string | { toString(): string };
+};
+
 export async function renderEveningPdf(
   campaignTitle: string,
-  session: CampaignSession,
+  session: EveningPdfSession,
   handouts: CampaignHandout[],
   extras?: EveningPackExtras,
 ): Promise<{ filename: string; save: () => void }> {
@@ -47,7 +51,7 @@ export async function renderEveningPdf(
   writeWrapped(session.title?.trim() || 'Session', 13, 'bold');
   if (session.scheduledAt) {
     try {
-      const d = new Date(session.scheduledAt);
+      const d = new Date(String(session.scheduledAt));
       if (!Number.isNaN(d.getTime())) {
         writeWrapped(d.toLocaleString('fr-FR'), 10);
       }

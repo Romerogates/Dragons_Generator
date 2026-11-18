@@ -72,7 +72,7 @@ describe('pwa-update.util', () => {
     await clearAppCaches(
       {
         getRegistrations: () =>
-          Promise.resolve([{ unregister } as unknown as ServiceWorkerRegistration]),
+          Promise.resolve([{ unregister }]),
       },
       { keys: () => Promise.resolve(['ngsw:abc']), delete: del },
     );

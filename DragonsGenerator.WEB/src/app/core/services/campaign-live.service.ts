@@ -27,8 +27,14 @@ export interface CampaignPresenceUser {
   atPlay: boolean;
 }
 
+/** Surface SignalR réellement utilisée (évite de mocker tout HubConnection). */
+export type CampaignLiveHub = Pick<
+  HubConnection,
+  'state' | 'on' | 'onreconnecting' | 'onreconnected' | 'onclose' | 'start' | 'stop' | 'invoke'
+>;
+
 /** Factory injectable pour les tests (mock HubConnection). */
-export const CAMPAIGN_LIVE_HUB_FACTORY = new InjectionToken<(url: string) => HubConnection>(
+export const CAMPAIGN_LIVE_HUB_FACTORY = new InjectionToken<(url: string) => CampaignLiveHub>(
   'CAMPAIGN_LIVE_HUB_FACTORY',
 );
 
@@ -42,7 +48,7 @@ export class CampaignLiveService implements OnDestroy {
   private readonly hubFactory =
     inject(CAMPAIGN_LIVE_HUB_FACTORY, { optional: true }) ?? defaultHubFactory;
 
-  private connection: HubConnection | null = null;
+  private connection: CampaignLiveHub | null = null;
   private watchId: string | null = null;
   private hubRefs = 0;
   private playRefs = 0;
@@ -201,7 +207,7 @@ export class CampaignLiveService implements OnDestroy {
   }
 }
 
-function defaultHubFactory(url: string): HubConnection {
+function defaultHubFactory(url: string): CampaignLiveHub {
   return new HubConnectionBuilder()
     .withUrl(url, {
       withCredentials: true,

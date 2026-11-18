@@ -53,7 +53,7 @@ export interface ActiveCombat {
   id: string;
   label?: string;
   encounterId?: string;
-  round: number;
+  round?: number;
   turnIndex: number;
   combatants: Combatant[];
   /** Collecte ouverte : les joueurs peuvent saisir leur jet. */

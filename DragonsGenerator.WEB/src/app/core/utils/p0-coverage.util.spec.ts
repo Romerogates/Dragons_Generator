@@ -1,3 +1,4 @@
+import { testCharacter } from '@testing/typed-fixtures';
 import { validateCharacterExport } from './character-export-validation.util';
 import { magicDetailsComplete } from './character-wizard-validation.util';
 import { CURRENT_SCHEMA_VERSION, type Character, type CharacterCreation } from '@core/models/Character/character';
@@ -58,7 +59,7 @@ describe('P0 coverage — magic quotas + export gates', () => {
   });
 
   it('export rejects missing subclass at level 3+', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Guerrier L3',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -66,14 +67,14 @@ describe('P0 coverage — magic quotas + export gates', () => {
       totalLevel: 3,
       proficiencies: { weapons: [], tools: [], armor: [], languages: ['Commun'] },
       equipment: [],
-    } as unknown as Character;
+    });
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
     expect(result.errors.some((e) => e.includes('Sous-classe'))).toBeTrue();
   });
 
   it('export rejects incomplete ASI and wizard spell quotas', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Mage',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -88,11 +89,11 @@ describe('P0 coverage — magic quotas + export gates', () => {
       ],
       totalLevel: 1,
       asiChoices: [{ level: 4, mode: 'plus2', primary: null, secondary: null, featId: null }],
-      spellcasting: { kind: 'wizard', ability: 'intelligence' },
-      knownSpells: [{ refId: 'c1', name: 'C', level: 0 }],
+      spellcasting: { kind: 'wizard', ability: 'Intelligence' },
+      knownSpells: [{ refId: 'c1', name: 'C', level: 0, prepared: false }],
       proficiencies: { weapons: [], tools: [], armor: [], languages: ['Commun'] },
       equipment: [],
-    } as unknown as Character;
+    });
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
     expect(result.errors.some((e) => e.includes('ASI'))).toBeTrue();
@@ -100,7 +101,7 @@ describe('P0 coverage — magic quotas + export gates', () => {
   });
 
   it('export rejects cleric without deity', () => {
-    const broken = {
+    const broken = testCharacter({
       schemaVersion: CURRENT_SCHEMA_VERSION,
       name: 'Prêtre',
       species: { id: 'spc-humain', label: 'Humain' },
@@ -108,15 +109,15 @@ describe('P0 coverage — magic quotas + export gates', () => {
         { classId: 'cls-pretre', classLabel: 'Prêtre', level: 1, hitDie: 8, subclassId: 'subcls-vie' },
       ],
       totalLevel: 1,
-      spellcasting: { kind: 'cleric', ability: 'wisdom' },
+      spellcasting: { kind: 'cleric', ability: 'Sagesse' },
       knownSpells: [
-        { refId: 'c1', name: 'C1', level: 0 },
-        { refId: 'c2', name: 'C2', level: 0 },
-        { refId: 'c3', name: 'C3', level: 0 },
+        { refId: 'c1', name: 'C1', level: 0, prepared: false },
+        { refId: 'c2', name: 'C2', level: 0, prepared: false },
+        { refId: 'c3', name: 'C3', level: 0, prepared: false },
       ],
       proficiencies: { weapons: [], tools: [], armor: [], languages: ['Commun'] },
       equipment: [],
-    } as unknown as Character;
+    });
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
     expect(result.errors.some((e) => e.includes('Divinité'))).toBeTrue();
@@ -133,18 +134,18 @@ describe('P0 coverage — magic quotas + export gates', () => {
       equipment: [],
     };
     expect(
-      validateCharacterExport({
+      validateCharacterExport(testCharacter({
         ...baseChar,
         asiChoices: [{ level: 4, mode: 'feat', primary: null, secondary: null, featId: null }],
-      } as unknown as Character).errors.some((e) => e.includes('don')),
+      })).errors.some((e) => e.includes('don')),
     ).toBeTrue();
     expect(
-      validateCharacterExport({
+      validateCharacterExport(testCharacter({
         ...baseChar,
         asiChoices: [
           { level: 4, mode: 'plus1plus1', primary: 'force', secondary: 'force', featId: null },
         ],
-      } as unknown as Character).errors.some((e) => e.includes('+1/+1')),
+      })).errors.some((e) => e.includes('+1/+1')),
     ).toBeTrue();
   });
 

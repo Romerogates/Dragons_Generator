@@ -61,8 +61,6 @@ describe('campaign-persist sparse sessions / fog', () => {
             theme: 'cave',
             createdAt: '2026-01-01T00:00:00Z',
             updatedAt: '2026-01-01T00:01:00Z',
-            fogOfWarEnabled: undefined as unknown as boolean,
-            revealedRoomIds: undefined as unknown as string[],
             rooms: [],
             markers: [],
             tiles: [],
@@ -71,10 +69,13 @@ describe('campaign-persist sparse sessions / fog', () => {
           },
         ],
       });
-      remote.data.sessions![0].activeCombat!.round = undefined as unknown as number;
-      remote.data.sessions![0].activeCombat!.initiativeCode = undefined;
-      remote.data.sessions![0].activeCombat!.flowPhase = undefined;
-      remote.data.sessions![0].status = undefined as unknown as 'planned';
+      const remoteCombat = remote.data.sessions![0].activeCombat;
+      if (remoteCombat) {
+        delete remoteCombat.round;
+        remoteCombat.initiativeCode = undefined;
+        remoteCombat.flowPhase = undefined;
+      }
+      delete remote.data.sessions![0].status;
       const merged = mergeRemoteLiveTable(local, remote);
       expect(merged.data.activeSessionId).toBe('s1');
       expect(merged.data.dungeonMaps![0].revealedRoomIds).toEqual(['keep']);

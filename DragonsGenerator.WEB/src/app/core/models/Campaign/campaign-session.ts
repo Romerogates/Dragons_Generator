@@ -79,7 +79,7 @@ export interface CampaignSession {
   playPads?: SessionPlayPad[];
   /** Tracker initiative / ordre de combat en cours (MJ). */
   activeCombat?: ActiveCombat | null;
-  status: CampaignSessionStatus;
+  status?: CampaignSessionStatus;
   /** Combats terminés durant cette session (MJ). */
   combatHistory?: CombatHistoryEntry[];
   /** Ordre de la soirée (MJ) — rencontres, pauses, notes. */

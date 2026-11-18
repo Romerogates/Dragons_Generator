@@ -2,6 +2,8 @@ import type {
   CharacterClass,
   EquipmentSlot,
   FeatureDetail,
+  ProgressionLevel,
+  Proficiencies,
   Subclass,
   SubclassCatalog,
 } from '@core/models/CharacterClasses/character-class';
@@ -13,6 +15,7 @@ interface RawFeatureDetail {
   id?: string;
   name?: string;
   desc?: string;
+  description?: string;
   flavor?: { summary?: string };
   level?: number;
   unlocks_at_level?: number;
@@ -48,7 +51,11 @@ interface RawSubChoice {
   option_descs?: Record<string, string>;
 }
 
-interface RawSubclassOption extends Subclass {
+interface RawSubclassOption {
+  id: string;
+  name?: string;
+  desc?: string;
+  features?: RawFeatureDetail[];
   flavor?: { summary?: string };
   features_details?: RawFeatureDetail[];
   choice_pools?: RawChoicePool[];
@@ -114,18 +121,77 @@ function parseHitDie(hitDie: unknown): number {
   return 8;
 }
 
-function mapSavingThrows(raw: string[] | undefined): Ability[] {
-  return (raw ?? [])
-    .map((a) => ABILITY_MAP[a.toLowerCase()] ?? (a as Ability))
-    .filter(Boolean);
+const ABILITY_VALUES: Ability[] = [
+  'Force',
+  'Dextérité',
+  'Constitution',
+  'Intelligence',
+  'Sagesse',
+  'Charisme',
+];
+
+function isAbility(v: string): v is Ability {
+  return ABILITY_VALUES.some((a) => a === v);
+}
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+function mapSavingThrows(raw: unknown): Ability[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Ability[] = [];
+  for (const a of raw) {
+    const token = String(a);
+    const mapped = ABILITY_MAP[token.toLowerCase()];
+    if (mapped) out.push(mapped);
+    else if (isAbility(token)) out.push(token);
+  }
+  return out;
+}
+
+function isEquipmentSlot(v: unknown): v is EquipmentSlot {
+  return isRecord(v) && typeof v['slot'] === 'number';
+}
+
+function isRawChoicePool(v: unknown): v is RawChoicePool {
+  return isRecord(v);
+}
+
+function readStringList(v: unknown): string[] | undefined {
+  return Array.isArray(v) ? v.map(String) : undefined;
+}
+
+function readProficiencies(raw: unknown): Proficiencies {
+  if (!isRecord(raw)) return {};
+  const skillsRaw = raw['skills'];
+  return {
+    armor: readStringList(raw['armor']),
+    weapons: readStringList(raw['weapons']),
+    tools: readStringList(raw['tools']),
+    saving_throws: mapSavingThrows(raw['saving_throws']),
+    skills: isRecord(skillsRaw)
+      ? {
+          count: typeof skillsRaw['count'] === 'number' ? skillsRaw['count'] : undefined,
+          options: readStringList(skillsRaw['options']),
+        }
+      : undefined,
+  };
+}
+
+function readProgression(raw: unknown): ProgressionLevel[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(isRecord).map((p) => ({
+    ...p,
+    level: typeof p['level'] === 'number' ? p['level'] : 1,
+    prof_bonus: typeof p['prof_bonus'] === 'number' ? p['prof_bonus'] : 2,
+    features: Array.isArray(p['features']) ? p['features'].map(String) : [],
+  }));
 }
 
 function normalizeFeaturesDetails(features: RawFeatureDetail[]): FeatureDetail[] {
   return (features ?? []).map((f) => {
-    const description =
-      typeof (f as { description?: unknown }).description === 'string'
-        ? (f as { description: string }).description
-        : '';
+    const description = typeof f.description === 'string' ? f.description : '';
     return {
       ...f,
       id: f.id ?? '',
@@ -171,16 +237,15 @@ function mapOptionItems(opt: unknown): { id: string; qty: number }[] {
  * Tolère aussi un objet brut stocké par erreur dans le brouillon (évite un spread qui crashe l'étape).
  */
 export function coerceEquipmentSlots(se: unknown, topLevelPools: RawChoicePool[] = []): EquipmentSlot[] {
-  // Déjà une liste de slots wizard.
-  if (Array.isArray(se)) return se as EquipmentSlot[];
+  if (Array.isArray(se)) return se.filter(isEquipmentSlot);
 
   const slots: EquipmentSlot[] = [];
   let slotNum = 1;
 
-  const obj = se && typeof se === 'object' ? (se as Record<string, unknown>) : {};
+  const obj = isRecord(se) ? se : {};
 
-  const fixed = obj['fixed'] as unknown[] | undefined;
-  if (fixed?.length) {
+  const fixed = obj['fixed'];
+  if (Array.isArray(fixed) && fixed.length) {
     slots.push({
       slot: slotNum++,
       description: 'Équipement de départ',
@@ -188,12 +253,14 @@ export function coerceEquipmentSlots(se: unknown, topLevelPools: RawChoicePool[]
     });
   }
 
-  const pools = (obj['choice_pools'] as RawChoicePool[]) ?? [];
+  const rawPools = obj['choice_pools'];
+  const pools = Array.isArray(rawPools) ? rawPools.filter(isRawChoicePool) : [];
   for (const pool of pools) {
+    const opts = pool.options ?? pool.pool ?? [];
     slots.push({
       slot: slotNum++,
       description: pool.name ?? "Choix d'équipement",
-      alternatives: (pool.options ?? pool.pool ?? []).map(mapOptionItems),
+      alternatives: opts.map(mapOptionItems),
     });
   }
 
@@ -396,100 +463,126 @@ function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
   return choices.filter((sc) => (sc.options?.length ?? 0) > 0);
 }
 
-function normalizeSubclasses(subclasses: RawSubclassCatalog | Subclass[] | undefined): SubclassCatalog | Subclass[] | undefined {
-  if (!subclasses) return subclasses;
+function isRawSubclassOption(v: unknown): v is RawSubclassOption {
+  return isRecord(v) && typeof v['id'] === 'string';
+}
+
+function normalizeSubclasses(subclasses: unknown): SubclassCatalog | Subclass[] | undefined {
+  if (subclasses == null) return undefined;
 
   if (Array.isArray(subclasses)) {
-    return subclasses.map((sub) => ({
+    return subclasses.filter(isRawSubclassOption).map((sub) => ({
       ...sub,
-      desc: sub.desc ?? (sub as RawSubclassOption).flavor?.summary ?? '',
-      features: normalizeFeaturesDetails(
-        (sub as RawSubclassOption).features_details ?? sub.features ?? [],
-      ),
-      sub_choices: normalizeSubChoices(sub as RawSubclassOption),
+      desc: sub.desc ?? sub.flavor?.summary ?? '',
+      features: normalizeFeaturesDetails(sub.features_details ?? sub.features ?? []),
+      sub_choices: normalizeSubChoices(sub),
     }));
   }
 
-  const catalog = subclasses as RawSubclassCatalog;
+  if (!isRecord(subclasses)) return undefined;
+  const catalog = subclasses;
+  const rawOptions = Array.isArray(catalog['options'])
+    ? catalog['options'].filter(isRawSubclassOption)
+    : [];
   const levelUnlocked =
-    catalog.level_unlocked ?? catalog.unlocked_at_level ?? catalog.subclass_level_unlocked ?? 3;
+    (typeof catalog['level_unlocked'] === 'number' ? catalog['level_unlocked'] : undefined) ??
+    (typeof catalog['unlocked_at_level'] === 'number' ? catalog['unlocked_at_level'] : undefined) ??
+    (typeof catalog['subclass_level_unlocked'] === 'number'
+      ? catalog['subclass_level_unlocked']
+      : undefined) ??
+    3;
 
   return {
-    ...catalog,
+    unlocked_at_level:
+      typeof catalog['unlocked_at_level'] === 'number' ? catalog['unlocked_at_level'] : undefined,
     level_unlocked: levelUnlocked,
-    options: (catalog.options ?? []).map((sub) => ({
+    options: rawOptions.map((sub) => ({
       ...sub,
       desc: sub.desc ?? sub.flavor?.summary ?? '',
       features: normalizeFeaturesDetails(sub.features_details ?? sub.features ?? []),
       sub_choices: normalizeSubChoices(sub),
     })),
-  } as SubclassCatalog;
+  };
 }
 
 /** Adapte le schema 3.0 API vers le format attendu par le wizard. */
-export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
-  const d = cls.data as Record<string, unknown>;
+export function normalizeCharacterClass(cls: { id: string; name: string; data: Record<string, unknown> }): CharacterClass {
+  const d = cls.data;
 
   if (d['proficiencies'] && Array.isArray(d['starting_equipment'])) {
     const flavor = normalizeClassFlavor(d['flavor']);
     return {
-      ...cls,
+      id: cls.id,
+      name: cls.name,
       data: {
         ...d,
         ...(flavor ? { flavor } : {}),
         hit_die: parseHitDie(d['hit_die']),
-        primary_abilities: mapSavingThrows(
-          (d['primary_abilities'] as string[]) ?? [],
-        ),
-      } as CharacterClass['data'],
+        primary_abilities: mapSavingThrows(d['primary_abilities']),
+        proficiencies: readProficiencies(d['proficiencies']),
+        starting_equipment: coerceEquipmentSlots(d['starting_equipment']),
+        progression: readProgression(d['progression']),
+      },
     };
   }
 
-  const choicePools = (d['choice_pools'] as RawChoicePool[]) ?? [];
+  const choicePoolsRaw = d['choice_pools'];
+  const choicePools: RawChoicePool[] = Array.isArray(choicePoolsRaw)
+    ? choicePoolsRaw.filter(isRawChoicePool)
+    : [];
   const skillPool = choicePools.find((p) => p.type === 'skill_proficiency');
   const fallback = DEFAULT_SKILL_POOLS[cls.id];
 
-  const rawOptions = (skillPool?.pool as string[] | undefined) ?? fallback?.options ?? [];
+  const rawOptions = Array.isArray(skillPool?.pool)
+    ? skillPool.pool.map(String)
+    : (fallback?.options ?? []);
   const skillOptions = rawOptions.map((id: string) =>
     id === 'any' || id === 'any-skills' || id === 'skill-any' ? 'any' : normalizeSkillId(id),
   );
   const skillCount = skillPool?.quantity ?? fallback?.count ?? 0;
   const flavor = normalizeClassFlavor(d['flavor']);
 
+  const featuresRaw = d['features_details'];
+  const subclassesRaw = d['subclasses'];
   return {
-    ...cls,
+    id: cls.id,
+    name: cls.name,
     data: {
       ...d,
       ...(flavor ? { flavor } : {}),
       hit_die: parseHitDie(d['hit_die']),
-      primary_abilities: mapSavingThrows(
-        (d['primary_abilities'] as string[]) ?? [],
-      ),
+      primary_abilities: mapSavingThrows(d['primary_abilities']),
       proficiencies: {
-        armor: (d['armor_proficiencies'] as string[]) ?? [],
-        weapons: (d['weapon_proficiencies'] as string[]) ?? [],
-        saving_throws: mapSavingThrows(d['saving_throw_proficiencies'] as string[]),
-        tools: (d['tool_proficiencies'] as string[]) ?? [],
+        armor: Array.isArray(d['armor_proficiencies']) ? d['armor_proficiencies'].map(String) : [],
+        weapons: Array.isArray(d['weapon_proficiencies']) ? d['weapon_proficiencies'].map(String) : [],
+        saving_throws: mapSavingThrows(d['saving_throw_proficiencies']),
+        tools: Array.isArray(d['tool_proficiencies']) ? d['tool_proficiencies'].map(String) : [],
         skills: {
           count: skillCount,
           options: skillOptions,
         },
       },
-      features_details: normalizeFeaturesDetails((d['features_details'] as RawFeatureDetail[]) ?? []),
-      subclasses: normalizeSubclasses(d['subclasses'] as RawSubclassCatalog | Subclass[] | undefined),
-      starting_equipment: normalizeStartingEquipment(
-        d['starting_equipment'],
-        choicePools,
-      ) as CharacterClass['data']['starting_equipment'],
-    } as CharacterClass['data'],
+      progression: readProgression(d['progression']),
+      features_details: normalizeFeaturesDetails(
+        Array.isArray(featuresRaw) ? featuresRaw.filter(isRecord) : [],
+      ),
+      subclasses: normalizeSubclasses(
+        Array.isArray(subclassesRaw)
+          ? subclassesRaw.filter(isRecord)
+          : isRecord(subclassesRaw)
+            ? subclassesRaw
+            : undefined,
+      ),
+      starting_equipment: normalizeStartingEquipment(d['starting_equipment'], choicePools),
+    },
   };
 }
 
 function normalizeClassFlavor(
   raw: unknown,
 ): { summary?: string; lore_note?: string } | undefined {
-  if (!raw || typeof raw !== 'object') return undefined;
-  const f = raw as Record<string, unknown>;
+  if (!isRecord(raw)) return undefined;
+  const f = raw;
   const summary = typeof f['summary'] === 'string' ? f['summary'].trim() : '';
   const lore =
     (typeof f['lore_note'] === 'string' && f['lore_note']) ||

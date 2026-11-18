@@ -1,6 +1,8 @@
+import { testClass } from '@testing/typed-fixtures';
 import { buildAutoClassSelection, CLASS_SPELLCASTING } from '../character-auto-build.util';
 import { makeGuerrierCls, makeMagicienCls, makePretreLikeCls, createLettreClass } from './spec-helpers';
 import type { CharacterClass } from './spec-helpers';
+import type { ClassChoicePool } from '@core/models/CharacterClasses/character-class';
 describe('character-auto-build class', () => {
   afterEach(() => {
     delete (CLASS_SPELLCASTING as Record<string, unknown>)['cls-test-inconnu'];
@@ -73,8 +75,8 @@ describe('buildAutoClassSelection', () => {
     });
   });
 describe('isFightingStylePool detection (via buildAutoClassSelection)', () => {
-    function clsWithPool(pool: Record<string, unknown>): CharacterClass {
-      return {
+    function clsWithPool(pool: ClassChoicePool): CharacterClass {
+      return testClass({
         id: 'cls-test-style',
         name: 'Test',
         data: {
@@ -88,8 +90,8 @@ describe('isFightingStylePool detection (via buildAutoClassSelection)', () => {
             { id: 'feat-style-y', name: 'Style Y', desc: '' },
           ],
           choice_pools: [pool],
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
     }
 
     it('detects a fighting style pool by id/type regex even when type differs', () => {
@@ -122,7 +124,7 @@ describe('isFightingStylePool detection (via buildAutoClassSelection)', () => {
   });
 describe('buildAutoClassSelection — cas additionnels', () => {
     it('returns no subclass for a class with no subclasses field at all', () => {
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-sans-sous-classe',
         name: 'Sans sous-classe',
         data: {
@@ -133,15 +135,15 @@ describe('buildAutoClassSelection — cas additionnels', () => {
           progression: [],
           features_details: [],
           choice_pools: [],
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
       const { selection } = buildAutoClassSelection(cls, 5);
       expect(selection.subclassId).toBeUndefined();
     });
 
     it('treats a raw subclasses array as unlocked from level 1', () => {
       spyOn(Math, 'random').and.returnValue(0);
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-array-subclasses',
         name: 'Array',
         data: {
@@ -153,15 +155,15 @@ describe('buildAutoClassSelection — cas additionnels', () => {
           features_details: [],
           choice_pools: [],
           subclasses: [{ id: 'subcls-a', name: 'A', features: [] }],
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
       const { selection } = buildAutoClassSelection(cls, 1);
       expect(selection.subclassId).toBe('subcls-a');
     });
 
     it('skips sub_choices not yet unlocked at the target level and with an empty option list', () => {
       spyOn(Math, 'random').and.returnValue(0);
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-sub-choices',
         name: 'Test',
         data: {
@@ -186,8 +188,8 @@ describe('buildAutoClassSelection — cas additionnels', () => {
               },
             ],
           },
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
       const { classChoiceAnswers } = buildAutoClassSelection(cls, 1);
       expect(classChoiceAnswers['choice-tardif']).toBeUndefined();
       expect(classChoiceAnswers['choice-vide']).toBeUndefined();
@@ -195,7 +197,7 @@ describe('buildAutoClassSelection — cas additionnels', () => {
 
     it('resolves a sub_choice pick that matches an actual class feature (not just a label fallback)', () => {
       spyOn(Math, 'random').and.returnValue(0);
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-sub-choice-feat',
         name: 'Test',
         data: {
@@ -219,8 +221,8 @@ describe('buildAutoClassSelection — cas additionnels', () => {
               },
             ],
           },
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
       const { extraFeatures } = buildAutoClassSelection(cls, 1);
       const feat = extraFeatures.find((f) => f.refId === 'dom-vie');
       expect(feat?.name).toBe('Domaine de la vie');
@@ -228,7 +230,7 @@ describe('buildAutoClassSelection — cas additionnels', () => {
     });
 
     it('returns null for an unknown feature id and reads explicit hp_at_level_1 / hp_per_level_average overrides', () => {
-      const cls: CharacterClass = {
+      const cls: CharacterClass = testClass({
         id: 'cls-hp-explicite',
         name: 'Test',
         data: {
@@ -241,8 +243,8 @@ describe('buildAutoClassSelection — cas additionnels', () => {
           progression: [{ level: 1, prof_bonus: 2, features: ['feat-inconnu'], resources: {} }],
           features_details: [],
           choice_pools: [],
-        } as any,
-      } as unknown as CharacterClass;
+        },
+      });
       const { selection } = buildAutoClassSelection(cls, 1);
       expect(selection.hpAtLevel1).toBe(14);
       expect(selection.hpPerLevelAverage).toBe(8);
@@ -259,7 +261,7 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
   });
   describe('cas limites (ex-branches)', () => {
     it('isFightingStylePool handles pools with no id/type keys at all', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-sans-cle',
           name: 'Test',
           data: {
@@ -270,13 +272,13 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
             progression: [],
             features_details: [],
             choice_pools: [{ pool: ['feat-x'] }],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { selection } = buildAutoClassSelection(cls, 1);
         expect(selection.classFeatures).toEqual([]);
       });
     it('pickAutoSubclass returns null when the subclasses payload has no options array', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-souscls-vide',
           name: 'Test',
           data: {
@@ -288,8 +290,8 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
             features_details: [],
             choice_pools: [],
             subclasses: { unlocked_at_level: 1 },
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { selection } = buildAutoClassSelection(cls, 1);
         expect(selection.subclassId).toBeUndefined();
       });
@@ -301,7 +303,7 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
       });
     it('buildAutoClassSelection deduplicates overlapping feature_selection pools', () => {
         spyOn(Math, 'random').and.returnValue(0);
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-overlap',
           name: 'Overlap',
           data: {
@@ -332,15 +334,15 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 pool: ['feat-a', 'feat-b'],
               },
             ],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { classChoiceAnswers, extraFeatures } = buildAutoClassSelection(cls, 1);
         const picked = new Set(Object.values(classChoiceAnswers).flat());
         expect(picked.size).toBe(2);
         expect(extraFeatures.filter((f) => f.refId === 'feat-fixed').length).toBe(1);
       });
     it('pickAutoSubclass honors level_unlocked and returns null below gate', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-gated',
           name: 'Gated',
           data: {
@@ -352,14 +354,14 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
             features_details: [],
             choice_pools: [],
             subclasses: { level_unlocked: 5, options: [{ id: 'sub-a', name: 'A', features: [] }] },
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         expect(buildAutoClassSelection(cls, 4).selection.subclassId).toBeUndefined();
         expect(buildAutoClassSelection(cls, 5).selection.subclassId).toBe('sub-a');
       });
     it('pickCombatStyles uses feat id fallback when style detail is missing', () => {
         spyOn(Math, 'random').and.returnValue(0);
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-style-fallback',
           name: 'Style',
           data: {
@@ -370,38 +372,35 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
             progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
             features_details: [],
             choice_pools: [{ id: 'choice-fighting-style', type: 'fighting_style', pool: ['feat-unknown-style'] }],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { selection } = buildAutoClassSelection(cls, 1);
         expect(selection.classFeatures[0]?.name).toBe('Style : feat-unknown-style');
       });
     it('buildAutoClassSelection tolerates non-array proficiency lists', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-weird-prof',
           name: 'Weird',
           data: {
             hit_die: 6,
             primary_abilities: [],
             proficiencies: {
-              armor: null,
-              weapons: null,
-              tools: null,
               saving_throws: [],
-              skills: { count: 0, options: null },
+              skills: { count: 0 },
             },
             starting_equipment: [],
             progression: [],
             features_details: [],
             choice_pools: [],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { selection } = buildAutoClassSelection(cls, 1);
         expect(selection.armorProficiencies).toEqual([]);
         expect(selection.skillOptions).toEqual([]);
       });
     it('materializes subclass sub_choices from labels when feature details are absent', () => {
         spyOn(Math, 'random').and.returnValue(0);
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-label-sub',
           name: 'Label',
           data: {
@@ -432,8 +431,8 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 },
               ],
             },
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { extraFeatures } = buildAutoClassSelection(cls, 1);
         const feat = extraFeatures.find((f) => f.refId === 'dom-label');
         expect(feat?.name).toBe('Domaine étiquette');
@@ -442,7 +441,7 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
       });
     it('skips unknown or duplicate fixed features in feature_selection pools', () => {
         spyOn(Math, 'random').and.returnValue(0);
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-fixed-skip',
           name: 'Fixed',
           data: {
@@ -465,14 +464,14 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 fixed_features: ['feat-fixed', 'feat-missing'],
               },
             ],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { extraFeatures } = buildAutoClassSelection(cls, 1);
         expect(extraFeatures.filter((f) => f.refId === 'feat-fixed').length).toBe(1);
         expect(extraFeatures.some((f) => f.refId === 'feat-missing')).toBeFalse();
       });
     it('buildAutoClassSelection skips high-level progression and subclass features', () => {
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-gated-feats',
           name: 'Gated',
           data: {
@@ -500,17 +499,17 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 },
               ],
             },
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { selection } = buildAutoClassSelection(cls, 1);
         expect(selection.classFeatures.some((f) => f.refId === 'feat-l1')).toBeTrue();
         expect(selection.classFeatures.some((f) => f.refId === 'feat-l5' || f.refId === 'sub-f5')).toBeFalse();
-        expect(selection.savingThrows as string[]).toContain('invalid-code');
+        expect(selection.savingThrows).toEqual(['Force']);
         expect(selection.skillChooseCount).toBe(0);
       });
     it('buildAutoClassSelection uses option labels when picked features lack detail rows', () => {
         spyOn(Math, 'random').and.returnValue(0);
-        const cls: CharacterClass = {
+        const cls: CharacterClass = testClass({
           id: 'cls-opt-label',
           name: 'Opt',
           data: {
@@ -529,14 +528,14 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 pool: ['feat-sans-fiche'],
               },
             ],
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         const { extraFeatures } = buildAutoClassSelection(cls, 1);
         expect(extraFeatures[0]?.name).toBe('Sans Fiche');
       });
 
       it('ignore un objet subclasses verrouillé ou sans options, et un pool de styles vide', () => {
-        const locked: CharacterClass = {
+        const locked: CharacterClass = testClass({
           id: 'cls-locked',
           name: 'Locked',
           data: {
@@ -548,12 +547,12 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
             features_details: [],
             subclasses: { options: [], unlocked_at_level: 10 },
             choice_pools: undefined,
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         expect(buildAutoClassSelection(locked, 5).selection.subclassId).toBeUndefined();
 
         spyOn(Math, 'random').and.returnValue(0);
-        const delayed: CharacterClass = {
+        const delayed: CharacterClass = testClass({
           id: 'cls-delayed',
           name: 'Delayed',
           data: {
@@ -576,8 +575,8 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
                 },
               ],
             },
-          } as any,
-        } as unknown as CharacterClass;
+          },
+        });
         expect(buildAutoClassSelection(delayed, 3).selection.subclassId).toBe('sub-x');
       });
   });

@@ -1,3 +1,4 @@
+import { testBackground, testSkill, testSpecies } from '@testing/typed-fixtures';
 import { validateCharacterExport } from '../character-export-validation.util';
 import {
   featBonusArmorProficiencies,
@@ -26,7 +27,6 @@ import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
 import type { Background } from '@core/models/Backgrounds/background';
 import type { Species } from '@core/models/Species/species';
-import type { Skill } from '@core/models/Skills/skill';
 import {
   canOpenFightPhase,
   createActiveCombat,
@@ -51,7 +51,7 @@ describe('character-export remaining', () => {
           languages: [],
         },
         equipment: [{ refId: '  ', name: 'Vide', qty: 1 }],
-      } as unknown as Character;
+      };
       const result = validateCharacterExport(broken);
       expect(result.valid).toBeFalse();
       expect(result.errors.length).toBeGreaterThan(0);
@@ -69,7 +69,7 @@ describe('character-export remaining', () => {
           tools: ['tl-focaliseur-arcanique', 'category-vehicles'],
         },
         equipment: [],
-      } as unknown as Character;
+      };
       expect(validateCharacterExport(ok).valid).toBeTrue();
 
       const sparse = {
@@ -78,7 +78,7 @@ describe('character-export remaining', () => {
         species: { id: 'spc-humain', label: 'Humain' },
         classes: [{ classId: 'cls-guerrier', classLabel: 'Guerrier', level: 1, hitDie: 10 }],
         proficiencies: {},
-      } as unknown as Character;
+      };
       const sparseResult = validateCharacterExport(sparse);
       expect(sparseResult.errors.some((e) => e.includes('Niveau'))).toBeTrue();
     });
@@ -126,22 +126,17 @@ describe('character-export remaining', () => {
   });
 
   describe('auto-build sparse species / background', () => {
-    const skills: Skill[] = [
-      { id: 'skill-acrobaties', name: 'Acrobaties', ability: 'DEX' },
-      { id: 'skill-athletisme', name: 'Athlétisme', ability: 'STR' },
-    ] as Skill[];
+    const skills = [
+      testSkill({ id: 'skill-acrobaties', name: 'Acrobaties', ability: 'DEX' }),
+      testSkill({ id: 'skill-athletisme', name: 'Athlétisme', ability: 'STR' }),
+    ];
 
     it('species without creationChoices / subspecies / darkvision', () => {
-      const species = {
+      const species = testSpecies({
         id: 'spc-sparse',
         name: 'Sparse',
-        playable: true,
-        baseStats: { speedM: 9, size: undefined, darkvisionM: undefined, abilityScoreIncrease: {} },
-        languages: undefined,
-        traits: undefined,
-        creationChoices: undefined,
-        subspecies: undefined,
-      } as unknown as Species;
+        baseStats: { speedM: 9, abilityScoreIncrease: {} },
+      });
       const sel = buildAutoSpeciesSelection(species, 1, []);
       expect(sel.speciesId).toBe('spc-sparse');
       expect(sel.hasDarkvision).toBeFalse();
@@ -150,31 +145,26 @@ describe('character-export remaining', () => {
     });
 
     it('background skill any-pool and empty personality / equipment qty', () => {
-      const bg = {
+      const bg = testBackground({
         id: 'bg-sparse',
         name: 'Sparse',
         data: {
           preset: true,
           privilege: { id: 'p', name: 'P', desc: 'D' },
           proficiencies: {
-            skills: { fixed: undefined, options: ['any'], chooseCount: 1 },
-            tools: { choose: [{ chooseCount: 1, options: undefined }] },
-            languages: undefined,
+            skills: { options: ['any'], chooseCount: 1 },
+            tools: { choose: [{ chooseCount: 1 }] },
           },
           equipment: {
-            fixed: [{ id: 'wp-dague', name: 'Dague', qty: undefined }],
-            choose: [{ name: undefined, pool: [{ id: 'wp-epee', qty: undefined }] }],
-            currency: undefined,
+            fixed: [{ id: 'wp-dague', name: 'Dague' }],
+            choose: [{ pool: [{ id: 'wp-epee' }] }],
           },
           personalityTables: {
             traits: { entries: [] },
-            ideals: undefined,
             bonds: { entries: [{ text: 'Bond' }] },
-            flaws: { entries: undefined },
           },
-          flavor: undefined,
         },
-      } as unknown as Background;
+      });
       const sel = buildAutoBackgroundSelection(bg, createSkillMapFromList(skills));
       expect(sel.skills.length).toBeGreaterThan(0);
       expect(sel.equipment[0]?.qty).toBe(1);
@@ -224,7 +214,7 @@ describe('character-export remaining', () => {
           id: 'n1',
           title: '',
           mode: 'text',
-          text: undefined as unknown as string,
+          text: undefined,
           inkStrokes: [],
           updatedAt: '',
         }).title,
@@ -287,7 +277,7 @@ describe('character-export remaining', () => {
 
     it('equipment display and game-id category fallbacks', () => {
       expect(
-        equipmentSummaryText({ type: 'GEAR', subtype: null, data: undefined as unknown as Record<string, unknown> }),
+        equipmentSummaryText({ type: 'GEAR', subtype: null, data: undefined }),
       ).toBe('');
       expect(
         equipmentSummaryText({

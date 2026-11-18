@@ -32,7 +32,7 @@ export interface TableCalendarEventView {
   editable: boolean;
 }
 
-const SESSION_COLORS: Record<CampaignSession['status'], { bg: string; border: string }> = {
+const SESSION_COLORS: Record<NonNullable<CampaignSession['status']>, { bg: string; border: string }> = {
   planned: { bg: '#7c3aed', border: '#a78bfa' },
   played: { bg: '#047857', border: '#34d399' },
   cancelled: { bg: '#57534e', border: '#78716c' },
@@ -50,7 +50,7 @@ export function mapSessionsToCalendarEvents(
   editable: boolean,
 ): TableCalendarEventView[] {
   return sessions.map((s) => {
-    const colors = SESSION_COLORS[s.status] ?? SESSION_COLORS.planned;
+    const colors = SESSION_COLORS[s.status ?? 'planned'] ?? SESSION_COLORS.planned;
     const start = s.scheduledAt || new Date().toISOString();
     const end = new Date(new Date(start).getTime() + 3 * 60 * 60 * 1000).toISOString();
     return {
