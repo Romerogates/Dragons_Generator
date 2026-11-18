@@ -10,7 +10,9 @@ export default defineConfig({
   retries: process.env['CI'] ? 1 : 0,
   workers: Number(process.env['E2E_WORKERS'] ?? 2),
   timeout: 60_000,
-  globalTimeout: process.env['CI'] ? 10 * 60_000 : undefined,
+  globalTimeout: process.env['CI']
+    ? Number(process.env['E2E_GLOBAL_TIMEOUT_MS'] ?? 10 * 60_000)
+    : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL,

@@ -13,6 +13,11 @@
     "e2e:ci:forge": "playwright test e2e/lettre-creation.spec.ts e2e/lettre-save.spec.ts e2e/multiclass-creation.spec.ts e2e/forge-draft.spec.ts e2e/class-creation.spec.ts e2e/catalog-smoke.spec.ts",
     "e2e:ci:table": "playwright test e2e/profile.spec.ts e2e/offline-banner.spec.ts e2e/reconnect-banner.spec.ts e2e/campaign-play-smoke.spec.ts e2e/campaign-player-session.spec.ts",
     "e2e:ci": "npm run e2e:ci:forge && npm run e2e:ci:table",
+    "e2e:ci:nightly:forge": "playwright test e2e/caster-save.spec.ts e2e/guide.spec.ts",
+    "e2e:ci:nightly:social": "playwright test e2e/friends-invites.spec.ts e2e/friend-chat-share.spec.ts e2e/agenda.spec.ts e2e/campaign-calendar.spec.ts e2e/campaign-members.spec.ts e2e/campaign-join-guest.spec.ts e2e/campaign-join-link.spec.ts",
+    "e2e:ci:nightly:combat": "playwright test e2e/campaign-play.spec.ts e2e/campaign-combat-xp.spec.ts e2e/campaign-combat-player-attack.spec.ts e2e/campaign-combat-attack.spec.ts e2e/campaign-live-polish.spec.ts e2e/campaign-soiree-audit.spec.ts",
+    "e2e:ci:nightly:campaign": "playwright test e2e/campaign-codex-table.spec.ts e2e/campaign-play-handouts.spec.ts e2e/campaign-documents.spec.ts e2e/campaign-lot-smoke.spec.ts e2e/campaign-abc-lot.spec.ts",
+    "e2e:ci:nightly": "npm run e2e:ci:nightly:forge && npm run e2e:ci:nightly:social && npm run e2e:ci:nightly:combat && npm run e2e:ci:nightly:campaign",
     "e2e:full": "playwright test e2e/lettre-creation.spec.ts e2e/lettre-save.spec.ts e2e/multiclass-creation.spec.ts e2e/forge-draft.spec.ts e2e/catalog-smoke.spec.ts e2e/offline-banner.spec.ts e2e/reconnect-banner.spec.ts e2e/profile.spec.ts e2e/class-creation.spec.ts e2e/caster-save.spec.ts",
     "e2e:ui": "playwright test --ui",
     "lint": "ng lint"

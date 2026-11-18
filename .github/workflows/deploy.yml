@@ -93,6 +93,7 @@ jobs:
         uses: ./.github/actions/e2e-run
         with:
           suite: forge
+          report-name: ci-forge
 
   e2e-table:
     needs: changes
@@ -107,6 +108,7 @@ jobs:
         uses: ./.github/actions/e2e-run
         with:
           suite: table
+          report-name: ci-table
 
   ci:
     name: CI

@@ -158,10 +158,11 @@ describe('SummaryStep', () => {
             steps: signal([
               { number: 1, title: 'Niveau', icon: '🔢' },
               { number: 2, title: 'Espèce', icon: '🧬' },
-              { number: 10, title: 'Identité', icon: '📜' },
-              { number: 11, title: 'Récapitulatif', icon: '✅' },
+              { number: 10, title: 'Magie', icon: '✨' },
+              { number: 11, title: 'Identité', icon: '📜' },
+              { number: 12, title: 'Récapitulatif', icon: '✅' },
             ]),
-            summaryStep: signal(11),
+            summaryStep: signal(12),
           },
         },
         {
@@ -278,10 +279,27 @@ describe('SummaryStep', () => {
 
   it('lists editable steps and jumps back via goToStep', () => {
     const steps = component.editableSteps();
-    expect(steps.map((s) => s.title)).toEqual(['Niveau', 'Espèce', 'Identité']);
+    expect(steps.map((s) => s.title)).toEqual(['Niveau', 'Espèce', 'Magie', 'Identité']);
     expect(steps.some((s) => s.title === 'Récapitulatif')).toBeFalse();
 
     component.goToStep(2);
     expect(goToStepSpy).toHaveBeenCalledWith(2);
+  });
+
+  it('summarizes the hero and flags missing name or spells', () => {
+    expect(component.recapHighlights()).toEqual(
+      jasmine.objectContaining({
+        name: 'Aria',
+        unnamed: false,
+        species: 'Elfe (Haut-elfe)',
+        vocation: 'Magicien — Évocation',
+        level: 1,
+        knownSpells: 0,
+        isCaster: false,
+        missingSpells: false,
+      }),
+    );
+    expect(component.identityStepNumber()).toBe(11);
+    expect(component.magicStepNumber()).toBe(10);
   });
 });

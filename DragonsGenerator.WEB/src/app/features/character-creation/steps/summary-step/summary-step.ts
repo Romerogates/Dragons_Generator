@@ -96,6 +96,30 @@ export class SummaryStep implements OnInit, OnDestroy {
     return this.builder.steps().filter((s) => s.number < summary);
   });
 
+  readonly recapHighlights = computed(() => {
+    const c = this.character();
+    const name = c.name?.trim() ?? '';
+    const known = c.knownSpells?.length ?? 0;
+    return {
+      name: name || 'Sans nom',
+      unnamed: !name,
+      species: this.speciesLabel(),
+      vocation: this.classLabel(),
+      level: c.totalLevel,
+      knownSpells: known,
+      isCaster: !!c.spellcasting,
+      missingSpells: !!c.spellcasting && known === 0,
+    };
+  });
+
+  readonly identityStepNumber = computed(
+    () => this.editableSteps().find((s) => s.title === 'Identité')?.number ?? null,
+  );
+
+  readonly magicStepNumber = computed(
+    () => this.editableSteps().find((s) => s.title === 'Magie')?.number ?? null,
+  );
+
   readonly isLoadingPreview = signal(true);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfRawUrl = signal<string | null>(null);

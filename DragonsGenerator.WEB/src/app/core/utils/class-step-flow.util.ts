@@ -158,7 +158,7 @@ export function classStepPhaseSubtitle(opts: {
     case 'class':
       return 'Choisissez la classe qui dictera vos talents et votre destinée.';
     case 'subclass':
-      return `Affinez les pouvoirs de votre ${opts.className ?? ''}.`;
+      return `Choisissez la spécialisation de votre ${opts.className ?? 'classe'}.`;
     case 'combat_style':
       return (opts.combatStyleNeed ?? 0) > 1
         ? `Choisissez ${opts.combatStyleNeed} styles (${opts.combatStylePicked ?? 0}/${opts.combatStyleNeed}).`
@@ -168,4 +168,52 @@ export function classStepPhaseSubtitle(opts: {
     case 'prog_choice':
       return 'Choisissez les options de progression débloquées par votre classe.';
   }
+}
+
+export function classStepConfirmLabel(phase: ClassStepPhase): string {
+  switch (phase) {
+    case 'subclass':
+      return 'Choisir cette spécialisation';
+    case 'combat_style':
+      return 'Choisir ce style';
+    case 'sub_choice':
+    case 'prog_choice':
+      return 'Valider ce choix';
+    default:
+      return 'Forger cette voie';
+  }
+}
+
+export type ClassPhaseTrailState = 'done' | 'current' | 'upcoming';
+
+export interface ClassPhaseTrailItem {
+  id: string;
+  label: string;
+  state: ClassPhaseTrailState;
+}
+
+/** Fil d’Ariane Classe → Style → Spécialisation → Options. */
+export function classStepPhaseTrail(opts: {
+  phase: ClassStepPhase;
+  requiresSubclass: boolean;
+  subclassConfigName?: string | null;
+  requiresCombatStyle: boolean;
+  hasExtraChoices: boolean;
+}): ClassPhaseTrailItem[] {
+  const items: { id: ClassStepPhase; label: string }[] = [{ id: 'class', label: 'Classe' }];
+  if (opts.requiresCombatStyle) items.push({ id: 'combat_style', label: 'Style' });
+  if (opts.requiresSubclass) {
+    const name = opts.subclassConfigName?.trim();
+    items.push({ id: 'subclass', label: name || 'Spécialisation' });
+  }
+  if (opts.hasExtraChoices) items.push({ id: 'sub_choice', label: 'Options' });
+
+  const currentKey = opts.phase === 'prog_choice' ? 'sub_choice' : opts.phase;
+  const currentIdx = items.findIndex((item) => item.id === currentKey);
+  const idx = currentIdx < 0 ? 0 : currentIdx;
+  return items.map((item, i) => ({
+    id: item.id,
+    label: item.label,
+    state: i < idx ? 'done' : i === idx ? 'current' : 'upcoming',
+  }));
 }

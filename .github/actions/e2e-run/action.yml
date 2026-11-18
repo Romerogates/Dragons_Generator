@@ -1,9 +1,17 @@
 name: 'E2E Playwright suite'
-description: 'Start the Docker e2e stack and run one Playwright suite (forge or table).'
+description: 'Start the Docker e2e stack and run one Playwright suite (forge, table, or nightly:*).'
 inputs:
   suite:
-    description: 'npm script: e2e:ci:forge or e2e:ci:table'
+    description: 'Suffix of npm script e2e:ci:<suite> (forge, table, nightly:forge, …)'
     required: true
+  report-name:
+    description: 'Artifact name for the Playwright HTML report on failure'
+    required: false
+    default: 'e2e'
+  global-timeout-ms:
+    description: 'Playwright globalTimeout in CI (milliseconds)'
+    required: false
+    default: '600000'
 
 runs:
   using: composite
@@ -72,6 +80,7 @@ runs:
       env:
         E2E_BASE_URL: http://localhost:8081
         CI: 'true'
+        E2E_GLOBAL_TIMEOUT_MS: ${{ inputs.global-timeout-ms }}
       run: |
         npm ci
         sudo rm -f /etc/apt/sources.list.d/google-chrome*.list \
@@ -82,6 +91,17 @@ runs:
           npx playwright install --with-deps chromium
         fi
         npm run e2e:ci:${{ inputs.suite }}
+
+    - name: Upload Playwright report
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-${{ inputs.report-name }}
+        path: |
+          DragonsGenerator.WEB/playwright-report
+          DragonsGenerator.WEB/test-results
+        retention-days: 7
+        if-no-files-found: ignore
 
     - name: Stop local stack
       if: always()

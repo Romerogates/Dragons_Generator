@@ -13,6 +13,44 @@
     </p>
   </div>
 
+  <section
+    class="w-full max-w-4xl px-3 sm:px-4"
+    data-testid="forge-recap-highlights"
+    aria-label="Aperçu du héros"
+  >
+    <div class="rounded-xl border border-slate-800 bg-[#0f1117] px-4 py-3 flex flex-col gap-1.5">
+      <p class="font-serif text-lg text-amber-400 leading-tight">{{ recapHighlights().name }}</p>
+      <p class="text-xs text-slate-300">
+        {{ recapHighlights().species }}
+        @if (recapHighlights().vocation) {
+          <span class="text-slate-600"> · </span>{{ recapHighlights().vocation }}
+        }
+        <span class="text-slate-600"> · </span>Niv. {{ recapHighlights().level }}
+      </p>
+      @if (recapHighlights().isCaster) {
+        <p class="text-[11px] text-slate-400">{{ recapHighlights().knownSpells }} sort(s) inscrits</p>
+      }
+      @if (recapHighlights().unnamed && identityStepNumber(); as identityStep) {
+        <button
+          type="button"
+          class="self-start mt-1 text-[10px] font-black uppercase tracking-widest text-amber-400 hover:text-amber-300"
+          (click)="goToStep(identityStep)"
+        >
+          Donner un nom
+        </button>
+      }
+      @if (recapHighlights().missingSpells && magicStepNumber(); as magicStep) {
+        <button
+          type="button"
+          class="self-start mt-1 text-[10px] font-black uppercase tracking-widest text-amber-400 hover:text-amber-300"
+          (click)="goToStep(magicStep)"
+        >
+          Revoir les sorts
+        </button>
+      }
+    </div>
+  </section>
+
   <!-- === APERÇU : PDF desktop ; mobile selon Paramètres → Forge === -->
   <div class="w-full max-w-[96rem] px-3 sm:px-6 lg:px-8 flex flex-col gap-3">
     @if (!showMobilePdf()) {

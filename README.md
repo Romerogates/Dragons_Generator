@@ -113,6 +113,8 @@ Push sur `main` → GitHub Actions (`.github/workflows/deploy.yml`) :
 
 Les secrets prod (`Jwt__Key`, `Admin__*`, SMTP…) restent dans `.env` sur le serveur, jamais commités.
 
+E2E nightly (cron 03:00 UTC, `.github/workflows/e2e-nightly.yml`) : specs hors smoke CI (`npm run e2e:ci:nightly` en local). Ne déploie pas.
+
 ## Authentification (Phase 2)
 
 | Élément | Comportement |

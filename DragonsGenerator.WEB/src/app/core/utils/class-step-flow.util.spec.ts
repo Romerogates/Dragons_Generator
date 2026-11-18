@@ -1,7 +1,9 @@
 import {
   classStepCarouselTargetId,
+  classStepConfirmLabel,
   classStepPhaseSubtitle,
   classStepPhaseTitle,
+  classStepPhaseTrail,
   classStepSelectionComplete,
   resolveClassStepPhase,
   splitClassChoiceAnswers,
@@ -275,5 +277,27 @@ describe('class-step-flow.util', () => {
       }),
     ).toBe('c');
     expect(splitClassChoiceAnswers({ n: 'x' as never }, new Set()).prog.size).toBe(0);
+    expect(classStepConfirmLabel('class')).toBe('Forger cette voie');
+    expect(classStepConfirmLabel('subclass')).toBe('Choisir cette spécialisation');
+    expect(classStepConfirmLabel('combat_style')).toBe('Choisir ce style');
+    expect(classStepConfirmLabel('sub_choice')).toBe('Valider ce choix');
+    expect(classStepConfirmLabel('prog_choice')).toBe('Valider ce choix');
+    const trail = classStepPhaseTrail({
+      phase: 'subclass',
+      requiresSubclass: true,
+      subclassConfigName: 'Atavisme',
+      requiresCombatStyle: false,
+      hasExtraChoices: true,
+    });
+    expect(trail.map((t) => t.label)).toEqual(['Classe', 'Atavisme', 'Options']);
+    expect(trail.map((t) => t.state)).toEqual(['done', 'current', 'upcoming']);
+    expect(
+      classStepPhaseTrail({
+        phase: 'prog_choice',
+        requiresSubclass: true,
+        requiresCombatStyle: true,
+        hasExtraChoices: true,
+      }).map((t) => t.state),
+    ).toEqual(['done', 'done', 'done', 'current']);
   });
 });

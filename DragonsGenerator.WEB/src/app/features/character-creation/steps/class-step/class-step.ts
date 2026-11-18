@@ -45,8 +45,10 @@ import {
 } from '@core/utils/class-step-combat.util';
 import {
   classStepCarouselTargetId,
+  classStepConfirmLabel,
   classStepPhaseSubtitle,
   classStepPhaseTitle,
+  classStepPhaseTrail,
   classStepSelectionComplete,
   resolveClassStepPhase,
   splitClassChoiceAnswers,
@@ -322,6 +324,18 @@ export class ClassStep implements OnInit {
       className: this.selectedClass()?.name,
       combatStyleNeed: this.combatStyleRequiredCount(),
       combatStylePicked: this.selectedCombatStyleIds().length,
+    }),
+  );
+
+  readonly confirmPhaseLabel = computed(() => classStepConfirmLabel(this.currentPhase()));
+
+  readonly phaseTrail = computed(() =>
+    classStepPhaseTrail({
+      phase: this.currentPhase(),
+      requiresSubclass: this.requiresSubclass(),
+      subclassConfigName: this.subclassesConfig()?.name,
+      requiresCombatStyle: this.requiresCombatStyle(),
+      hasExtraChoices: this.activeSubChoices().length > 0 || this.activeProgChoices().length > 0,
     }),
   );
 

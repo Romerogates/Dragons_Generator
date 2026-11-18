@@ -1,0 +1,70 @@
+name: E2E nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-nightly
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-nightly-forge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: E2E nightly forge
+        uses: ./.github/actions/e2e-run
+        with:
+          suite: nightly:forge
+          report-name: nightly-forge
+          global-timeout-ms: '1500000'
+
+  e2e-nightly-social:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: E2E nightly social
+        uses: ./.github/actions/e2e-run
+        with:
+          suite: nightly:social
+          report-name: nightly-social
+          global-timeout-ms: '1500000'
+
+  e2e-nightly-combat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: E2E nightly combat
+        uses: ./.github/actions/e2e-run
+        with:
+          suite: nightly:combat
+          report-name: nightly-combat
+          global-timeout-ms: '1800000'
+
+  e2e-nightly-campaign:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: E2E nightly campaign
+        uses: ./.github/actions/e2e-run
+        with:
+          suite: nightly:campaign
+          report-name: nightly-campaign
+          global-timeout-ms: '1800000'

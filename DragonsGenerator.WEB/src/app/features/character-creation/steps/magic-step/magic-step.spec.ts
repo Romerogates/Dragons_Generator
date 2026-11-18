@@ -201,6 +201,19 @@ describe('MagicStep', () => {
     expect(
       component.filteredCantrips().every((s) => s.school.toLowerCase().includes('evocation')),
     ).toBeTrue();
+
+    component.clearSpellFilters();
+    component.setSpellLevelFilter('cantrip');
+    fixture.detectChanges();
+    expect(component.showCantripList()).toBeTrue();
+    expect(component.showLeveledList()).toBeFalse();
+    component.setSpellLevelFilter(1);
+    fixture.detectChanges();
+    expect(component.showCantripList()).toBeFalse();
+    expect(component.availableLevel1().every((s) => s.level === 1)).toBeTrue();
+    expect(component.spellFiltersActive()).toBeTrue();
+    component.clearSpellFilters();
+    expect(component.spellLevelFilter()).toBe('all');
   });
 
   it('gates mastery (L17) and signature spells (L19) for high-level wizard', async () => {

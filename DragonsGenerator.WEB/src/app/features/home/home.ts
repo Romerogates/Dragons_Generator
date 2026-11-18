@@ -15,6 +15,12 @@ import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.ser
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
 import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-list';
+import {
+  homeHeroCtas,
+  readGuestAudience,
+  writeGuestAudience,
+  type HomeHeroCta,
+} from '@core/utils/home-hero-cta.util';
 
 @Component({
   selector: 'app-home',
@@ -42,6 +48,25 @@ export class Home implements OnInit {
   readonly showRoleOnboarding = signal(false);
   /** Après choix de rôle : CTAs adaptés (pas encore fermé). */
   readonly roleOnboardingChoice = signal<'dm' | 'player' | null>(null);
+  /** Visiteur non connecté : MJ / joueur mémorisé en local. */
+  readonly guestAudience = signal<'dm' | 'player' | null>(readGuestAudience());
+
+  readonly effectiveAudience = computed(() => {
+    if (this.isLoggedIn()) {
+      const overlay = this.roleOnboardingChoice();
+      if (overlay) return overlay;
+      return this.guidePrefs.audience();
+    }
+    return this.guestAudience() ?? 'all';
+  });
+
+  readonly heroCtas = computed(() =>
+    homeHeroCtas({ loggedIn: this.isLoggedIn(), audience: this.effectiveAudience() }),
+  );
+
+  readonly showGuestRolePicker = computed(
+    () => !this.isLoggedIn() && this.guestAudience() == null,
+  );
 
   readonly hasPulse = computed(() => {
     const s = this.summary();
@@ -97,8 +122,24 @@ export class Home implements OnInit {
   }
 
   chooseRole(role: 'dm' | 'player'): void {
+    writeGuestAudience(role);
     this.guidePrefs.setAudience(role);
     this.roleOnboardingChoice.set(role);
+  }
+
+  pickGuestRole(role: 'dm' | 'player'): void {
+    writeGuestAudience(role);
+    this.guestAudience.set(role);
+  }
+
+  heroCtaClass(cta: HomeHeroCta): string {
+    if (cta.tone === 'violet') {
+      return 'flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-violet-600 text-white shadow-[0_12px_40px_rgba(124,58,237,0.25)] hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-2';
+    }
+    if (cta.tone === 'amber') {
+      return 'flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-[0_12px_40px_rgba(245,158,11,0.25)] hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-2';
+    }
+    return 'flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-white/5 text-violet-100 border border-violet-400/30 backdrop-blur-sm hover:bg-violet-950/40 hover:border-violet-400/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2';
   }
 
   finishRoleOnboarding(path?: string): void {
@@ -108,6 +149,7 @@ export class Home implements OnInit {
   }
 
   skipRoleOnboarding(): void {
+    writeGuestAudience('all');
     this.guidePrefs.setAudience('all');
     this.showRoleOnboarding.set(false);
     this.roleOnboardingChoice.set(null);

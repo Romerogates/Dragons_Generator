@@ -103,6 +103,8 @@ export class MagicStep implements OnInit {
   readonly spellSearchQuery = signal('');
   readonly spellSchoolFilter = signal('');
   readonly spellTagFilter = signal<'all' | 'selected' | 'concentration' | 'ritual'>('all');
+  /** Tous | tours de magie | un niveau de sort. */
+  readonly spellLevelFilter = signal<'all' | 'cantrip' | number>('all');
   /** Filtres école / tags repliés sous la recherche (mobile). */
   readonly spellFiltersOpen = signal(false);
   /** Sorts raciaux (espèce) : choiceId → spellId */
@@ -272,7 +274,8 @@ export class MagicStep implements OnInit {
     this.expandedArcanumLevel.update((cur) => (cur === level ? null : level));
   }
 
-  pickMastery(spellLevel: 1 | 2, spellId: string): void {
+  pickMastery(spellLevel: number, spellId: string): void {
+    if (spellLevel !== 1 && spellLevel !== 2) return;
     this.masteryPicks.update((m) => {
       const next = { ...m };
       if (next[spellLevel] === spellId) delete next[spellLevel];
@@ -490,9 +493,22 @@ export class MagicStep implements OnInit {
     return out;
   });
 
-  readonly availableLevel1 = computed(() =>
-    this.filterSpellList(this.availableLeveledSpells(), 'leveled'),
-  );
+  readonly availableLevel1 = computed(() => {
+    const list = this.filterSpellList(this.availableLeveledSpells(), 'leveled');
+    const lvl = this.spellLevelFilter();
+    if (typeof lvl === 'number') return list.filter((s) => s.level === lvl);
+    return list;
+  });
+
+  readonly showCantripList = computed(() => {
+    const filter = this.spellLevelFilter();
+    return filter === 'all' || filter === 'cantrip';
+  });
+
+  readonly showLeveledList = computed(() => {
+    const filter = this.spellLevelFilter();
+    return filter === 'all' || typeof filter === 'number';
+  });
 
   readonly spellSchoolOptions = computed(() => {
     const keys = new Set<string>();
@@ -511,7 +527,8 @@ export class MagicStep implements OnInit {
     () =>
       !!this.spellSearchQuery().trim() ||
       !!this.spellSchoolFilter() ||
-      this.spellTagFilter() !== 'all',
+      this.spellTagFilter() !== 'all' ||
+      this.spellLevelFilter() !== 'all',
   );
 
   onSpellSearchInput(event: Event): void {
@@ -528,10 +545,19 @@ export class MagicStep implements OnInit {
     this.spellTagFilter.set(tag);
   }
 
+  setSpellLevelFilter(level: 'all' | 'cantrip' | number): void {
+    this.spellLevelFilter.set(level);
+  }
+
+  scrollToMagicSection(id: string): void {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   clearSpellFilters(): void {
     this.spellSearchQuery.set('');
     this.spellSchoolFilter.set('');
     this.spellTagFilter.set('all');
+    this.spellLevelFilter.set('all');
   }
 
   /** Filtre une liste de sorts selon la barre de recherche. */

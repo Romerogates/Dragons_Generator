@@ -165,7 +165,9 @@ export async function expectStepHeading(page: Page, text: RegExp | string): Prom
 
 /** Valide l’étape Classe (bouton Forger) — plus d’auto-avance après le dernier choix carrousel. */
 export async function finishClassStep(page: Page): Promise<void> {
-  const forge = page.getByRole('button', { name: /^Forger cette voie$/ });
+  const forge = page.getByRole('button', {
+    name: /^(Forger cette voie|Choisir cette spécialisation|Choisir ce style|Valider ce choix)$/,
+  });
   await expect(forge).toBeVisible({ timeout: 15_000 });
   await forge.click();
 }

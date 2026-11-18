@@ -140,6 +140,8 @@ Un push qui ne touche que `docs/` ou `.cursor/` ne lance pas la CI lourde ni le 
 
 Le job **deploy** n’est jamais annulé par un second push (pas de `cancel-in-progress` sur le SSH).
 
+**E2E nightly** ([.github/workflows/e2e-nightly.yml](../.github/workflows/e2e-nightly.yml)) : tous les jours à 03:00 UTC (et `workflow_dispatch`). Specs hors CI smoke (`caster-save`, calendrier, amis, combats, documents…). Ne déploie pas. Rapport Playwright en artifact si un job échoue.
+
 Secrets GitHub (Settings → Secrets and variables → Actions) :
 
 | Secret | Contenu |

@@ -13,6 +13,22 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.479',
+    date: '2026-11-18',
+    title: 'Forge plus claire, accueil selon le rôle',
+    player: [
+      'À l’étape Classe, un fil d’étapes indique où vous en êtes (classe, style, spécialisation, options) et le bouton de confirmation suit le choix en cours.',
+      'À l’étape Magie, les compteurs restent visibles en haut, vous pouvez filtrer par niveau de sort, et un tap sur « encore X sorts » vous y emmène.',
+      'Le récapitulatif affiche nom, espèce, classe et sorts ; un bouton permet de revenir donner un nom ou revoir les sorts s’il en manque.',
+      'Sur l’accueil, MJ ou joueur : les gros boutons suivent votre rôle (table d’abord, ou forger d’abord). Vous pouvez le dire même avant de vous connecter.',
+    ],
+    tech: [
+      'Wizard : `classStepPhaseTrail` / `classStepConfirmLabel` ; magie `spellLevelFilter` + barre sticky `magic-filter-bar` ; récap `recapHighlights`.',
+      'CI : workflow `e2e-nightly.yml` (cron 03:00 UTC) — suites `e2e:ci:nightly:{forge,social,combat,campaign}`. Action e2e : artifact Playwright + `E2E_GLOBAL_TIMEOUT_MS`.',
+      'Accueil : `homeHeroCtas` + `dragons-guest-audience` ; GET guide-preferences reprend le choix visiteur si `audience` serveur est encore vide.',
+    ],
+  },
+  {
     version: '1.478',
     date: '2026-11-18',
     title: 'Types JSON sans casts',

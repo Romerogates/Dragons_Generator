@@ -9,6 +9,7 @@ import {
   parseGuideBlogDate,
 } from '@features/guide/guide-content';
 import { AuthService } from './auth.service';
+import { readGuestAudience } from '@core/utils/home-hero-cta.util';
 
 export type GuideAudiencePref = 'all' | 'dm' | 'player';
 
@@ -113,7 +114,14 @@ export class GuidePreferencesService {
       const newsIds = remote.readNewsIds ?? [];
       const sectionIds = remote.readSectionIds ?? [];
       this.audience.set(remote.audience ?? 'all');
-      this.needsRoleOnboarding.set(remote.audience == null);
+      const guestPick = remote.audience == null ? readGuestAudience() : null;
+      if (guestPick) {
+        this.audience.set(guestPick);
+        this.needsRoleOnboarding.set(false);
+        this.schedulePersist();
+      } else {
+        this.needsRoleOnboarding.set(remote.audience == null);
+      }
 
       const storedLastSeen = this.readLastSeenFromStorage();
       this.newsLastSeenAt.set(storedLastSeen);
