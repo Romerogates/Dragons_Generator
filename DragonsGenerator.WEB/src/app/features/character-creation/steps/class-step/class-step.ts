@@ -16,44 +16,22 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../../../core/services/data.service';
-import {
-  CharacterBuilderService,
-  ClassSelection,
-} from '../../../../core/services/character-builder.service';
+import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import type { CharacterClass } from '../../../../core/models/CharacterClasses/character-class';
-import {
-  coerceEquipmentSlots,
-  normalizeCharacterClasses,
-} from '@core/utils/class-data.adapter';
+import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatGameIds, labelForGameId } from '@core/utils/game-id-labels';
 import { metamagicLabel } from '@core/data/metamagic-labels.data';
-import {
-  resolveFeatureUses,
-  extractScalarResources,
-  extractSpellSlotsFromResources,
-  extractPactSlotsFromResources,
-} from '@core/utils/feature-uses.util';
-import { annotateAuraDesc } from '@core/utils/aura-range.util';
+import { resolveFeatureUses } from '@core/utils/feature-uses.util';
 import { animalTotemEmoji, animalTotemIconify } from '@core/utils/animal-totem-icon.util';
-import {
-  extractProgressionChoices,
-  classBonusLanguageCount,
-  classRootRequiredExoticLanguageCount,
-  classRootRequiredBaseLanguageCount,
-  subclassFixedToolProficiencies,
-  subclassBonusProficiencies,
-  subclassBonusResistances,
-  classBonusSenses,
-  classRootSavingThrowGrants,
-  type ProgressionChoiceDef,
-} from '@core/utils/progression-choices.util';
-import type {
-  Ability,
-  FeatureInstance,
-  SpellcastingKind,
-} from '../../../../core/models/Character/character';
+import { extractProgressionChoices, type ProgressionChoiceDef } from '@core/utils/progression-choices.util';
+import type { Ability, FeatureInstance, SpellcastingKind } from '../../../../core/models/Character/character';
 import { MulticlassPanel } from './multiclass-panel/multiclass-panel';
+import { ForgeFlipCard } from '../forge-flip-card/forge-flip-card';
+import {
+  buildClassProgressionChoicesFromWizard,
+  buildClassSelectionFromWizard,
+} from './class-step-apply.util';
 import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import {
@@ -73,99 +51,23 @@ import {
   splitClassChoiceAnswers,
   toggleCappedPick,
   wrapCarouselIndex,
+  wrapCarouselOffsetPx,
   type ClassStepPhase,
 } from '@core/utils/class-step-flow.util';
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface CardOption {
-  id: string;
-  title: string;
-  subtitle?: string;
-  desc: string;
-  stats?: string;
-  badge?: string;
-  icon: string;
-  /** Emoji natif (totems animaux) — plus fiable qu’Iconify sur le carrousel. */
-  emoji?: string;
-}
-interface FeatureMechanicsOption {
-  id?: string;
-  name?: string;
-  description?: string;
-  desc?: string;
-}
-
-interface FeatureJson {
-  id: string;
-  name: string;
-  level: number;
-  desc: string;
-  rechargeType?: 'unlimited' | 'short_rest' | 'long_rest' | 'special';
-  recharge?: string;
-  resource_key?: string;
-  unlocks_at_level?: number;
-  uses?:
-    | number
-    | {
-        formula?: string;
-        base?: number;
-        source_column?: string;
-        null_means_unlimited?: boolean;
-        upgrades?: { at_level: number; value: number }[];
-      };
-  mechanics?: {
-    points_formula?: string;
-    uses_key?: string;
-    upgrades?: { at_level: number; uses?: number; value?: number }[];
-    options?: FeatureMechanicsOption[];
-    range_m_initial?: number;
-    range_m_improved?: number;
-    range_improves_at_level?: number;
-    [key: string]: unknown;
-  };
-  resolves_to_choice_pool?: string;
-}
+import {
+  type ClassStepCardOption as CardOption,
+  type FeatureJson,
+  type SubChoice,
+  type SubclassOption,
+  type SubclassesConfig,
+} from './class-step.types';
+import {
+  carouselIndexFromScroll,
+  carouselScrollDeltaToIndex,
+  toggleFlipId,
+} from '@core/utils/forge-carousel.util';
 
 type Phase = ClassStepPhase;
-
-interface SubclassesConfig {
-  name: string;
-  level_unlocked: number;
-  options: SubclassOption[];
-}
-
-interface SubclassOption {
-  id: string;
-  name: string;
-  desc: string;
-  features: FeatureJson[];
-  sub_choices?: SubChoice[];
-  [key: string]: unknown;
-}
-
-interface SubChoice {
-  id: string;
-  type: string;
-  count: number;
-  level_required: number;
-  label: string;
-  options: string[];
-  option_labels?: Record<string, string>;
-  option_descs?: Record<string, string>;
-}
-
-/** Codes courts (JSON) → libellés français utilisés par `Ability`. */
-const ABILITY_CODE_TO_LABEL: Record<string, Ability> = {
-  str: 'Force',
-  dex: 'Dextérité',
-  con: 'Constitution',
-  int: 'Intelligence',
-  wis: 'Sagesse',
-  cha: 'Charisme',
-};
 
 // ============================================================================
 // CONSTANTES
@@ -178,7 +80,7 @@ const ABILITY_CODE_TO_LABEL: Record<string, Ability> = {
 @Component({
   selector: 'app-class-step',
   standalone: true,
-  imports: [CommonModule, MulticlassPanel, ConfirmDialog],
+  imports: [CommonModule, MulticlassPanel, ConfirmDialog, ForgeFlipCard],
   templateUrl: './class-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -585,25 +487,8 @@ export class ClassStep implements OnInit {
   private syncIndexFromScroll(): void {
     const viewport = this.carouselViewport()?.nativeElement;
     if (!viewport) return;
-
-    const viewportCenter =
-      viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
-    let best = 0;
-    let bestDist = Number.POSITIVE_INFINITY;
-
-    viewport.querySelectorAll<HTMLElement>('[data-carousel-index]').forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      const mid = rect.left + rect.width / 2;
-      const dist = Math.abs(mid - viewportCenter);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = Number(el.dataset['carouselIndex'] ?? 0);
-      }
-    });
-
-    if (best !== this.currentIndex()) {
-      this.currentIndex.set(best);
-    }
+    const best = carouselIndexFromScroll(viewport);
+    if (best !== this.currentIndex()) this.currentIndex.set(best);
   }
 
   private scrollToIndex(index: number, behavior: ScrollBehavior = 'smooth'): void {
@@ -613,13 +498,9 @@ export class ClassStep implements OnInit {
     this.currentIndex.set(safe);
 
     const viewport = this.carouselViewport()?.nativeElement;
-    const card = viewport?.querySelector<HTMLElement>(`[data-carousel-index="${safe}"]`);
-    if (!viewport || !card) return;
-
-    const viewportRect = viewport.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const delta =
-      cardRect.left + cardRect.width / 2 - (viewportRect.left + viewport.clientWidth / 2);
+    if (!viewport) return;
+    const delta = carouselScrollDeltaToIndex(viewport, safe);
+    if (delta == null) return;
 
     this.suppressScrollSync = true;
     viewport.scrollBy({ left: delta, behavior });
@@ -645,10 +526,7 @@ export class ClassStep implements OnInit {
   }
 
   getWrapOffset(index: number): string {
-    const total = this.currentCards().length;
-    if (total === 0) return '0px';
-    const wraps = Math.floor((this.currentIndex() - index + total / 2) / total);
-    return `${wraps * total * this.cardStridePx}px`;
+    return wrapCarouselOffsetPx(index, this.currentIndex(), this.currentCards().length, this.cardStridePx);
   }
 
   normalizedIndex(): number {
@@ -682,12 +560,7 @@ export class ClassStep implements OnInit {
   onRightClick(event: Event, cardId: string): void {
     event.preventDefault();
     event.stopPropagation();
-    this.flippedCards.update((set) => {
-      const newSet = new Set(set);
-      if (newSet.has(cardId)) newSet.delete(cardId);
-      else newSet.add(cardId);
-      return newSet;
-    });
+    this.flippedCards.update((set) => toggleFlipId(set, cardId));
   }
 
   // === LOGIQUE DE CLIC ===
@@ -934,249 +807,26 @@ export class ClassStep implements OnInit {
     try {
       const cls = this.selectedClass();
       if (!cls || !this.selectionComplete()) return false;
-
-      const sub = this.selectedSubclass();
-      const spellInfo = this.resolveSpellcasting(cls);
-      const prof = cls.data.proficiencies;
-
-      const features: FeatureInstance[] = [];
-      const targetLevel = this.targetLevel();
-      const progression = (cls.data.progression ?? []) as {
-        level: number;
-        features?: string[];
-        resources?: Record<string, unknown>;
-      }[];
-      const profBonus = this.builder.proficiencyBonus();
-
-      for (const prog of progression) {
-        if (prog.level < 1 || prog.level > targetLevel) continue;
-        for (const id of prog.features ?? []) {
-          const feat = this.featureDetailsOf(cls).find((f) => f.id === id);
-          if (!feat) continue;
-          // Remplacé par le style concret choisi
-          if (
-            feat.resolves_to_choice_pool ||
-            /style-de-combat(?!-supplementaire)/i.test(feat.id) ||
-            feat.id.includes('style-de-combat-guerrier') ||
-            feat.id.includes('style-de-combat-paladin') ||
-            feat.id.includes('style-de-combat-rodeur') ||
-            feat.id === 'feat-style-de-combat-guerrier'
-          ) {
-            continue;
-          }
-          if (features.some((f) => f.refId === feat.id)) continue;
-          features.push({
-            refId: feat.id,
-            name: feat.name,
-            desc: annotateAuraDesc(feat, targetLevel),
-            source: 'class',
-            sourceDetail: `${cls.name} ${prog.level}`,
-            level: prog.level,
-            uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
-          });
-        }
-      }
-
-      if (sub) {
-        sub.features
-          .filter((f) => f.level <= targetLevel)
-          .forEach((feat) => {
-            if (feat.resolves_to_choice_pool) return;
-            if (features.some((f) => f.refId === feat.id)) return;
-            features.push({
-              refId: feat.id,
-              name: feat.name,
-              desc: annotateAuraDesc(feat, targetLevel),
-              source: 'subclass',
-              sourceDetail: `${sub.name} ${feat.level}`,
-              level: feat.level,
-              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
-            });
-          });
-
-        // Injecte les options de sub_choices sélectionnées (coups bas, école, etc.)
-        for (const sc of this.activeSubChoices()) {
-          const picks = this.subChoiceAnswers().get(sc.id) ?? [];
-          for (const pickId of picks) {
-            const fromSub = sub.features.find((f) => f.id === pickId);
-            const fromClass = this.featureDetailsOf(cls).find((f) => f.id === pickId);
-            let feat = fromSub ?? fromClass;
-            // Choix imbriqués (mechanics.options + choice_quantity, ex. Rôdeur Chasseur) :
-            // l'id sélectionné n'est pas une feature de premier niveau mais une option nichée
-            // dans `mechanics.options` d'une feature parente. On synthétise une carte dédiée
-            // avec le nom/texte réel de la technique choisie, pour rester fidèle aux règles.
-            if (!feat) {
-              const allFeats = [...sub.features, ...this.featureDetailsOf(cls)];
-              for (const parent of allFeats) {
-                const opt = parent.mechanics?.options?.find((o) => o?.id === pickId);
-                if (opt) {
-                  feat = {
-                    id: pickId,
-                    name: opt.name ?? sc.option_labels?.[pickId] ?? labelForGameId(pickId),
-                    desc: opt.description ?? opt.desc ?? '',
-                    level: parent.level ?? sc.level_required,
-                  };
-                  break;
-                }
-              }
-            }
-            if (!feat || features.some((f) => f.refId === feat.id)) continue;
-            features.push({
-              refId: feat.id,
-              name: feat.name,
-              desc: annotateAuraDesc(feat, targetLevel),
-              source: 'subclass',
-              sourceDetail: `${sub.name} · ${sc.label}`,
-              level: feat.level || sc.level_required,
-              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
-            });
-          }
-        }
-      }
-
-      for (const styleId of this.selectedCombatStyleIds()) {
-        const combatStyle = this.availableCombatStyles().find((s) => s.id === styleId);
-        if (!combatStyle) continue;
-        features.push({
-          refId: combatStyle.id,
-          name: `Style : ${combatStyle.name}`,
-          desc: combatStyle.desc,
-          source: 'class',
-          sourceDetail: `${cls.name} ${this.combatStyleUnlockLevel()}`,
-          level: this.combatStyleUnlockLevel(),
-        });
-      }
-
-      const progAtLevel = progression.find((p) => p.level === targetLevel);
-      const classProgressionResources = extractScalarResources(progAtLevel?.resources);
-      const pactSlots = extractPactSlotsFromResources(progAtLevel?.resources);
-      const classSpellSlots =
-        pactSlots.length > 0
-          ? pactSlots
-          : extractSpellSlotsFromResources(progAtLevel?.resources);
-      const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
-      // Passé pour résoudre les octrois d'armure à palier conditionnel (ex. Magicien "Mage de
-      // guerre" : légère, ou intermédiaire si déjà légère) — sans ça, chaque palier serait résolu
-      // comme si le personnage n'avait jamais rien maîtrisé, faussant la progression niv. 2 → 6.
-      const subBonus = subclassBonusProficiencies(cls, sub?.id, targetLevel, baseArmor);
-      const langBonus =
-        classBonusLanguageCount(cls, targetLevel, undefined, sub?.id) + subBonus.bonusLanguages;
-      const subclassTools = subclassFixedToolProficiencies(cls, targetLevel, sub?.id);
-      const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
-      const toolProficiencies = [...new Set([...baseTools, ...subclassTools, ...subBonus.tools])];
-      const baseWeapons = Array.isArray(prof.weapons) ? prof.weapons : [];
-      const armorProficiencies = [...new Set([...baseArmor, ...subBonus.armor])];
-      const weaponProficiencies = [...new Set([...baseWeapons, ...subBonus.weapons])];
-      const bonusSaveCodes = [
-        ...subBonus.savingThrows,
-        ...classRootSavingThrowGrants(cls, targetLevel),
-      ];
-      const classResistances = subclassBonusResistances(cls, sub?.id, targetLevel);
-      const allSubChoicePicks = [...this.subChoiceAnswers().values()].flat();
-      const classSenses = classBonusSenses(cls, sub?.id, targetLevel, allSubChoicePicks);
-      const savingThrows = [
-        ...new Set([
-          ...((prof.saving_throws ?? []) as Ability[]),
-          ...bonusSaveCodes.map((code) => ABILITY_CODE_TO_LABEL[code]).filter((a): a is Ability => !!a),
-        ]),
-      ];
-
-      const data = cls.data as Record<string, unknown>;
-      const selection: ClassSelection = {
-        classId: cls.id,
-        className: cls.name,
-        subclassId: sub?.id,
-        subclassName: sub?.name,
-        hitDie: cls.data.hit_die,
-        hpAtLevel1:
-          typeof data['hp_at_level_1'] === 'number' ? data['hp_at_level_1'] : cls.data.hit_die,
-        hpPerLevelAverage:
-          typeof data['hp_per_level_average'] === 'number'
-            ? data['hp_per_level_average']
-            : Math.floor(cls.data.hit_die / 2) + 1,
-        hasSpellcasting: spellInfo !== null,
-        spellcastingKind: spellInfo?.kind ?? null,
-        spellcastingAbility: spellInfo?.ability ?? null,
-        savingThrows,
-        armorProficiencies,
-        weaponProficiencies,
-        toolProficiencies,
-        skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
-        skillChooseCount: prof.skills?.count ?? 0,
-        classFeatures: features,
-        startingEquipmentSlots: coerceEquipmentSlots(cls.data.starting_equipment),
-        classProgressionResources,
-        classBonusLanguageCount: langBonus,
-        classRequiredExoticLanguageCount:
-          subBonus.requiredExoticLanguages +
-          classRootRequiredExoticLanguageCount(cls, targetLevel),
-        classRequiredBaseLanguageCount: classRootRequiredBaseLanguageCount(cls, targetLevel),
-        classResistances,
-        classDarkvisionRadius: classSenses.darkvisionRadius,
-        classHasBlindsight: classSenses.hasBlindsight,
-        classBlindsightRadius: classSenses.blindsightRadius,
-        classSpellSlots,
+      const input = {
+        cls,
+        subclass: this.selectedSubclass(),
+        targetLevel: this.targetLevel(),
+        proficiencyBonus: this.builder.proficiencyBonus(),
+        featureDetails: this.featureDetailsOf(cls),
+        subChoices: this.activeSubChoices(),
+        subChoiceAnswers: this.subChoiceAnswers(),
+        combatStyleIds: this.selectedCombatStyleIds(),
+        combatStyles: this.availableCombatStyles(),
+        combatStyleUnlockLevel: this.combatStyleUnlockLevel(),
+        progChoices: this.activeProgChoices(),
+        progChoiceAnswers: this.progChoiceAnswers(),
+        spellInfo: this.resolveSpellcasting(cls),
+        resolveOptionFeature: (id: string) => this.resolveOptionFeature(id),
       };
-
-      this.builder.setClass(selection, { preserveProgress: !!this.builder.creation().classId });
-
-      const classChoiceAnswers: Record<string, string[]> = {};
-      const metamagic: string[] = [];
-      const invocations: string[] = [];
-      let pactBoon: string | null = null;
-      const extraFeatures: FeatureInstance[] = [];
-
-      for (const sc of this.activeSubChoices()) {
-        const picks = this.subChoiceAnswers().get(sc.id) ?? [];
-        if (picks.length) classChoiceAnswers[sc.id] = picks;
-      }
-
-      for (const choice of this.activeProgChoices()) {
-        const picks = this.progChoiceAnswers().get(choice.id) ?? [];
-        classChoiceAnswers[choice.id] = picks;
-
-        if (choice.type === 'metamagic') metamagic.push(...picks);
-        if (choice.type === 'invocation') invocations.push(...picks);
-        if (choice.type === 'pact_boon' && picks[0]) pactBoon = picks[0];
-
-        for (const pickId of picks) {
-          if (extraFeatures.some((f) => f.refId === pickId)) continue;
-          const opt = choice.options.find((o) => o.id === pickId);
-          const feat = this.resolveOptionFeature(pickId);
-          extraFeatures.push({
-            refId: pickId,
-            name: feat?.name ?? opt?.name ?? labelForGameId(pickId),
-            desc: feat?.desc ?? opt?.desc ?? '',
-            source: 'class',
-            sourceDetail: `${cls.name} · ${choice.label}`,
-            level: feat?.level ?? 1,
-            uses: feat ? resolveFeatureUses(feat, cls, targetLevel, profBonus) : undefined,
-          });
-        }
-
-        for (const fid of choice.fixedFeatureIds ?? []) {
-          if (extraFeatures.some((f) => f.refId === fid)) continue;
-          const feat = this.resolveOptionFeature(fid);
-          extraFeatures.push({
-            refId: fid,
-            name: feat?.name ?? labelForGameId(fid),
-            desc: feat?.desc ?? '',
-            source: 'class',
-            sourceDetail: `${cls.name} · ${choice.label}`,
-            level: feat?.level ?? 1,
-            uses: feat ? resolveFeatureUses(feat, cls, targetLevel, profBonus) : undefined,
-          });
-        }
-      }
-
-      this.builder.setClassProgressionChoices({
-        classChoiceAnswers,
-        metamagicOptions: metamagic,
-        eldritchInvocations: invocations,
-        pactBoon,
-        extraFeatures,
+      this.builder.setClass(buildClassSelectionFromWizard(input), {
+        preserveProgress: !!this.builder.creation().classId,
       });
-
+      this.builder.setClassProgressionChoices(buildClassProgressionChoicesFromWizard(input));
       return true;
     } catch (err) {
       console.error('[class-step] applySelectionToBuilder failed', err);

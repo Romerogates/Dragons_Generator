@@ -40,6 +40,7 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
             OwnerUserId = userId.Value,
             Title = title,
             JsonData = json,
+            LiveTableJson = CampaignLiveTableStore.Extract(json),
         };
         campaign.Members.Add(new CampaignMember
         {

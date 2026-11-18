@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import { createCampaignAs } from './helpers/campaign';
 
 test.describe('Campagne — documents FR', () => {
   test('créer un document type Lettre (pas Letter)', async ({ page }) => {
     test.setTimeout(60_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Docs ${Date.now()}`);
     await applyAuthSession(page, owner, `/campaigns/${campaignId}?tab=handouts`);
 

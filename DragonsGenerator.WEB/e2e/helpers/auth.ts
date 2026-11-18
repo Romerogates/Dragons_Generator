@@ -119,6 +119,11 @@ export async function registerConfirmAndLogin(
   return { email, password, token: auth.token ?? extractSessionToken(loginRes), user: auth.user };
 }
 
+/** Compte neuf (évite la limite 20 campagnes du seed). */
+export async function uniqueOwnerSession(request: APIRequestContext): Promise<AuthSession> {
+  return registerConfirmAndLogin(request, 'Mj');
+}
+
 export async function loginSeedSession(request: APIRequestContext): Promise<AuthSession> {
   const loginRes = await request.post('/api/auth/login', {
     data: { email: TEST_EMAIL, password: TEST_PASSWORD },

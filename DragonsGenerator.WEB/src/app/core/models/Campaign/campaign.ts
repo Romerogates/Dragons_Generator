@@ -5,6 +5,79 @@ import {
   StoryCreatureSelection,
 } from '../Story/story';
 import type { CampaignDungeonMap } from './dungeon-map';
+import type { CampaignHandout } from './campaign-handout';
+import type { NotebookPage } from './campaign-notebook';
+import type { CampaignScheduleEvent } from './campaign-schedule';
+import type { CampaignSession } from './campaign-session';
+
+export type {
+  CombatantKind,
+  CombatantEncounterLink,
+  CombatantAttack,
+  Combatant,
+  ActiveCombat,
+  CombatHistoryEntry,
+} from './campaign-combat';
+
+export type {
+  NotebookMode,
+  InkPoint,
+  InkStroke,
+  NotebookPage,
+  SessionChecklistItem,
+  SessionPlayPadKind,
+  SessionPlayPadWidgetSize,
+  SessionPlayPadLayout,
+  SessionPlayPad,
+} from './campaign-notebook';
+export {
+  SESSION_PLAY_PAD_MAX,
+  NOTEBOOK_MAX_PAGES,
+  NOTEBOOK_INK_MAX_DIMENSION,
+  NOTEBOOK_INK_JPEG_QUALITY,
+  createNotebookPage,
+  createChecklistItem,
+  createSessionPlayPad,
+} from './campaign-notebook';
+
+export type {
+  HandoutKind,
+  CampaignHandoutPage,
+  CampaignHandout,
+} from './campaign-handout';
+export {
+  HANDOUT_KIND_LABELS,
+  createCampaignHandout,
+  createHandoutPage,
+  handoutPlayerBody,
+  normalizeHandoutKind,
+} from './campaign-handout';
+
+export type {
+  CampaignScheduleKind,
+  ScheduleRsvpStatus,
+  ScheduleRsvp,
+  CampaignScheduleEvent,
+} from './campaign-schedule';
+export {
+  CAMPAIGN_SCHEDULE_KIND_LABELS,
+  CAMPAIGN_SCHEDULE_RRULE_PRESETS,
+  createCampaignScheduleEvent,
+} from './campaign-schedule';
+
+export type {
+  CampaignSessionStatus,
+  CampaignSessionMode,
+  SessionTablePawn,
+  SessionTimelineKind,
+  SessionTimelineItem,
+  TableChatMessage,
+  TablePinHistoryEntry,
+  TableMacroKind,
+  TableMacroDef,
+  CampaignSession,
+} from './campaign-session';
+export { DEFAULT_TABLE_MACROS } from './campaign-session';
 
 export interface EncounterCreature {
   creatureId: string;
@@ -43,254 +116,6 @@ export interface CampaignPregen {
   assignedUserId?: string | null;
   assignedDisplayName?: string | null;
   status: CampaignPregenStatus;
-}
-
-export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
-
-/** Mode de table pour la session (jets dés vs encodage MJ). */
-export type CampaignSessionMode = 'online' | 'in_person' | 'other';
-
-/** Type d’entrée du calendrier de table (hors / autour du play). */
-export type CampaignScheduleKind = 'game' | 'prep' | 'social' | 'other';
-
-export const CAMPAIGN_SCHEDULE_KIND_LABELS: Record<CampaignScheduleKind, string> = {
-  game: 'Soirée de jeu',
-  prep: 'Préparation',
-  social: 'Social / hors jeu',
-  other: 'Autre',
-};
-
-export type CombatantKind = 'player' | 'monster' | 'npc';
-
-export interface CombatantEncounterLink {
-  encounterId: string;
-  creatureIndex: number;
-  /** Index de l'unité dans le groupe (0 … quantity−1). */
-  unitIndex: number;
-}
-
-/** Jeton héros sur la carte de soirée. */
-export interface SessionTablePawn {
-  id: string;
-  memberUserId?: string | null;
-  characterId?: string | null;
-  name: string;
-  mapX: number;
-  mapY: number;
-  tokenImageUrl?: string | null;
-}
-
-/** Snapshot d'attaque pour le tracker (import party / créature). */
-export interface CombatantAttack {
-  name: string;
-  attackBonus: number;
-  /** Ex. "1d8+3" ou "1d6". */
-  damageDice?: string;
-  damageBonus?: number;
-  damageType?: string;
-}
-
-export interface Combatant {
-  id: string;
-  name: string;
-  kind: CombatantKind;
-  initiativeBonus: number;
-  initiativeRoll?: number;
-  currentHp?: number;
-  maxHp?: number;
-  conditions?: string[];
-  /** Lien vers une ligne de rencontre (monstres importés). */
-  encounterLink?: CombatantEncounterLink;
-  /** Unité hors de combat (sync +1 kill sur la rencontre). */
-  defeated?: boolean;
-  /** Joueur lié (collecte d'initiative). */
-  memberUserId?: string | null;
-  /** Jet soumis par le joueur via la collecte. */
-  playerSubmitted?: boolean;
-  /** CA snapshot (affichage / résolution d'attaque). */
-  armorClass?: number;
-  /** Attaques snapshot à l'import. */
-  attacks?: CombatantAttack[];
-  /** Perso cloud lié (PJ). */
-  characterId?: string | null;
-  /** Id fiche Codex d’origine (bestiaire). */
-  sourceCreatureId?: string | null;
-  /** URL portrait jeton (https ou data:) — optionnel. */
-  tokenImageUrl?: string | null;
-  /** Position sur la carte de session (grille 0-based). */
-  mapX?: number;
-  mapY?: number;
-}
-
-export interface ActiveCombat {
-  id: string;
-  label?: string;
-  encounterId?: string;
-  round: number;
-  turnIndex: number;
-  combatants: Combatant[];
-  /** Collecte ouverte : les joueurs peuvent saisir leur jet. */
-  collectingInitiative?: boolean;
-  /** Code court partagé avec les joueurs. */
-  initiativeCode?: string;
-  /** Ordre manuel entre combattants à égalité d'initiative (ids). */
-  turnOrderIds?: string[];
-  /**
-   * Fil guidé MJ : setup (roster) → initiative (ordre) → fight (menu Pokémon).
-   * Absent → déduit (rétrocompat).
-   */
-  flowPhase?: 'setup' | 'initiative' | 'fight';
-}
-
-export type SessionTimelineKind = 'encounter' | 'break' | 'note' | 'handout';
-
-export interface SessionTimelineItem {
-  id: string;
-  kind: SessionTimelineKind;
-  label: string;
-  encounterId?: string;
-  handoutId?: string;
-  dungeonMapId?: string;
-  durationMin?: number;
-}
-
-/** Message du fil de table (session live). */
-export interface TableChatMessage {
-  id: string;
-  at: string;
-  authorUserId: string;
-  authorName: string;
-  body: string;
-}
-
-/** Entrée d’historique des pins du fil de table. */
-export interface TablePinHistoryEntry {
-  at: string;
-  body: string;
-  messageId?: string;
-}
-
-/** Macro MJ partageable sur la session (sync blob). */
-export type TableMacroKind = 'perception' | 'next_turn' | 'end_combat';
-
-export interface TableMacroDef {
-  id: string;
-  label: string;
-  kind: TableMacroKind;
-}
-
-export const DEFAULT_TABLE_MACROS: TableMacroDef[] = [
-  { id: 'macro-perception', label: 'Perception', kind: 'perception' },
-  { id: 'macro-next-turn', label: 'Tour +', kind: 'next_turn' },
-  { id: 'macro-end-combat', label: 'Fin combat', kind: 'end_combat' },
-];
-
-export interface CampaignSession {
-  id: string;
-  title: string;
-  scheduledAt: string;
-  location?: string;
-  /**
-   * Mode de table : en ligne (dés), présentiel (MJ encode), autre (choix à chaque jet).
-   * Absent → traité comme `online` pour rétrocompat.
-   */
-  mode?: CampaignSessionMode;
-  notes?: string;
-  /** Notes prises en direct pendant la session (MJ). */
-  playNotes?: string;
-  /** Mode / encre de la page de notes live (stylet). */
-  playNotebook?: NotebookPage;
-  /** Calepins de session (notes + checklists). */
-  playPads?: SessionPlayPad[];
-  /** Tracker initiative / ordre de combat en cours (MJ). */
-  activeCombat?: ActiveCombat | null;
-  status: CampaignSessionStatus;
-  /** Combats terminés durant cette session (MJ). */
-  combatHistory?: CombatHistoryEntry[];
-  /** Ordre de la soirée (MJ) — rencontres, pauses, notes. */
-  timeline?: SessionTimelineItem[];
-  /** Journal court des actions de combat (MJ / table). */
-  combatLog?: string[];
-  /** Donjon de campagne consulté pendant cette session (id dans data.dungeonMaps). */
-  activeMapId?: string | null;
-  /** Pions de la carte de soirée (hors combat, ou positions de départ). */
-  tablePawns?: SessionTablePawn[];
-  /** Fil de table minimal (MJ + joueurs) — sync live via blob campagne. */
-  tableChat?: TableChatMessage[];
-  /** Message épinglé en haut du fil (objectif de scène / indice). */
-  tablePin?: string | null;
-  /** Historique des pins retirés / remplacés (MJ, cap ~10). */
-  tablePinHistory?: TablePinHistoryEntry[];
-  /** Macros MJ partagées (sinon défauts client). */
-  tableMacros?: TableMacroDef[];
-  /** Run sheet MJ — objectifs de la soirée. */
-  objectives?: string;
-  /** Run sheet MJ — scènes / actes prévus. */
-  scenes?: string;
-  /** Run sheet MJ — pense-bête (docs à publier, matériel…). */
-  prepChecklist?: string;
-  /** Récap publié aux joueurs après la session. */
-  playerRecap?: string;
-  /** UserIds des joueurs « prêts » avant combat (table live). */
-  tableReadyUserIds?: string[];
-  /** Timer de scène partagé (horloge murale) — sync via blob session. */
-  sceneTimer?: {
-    label: string;
-    endsAtIso: string;
-    pausedRemainingSec?: number | null;
-  } | null;
-}
-
-/** Réponse d’un joueur à une date de table. */
-export type ScheduleRsvpStatus = 'yes' | 'no' | 'maybe';
-
-export interface ScheduleRsvp {
-  userId: string;
-  displayName?: string;
-  status: ScheduleRsvpStatus;
-  at: string;
-}
-
-/** Date libre du calendrier de table (pas forcément une session de play). */
-export interface CampaignScheduleEvent {
-  id: string;
-  title: string;
-  startsAt: string;
-  endsAt?: string | null;
-  allDay?: boolean;
-  kind: CampaignScheduleKind;
-  location?: string;
-  notes?: string;
-  /** Héros liés (ids personnages cloud / pré-tirés). */
-  characterIds?: string[];
-  /** Optionnel : lier une vraie session de play. */
-  linkedSessionId?: string | null;
-  createdByUserId?: string;
-  /**
-   * Récurrence iCalendar (sous-ensemble) — ex. `FREQ=WEEKLY;INTERVAL=1`.
-   * Absent / vide = ponctuel.
-   */
-  rrule?: string | null;
-  /** Confirmations joueurs (oui / non / peut-être). */
-  rsvps?: ScheduleRsvp[];
-}
-
-/** Presets RRULE pour l’UI calendrier. */
-export const CAMPAIGN_SCHEDULE_RRULE_PRESETS: { value: string; label: string }[] = [
-  { value: '', label: 'Une seule fois' },
-  { value: 'FREQ=WEEKLY;INTERVAL=1', label: 'Chaque semaine' },
-  { value: 'FREQ=WEEKLY;INTERVAL=2', label: 'Toutes les 2 semaines' },
-  { value: 'FREQ=MONTHLY;INTERVAL=1', label: 'Chaque mois' },
-];
-
-
-export interface CombatHistoryEntry {
-  id: string;
-  endedAt: string;
-  label?: string;
-  encounterId?: string;
-  round: number;
-  summary: string;
 }
 
 export interface CampaignData {
@@ -426,80 +251,6 @@ export interface CampaignInvite {
   createdAt: string;
 }
 
-export type HandoutKind = 'letter' | 'map' | 'summary' | 'other';
-
-export const HANDOUT_KIND_LABELS: Record<HandoutKind, string> = {
-  letter: 'Lettre',
-  map: 'Carte',
-  summary: 'Résumé',
-  other: 'Autre',
-};
-
-/** Document / handout publiable par le MJ (sans spoiler). */
-export interface CampaignHandoutPage {
-  id: string;
-  title: string;
-  body: string;
-  /** Page visible joueurs quand le document est publié. */
-  published: boolean;
-}
-
-export interface CampaignHandout {
-  id: string;
-  title: string;
-  body: string;
-  kind: HandoutKind;
-  published: boolean;
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt?: string;
-  /** Notes MJ uniquement (jamais envoyées aux joueurs). */
-  dmNotes?: string;
-  /**
-   * Pages de révélation progressive. Si absentes, `body` reste la seule page.
-   * Publier le document expose les pages `published: true` (sinon tout le body).
-   */
-  pages?: CampaignHandoutPage[];
-}
-
-export function createCampaignHandout(title = 'Nouveau document'): CampaignHandout {
-  const now = new Date().toISOString();
-  return {
-    id: crypto.randomUUID?.() ?? `ho-${Date.now()}`,
-    title,
-    body: '',
-    kind: 'other',
-    published: false,
-    createdAt: now,
-    pages: [],
-  };
-}
-
-export function createHandoutPage(title = 'Page'): CampaignHandoutPage {
-  return {
-    id: crypto.randomUUID?.() ?? `hop-${Date.now()}`,
-    title,
-    body: '',
-    published: false,
-  };
-}
-
-/** Corps joueur : pages publiées concaténées, sinon body. */
-export function handoutPlayerBody(h: CampaignHandout): string {
-  const pages = h.pages?.filter((p) => p.published) ?? [];
-  if (pages.length) {
-    return pages
-      .map((p) => (p.title?.trim() ? `## ${p.title.trim()}\n\n${p.body}` : p.body))
-      .join('\n\n---\n\n');
-  }
-  return h.body ?? '';
-}
-
-export function normalizeHandoutKind(raw: unknown): HandoutKind {
-  if (raw === 'letter' || raw === 'map' || raw === 'summary' || raw === 'other') return raw;
-  return 'other';
-}
-
 export function emptyCampaignData(partyLevel = 3): CampaignData {
   return {
     setting: '',
@@ -520,145 +271,6 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     dungeonMaps: [],
   };
 }
-
-export function createCampaignScheduleEvent(
-  partial?: Partial<CampaignScheduleEvent>,
-): CampaignScheduleEvent {
-  const starts = partial?.startsAt ? new Date(partial.startsAt) : new Date();
-  const ends =
-    partial?.endsAt != null
-      ? partial.endsAt
-      : new Date(starts.getTime() + 3 * 60 * 60 * 1000).toISOString();
-  return {
-    id: partial?.id ?? crypto.randomUUID?.() ?? `sched-${Date.now()}`,
-    title: partial?.title?.trim() || 'Soirée de table',
-    startsAt: starts.toISOString(),
-    endsAt: ends,
-    allDay: partial?.allDay ?? false,
-    kind: partial?.kind ?? 'game',
-    location: partial?.location ?? '',
-    notes: partial?.notes ?? '',
-    characterIds: partial?.characterIds ? [...partial.characterIds] : [],
-    linkedSessionId: partial?.linkedSessionId ?? null,
-    createdByUserId: partial?.createdByUserId,
-    rrule: partial?.rrule?.trim() || null,
-    rsvps: partial?.rsvps ? [...partial.rsvps] : [],
-  };
-}
-
-export type NotebookMode = 'text' | 'ink';
-
-export interface InkPoint {
-  x: number;
-  y: number;
-}
-
-export interface InkStroke {
-  color: string;
-  width: number;
-  points: InkPoint[];
-  /** pen = trait opaque ; highlighter = semi-transparent */
-  tool?: 'pen' | 'highlighter';
-}
-
-/** Page du carnet MJ (clavier et/ou stylet). */
-export interface NotebookPage {
-  id: string;
-  title: string;
-  mode: NotebookMode;
-  text?: string;
-  inkStrokes?: InkStroke[];
-  /** Aperçu compressé (JPEG data URL) — pas d’OCR en V1. */
-  inkImageDataUrl?: string;
-  updatedAt: string;
-}
-
-export interface SessionChecklistItem {
-  id: string;
-  text: string;
-  done?: boolean;
-}
-
-export type SessionPlayPadKind = 'note' | 'checklist';
-
-/** @deprecated Prefer layout cells; kept for migration. */
-export type SessionPlayPadWidgetSize = 'third' | 'half' | 'full';
-
-/** Position / taille sur grille 12 colonnes. */
-export interface SessionPlayPadLayout {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-export interface SessionPlayPad {
-  id: string;
-  kind: SessionPlayPadKind;
-  title: string;
-  order: number;
-  /** @deprecated Migrated to layout. */
-  widgetSize?: SessionPlayPadWidgetSize;
-  /** Grille aimantée (x,y,w,h en cellules). */
-  layout?: SessionPlayPadLayout;
-  page?: NotebookPage;
-  items?: SessionChecklistItem[];
-}
-
-export const SESSION_PLAY_PAD_MAX = 8;
-
-export function createNotebookPage(title = 'Nouvelle page'): NotebookPage {
-  return {
-    id: crypto.randomUUID?.() ?? `nb-${Date.now()}`,
-    title,
-    mode: 'text',
-    text: '',
-    inkStrokes: [],
-    updatedAt: new Date().toISOString(),
-  };
-}
-
-export function createChecklistItem(text = ''): SessionChecklistItem {
-  return {
-    id: crypto.randomUUID?.() ?? `cli-${Date.now()}`,
-    text,
-    done: false,
-  };
-}
-
-export function createSessionPlayPad(
-  kind: SessionPlayPadKind,
-  title?: string,
-  order = 0,
-  layout?: SessionPlayPadLayout,
-): SessionPlayPad {
-  const id = crypto.randomUUID?.() ?? `pad-${Date.now()}`;
-  const resolvedLayout = layout ?? { x: (order % 2) * 6, y: Math.floor(order / 2) * 6, w: 6, h: 6 };
-  if (kind === 'checklist') {
-    return {
-      id,
-      kind,
-      title: title ?? 'Liste',
-      order,
-      layout: resolvedLayout,
-      items: [createChecklistItem('')],
-    };
-  }
-  const page = createNotebookPage(title ?? 'Notes');
-  return {
-    id,
-    kind: 'note',
-    title: page.title,
-    order,
-    layout: resolvedLayout,
-    page,
-  };
-}
-
-/** Plafond soft pour éviter d’exploser le JSON campagne. */
-export const NOTEBOOK_MAX_PAGES = 24;
-export const NOTEBOOK_INK_MAX_DIMENSION = 1280;
-export const NOTEBOOK_INK_JPEG_QUALITY = 0.55;
 
 export function createEncounterFromCreatures(
   name: string,

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -26,7 +26,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
     const ownerPage = await ownerCtx.newPage();
     const playerPage = await playerCtx.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const player = await registerConfirmAndLogin(playerPage.request, 'Rsvp');
     const campaignId = await createCampaignAs(ownerPage, owner, `E2E RSVP ${Date.now()}`);
     await invitePlayerToCampaign(ownerPage, owner, player, campaignId);
@@ -64,7 +64,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
   test('écran initiative ?display=1 est lecture seule', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'InitDisp');
     const campaignId = await createCampaignAs(page, owner, `E2E InitDisp ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Héros Display');
@@ -88,7 +88,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
   test('galerie donjons liste un partage public', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const name = `Galerie E2E ${Date.now()}`;
     await createSharedDungeonAs(page, owner, name);
 
@@ -103,7 +103,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
   test('create → share → gallery → copy → Mes donjons', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const name = `Copie Galerie E2E ${Date.now()}`;
     const { token } = await createSharedDungeonAs(page, owner, name);
 
@@ -133,7 +133,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
   test('session : PDF soirée + brouillon récap sur /play', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E PDF ${Date.now()}`);
     const sessionId = await seedEveningExportSessionAs(page, owner, campaignId);
 

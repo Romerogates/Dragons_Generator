@@ -522,6 +522,42 @@ public class CampaignJsonHelpersTests
     }
 
     [Fact]
+    public void TryPatchLiveTable_player_moves_own_pawn_not_map_or_others()
+    {
+        const string stored = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeMapId": "keep",
+                "tablePawns": [
+                  { "id": "pawn-u1", "name": "Aria", "mapX": 1, "mapY": 1, "memberUserId": "u1" },
+                  { "id": "pawn-u2", "name": "Lila", "mapX": 2, "mapY": 1, "memberUserId": "u2" }
+                ]
+              }]
+            }
+            """;
+        using var pawns = System.Text.Json.JsonDocument.Parse(
+            "[{\"id\":\"pawn-u1\",\"name\":\"Aria\",\"mapX\":4,\"mapY\":5,\"memberUserId\":\"u1\"}," +
+            "{\"id\":\"pawn-u2\",\"name\":\"Hacked\",\"mapX\":9,\"mapY\":9,\"memberUserId\":\"u2\"}]");
+        var json = CampaignJsonHelpers.TryPatchLiveTable(
+            stored,
+            "ses-1",
+            pawns.RootElement,
+            null,
+            "stolen-map",
+            clearActiveMapId: false,
+            actorUserId: "u1",
+            restrictToActor: true,
+            out var error);
+        Assert.Null(error);
+        var session = JsonNode.Parse(json!)!["sessions"]![0]!;
+        Assert.Equal("keep", session["activeMapId"]!.GetValue<string>());
+        Assert.Equal(4, session["tablePawns"]![0]!["mapX"]!.GetValue<int>());
+        Assert.Equal(2, session["tablePawns"]![1]!["mapX"]!.GetValue<int>());
+        Assert.Equal("Lila", session["tablePawns"]![1]!["name"]!.GetValue<string>());
+    }
+
+    [Fact]
     public void TryPatchLiveTable_rejects_unknown_session()
     {
         using var pawns = System.Text.Json.JsonDocument.Parse("[]");

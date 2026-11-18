@@ -1,0 +1,352 @@
+    <div class="dg-panel" data-testid="wizard-bg-skills">
+      <div class="flex justify-between items-center mb-2">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+        >
+          <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Compétences d'Historique
+        </h4>
+        @if (host().bgSkillChooseCount() > 0) {
+          <span
+            class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+            [ngClass]="host().bgSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().bgChosenCount() }} / {{ host().bgSkillChooseCount() }}
+          </span>
+        }
+      </div>
+      <p class="text-xs text-slate-500 mb-5">
+        @if (host().bgFixedSkills().length > 0 && host().bgSkillChooseCount() === 0) {
+          Compétences automatiquement accordées par votre historique (non modifiables).
+        } @else if (host().bgFixedSkills().length > 0) {
+          {{ host().bgFixedSkills().length }} compétence(s) fixe(s) + {{ host().bgSkillChooseCount() }} au choix.
+        } @else {
+          Choisissez {{ host().bgSkillChooseCount() }} compétence(s) issues de votre passé.
+        }
+      </p>
+      @if (host().bgNeedsReplacementPool()) {
+        <p class="text-xs text-amber-300/90 mb-4 rounded-lg border border-amber-800/40 bg-amber-950/25 px-3 py-2">
+          Des compétences de votre historique sont déjà prises par votre classe (badge
+          <span class="font-black uppercase tracking-widest text-sky-300">déjà</span>).
+          Complétez avec le bloc <strong>Remplacement</strong> ci-dessous.
+        </p>
+      }
+
+      @if (!host().isCustomBg()) {
+        @if (host().bgFixedSkills().length > 0) {
+          <div class="mb-5">
+            <p
+              class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5"
+            >
+              Accordées par l'historique
+            </p>
+            <div class="flex flex-wrap gap-2">
+              @for (id of host().bgFixedSkills(); track id) {
+                <span
+                  class="px-3 py-2 rounded-xl border border-slate-600/80 bg-slate-900/70 text-slate-300 text-sm font-bold flex items-center gap-2 cursor-default"
+                  title="Compétence d'historique — non modifiable"
+                >
+                  <span class="text-[10px] text-slate-500">🔒</span>
+                  {{ host().prettifySkill(id) }}
+                  <span
+                    class="text-[9px] uppercase tracking-widest text-slate-500 border border-slate-700 rounded px-1.5 py-0.5"
+                    >Historique</span
+                  >
+                  <span class="text-[10px] ml-0.5 px-1.5 rounded bg-slate-800 text-slate-400">
+                    {{ host().getModifierForSkill(id) }}
+                  </span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (host().bgSkillChooseCount() > 0) {
+          <div class="flex flex-col gap-5">
+            <div>
+              @if (host().bgNeedsReplacementPool()) {
+                <p
+                  class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2"
+                >
+                  Propositions de l'historique
+                </p>
+              }
+              <div class="flex flex-wrap gap-3">
+                @for (skill of host().bgSkillOptions(); track skill.id) {
+                  <button
+                    class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
+                    [ngClass]="
+                      host().selectedBgSkills().includes(skill.id)
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-[1.02]'
+                        : host().isBgSkillOwnedElsewhere(skill.id)
+                          ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                          : host().bgSkillsRemaining() === 0
+                            ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                    "
+                    [disabled]="
+                      (!host().selectedBgSkills().includes(skill.id) && host().bgSkillsRemaining() === 0) ||
+                      host().isBgSkillOwnedElsewhere(skill.id)
+                    "
+                    (click)="host().toggleBgSkill(skill.id)"
+                  >
+                    <iconify-icon [icon]="skill.icon"></iconify-icon>
+                    {{ skill.label }}
+                    @if (host().isBgSkillOwnedElsewhere(skill.id)) {
+                      <span
+                        class="text-[9px] uppercase tracking-widest text-sky-400/80 border border-sky-800/50 rounded px-1.5 py-0.5"
+                        >déjà</span
+                      >
+                    }
+                    <span
+                      class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                      [ngClass]="
+                        host().selectedBgSkills().includes(skill.id)
+                          ? 'bg-emerald-600 text-emerald-950'
+                          : 'bg-slate-800 text-slate-400'
+                      "
+                    >
+                      {{ host().getModifierForSkill(skill.id) }}
+                    </span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (host().bgNeedsReplacementPool()) {
+              <div class="rounded-xl border border-amber-800/35 bg-amber-950/15 p-4">
+                <div class="flex justify-between items-center gap-2 mb-3">
+                  <p
+                    class="text-[9px] font-black uppercase tracking-widest text-amber-400"
+                  >
+                    Remplacement
+                  </p>
+                  <span
+                    class="text-[10px] font-black uppercase tracking-widest"
+                    [ngClass]="host().bgSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-amber-400/80'"
+                  >
+                    {{ host().bgSkillsRemaining() }} restante(s)
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-3">
+                  Choisissez parmi le catalogue pour remplacer les compétences déjà prises.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                  @for (skill of host().bgReplacementOptions(); track skill.id) {
+                    <button
+                      class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
+                      [ngClass]="
+                        host().selectedBgSkills().includes(skill.id)
+                          ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-[1.02]'
+                          : host().bgSkillsRemaining() === 0
+                            ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                      "
+                      [disabled]="
+                        !host().selectedBgSkills().includes(skill.id) && host().bgSkillsRemaining() === 0
+                      "
+                      (click)="host().toggleBgSkill(skill.id)"
+                    >
+                      <iconify-icon [icon]="skill.icon"></iconify-icon>
+                      {{ skill.label }}
+                      <span
+                        class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                        [ngClass]="
+                          host().selectedBgSkills().includes(skill.id)
+                            ? 'bg-emerald-600 text-emerald-950'
+                            : 'bg-slate-800 text-slate-400'
+                        "
+                      >
+                        {{ host().getModifierForSkill(skill.id) }}
+                      </span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        @if (host().selectedBgSkills().length > 0) {
+          <div class="flex flex-wrap gap-2 mb-4">
+            @for (skill of host().selectedBgSkills(); track skill) {
+              <span
+                class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-800/50 rounded-full text-emerald-400 text-xs font-bold"
+              >
+                {{ host().prettifySkill(skill) }}
+                <button
+                  class="text-emerald-600 hover:text-red-400 transition-colors text-sm leading-none"
+                  (click)="host().removeCustomBgSkill(skill)"
+                >
+                  ✕
+                </button>
+              </span>
+            }
+          </div>
+        }
+        @if (host().bgSkillsRemaining() > 0) {
+          <div class="flex gap-3">
+            <select
+              [ngModel]="host().customSkillInput()"
+              (ngModelChange)="host().customSkillInput.set($event)"
+              class="dg-select flex-1 bg-[var(--dg-bg)] border border-slate-700 rounded-xl px-4 py-2.5 pr-10 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+            >
+              <option value="" disabled selected>Sélectionnez une compétence...</option>
+              @for (skill of host().bgSkillOptions(); track skill.id) {
+                <option
+                  [value]="skill.id"
+                  [disabled]="
+                    host().selectedClassSkills().includes(skill.id) ||
+                    host().selectedBgSkills().includes(skill.id)
+                  "
+                >
+                  {{ skill.label }}
+                </option>
+              }
+            </select>
+            <button
+              class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="!host().customSkillInput()"
+              (click)="host().addCustomBgSkill()"
+            >
+              Ajouter
+            </button>
+          </div>
+        }
+      }
+    </div>
+
+    @if (host().bgToolChoiceGroups().length > 0 || host().isCustomBg()) {
+      <div class="dg-panel">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon> Maîtrises d'outils
+            et véhicules
+          </h4>
+          @if (host().isCustomBg()) {
+            <span
+              class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+              [ngClass]="host().customBgToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+            >
+              {{ host().selectedBgTools().length }} / {{ host().customBgToolMax() }}
+            </span>
+          }
+        </div>
+
+        @if (host().isCustomBg()) {
+          <p class="text-xs text-slate-500 mb-5">
+            Choisissez {{ host().customBgToolMax() }} maîtrise(s) parmi les outils, instruments, jeux ou
+            véhicules ci-dessous.
+          </p>
+
+          @if (host().selectedBgTools().length > 0) {
+            <div class="flex flex-wrap gap-2 mb-5">
+              @for (toolId of host().selectedBgTools(); track toolId) {
+                <span
+                  class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-800/50 rounded-full text-emerald-400 text-xs font-bold"
+                >
+                  {{ host().getToolName(toolId) }}
+                  <button
+                    class="text-emerald-600 hover:text-red-400 transition-colors text-sm leading-none"
+                    (click)="host().toggleCustomBgTool(toolId)"
+                  >
+                    ✕
+                  </button>
+                </span>
+              }
+            </div>
+          }
+
+          @for (group of host().toolGroups(); track group.label) {
+            <div class="mb-5">
+              <div class="flex items-center gap-2 mb-3">
+                <iconify-icon [icon]="group.icon" class="text-lg"></iconify-icon>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  {{ group.label }}
+                </span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (tool of group.items; track tool.id) {
+                  <button
+                    class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+                    [ngClass]="
+                      host().isToolSelected(tool.id)
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                        : host().customBgToolsRemaining() === 0 && !host().isToolSelected(tool.id)
+                          ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                          : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                    "
+                    [disabled]="host().customBgToolsRemaining() === 0 && !host().isToolSelected(tool.id)"
+                    (click)="host().toggleCustomBgTool(tool.id)"
+                  >
+                    {{ tool.name }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          @for (group of host().bgToolChoiceGroups(); track group.groupIndex) {
+            <p class="text-xs text-slate-500 mb-4 mt-3">
+              Choisissez {{ group.chooseCount }} maîtrise{{ group.chooseCount > 1 ? 's' : '' }}
+              @if (host().groupHasCategoryOptions(group)) {
+                — puis l'outil précis dans la liste.
+              }
+              @if (group.note) {
+                <span class="italic text-slate-600 ml-1">{{ group.note }}</span>
+              }
+            </p>
+            <div class="flex flex-wrap gap-3 mb-4">
+              @for (opt of group.options; track opt.key) {
+                <button
+                  type="button"
+                  class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+                  [ngClass]="
+                    opt.selected
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                      : host().expandedBgToolCategory() === opt.category
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                  "
+                  (click)="host().onBgToolOptionClick(opt, group)"
+                >
+                  {{ opt.label }}
+                  @if (opt.selected && opt.category) {
+                    <span class="block text-[9px] font-black uppercase tracking-widest opacity-80 mt-0.5">
+                      {{ host().getSelectedConcreteToolLabel(opt.category, opt.label) }}
+                    </span>
+                  }
+                </button>
+              }
+            </div>
+
+            @if (host().expandedBgToolCategory(); as cat) {
+              @if (host().groupOwnsExpandedCategory(group, cat)) {
+                <div
+                  class="mb-6 p-4 rounded-xl border border-amber-800/40 bg-amber-950/20"
+                >
+                  <p
+                    class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3"
+                  >
+                    Choisissez l'outil précis
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    @for (tool of host().toolsForExpandedCategory(); track tool.id) {
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150 bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer"
+                        (click)="host().pickConcreteBgTool(tool.id, cat, group)"
+                      >
+                        {{ tool.name }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          }
+        }
+      </div>
+    }
+

@@ -53,6 +53,7 @@ import {
   resolveHeroProposalStatus,
 } from '@core/utils/play-table.util';
 import type { PlayFightStep } from '../play-combat-flow/play-combat-host';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 
 /**
  * État dérivé de la table (computeds). Pas de persist HTTP ici.
@@ -91,7 +92,7 @@ export class PlayCombatState {
     this.fullscreen = fullscreen;
   }
 
-  readonly isDm = computed(() => this.campaign().isOwner === true);
+  readonly isDm = computed(() => campaignIsTableDm(this.campaign()));
   readonly isSpectator = computed(() => this.campaign().role === 'spectator');
 
   readonly activeSession = computed(() => {

@@ -22,7 +22,6 @@ import {
   type SkillInfo,
 } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
-import { resolveEquipmentRefId } from '@core/utils/equipment.utils';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import type { Equipment } from '@core/models/Equipments/equipment';
 import type { BackgroundToolRef, BackgroundSkillChoice } from '@core/models/Backgrounds/background';
@@ -34,66 +33,34 @@ import {
   subclassBonusProficiencies,
   type SubclassSkillChoicePool,
 } from '@core/utils/progression-choices.util';
+import {
+  backgroundToolCategoryGroupLabel,
+  normalizeBackgroundToolOption,
+  toggleSkillIdInList,
+} from '@core/utils/skills-choice.util';
+import {
+  expandToolPoolIds,
+  filterToolGroupsByPool,
+  groupToolCatalog,
+} from '@core/utils/skills-tool-catalog.util';
+import type {
+  BgToolChoiceGroup,
+  BgToolChoiceOption,
+  BgToolChooseGroupRaw,
+  ToolCatalogEntry,
+  ToolCatalogGroup,
+} from './skills-step.types';
+import { SkillsClassPanel } from './skills-class-panel/skills-class-panel';
+import { SkillsBgPanel } from './skills-bg-panel/skills-bg-panel';
+import { SkillsToolsPanel } from './skills-tools-panel/skills-tools-panel';
+import { SkillsExpertisePanel } from './skills-expertise-panel/skills-expertise-panel';
 
 export type { SkillInfo };
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface ToolCatalogEntry {
-  id: string;
-  name: string;
-  type: string;
-  subtype: string | null;
-}
-
-interface ToolCatalogGroup {
-  label: string;
-  icon: string;
-  items: ToolCatalogEntry[];
-}
-
-interface BgToolChoiceOption {
-  key: string;
-  label: string;
-  category: string | null;
-  selected: boolean;
-}
-
-interface BgToolChoiceGroup {
-  groupIndex: number;
-  chooseCount: number;
-  note?: string;
-  options: BgToolChoiceOption[];
-}
-
-/** Groupe `tools.choose` tel que renvoyé par l’API (camelCase ou snake_case). */
-interface BgToolChooseGroupRaw {
-  chooseCount?: number;
-  choose_count?: number;
-  count?: number;
-  note?: string;
-  options?: unknown[];
-  category_options?: unknown[];
-  categoryOptions?: unknown[];
-}
-
-/** Option d’outil brute avant `normalizeToolOption`. */
-type RawToolOption =
-  | string
-  | BackgroundToolRef
-  | {
-      type?: string;
-      id?: string;
-      any?: boolean;
-      category?: string;
-    };
 
 @Component({
   selector: 'app-skills-step',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SkillsClassPanel, SkillsBgPanel, SkillsToolsPanel, SkillsExpertisePanel],
   templateUrl: './skills-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -274,17 +241,18 @@ export class SkillsStep implements OnInit {
 
   toggleClassSkill(skillId: string): void {
     const id = normalizeSkillId(skillId);
-    if (this.classBlockedBySubclass().has(id)) return;
-    const current = this.selectedClassSkills().map(normalizeSkillId);
-    if (current.includes(id)) {
-      this.selectedClassSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
-    } else if (
-      current.length < this.classSkillChooseCount() &&
-      !this.selectedBgSkills().map(normalizeSkillId).includes(id) &&
-      !this.selectedSpeciesSkills().map(normalizeSkillId).includes(id)
-    ) {
-      this.selectedClassSkills.update((arr) => [...arr, id]);
-    }
+    this.selectedClassSkills.update((arr) =>
+      toggleSkillIdInList(
+        arr.map(normalizeSkillId),
+        id,
+        this.classSkillChooseCount(),
+        this.classBlockedBySubclass(),
+        [
+          ...this.selectedBgSkills().map(normalizeSkillId),
+          ...this.selectedSpeciesSkills().map(normalizeSkillId),
+        ],
+      ),
+    );
   }
 
   // === COMPÉTENCES DE MULTICLASSAGE (maîtrises RÉDUITES, ex. Barde/Rôdeur/Roublard +1) ===
@@ -307,18 +275,19 @@ export class SkillsStep implements OnInit {
 
   toggleSecondaryClassSkill(skillId: string): void {
     const id = normalizeSkillId(skillId);
-    if (this.classBlockedBySubclass().has(id)) return;
-    const current = this.selectedSecondaryClassSkills().map(normalizeSkillId);
-    if (current.includes(id)) {
-      this.selectedSecondaryClassSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
-    } else if (
-      current.length < this.secondaryClassSkillChooseCount() &&
-      !this.selectedClassSkills().map(normalizeSkillId).includes(id) &&
-      !this.selectedBgSkills().map(normalizeSkillId).includes(id) &&
-      !this.selectedSpeciesSkills().map(normalizeSkillId).includes(id)
-    ) {
-      this.selectedSecondaryClassSkills.update((arr) => [...arr, id]);
-    }
+    this.selectedSecondaryClassSkills.update((arr) =>
+      toggleSkillIdInList(
+        arr.map(normalizeSkillId),
+        id,
+        this.secondaryClassSkillChooseCount(),
+        this.classBlockedBySubclass(),
+        [
+          ...this.selectedClassSkills().map(normalizeSkillId),
+          ...this.selectedBgSkills().map(normalizeSkillId),
+          ...this.selectedSpeciesSkills().map(normalizeSkillId),
+        ],
+      ),
+    );
   }
 
   /** Compétence déjà prise ailleurs (classe / historique / espèce / sous-classe) — hors choix secondaire. */
@@ -622,100 +591,11 @@ export class SkillsStep implements OnInit {
   }
 
   private normalizeToolOption(opt: unknown): BackgroundToolRef {
-    if (typeof opt === 'string') {
-      const id = opt.toLowerCase();
-      if (id === 'tool' || id === 'artisan') return { type: 'tool', any: true };
-      if (id === 'instrument') return { type: 'instrument', any: true };
-      if (id === 'game_set' || id === 'gameset' || id === 'jeu') return { type: 'gameSet', any: true };
-      if (id === 'vehicle' || id === 'vehicule') return { type: 'vehicle', any: true };
-      if (id === 'tl-outils-dalchimiste') return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
-      // Id catalogue concret (ex. Larron : outils de voleur)
-      if (id.startsWith('tl-') || id.startsWith('vhc-')) {
-        return { type: 'tool', id: opt, any: false };
-      }
-      return { type: 'tool', id: opt, any: false };
-    }
-
-    if (!opt || typeof opt !== 'object') {
-      return { type: 'tool', any: true };
-    }
-
-    const raw = opt as RawToolOption & object;
-
-    // Catégorie libre (any) — sans id concret
-    if (
-      'any' in raw &&
-      raw.any === true &&
-      'type' in raw &&
-      typeof raw.type === 'string' &&
-      (raw.type === 'tool' ||
-        raw.type === 'instrument' ||
-        raw.type === 'gameSet' ||
-        raw.type === 'vehicle') &&
-      !('id' in raw && raw.id)
-    ) {
-      return { type: raw.type, any: true };
-    }
-    if ('type' in raw && raw.type === 'tool_category') {
-      const cat = String(
-        ('category' in raw ? raw.category : undefined) ??
-          ('id' in raw ? raw.id : undefined) ??
-          '',
-      ).toLowerCase();
-      if (cat.includes('instrument')) return { type: 'instrument', any: true };
-      if (cat.includes('game') || cat === 'jeu') return { type: 'gameSet', any: true };
-      if (cat.includes('vehic')) return { type: 'vehicle', any: true };
-      return { type: 'tool', any: true };
-    }
-    // Outil / instrument / véhicule concret (ex. Larron type:"tool" + id)
-    if (
-      'type' in raw &&
-      (raw.type === 'tool' ||
-        raw.type === 'instrument' ||
-        raw.type === 'gameSet' ||
-        raw.type === 'vehicle')
-    ) {
-      const oid = String(('id' in raw ? raw.id : undefined) ?? '');
-      if (
-        !oid ||
-        oid.startsWith('tl-vehicules') ||
-        oid === 'tl-materiel-de-jeu' ||
-        oid.includes('category')
-      ) {
-        return { type: raw.type, any: true };
-      }
-      if (oid === 'tl-outils-dalchimiste') {
-        return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
-      }
-      return { type: raw.type, id: oid, any: false };
-    }
-    if ('id' in raw && raw.id) {
-      const oid = String(raw.id);
-      if (oid === 'tl-outils-dalchimiste') {
-        return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
-      }
-      if (oid.startsWith('tl-vehicules') || oid === 'tl-materiel-de-jeu') {
-        return oid.includes('jeu')
-          ? { type: 'gameSet', any: true }
-          : { type: 'vehicle', any: true };
-      }
-      return { type: 'tool', id: oid, any: false };
-    }
-    return { type: 'tool', any: true };
+    return normalizeBackgroundToolOption(opt);
   }
 
-  /** Libellé de groupe catalogue pour une catégorie wizard. */
   private categoryGroupLabel(category: string): string | null {
-    const map: Record<string, string> = {
-      instrument: 'Instruments de musique',
-      gameSet: 'Matériel de jeu',
-      game_set: 'Matériel de jeu',
-      vehicle: 'Véhicules',
-      vehicule: 'Véhicules',
-      tool: "Outils d'artisan",
-      artisan: "Outils d'artisan",
-    };
-    return map[category] ?? null;
+    return backgroundToolCategoryGroupLabel(category);
   }
 
   /** Clic sur une option d'historique : catégorie → expand, outil concret → toggle. */
@@ -882,140 +762,14 @@ export class SkillsStep implements OnInit {
 
   // === CATALOGUE D'OUTILS GROUPÉS ===
 
-  readonly toolGroups = computed((): ToolCatalogGroup[] => {
-    const catalog = this.toolCatalog();
-    if (catalog.length === 0) return [];
+  readonly toolGroups = computed((): ToolCatalogGroup[] => groupToolCatalog(this.toolCatalog()));
 
-    const instruments = catalog.filter(
-      (t) =>
-        t.type === 'TOOL' &&
-        (t.subtype === 'instrument' ||
-          [
-            'tl-bombarde',
-            'tl-cor',
-            'tl-cornemuse',
-            'tl-dulcimer',
-            'tl-flute',
-            'tl-flute-de-pan',
-            'tl-luth',
-            'tl-lyre',
-            'tl-tambour',
-            'tl-viole',
-          ].includes(t.id)),
-    );
-    const games = catalog.filter(
-      (t) =>
-        t.type === 'TOOL' &&
-        (t.subtype === 'gaming_set' ||
-          ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'].includes(t.id)),
-    );
-    const vehicles = catalog.filter((t) => t.type === 'VEHICLE');
-    const specialKits = catalog.filter(
-      (t) =>
-        t.type === 'TOOL' &&
-        (t.subtype === 'special_kit' ||
-          t.subtype === 'thieves_tools' ||
-          [
-            'tl-outils-de-voleur',
-            'tl-necessaire-de-deguisement',
-            'tl-necessaire-de-faussaire',
-            'tl-necessaire-dempoisonneur',
-          ].includes(t.id)),
-    );
-    const artisan = catalog.filter((t) => {
-      if (t.type !== 'TOOL') return false;
-      if (specialKits.some((s) => s.id === t.id)) return false;
-      if (t.subtype === 'artisan_tool' || t.subtype === 'artisan_tools') return true;
-      // Fallback si subtype manquant : outils hors instruments / jeux / kits spéciaux
-      if (t.subtype) return false;
-      return (
-        !instruments.some((i) => i.id === t.id) &&
-        !games.some((g) => g.id === t.id) &&
-        !specialKits.some((s) => s.id === t.id)
-      );
-    });
-
-    return [
-      { label: "Outils d'artisan", icon: 'fluent-emoji:hammer-and-wrench', items: artisan },
-      {
-        label: 'Kits et outils spéciaux',
-        icon: 'fluent-emoji:locked-with-key',
-        items: specialKits,
-      },
-      { label: 'Instruments de musique', icon: 'fluent-emoji:violin', items: instruments },
-      { label: 'Matériel de jeu', icon: 'fluent-emoji:game-die', items: games },
-      { label: 'Véhicules', icon: 'fluent-emoji:horse', items: vehicles },
-    ].filter((g) => g.items.length > 0);
-  });
-
-  /** Correspondance entre les jetons de catégorie de véhicules (ex. Gnome des roches/Mélesse
-   * "Pilote") et le `subtype` réel des véhicules au catalogue (voir `subcategory` en JSON API). */
-  private static readonly VEHICLE_CATEGORY_SUBTYPES: Record<string, string> = {
-    'tl-vehicules-terrestres': 'land',
-    'tl-vehicules-maritimes': 'water',
-    'tl-vehicules-aeriens': 'air',
-  };
-
-  /** Correspondance entre jetons de catégorie abstraits d'outils (espèce/classe — ex. Mélesse
-   * "Polyvalence" `tl-instrument-de-musique`/`tl-outils-artisan`, Moine `tl-cat-outils-artisan`/
-   * `tl-cat-instrument-musique`, Barde `category-musical-instruments`) et le libellé de groupe du
-   * catalogue (voir `toolGroups()`) dont il faut prendre tous les items. */
-  private static readonly TOOL_POOL_GROUP_LABELS: Record<string, string> = {
-    'tl-instrument-de-musique': 'Instruments de musique',
-    'tl-cat-instrument-musique': 'Instruments de musique',
-    'category-musical-instruments': 'Instruments de musique',
-    'tl-outils-artisan': "Outils d'artisan",
-    'tl-cat-outils-artisan': "Outils d'artisan",
-    'category-tools': "Outils d'artisan",
-    'tl-materiel-de-jeu': 'Matériel de jeu',
-    'tl-category-materiel-de-jeu': 'Matériel de jeu',
-    'category-gaming-sets': 'Matériel de jeu',
-  };
-
-  /** Étend un pool brut d'ids/jetons abstraits d'un `choice_pool` d'outils (véhicules par
-   * sous-type, catégories d'outils par groupe catalogue, alias/coquilles d'ids concrets) en
-   * identifiants concrets du catalogue réellement affichables. Utilisé pour les choix d'espèce
-   * (ex. Gnome des roches/Mélesse "Pilote"/"Polyvalence") et de classe (ex. Moine, Barde,
-   * Magicien) afin d'éviter le repli silencieux sur tout le catalogue quand un jeton ne matche
-   * aucun id littéral. */
-  private expandToolPoolIds(poolIds: string[]): Set<string> {
-    const catalog = this.toolCatalog();
-    const groups = this.toolGroups();
-    const expanded = new Set<string>();
-    for (const raw of poolIds) {
-      const vehicleSubtype = SkillsStep.VEHICLE_CATEGORY_SUBTYPES[raw];
-      if (vehicleSubtype) {
-        catalog
-          .filter((t) => t.type === 'VEHICLE' && t.subtype === vehicleSubtype)
-          .forEach((t) => expanded.add(t.id));
-        continue;
-      }
-      const groupLabel = SkillsStep.TOOL_POOL_GROUP_LABELS[raw];
-      if (groupLabel) {
-        groups.find((g) => g.label === groupLabel)?.items.forEach((t) => expanded.add(t.id));
-        continue;
-      }
-      expanded.add(resolveEquipmentRefId(raw));
-    }
-    return expanded;
-  }
-
-  /**
-   * Groupes d'outils affichés pour le choix d'espèce différé. Restreint au pool concret défini
-   * côté API (ex. Nain : nécessaire de brasseur/outils de forgeron/outils de maçon ; Gnome des
-   * roches/Mélesse "Pilote"/"Polyvalence" : véhicules par sous-type, instruments, outils
-   * d'artisan, une fois les jetons de catégorie développés en identifiants concrets) quand ce
-   * pool matche des entrées réelles du catalogue. Repli sur le catalogue complet si le pool est
-   * vide ou ne matche vraiment rien.
-   */
-  readonly speciesToolGroups = computed(() => {
-    const poolIds = this.expandToolPoolIds(this.speciesBonusToolPoolIds());
-    if (poolIds.size === 0) return this.toolGroups();
-    const filtered = this.toolGroups()
-      .map((g) => ({ ...g, items: g.items.filter((t) => poolIds.has(t.id)) }))
-      .filter((g) => g.items.length > 0);
-    return filtered.length > 0 ? filtered : this.toolGroups();
-  });
+  readonly speciesToolGroups = computed(() =>
+    filterToolGroupsByPool(
+      this.toolGroups(),
+      expandToolPoolIds(this.speciesBonusToolPoolIds(), this.toolCatalog(), this.toolGroups()),
+    ),
+  );
 
   isToolSelected(toolId: string): boolean {
     return this.selectedBgTools().includes(toolId) || this.selectedSpeciesTools().includes(toolId);
@@ -1110,7 +864,7 @@ export class SkillsStep implements OnInit {
     const choice = this.classToolChoices()[0];
     const poolIds = ((choice?.meta?.['poolIds'] as unknown[]) ?? []).map(String);
     if (poolIds.length === 0) return this.toolCatalog();
-    const expanded = this.expandToolPoolIds(poolIds);
+    const expanded = expandToolPoolIds(poolIds, this.toolCatalog(), this.toolGroups());
     if (expanded.size === 0) return this.toolCatalog();
     const filtered = this.toolCatalog().filter((t) => expanded.has(t.id));
     return filtered.length > 0 ? filtered : this.toolCatalog();

@@ -7,6 +7,7 @@ import {
   splitClassChoiceAnswers,
   toggleCappedPick,
   wrapCarouselIndex,
+  wrapCarouselOffsetPx,
 } from './class-step-flow.util';
 
 describe('class-step-flow.util', () => {
@@ -75,6 +76,8 @@ describe('class-step-flow.util', () => {
     expect(wrapCarouselIndex(5, 3)).toBe(2);
     expect(wrapCarouselIndex(-1, 3)).toBe(2);
     expect(wrapCarouselIndex(0, 0)).toBe(0);
+    expect(wrapCarouselOffsetPx(0, 0, 0, 352)).toBe('0px');
+    expect(wrapCarouselOffsetPx(0, 5, 3, 10)).toMatch(/px$/);
   });
 
   it('computes completion, titles, and restore maps', () => {
@@ -218,5 +221,59 @@ describe('class-step-flow.util', () => {
       }),
     ).toBe('meta');
     expect(splitClassChoiceAnswers({ z: undefined }, new Set()).prog.size).toBe(0);
+    expect(
+      resolveClassStepPhase({
+        holdPhase: null,
+        classId: 'c',
+        subclassId: 's',
+        requiresSubclass: true,
+        requiresCombatStyle: false,
+        selectedStyleCount: 0,
+        requiredStyleCount: 0,
+        hasUnresolvedSubChoice: false,
+        hasUnresolvedProgChoice: false,
+        focusedProgChoice: false,
+      }),
+    ).toBe('subclass');
+    expect(
+      resolveClassStepPhase({
+        holdPhase: null,
+        classId: 'c',
+        subclassId: null,
+        requiresSubclass: false,
+        requiresCombatStyle: true,
+        selectedStyleCount: 1,
+        requiredStyleCount: 1,
+        hasUnresolvedSubChoice: false,
+        hasUnresolvedProgChoice: false,
+        focusedProgChoice: false,
+      }),
+    ).toBe('combat_style');
+    expect(classStepPhaseTitle({ phase: 'combat_style' })).toBe('Style de Combat');
+    expect(classStepPhaseTitle({ phase: 'sub_choice' })).toBe('Faites votre choix');
+    expect(classStepPhaseTitle({ phase: 'prog_choice', progChoiceLabel: 'Métamagie', progChoiceNeed: 1 })).toBe(
+      'Métamagie',
+    );
+    expect(
+      classStepCarouselTargetId({
+        phase: 'combat_style',
+        classId: 'c',
+        subclassId: null,
+        combatStyleIds: [],
+        subChoiceLastPick: null,
+        progChoiceLastPick: null,
+      }),
+    ).toBeNull();
+    expect(
+      classStepCarouselTargetId({
+        phase: 'unknown' as never,
+        classId: 'c',
+        subclassId: null,
+        combatStyleIds: [],
+        subChoiceLastPick: null,
+        progChoiceLastPick: null,
+      }),
+    ).toBe('c');
+    expect(splitClassChoiceAnswers({ n: 'x' as never }, new Set()).prog.size).toBe(0);
   });
 });

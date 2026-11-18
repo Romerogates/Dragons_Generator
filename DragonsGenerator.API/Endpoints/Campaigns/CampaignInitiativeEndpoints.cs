@@ -26,7 +26,7 @@ public class GetInitiativeBoardEndpoint(AppDbContext db) : EndpointWithoutReques
             return;
         }
 
-        var board = CampaignJsonHelpers.TryReadInitiativeBoard(campaign.JsonData);
+        var board = CampaignJsonHelpers.TryReadInitiativeBoard(CampaignLiveTableStore.Read(campaign));
         if (board is null)
         {
             await Send.OkAsync(new InitiativeBoardDto(false, null, null, []), ct);
@@ -81,7 +81,7 @@ public class SubmitInitiativeEndpoint(AppDbContext db, CampaignLivePublisher liv
             }
 
             var newJson = CampaignJsonHelpers.TryApplyInitiativeRoll(
-                campaign.JsonData,
+                CampaignLiveTableStore.Read(campaign),
                 req.Code,
                 req.CombatantId,
                 req.Roll,
@@ -95,7 +95,7 @@ public class SubmitInitiativeEndpoint(AppDbContext db, CampaignLivePublisher liv
                 return;
             }
 
-            campaign.JsonData = newJson;
+            CampaignLiveTableStore.Write(campaign, newJson);
             campaign.UpdatedAt = DateTimeOffset.UtcNow;
             try
             {

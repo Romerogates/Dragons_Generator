@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import {
   createCampaignAs,
   seedEveningExportSessionAs,
@@ -10,7 +10,7 @@ test.describe('Lot ABC — convert / deep-link / run sheet', () => {
   test('deep-link ?event= ouvre le panneau calendrier', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E EventLink ${Date.now()}`);
     const eventId = await seedScheduleEventAs(page, owner, campaignId, 'Date deep-link');
 
@@ -28,7 +28,7 @@ test.describe('Lot ABC — convert / deep-link / run sheet', () => {
   test('MJ convertit une date en session depuis le calendrier', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Convert ${Date.now()}`);
     const eventId = await seedScheduleEventAs(page, owner, campaignId, 'À convertir');
 
@@ -69,7 +69,7 @@ test.describe('Lot ABC — convert / deep-link / run sheet', () => {
   test('préremplir run sheet depuis la prépa', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E RunSheet ${Date.now()}`);
     const sessionId = await seedEveningExportSessionAs(page, owner, campaignId);
 

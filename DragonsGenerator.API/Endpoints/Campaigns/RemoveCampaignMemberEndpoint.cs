@@ -51,7 +51,7 @@ public class RemoveCampaignMemberEndpoint(AppDbContext db) : EndpointWithoutRequ
         if (data["pregenCharacters"] is System.Text.Json.Nodes.JsonArray)
         {
             CampaignPregenHelpers.UnassignUser(data, removedUserId.ToString());
-            campaign.JsonData = data.ToJsonString();
+            CampaignLiveTableStore.Write(campaign, data.ToJsonString());
         }
 
         CampaignHistoryHelpers.SealRemoved(member, campaign.JsonData);

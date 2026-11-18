@@ -1,5 +1,5 @@
 ﻿import { test, expect, type Page } from '@playwright/test';
-import { loginViaUi, applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import {
   createPlayableCampaign,
   createCampaignAs,
@@ -16,8 +16,9 @@ test.describe('Mode table MJ', () => {
   test('session → combat → collecte init → fin combat → fin session', async ({ page }) => {
     test.setTimeout(120_000);
 
-    await loginViaUi(page, '/');
-    const campaignId = await createPlayableCampaign(page);
+    const owner = await uniqueOwnerSession(page.request);
+    await applyAuthSession(page, owner, '/');
+    const campaignId = await createPlayableCampaign(page, owner);
     await page.goto(`/campaigns/${campaignId}/play`);
 
     await expect(page.getByRole('button', { name: 'Entrer en session' })).toBeVisible({
@@ -25,7 +26,7 @@ test.describe('Mode table MJ', () => {
     });
     await page.getByRole('button', { name: 'Entrer en session' }).click();
 
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('navigation', { name: 'Sections de la session' })).toBeVisible();
     await page.getByRole('button', { name: 'Combattre' }).click();
 
@@ -53,7 +54,7 @@ test.describe('Mode table MJ', () => {
     await confirmInApp(page, 'Terminer la session');
 
     await expect(page).toHaveURL(new RegExp(`/campaigns/${campaignId}$`), { timeout: 20_000 });
-    await expect(page.getByText('Table de jeu — session en cours')).not.toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).not.toBeVisible({
       timeout: 20_000,
     });
     await expect(page.getByRole('button', { name: 'Résumé' })).toBeVisible();
@@ -65,12 +66,13 @@ test.describe('Mode table MJ', () => {
   test('notes calepin persistent après navigation onglets', async ({ page }) => {
     test.setTimeout(90_000);
 
-    await loginViaUi(page, '/');
-    const campaignId = await createPlayableCampaign(page);
+    const owner = await uniqueOwnerSession(page.request);
+    await applyAuthSession(page, owner, '/');
+    const campaignId = await createPlayableCampaign(page, owner);
     await page.goto(`/campaigns/${campaignId}/play`);
 
     await page.getByRole('button', { name: 'Entrer en session' }).click();
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({ timeout: 15_000 });
 
     await page
       .getByRole('navigation', { name: 'Sections de la session' })
@@ -95,12 +97,12 @@ test.describe('Mode table MJ', () => {
   test('prep map → session → onglet Donjon montre la carte', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Donjon tab ${Date.now()}`);
     const { mapName } = await seedCampaignDungeonMapAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({ timeout: 30_000 });
 
     await page
       .getByRole('navigation', { name: 'Sections de la session' })

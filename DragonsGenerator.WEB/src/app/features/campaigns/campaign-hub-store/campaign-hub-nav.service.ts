@@ -13,6 +13,7 @@ import {
   type CampaignPrepSub,
   type CampaignPrimaryTab,
 } from '@core/utils/campaign-detail-tabs.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 
 export type CampaignHubTabTarget = CampaignPrimaryTab | CampaignPrepSub | 'activity';
 
@@ -119,7 +120,7 @@ export class CampaignHubNavService {
   }
 
   setPrepSub(sub: CampaignPrepSub): void {
-    const next = clampPrepSubForRole(sub, this.hooks?.campaign()?.isOwner === true);
+    const next = clampPrepSubForRole(sub, campaignIsTableDm(this.hooks?.campaign()));
     if (this.isOnMapsView() && next !== 'maps') this.hooks?.flushMaps();
     this.prepSub.set(next);
     if (next === 'notebook') this.hooks?.ensureNotebook();
@@ -129,7 +130,7 @@ export class CampaignHubNavService {
   setTab(t: CampaignHubTabTarget): void {
     const campaign = this.hooks?.campaign();
     // Campagne pas encore chargée : ne pas traiter le MJ comme un joueur (sinon maps → pré-tirés).
-    const owner = campaign ? campaign.isOwner === true : true;
+    const owner = campaign ? campaignIsTableDm(campaign) : true;
 
     if (t === 'activity') {
       if (this.isOnMapsView()) this.hooks?.flushMaps();
@@ -141,7 +142,7 @@ export class CampaignHubNavService {
 
     if (t === 'prep' || isCampaignPrepSub(t)) {
       const c = this.hooks?.campaign();
-      if (c && playerPrepTabBlocked(c.isOwner === true, c.data.pregenCharacters?.length ?? 0)) {
+      if (c && playerPrepTabBlocked(campaignIsTableDm(c), c.data.pregenCharacters?.length ?? 0)) {
         this.tab.set('overview');
         this.syncTabQueryParams();
         return;

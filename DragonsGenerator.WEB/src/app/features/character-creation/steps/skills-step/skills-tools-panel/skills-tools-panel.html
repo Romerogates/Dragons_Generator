@@ -1,0 +1,231 @@
+    @if (host().speciesBonusSkillCount() > 0) {
+      <div class="dg-panel">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Compétences d'espèce
+            (Polyvalence)
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="host().speciesSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().selectedSpeciesSkills().length }} / {{ host().speciesBonusSkillCount() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Votre héritage vous offre {{ host().speciesBonusSkillCount() }} compétence(s) supplémentaire(s)
+          au choix.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          @for (skill of host().speciesSkillOptions(); track skill.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                host().selectedSpeciesSkills().includes(skill.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : host().isSkillSelected(skill.id)
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : host().speciesSkillsRemaining() === 0
+                      ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (!host().selectedSpeciesSkills().includes(skill.id) &&
+                  (host().isSkillSelected(skill.id) || host().speciesSkillsRemaining() === 0))
+              "
+              (click)="host().toggleSpeciesSkill(skill.id)"
+            >
+              {{ skill.label }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (host().speciesBonusToolCount() > 0) {
+      <div class="dg-panel">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon> Outil d'espèce
+            ({{ host().speciesBonusToolChoiceLabel() }})
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="host().speciesToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().selectedSpeciesTools().length }} / {{ host().speciesBonusToolCount() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Choisissez {{ host().speciesBonusToolCount() }} maîtrise(s) d'outil liée(s) à votre peuple.
+        </p>
+        @for (group of host().speciesToolGroups(); track group.label) {
+          <div class="mb-5">
+            <div class="flex items-center gap-2 mb-3">
+              <iconify-icon [icon]="group.icon" class="text-lg"></iconify-icon>
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                {{ group.label }}
+              </span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (tool of group.items; track tool.id) {
+                <button
+                  class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+                  [ngClass]="
+                    host().selectedSpeciesTools().includes(tool.id)
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                      : host().speciesToolsRemaining() === 0
+                        ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                  "
+                  [disabled]="
+                    host().speciesToolsRemaining() === 0 && !host().selectedSpeciesTools().includes(tool.id)
+                  "
+                  (click)="host().toggleSpeciesTool(tool.id)"
+                >
+                  {{ tool.name }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (host().classWeaponsNeeded() > 0) {
+      <div
+        class="dg-panel"
+        data-testid="wizard-class-weapons"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon>
+            {{ host().classWeaponChoices()[0]?.label ?? 'Armes maîtrisées' }}
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="host().classWeaponsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().classWeaponsPicked() }} / {{ host().classWeaponsNeeded() }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (weapon of host().classWeaponOptions(); track weapon.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                host().isClassWeaponSelected(weapon.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : host().classWeaponsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="host().classWeaponsRemaining() === 0 && !host().isClassWeaponSelected(weapon.id)"
+              (click)="host().toggleClassWeapon(weapon.id)"
+            >
+              {{ weapon.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (host().classToolsNeeded() > 0) {
+      <div
+        class="dg-panel"
+        data-testid="wizard-class-tools"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon>
+            {{ host().classToolChoices()[0]?.label ?? "Maîtrises d'outils" }}
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="host().classToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().classToolsPicked() }} / {{ host().classToolsNeeded() }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (tool of host().displayedClassTools(); track tool.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                host().isClassToolSelected(tool.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : host().classToolsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="host().classToolsRemaining() === 0 && !host().isClassToolSelected(tool.id)"
+              (click)="host().toggleClassTool(tool.id)"
+            >
+              {{ tool.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @for (pool of host().subclassSkillChoicePools(); track pool.id) {
+      <div
+        class="dg-panel"
+        data-testid="wizard-subclass-skill-choice"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon>
+            {{ pool.label }}
+            @if (pool.expertiseIfAlreadyProficient) {
+              <span class="normal-case font-semibold text-amber-500/70"
+                >(expertise si déjà maîtrisée)</span
+              >
+            }
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="
+              (host().subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count
+                ? 'text-emerald-400'
+                : 'text-slate-500'
+            "
+          >
+            {{ (host().subclassSkillChoiceAnswers().get(pool.id) ?? []).length }} / {{ pool.count }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (optId of pool.poolIds; track optId) {
+            <button
+              type="button"
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                host().isSubclassSkillChoiceOptionSelected(pool.id, optId)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : (host().subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (host().subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count &&
+                !host().isSubclassSkillChoiceOptionSelected(pool.id, optId)
+              "
+              (click)="host().toggleSubclassSkillChoiceOption(pool.id, optId)"
+            >
+              {{ host().subclassChoiceOptionLabel(optId) }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+

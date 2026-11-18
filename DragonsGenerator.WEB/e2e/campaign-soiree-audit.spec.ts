@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import {
   createCampaignAs,
   setSessionModeAs,
@@ -14,7 +14,7 @@ test.describe('Audit soirée — hub → Codex → table', () => {
   test('session → CTA Codex → rencontre → Lancer le combat sans frottement', async ({ page }) => {
     test.setTimeout(150_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Soirée Audit ${Date.now()}`);
     const sessionId = await startActiveSessionAs(page, owner, campaignId);
     await setSessionModeAs(page, owner, campaignId, sessionId, 'in_person');

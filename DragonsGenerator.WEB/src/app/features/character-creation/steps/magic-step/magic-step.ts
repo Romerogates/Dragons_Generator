@@ -16,8 +16,8 @@ import { DataService } from '@core/services/data.service';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
-import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
-import type { CharacterClass, Subclass } from '@core/models/CharacterClasses/character-class';
+import type { SpellcastingKind } from '@core/models/Character/character';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { warlockArcanumSpellLevels, spellProgressionMilestones } from '@core/utils/progression-choices.util';
 import { collectCasterSources, type CasterSource } from '@core/utils/class-spellcasting.util';
 import { maxSpellLevelFromSlots } from '@core/utils/feature-uses.util';
@@ -26,6 +26,13 @@ import {
   spellPickCount,
   type SpellQuota,
 } from '@core/utils/spell-quota.util';
+import { filterSpellList as filterSpellListByQuery, spellSchoolKey } from '@core/utils/magic-spell-filter.util';
+import {
+  magicBadgeClasses,
+  magicCardClasses,
+  magicCheckboxClasses,
+  magicTextClasses,
+} from './magic-step-theme.util';
 import {
   spellCastTimeLabel,
   spellComponentsLabel,
@@ -36,59 +43,17 @@ import {
   SPELL_SCHOOL_LABELS,
 } from '@core/utils/spell-display.util';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import {
+  SUBCLASS_TO_DOMAIN,
+  type SpellcastingDetailsDraft,
+  type SubclassWithBonusSpells,
+} from './magic-step.types';
+import { magicAbilityToKey, restoreMagicDraft } from './magic-step-restore.util';
+import { persistMagicDraft } from './magic-step-persist.util';
+import { MagicCasterTabs } from './magic-caster-tabs/magic-caster-tabs';
+import { MagicArcanumPanel } from './magic-arcanum-panel/magic-arcanum-panel';
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface SpellRaw {
-  id: string;
-  name: string;
-  level: number;
-  school: string;
-  castingTime: { amount: number | null; unit: string | null };
-  range: { amount: number | string | null; unit: string | null };
-  duration: { amount: number | string | null; unit: string | null };
-  components: { v: boolean; s: boolean; m: string | null };
-  isRitual: boolean;
-  isConcentration: boolean;
-  isCorrupted: boolean;
-  description: string;
-  modularOptions: unknown[];
-  classes: string[];
-  higherLevels: string | null;
-}
-
-interface SpellDetailEntry {
-  refId: string;
-  name?: string;
-  level?: number;
-  prepared?: boolean;
-  alwaysPrepared?: boolean;
-  effectSummary?: string;
-}
-
-/** Forme brouillon de `creation.spellcastingDetails` lue / écrite par l’étape Magie. */
-interface SpellcastingDetailsDraft {
-  cantrips?: SpellDetailEntry[];
-  spells?: SpellDetailEntry[];
-  deity?: string;
-  deityId?: string | null;
-  mysticArcanum?: { spellLevel: number; spellId: string }[];
-  spellMastery?: { spellLevel: number; spellId: string }[];
-  signatureSpells?: { spellId: string }[];
-  byClass?: Record<string, { cantrips?: string[]; spells?: string[]; deityId?: string | null }>;
-}
-
-interface BonusSpellGrant {
-  level_unlocked?: number;
-  spells?: string[];
-}
-
-interface SubclassWithBonusSpells extends Subclass {
-  bonus_spells_granted?: BonusSpellGrant[];
-  bonus_spells_by_terrain?: Record<string, { grants?: BonusSpellGrant[] }>;
-}
+export type { SpellRaw } from './magic-step.types';
 
 function subclassOptions(cls: CharacterClass | null | undefined): SubclassWithBonusSpells[] {
   const raw = cls?.data?.subclasses;
@@ -97,17 +62,6 @@ function subclassOptions(cls: CharacterClass | null | undefined): SubclassWithBo
   return (raw.options ?? []) as SubclassWithBonusSpells[];
 }
 
-/** subcls-domaine-de-la-vie → dom-vie */
-const SUBCLASS_TO_DOMAIN: Record<string, string> = {
-  'subcls-domaine-de-la-vie': 'dom-vie',
-  'subcls-domaine-de-letrange': 'dom-etrange',
-  'subcls-domaine-de-la-force': 'dom-force',
-  'subcls-domaine-de-lindicible': 'dom-indicible',
-  'subcls-domaine-du-partage': 'dom-partage',
-  'subcls-domaine-du-temps': 'dom-temps',
-  'subcls-domaine-du-voyage': 'dom-voyage',
-};
-
 // ============================================================================
 // COMPOSANT
 // ============================================================================
@@ -115,7 +69,7 @@ const SUBCLASS_TO_DOMAIN: Record<string, string> = {
 @Component({
   selector: 'app-magic-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MagicCasterTabs, MagicArcanumPanel],
   templateUrl: './magic-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -382,7 +336,7 @@ export class MagicStep implements OnInit {
   readonly spellSaveDC = computed(() => {
     const ability = this.spellcastingAbility();
     if (!ability) return 0;
-    const key = this.abilityToKey(ability);
+    const key = magicAbilityToKey(ability);
     const mod = key ? this.builder.abilityModifiers()[key] : 0;
     return 8 + this.builder.proficiencyBonus() + mod;
   });
@@ -391,7 +345,7 @@ export class MagicStep implements OnInit {
   readonly spellAttackBonus = computed(() => {
     const ability = this.spellcastingAbility();
     if (!ability) return 0;
-    const key = this.abilityToKey(ability);
+    const key = magicAbilityToKey(ability);
     const mod = key ? this.builder.abilityModifiers()[key] : 0;
     return this.builder.proficiencyBonus() + mod;
   });
@@ -542,8 +496,8 @@ export class MagicStep implements OnInit {
 
   readonly spellSchoolOptions = computed(() => {
     const keys = new Set<string>();
-    for (const s of this.availableCantrips()) keys.add(this.getSchoolKey(s.school));
-    for (const s of this.availableLeveledSpells()) keys.add(this.getSchoolKey(s.school));
+    for (const s of this.availableCantrips()) keys.add(spellSchoolKey(s.school));
+    for (const s of this.availableLeveledSpells()) keys.add(spellSchoolKey(s.school));
     return [...keys]
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))
@@ -585,45 +539,18 @@ export class MagicStep implements OnInit {
     spells: Spell[],
     scope: 'cantrip' | 'leveled' | 'racial' | 'arcanum' | 'mastery',
   ): Spell[] {
-    const q = this.normalizeSearch(this.spellSearchQuery().trim());
-    const school = this.spellSchoolFilter();
-    const tag = this.spellTagFilter();
-    const selectedCantrips = this.selectedCantrips();
-    const selectedSpells = this.selectedSpells();
-    const racialPicks = new Set(Object.values(this.racialCantripPicks()));
-    const arcanumPicks = new Set(Object.values(this.arcanumPicks()));
-    const masteryPicks = new Set(Object.values(this.masteryPicks()));
-    const signaturePicks = new Set(this.signatureIds());
-
-    return spells.filter((spell) => {
-      if (school && this.getSchoolKey(spell.school) !== school) return false;
-      if (tag === 'concentration' && !spell.isConcentration) return false;
-      if (tag === 'ritual' && !spell.isRitual) return false;
-      if (tag === 'selected') {
-        const selected =
-          scope === 'cantrip'
-            ? selectedCantrips.has(spell.id)
-            : scope === 'leveled'
-              ? selectedSpells.has(spell.id)
-              : scope === 'racial'
-                ? racialPicks.has(spell.id)
-                : scope === 'arcanum'
-                  ? arcanumPicks.has(spell.id)
-                  : masteryPicks.has(spell.id) ||
-                    signaturePicks.has(spell.id) ||
-                    selectedSpells.has(spell.id);
-        if (!selected) return false;
-      }
-      if (!q) return true;
-      return this.normalizeSearch(spell.name).includes(q);
+    return filterSpellListByQuery(spells, {
+      query: this.spellSearchQuery(),
+      school: this.spellSchoolFilter(),
+      tag: this.spellTagFilter(),
+      scope,
+      selectedCantrips: this.selectedCantrips(),
+      selectedSpells: this.selectedSpells(),
+      racialPicks: new Set(Object.values(this.racialCantripPicks())),
+      arcanumPicks: new Set(Object.values(this.arcanumPicks())),
+      masteryPicks: new Set(Object.values(this.masteryPicks())),
+      signaturePicks: new Set(this.signatureIds()),
     });
-  }
-
-  private normalizeSearch(value: string): string {
-    return value
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
   }
 
   /** Divinités filtrées (prêtre + domaine compatible). */
@@ -955,169 +882,37 @@ export class MagicStep implements OnInit {
     if (!this.selectionComplete()) return;
 
     this.persistActivePicks();
-    const mergedCantripIds = new Set<string>();
-    const mergedSpellIds = new Set<string>();
-    for (const src of this.casterSources()) {
-      const p = this.picksByClass[src.classId];
-      (p?.cantrips ?? []).forEach((id) => mergedCantripIds.add(id));
-      (p?.spells ?? []).forEach((id) => mergedSpellIds.add(id));
-    }
-    if (!mergedCantripIds.size) this.selectedCantrips().forEach((id) => mergedCantripIds.add(id));
-    if (!mergedSpellIds.size) this.selectedSpells().forEach((id) => mergedSpellIds.add(id));
-
     const allMap = new Map(this.allSpells().map((s) => [s.id, s]));
-
-    const racialCantripInstances = this.racialSpellGrants()
-      .map((grant) => {
-        const id = this.racialCantripPicks()[grant.choiceId];
-        if (!id) return null;
-        const raw = allMap.get(id);
-        return {
-          refId: id,
-          name: raw?.name ?? labelForGameId(id),
-          level: 0,
-          prepared: true,
-          effectSummary: `${grant.label} · ${this.extractEffect(raw)}`,
-        };
-      })
-      .filter((x): x is NonNullable<typeof x> => !!x);
-
-    const cantripInstances = [
-      ...racialCantripInstances,
-      ...[...mergedCantripIds].map((id) => {
-        const raw = allMap.get(id);
-        return {
-          refId: id,
-          name: raw?.name ?? labelForGameId(id),
-          level: 0,
-          prepared: true,
-          effectSummary: this.extractEffect(raw),
-        };
-      }),
-    ];
-
-    const chosenSpellIds = [...mergedSpellIds];
-    const domainIds = this.domainSpellIds().filter((id) => !chosenSpellIds.includes(id));
-    const spellInstances = [...chosenSpellIds, ...domainIds].map((id) => {
-      const raw = allMap.get(id);
-      const isDomain = this.domainSpellIds().includes(id);
-      return {
-        refId: id,
-        name: raw?.name ?? labelForGameId(id),
-        level: raw?.level ?? 1,
-        prepared: true,
-        alwaysPrepared: isDomain,
-        effectSummary: this.extractEffect(raw),
-      };
-    });
-
-    const mysticArcanum = this.arcanumSpellLevels().map((spellLevel) => {
-      const spellId = this.arcanumPicks()[spellLevel];
-      const raw = spellId ? allMap.get(spellId) : undefined;
-      return {
-        spellLevel,
-        spellId: spellId ?? '',
-        spellName: raw?.name ?? (spellId ? labelForGameId(spellId) : ''),
-      };
-    }).filter((a) => !!a.spellId);
-
-    // Inclure les arcanes dans la liste des sorts connus (marqués alwaysPrepared)
-    for (const a of mysticArcanum) {
-      if (spellInstances.some((s) => s.refId === a.spellId)) continue;
-      const raw = allMap.get(a.spellId);
-      spellInstances.push({
-        refId: a.spellId,
-        name: a.spellName,
-        level: a.spellLevel,
-        prepared: true,
-        alwaysPrepared: true,
-        effectSummary: `Arcane (1× / repos long) · ${this.extractEffect(raw)}`,
-      });
-    }
-
-    const spellMastery = ([1, 2] as const)
-      .map((spellLevel) => {
-        const spellId = this.masteryPicks()[spellLevel];
-        if (!spellId) return null;
-        const raw = allMap.get(spellId);
-        return {
-          spellLevel,
-          spellId,
-          spellName: raw?.name ?? labelForGameId(spellId),
-        };
-      })
-      .filter((x): x is NonNullable<typeof x> => !!x);
-
-    const signatureSpells = this.signatureIds().slice(0, 2).map((spellId) => {
-      const raw = allMap.get(spellId);
-      return { spellId, spellName: raw?.name ?? labelForGameId(spellId) };
-    });
-
-    // Sorts attitrés : toujours préparés
-    for (const s of signatureSpells) {
-      const existing = spellInstances.find((x) => x.refId === s.spellId);
-      if (existing) {
-        existing.alwaysPrepared = true;
-        existing.effectSummary = `Sort attitré (1× / repos court ou long) · ${existing.effectSummary}`;
-      }
-    }
-    // Maîtrise : annotation
-    for (const m of spellMastery) {
-      const existing = spellInstances.find((x) => x.refId === m.spellId);
-      if (existing) {
-        existing.effectSummary = `Maîtrise (à volonté) · ${existing.effectSummary}`;
-      }
-    }
-
-    const oathSpells = this.subclassBonusSpells
-      .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
-      .map((g) => ({
-        characterLevel: g.level_unlocked ?? 0,
-        spells: (g.spells ?? []).map((id) => allMap.get(id)?.name ?? labelForGameId(id)),
-      }))
-      .filter((g) => g.spells.length > 0);
-
-    const deity = this.deities().find((d) => d.id === this.selectedDeityId());
-
-    const details = {
-      confirmed: true,
-      cantrips: cantripInstances,
-      spells: spellInstances,
-      deity: deity?.name ?? '',
-      deityId: deity?.id ?? '',
-      domain: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
+    const persisted = persistMagicDraft({
+      casterClassIds: this.casterSources().map((s) => s.classId),
+      picksByClass: this.picksByClass,
+      selectedCantrips: this.selectedCantrips(),
+      selectedSpells: this.selectedSpells(),
+      racialGrants: this.racialSpellGrants().map((g) => ({ choiceId: g.choiceId, label: g.label })),
+      racialCantripPicks: this.racialCantripPicks(),
+      domainSpellIds: this.domainSpellIds(),
+      arcanumLevels: this.arcanumSpellLevels(),
+      arcanumPicks: this.arcanumPicks(),
+      masteryPicks: this.masteryPicks(),
+      signatureIds: this.signatureIds(),
+      subclassBonusSpells: this.subclassBonusSpells,
+      targetLevel: this.builder.targetLevel(),
+      deity: this.deities().find((d) => d.id === this.selectedDeityId()) ?? null,
+      domainName: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
       domainId: this.activeSubclassId() ?? '',
-        hasFullSpellList: this.quota()?.hasFullListAccess ?? false,
-        preparedCount: this.quota()?.preparedSpells ?? 0,
-        byClass: this.picksByClass,
-      patron: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
-      arcaneTradition: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
-      mysticArcanum,
-      spellMastery,
-      signatureSpells,
-      oathSpells,
-    };
-
-    const arcanumRecord: Record<string, string> = {};
-    for (const a of mysticArcanum) arcanumRecord[String(a.spellLevel)] = a.spellId;
-    const masteryRecord: Record<string, string> = {};
-    for (const m of spellMastery) masteryRecord[String(m.spellLevel)] = m.spellId;
-
-    this.builder.creation.update((c) => {
-      const speciesAnswers = { ...(c.speciesChoiceAnswers ?? {}) };
-      for (const grant of this.racialSpellGrants()) {
-        const pick = this.racialCantripPicks()[grant.choiceId];
-        if (pick) speciesAnswers[grant.choiceId] = [pick];
-      }
-      return {
-        ...c,
-        speciesChoiceAnswers: speciesAnswers,
-        spellcastingDetails: details,
-        mysticArcanumPicks: arcanumRecord,
-        spellMasteryPicks: masteryRecord,
-        signatureSpellIds: signatureSpells.map((s) => s.spellId),
-      };
+      quota: this.quota(),
+      spellsById: allMap,
+      effectOf: (id) => this.extractEffect(id ? allMap.get(id) : undefined),
     });
+
+    this.builder.creation.update((c) => ({
+      ...c,
+      speciesChoiceAnswers: { ...(c.speciesChoiceAnswers ?? {}), ...persisted.speciesChoiceAnswersPatch },
+      spellcastingDetails: persisted.details as unknown as Record<string, unknown>,
+      mysticArcanumPicks: persisted.mysticArcanumPicks,
+      spellMasteryPicks: persisted.spellMasteryPicks,
+      signatureSpellIds: persisted.signatureSpellIds,
+    }));
     this.builder.nextStep();
   }
 
@@ -1136,7 +931,7 @@ export class MagicStep implements OnInit {
     const comp = this.formatComponents(raw.components);
     if (comp) parts.push(comp);
 
-    const dur = this.formatDuration(raw.duration);
+    const dur = spellDurationLabel(raw);
     if (dur) parts.push(dur);
 
     if (raw.description) {
@@ -1158,40 +953,6 @@ export class MagicStep implements OnInit {
       parts.push(`M(${mat})`);
     }
     return parts.join(',');
-  }
-
-  private formatDuration(dur: { amount: number | string | null; unit: string | null }): string {
-    const amountStr = dur.amount != null ? String(dur.amount) : '';
-    const unitStr = (dur.unit ?? '').toLowerCase();
-    if (!amountStr && !unitStr) return 'Instantanée';
-    if (
-      amountStr === 'instantanee' ||
-      amountStr === 'instantané' ||
-      amountStr === 'instantanée' ||
-      unitStr === 'instantane' ||
-      unitStr === 'instantanée'
-    ) {
-      return 'Instantanée';
-    }
-
-    const amount = dur.amount ?? '';
-    const unit = dur.unit ?? '';
-
-    const shortUnits: Record<string, string> = {
-      minute: 'min',
-      minutes: 'min',
-      heure: 'h',
-      heures: 'h',
-      round: 'rd',
-      rounds: 'rds',
-      jour: 'j',
-      jours: 'j',
-      tour: 'tour',
-      tours: 'tours',
-    };
-    const shortUnit = shortUnits[unit.toLowerCase()] ?? unit;
-
-    return `${amount} ${shortUnit}`.trim();
   }
 
   clearSelection(): void {
@@ -1240,227 +1001,48 @@ export class MagicStep implements OnInit {
 
   // === Private ===
 
-  private abilityToKey(ability: string): AbilityKey | null {
-    const map: Record<string, AbilityKey> = {
-      Force: 'force',
-      Dextérité: 'dexterite',
-      Constitution: 'constitution',
-      Intelligence: 'intelligence',
-      Sagesse: 'sagesse',
-      Charisme: 'charisme',
-      str: 'force',
-      dex: 'dexterite',
-      con: 'constitution',
-      int: 'intelligence',
-      wis: 'sagesse',
-      cha: 'charisme',
-      force: 'force',
-      dexterite: 'dexterite',
-      constitution: 'constitution',
-      intelligence: 'intelligence',
-      sagesse: 'sagesse',
-      charisme: 'charisme',
-    };
-    return map[ability] ?? map[ability.toLowerCase()] ?? null;
-  }
-
   private restoreFromBuilder(): void {
-    const racial: Record<string, string> = {};
-    const answers = this.builder.creation().speciesChoiceAnswers ?? {};
-    for (const grant of this.racialSpellGrants()) {
-      const pick = answers[grant.choiceId]?.[0];
-      if (pick && pick !== 'any_wizard_cantrip') racial[grant.choiceId] = pick;
+    const creation = this.builder.creation();
+    const details = creation.spellcastingDetails as SpellcastingDetailsDraft | undefined;
+    const restored = restoreMagicDraft({
+      speciesChoiceAnswers: creation.speciesChoiceAnswers ?? {},
+      racialChoiceIds: this.racialSpellGrants().map((g) => g.choiceId),
+      details,
+      activeClassId: this.activeCaster()?.classId ?? null,
+      deities: this.deities(),
+      mysticArcanumPicks: creation.mysticArcanumPicks ?? {},
+      spellMasteryPicks: creation.spellMasteryPicks ?? {},
+      signatureSpellIds: creation.signatureSpellIds ?? [],
+    });
+    if (Object.keys(restored.racialCantripPicks).length) {
+      this.racialCantripPicks.set(restored.racialCantripPicks);
     }
-    if (Object.keys(racial).length) this.racialCantripPicks.set(racial);
-    const racialIds = new Set(Object.values(racial));
-
-    const details = this.builder.creation().spellcastingDetails as SpellcastingDetailsDraft;
-    const arcanumIds = new Set(
-      (details?.mysticArcanum ?? [])
-        .map((a) => a.spellId)
-        .filter(Boolean),
-    );
     if (details?.cantrips) {
-      const byClass = details.byClass;
-      const activeId = this.activeCaster()?.classId;
-      const fromClass = activeId ? byClass?.[activeId]?.cantrips : undefined;
-      const cantripIds = fromClass ?? details.cantrips.map((c) => c.refId);
-      this.selectedCantrips.set(
-        new Set(cantripIds.filter((id): id is string => typeof id === 'string' && !racialIds.has(id))),
-      );
-      if (byClass) {
-        for (const [id, p] of Object.entries(byClass)) {
-          this.picksByClass[id] = {
-            cantrips: p.cantrips ?? [],
-            spells: p.spells ?? [],
-            deityId: p.deityId ?? null,
-          };
-        }
+      this.selectedCantrips.set(new Set(restored.selectedCantrips));
+      for (const [id, p] of Object.entries(restored.picksByClass)) {
+        this.picksByClass[id] = p;
       }
     }
-    if (details?.spells) {
-      this.selectedSpells.set(
-        new Set(
-          details.spells
-            .filter((s) => !s.alwaysPrepared && !arcanumIds.has(s.refId))
-            .map((s) => s.refId),
-        ),
-      );
-    }
-    if (details?.deity) {
-      const match = this.deities().find((d) => d.name === details.deity);
-      if (match) this.selectedDeityId.set(match.id);
-    }
-    const fromDetails = details?.mysticArcanum as
-      | { spellLevel: number; spellId: string }[]
-      | undefined;
-    const fromCreation = this.builder.creation().mysticArcanumPicks ?? {};
-    const picks: Record<number, string> = {};
-    if (fromDetails?.length) {
-      for (const a of fromDetails) {
-        if (a.spellId) picks[a.spellLevel] = a.spellId;
-      }
-    } else {
-      for (const [k, v] of Object.entries(fromCreation)) {
-        const lvl = Number(k);
-        if (v) picks[lvl] = v;
-      }
-    }
-    this.arcanumPicks.set(picks);
-
-    const masteryFromDetails = details?.spellMastery as
-      | { spellLevel: number; spellId: string }[]
-      | undefined;
-    const masteryFromCreation = this.builder.creation().spellMasteryPicks ?? {};
-    const mastery: Record<number, string> = {};
-    if (masteryFromDetails?.length) {
-      for (const m of masteryFromDetails) {
-        if (m.spellId) mastery[m.spellLevel] = m.spellId;
-      }
-    } else {
-      for (const [k, v] of Object.entries(masteryFromCreation)) {
-        if (v) mastery[Number(k)] = v;
-      }
-    }
-    this.masteryPicks.set(mastery);
-
-    const sigFromDetails = details?.signatureSpells as { spellId: string }[] | undefined;
-    const sigFromCreation = this.builder.creation().signatureSpellIds ?? [];
-    this.signatureIds.set(
-      sigFromDetails?.length
-        ? sigFromDetails.map((s) => s.spellId).filter(Boolean)
-        : [...sigFromCreation],
-    );
-  }
-
-  // ============================================================================
-  // THEME VISUEL : LE TAROT ÉSOTÉRIQUE
-  // ============================================================================
-
-  private getSchoolKey(school: string): string {
-    return (school || '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
+    if (details?.spells) this.selectedSpells.set(new Set(restored.selectedSpells));
+    if (restored.selectedDeityId) this.selectedDeityId.set(restored.selectedDeityId);
+    this.arcanumPicks.set(restored.arcanumPicks);
+    this.masteryPicks.set(restored.masteryPicks);
+    this.signatureIds.set(restored.signatureIds);
   }
 
   getCardClasses(school: string, isSelected: boolean): string {
-    if (!isSelected) return 'border-slate-800 hover:border-slate-600 shadow-md';
-    switch (this.getSchoolKey(school)) {
-      case 'abjuration':
-        return 'border-2 border-cyan-500';
-      case 'conjuration':
-      case 'invocation':
-        return 'border-2 border-yellow-500';
-      case 'divination':
-        return 'border-2 border-indigo-500';
-      case 'enchantement':
-        return 'border-2 border-fuchsia-500';
-      case 'evocation':
-        return 'border-2 border-red-500';
-      case 'illusion':
-        return 'border-2 border-purple-500';
-      case 'necromancie':
-        return 'border-2 border-lime-500';
-      case 'transmutation':
-        return 'border-2 border-orange-500';
-      default:
-        return 'border-2 border-slate-500';
-    }
+    return magicCardClasses(school, isSelected);
   }
 
   getTextClasses(school: string, isSelected: boolean): string {
-    if (!isSelected) return 'text-slate-300 group-hover:text-slate-100';
-    switch (this.getSchoolKey(school)) {
-      case 'abjuration':
-        return 'text-cyan-400';
-      case 'conjuration':
-      case 'invocation':
-        return 'text-yellow-400';
-      case 'divination':
-        return 'text-indigo-400';
-      case 'enchantement':
-        return 'text-fuchsia-400';
-      case 'evocation':
-        return 'text-red-400';
-      case 'illusion':
-        return 'text-purple-400';
-      case 'necromancie':
-        return 'text-lime-400';
-      case 'transmutation':
-        return 'text-orange-400';
-      default:
-        return 'text-slate-200';
-    }
+    return magicTextClasses(school, isSelected);
   }
 
   getBadgeClasses(school: string): string {
-    switch (this.getSchoolKey(school)) {
-      case 'abjuration':
-        return 'bg-cyan-950/30 text-cyan-500 border-cyan-900/50';
-      case 'conjuration':
-      case 'invocation':
-        return 'bg-yellow-950/30 text-yellow-500 border-yellow-900/50';
-      case 'divination':
-        return 'bg-indigo-950/30 text-indigo-400 border-indigo-900/50';
-      case 'enchantement':
-        return 'bg-fuchsia-950/30 text-fuchsia-400 border-fuchsia-900/50';
-      case 'evocation':
-        return 'bg-red-950/30 text-red-500 border-red-900/50';
-      case 'illusion':
-        return 'bg-purple-950/30 text-purple-400 border-purple-900/50';
-      case 'necromancie':
-        return 'bg-lime-950/30 text-lime-500 border-lime-900/50';
-      case 'transmutation':
-        return 'bg-orange-950/30 text-orange-500 border-orange-900/50';
-      default:
-        return 'bg-slate-900 text-slate-400 border-slate-700';
-    }
+    return magicBadgeClasses(school);
   }
 
   getCheckboxClasses(school: string, isSelected: boolean): string {
-    if (!isSelected)
-      return 'border-slate-700 group-hover:border-slate-500 bg-[#1b2028] text-transparent';
-    switch (this.getSchoolKey(school)) {
-      case 'abjuration':
-        return 'border-cyan-500 bg-cyan-950/50 text-cyan-400';
-      case 'conjuration':
-      case 'invocation':
-        return 'border-yellow-500 bg-yellow-950/50 text-yellow-500';
-      case 'divination':
-        return 'border-indigo-500 bg-indigo-950/50 text-indigo-400';
-      case 'enchantement':
-        return 'border-fuchsia-500 bg-fuchsia-950/50 text-fuchsia-400';
-      case 'evocation':
-        return 'border-red-500 bg-red-950/50 text-red-500';
-      case 'illusion':
-        return 'border-purple-500 bg-purple-950/50 text-purple-400';
-      case 'necromancie':
-        return 'border-lime-500 bg-lime-950/50 text-lime-500';
-      case 'transmutation':
-        return 'border-orange-500 bg-orange-950/50 text-orange-500';
-      default:
-        return 'border-slate-500 bg-slate-800 text-slate-200';
-    }
+    return magicCheckboxClasses(school, isSelected);
   }
 }

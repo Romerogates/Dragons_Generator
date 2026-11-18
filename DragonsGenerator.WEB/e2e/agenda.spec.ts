@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import { createCampaignAs } from './helpers/campaign';
 
 test.describe('Agenda global', () => {
   test('navbar Agenda ouvre le calendrier multi-campagnes', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     await createCampaignAs(page, owner, `E2E Agenda ${Date.now()}`);
     await applyAuthSession(page, owner, '/agenda');
 
@@ -27,7 +27,7 @@ test.describe('Agenda global', () => {
   test('date perso sans campagne (héros seul)', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     await createCampaignAs(page, owner, `E2E Agenda Perso ${Date.now()}`);
     await applyAuthSession(page, owner, '/agenda');
 

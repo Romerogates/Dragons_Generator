@@ -7,33 +7,29 @@ import {
   validateCharacterForEdit,
 } from '../utils/character-edit.mapper';
 import {
-  computeCharacterArmorClass,
-} from '../utils/character-combat.util';
-import {
   aggregateAsiChoices,
-  canAffordAbilityScore,
   computeAbilityModifiersFromScores,
-  computeFinalAbilities,
-  computeHitPointsMax,
-  computeSecondaryClassesHitPoints,
-  computePassivePerception,
 } from '../utils/character-abilities.util';
+import {
+  deriveBaseArmorClass,
+  deriveFinalAbilities,
+  deriveHitPointsMax,
+  derivePassivePerception,
+  deriveWoundThreshold,
+  secondaryClassesTotalLevel,
+  totalCharacterLevel,
+} from '../utils/character-builder-derived.util';
 import {
   buildClassFeaturesForLevel,
 } from '../utils/character-class-features.util';
-import { mergeCreationLanguages } from '../utils/character-languages.util';
 import {
-  mergeToolProficiencies,
-  mergeWeaponProficiencies,
   normalizeBackgroundSkillId,
   stripProgressionChoiceFeatures,
-  toggleSkillSelection,
 } from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import type { RawFeatData } from '../utils/feat-benefits.util';
 import type { Spell } from '../models/Spells/spell';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
-import { coerceEquipmentSlots } from '../utils/class-data.adapter';
 import { creationNeedsMagicStep } from '../utils/class-spellcasting.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { forkJoin } from 'rxjs';
@@ -45,14 +41,10 @@ import {
   AbilityKey,
   AbilityScores,
   AsiChoiceSlot,
-  Size,
   FeatureInstance,
   EquipmentInstance,
   EquipmentSlot,
   Currency,
-  ABILITY_POINT_COSTS,
-  STARTING_POINTS,
-  DEFAULT_ABILITY_SCORE,
   MIN_ABILITY_SCORE,
   MAX_ABILITY_SCORE,
   getAbilityModifier,
@@ -80,7 +72,44 @@ export type {
   SpeciesSelection,
 } from '../models/Character/character-builder.types';
 
-const STORAGE_KEY = 'dragon_character_builder_v6';
+import {
+  CHARACTER_BUILDER_STORAGE_KEY,
+  builderDraftStorageKey,
+  clearBuilderDraftStorage,
+  isMeaningfulBuilderDraft,
+  purgeLegacyBuilderDraftKeys,
+  readBuilderDraftFromStorage,
+  writeBuilderDraftToStorage,
+} from '../utils/character-builder-draft.util';
+import {
+  addSecondaryClassSelection,
+  applyBackgroundSelection,
+  applyCivilizationSelection,
+  applyClassProgressionChoices,
+  applyClassSelection,
+  applySpeciesSelection,
+  clearBackgroundSelection,
+  clearCivilizationSelection,
+  clearClassSelection,
+  clearSpeciesSelection,
+  removeSecondaryClassSelection,
+} from '../utils/character-builder-creation.util';
+import {
+  addLanguageInCreation,
+  applyAbilityScore,
+  applyAbilityScoresBulk,
+  applyAsiChoiceSimple,
+  applyCurrencyInCreation,
+  applyIdentityInCreation,
+  applyProficienciesInCreation,
+  mergeClassProficienciesInCreation,
+  patchSecondaryClassInCreation,
+  resetAbilitiesInCreation,
+  setEquipmentInCreation,
+  setLanguagesInCreation,
+  toggleSkillInCreation,
+  updateSecondaryClassLevelInCreation,
+} from '../utils/character-builder-kit.util';
 
 export { proficiencyBonusForLevel } from '../utils/character-progression.util';
 
@@ -153,10 +182,7 @@ export class CharacterBuilderService {
    */
   readonly isLevelLocked = computed(() => this.currentStep() > this.classStepNumber);
 
-  readonly finalAbilities = computed<AbilityScores>(() => {
-    const c = this.creation();
-    return computeFinalAbilities(c.baseAbilities, c.racialBonuses, c.asiBonuses ?? {});
-  });
+  readonly finalAbilities = computed<AbilityScores>(() => deriveFinalAbilities(this.creation()));
 
   readonly abilityModifiers = computed<AbilityScores>(() =>
     computeAbilityModifiersFromScores(this.finalAbilities()),
@@ -170,33 +196,17 @@ export class CharacterBuilderService {
    * Mono-classe : total === targetLevel (inchangé).
    */
   readonly secondaryClassesTotalLevel = computed<number>(() =>
-    (this.creation().secondaryClasses ?? []).reduce((sum, sc) => sum + (sc.level || 0), 0),
+    secondaryClassesTotalLevel(this.creation().secondaryClasses),
   );
 
   /** Niveau TOTAL du personnage (primaire + multiclassage), pour bonus de maîtrise et affichage. */
   readonly totalCharacterLevel = computed<number>(() =>
-    Math.min(20, (this.creation().targetLevel || 1) + this.secondaryClassesTotalLevel()),
+    totalCharacterLevel(this.creation().targetLevel || 1, this.secondaryClassesTotalLevel()),
   );
 
-  readonly hitPointsMax = computed<number>(() => {
-    const c = this.creation();
-    const primary = computeHitPointsMax({
-      targetLevel: c.targetLevel || 1,
-      hpAtLevel1: c.hpAtLevel1,
-      hpPerLevelAverage: c.hpPerLevelAverage,
-      hitDie: c.hitDie,
-      constitutionMod: this.abilityModifiers().constitution,
-      classId: c.classId,
-      subclassId: c.subclassId,
-      subspeciesId: c.subspeciesId,
-      classFeatures: c.classFeatures ?? [],
-    });
-    const secondary = computeSecondaryClassesHitPoints(
-      c.secondaryClasses ?? [],
-      this.abilityModifiers().constitution,
-    );
-    return primary + secondary;
-  });
+  readonly hitPointsMax = computed<number>(() =>
+    deriveHitPointsMax(this.creation(), this.abilityModifiers().constitution),
+  );
 
   readonly proficiencyBonus = computed<number>(() =>
     proficiencyBonusForLevel(this.totalCharacterLevel()),
@@ -208,35 +218,21 @@ export class CharacterBuilderService {
     () => this.creation().secondaryClasses ?? [],
   );
 
-  readonly woundThreshold = computed<number>(() => {
-    return Math.ceil(this.hitPointsMax() / 2);
-  });
+  readonly woundThreshold = computed<number>(() => deriveWoundThreshold(this.hitPointsMax()));
 
-  readonly baseArmorClass = computed<number>(() => {
-    const c = this.creation();
-    const allEquipment = [...c.selectedEquipment, ...(c.backgroundEquipment ?? [])];
-    return computeCharacterArmorClass(allEquipment, this.abilityModifiers(), {
-      classId: c.classId,
-      subclassId: c.subclassId,
-      classFeatures: c.classFeatures,
-    });
-  });
+  readonly baseArmorClass = computed<number>(() =>
+    deriveBaseArmorClass(this.creation(), this.abilityModifiers()),
+  );
 
-  readonly initiative = computed<number>(() => {
-    return this.abilityModifiers().dexterite;
-  });
+  readonly initiative = computed<number>(() => this.abilityModifiers().dexterite);
 
-  readonly passivePerception = computed<number>(() => {
-    const c = this.creation();
-    const hasPerception =
-      c.selectedSkills.includes('skill-perception') ||
-      c.backgroundSkills.includes('skill-perception');
-    return computePassivePerception(
+  readonly passivePerception = computed<number>(() =>
+    derivePassivePerception(
+      this.creation(),
       this.abilityModifiers().sagesse,
-      hasPerception,
       this.proficiencyBonus(),
-    );
-  });
+    ),
+  );
 
   readonly isCurrentStepValid = computed<boolean>(() => {
     return this.isStepValid(this.currentStep());
@@ -266,181 +262,27 @@ export class CharacterBuilderService {
   }
 
   setSpecies(selection: SpeciesSelection): void {
-    this.creation.update((c) => {
-      const prevSpBonus = c.speciesBonusLangApplied ?? 0;
-      const newBonusTotal =
-        (c.bonusLanguageCount || 0) - prevSpBonus + selection.bonusLanguageCount;
-
-      return {
-        ...c,
-        speciesId: selection.speciesId,
-        speciesName: selection.speciesName,
-        subspeciesId: selection.subspeciesId,
-        subspeciesName: selection.subspeciesName,
-        racialBonuses: selection.racialBonuses,
-        speciesTraits: selection.traits,
-        speciesSpeed: selection.speed,
-        speciesSize: selection.size,
-        speciesLanguages: selection.languages,
-        speciesResistances: selection.resistances,
-        hasDarkvision: selection.hasDarkvision,
-        darkvisionRadius: selection.darkvisionRadius,
-        speciesFixedSkills: selection.bonusSkills ?? [],
-        speciesFixedWeapons: selection.bonusWeapons ?? [],
-        speciesFixedArmor: selection.bonusArmor ?? [],
-        speciesFixedTools: selection.bonusTools ?? [],
-        speciesInnateSpells: selection.innateSpells ?? [],
-        speciesChoiceAnswers: selection.choiceAnswers,
-        speciesBonusSkillCount: selection.bonusSkillCount,
-        speciesBonusToolCount: selection.bonusToolCount,
-        speciesBonusToolPoolIds: selection.bonusToolPoolIds ?? [],
-        speciesBonusToolChoiceLabel: selection.bonusToolChoiceLabel ?? '',
-        racialSpellGrants: selection.racialSpellGrants,
-        bonusLanguageCount: newBonusTotal,
-        speciesBonusLangApplied: selection.bonusLanguageCount,
-        languages: mergeCreationLanguages(
-          selection.languages,
-          c.civilizationLanguages,
-          c.backgroundLanguages,
-        ),
-      };
-    });
+    this.creation.update((c) => applySpeciesSelection(c, selection));
   }
 
   clearSpecies(): void {
-    this.creation.update((c) => {
-      const prevSpBonus = c.speciesBonusLangApplied ?? 0;
-
-      return {
-        ...c,
-        speciesId: null,
-        speciesName: null,
-        subspeciesId: null,
-        subspeciesName: null,
-        racialBonuses: {},
-        speciesTraits: [],
-        speciesSpeed: 9,
-        speciesSize: 'M' as Size,
-        speciesLanguages: [],
-        speciesResistances: [],
-        hasDarkvision: false,
-        darkvisionRadius: 0,
-        speciesFixedSkills: [],
-        speciesFixedWeapons: [],
-        speciesFixedArmor: [],
-        speciesFixedTools: [],
-        speciesInnateSpells: [],
-        speciesChoiceAnswers: {},
-        speciesBonusSkillCount: 0,
-        speciesBonusToolCount: 0,
-        speciesBonusToolPoolIds: [],
-        speciesBonusToolChoiceLabel: '',
-        racialSpellGrants: [],
-        bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
-        speciesBonusLangApplied: 0,
-        languages: mergeCreationLanguages(c.civilizationLanguages, c.backgroundLanguages),
-      };
-    });
+    this.creation.update((c) => clearSpeciesSelection(c));
   }
 
   setCivilization(selection: CivilizationSelection): void {
-    this.creation.update((c) => ({
-      ...c,
-      civilizationId: selection.civilizationId,
-      civilizationName: selection.civilizationName,
-      civilizationLanguages: selection.languages,
-      civilizationWritingSystems: selection.writingSystems,
-      languages: mergeCreationLanguages(
-        c.speciesLanguages,
-        selection.languages,
-        c.backgroundLanguages,
-      ),
-    }));
+    this.creation.update((c) => applyCivilizationSelection(c, selection));
   }
 
   clearCivilization(): void {
-    this.creation.update((c) => ({
-      ...c,
-      civilizationId: null,
-      civilizationName: null,
-      civilizationLanguages: [],
-      civilizationWritingSystems: [],
-      languages: mergeCreationLanguages(c.speciesLanguages, c.backgroundLanguages),
-    }));
+    this.creation.update((c) => clearCivilizationSelection(c));
   }
 
   setBackground(selection: BackgroundSelection): void {
-    this.creation.update((c) => {
-      const prevBgBonus = c.backgroundBonusLangApplied ?? 0;
-      const newBonusTotal =
-        (c.bonusLanguageCount || 0) - prevBgBonus + selection.bonusLanguageCount;
-
-      return {
-        ...c,
-        backgroundId: selection.backgroundId,
-        backgroundName: selection.backgroundName,
-        backgroundPreset: selection.backgroundPreset,
-        backgroundProficiencies: selection.proficiencies ?? null,
-        backgroundSkills: (selection.skills ?? []).map(normalizeBackgroundSkillId),
-        backgroundTools: [],
-        toolEquipmentSlots: [],
-        backgroundLanguages: [],
-
-        backgroundEquipment: selection.equipment,
-        backgroundEquipmentSlots: selection.equipmentSlots,
-
-        backgroundCurrency: selection.currency,
-        privilegeId: selection.privilegeId,
-        privilegeName: selection.privilegeName,
-        privilegeDesc: selection.privilegeDesc,
-        selectedHandicaps: selection.selectedHandicaps,
-        handicapCompensationType: selection.handicapCompensationType,
-        background: selection.backgroundText || c.background,
-        traits: selection.traits || c.traits,
-        ideal: selection.ideal || c.ideal,
-        bonds: selection.bonds || c.bonds,
-        flaws: selection.flaws || c.flaws,
-        handicap: selection.handicap || c.handicap,
-        bonusLanguageCount: newBonusTotal,
-        backgroundBonusLangApplied: selection.bonusLanguageCount,
-        languages: mergeCreationLanguages(c.speciesLanguages, c.civilizationLanguages),
-      };
-    });
+    this.creation.update((c) => applyBackgroundSelection(c, selection));
   }
 
   clearBackground(): void {
-    this.creation.update((c) => {
-      const prevBgBonus = c.backgroundBonusLangApplied ?? 0;
-
-      return {
-        ...c,
-        backgroundId: null,
-        backgroundName: null,
-        backgroundPreset: false,
-        backgroundSkills: [],
-        backgroundTools: [],
-        backgroundProficiencies: null,
-        backgroundLanguages: [],
-        backgroundEquipment: [],
-        backgroundEquipmentSlots: [],
-        toolEquipmentSlots: [],
-        backgroundCurrency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
-        privilegeId: null,
-        privilegeName: null,
-        privilegeDesc: null,
-        selectedHandicaps: [],
-        handicapCompensationType: null,
-        background: '',
-        traits: '',
-        ideal: '',
-        bonds: '',
-        flaws: '',
-        handicap: '',
-        bonusLanguageCount: (c.bonusLanguageCount || 0) - prevBgBonus,
-        backgroundBonusLangApplied: 0,
-        languages: mergeCreationLanguages(c.speciesLanguages, c.civilizationLanguages),
-      };
-    });
+    this.creation.update((c) => clearBackgroundSelection(c));
   }
 
   setTargetLevel(level: number): void {
@@ -495,63 +337,7 @@ export class CharacterBuilderService {
   }
 
   setClass(selection: ClassSelection, opts?: { preserveProgress?: boolean }): void {
-    const preserve = opts?.preserveProgress === true;
-    this.creation.update((c) => {
-      const prevClassLang = c.classBonusLanguageCount ?? 0;
-      const newClassLang = selection.classBonusLanguageCount ?? 0;
-      return {
-      ...c,
-      classId: selection.classId,
-      className: selection.className,
-      subclassId: selection.subclassId ?? null,
-      subclassName: selection.subclassName ?? null,
-      hitDie: selection.hitDie,
-      hpAtLevel1:
-        selection.hpAtLevel1 && selection.hpAtLevel1 > 0
-          ? selection.hpAtLevel1
-          : selection.hitDie,
-      hpPerLevelAverage:
-        selection.hpPerLevelAverage && selection.hpPerLevelAverage > 0
-          ? selection.hpPerLevelAverage
-          : Math.floor(selection.hitDie / 2) + 1,
-      hasSpellcasting: selection.hasSpellcasting,
-      spellcastingKind: selection.spellcastingKind,
-      spellcastingAbility: selection.spellcastingAbility,
-      savingThrows: selection.savingThrows,
-      armorProficiencies: selection.armorProficiencies,
-      weaponProficiencies: selection.weaponProficiencies,
-      toolProficiencies: selection.toolProficiencies,
-      skillOptions: selection.skillOptions,
-      skillChooseCount: selection.skillChooseCount,
-      classFeatures: selection.classFeatures,
-      startingEquipmentSlots: coerceEquipmentSlots(selection.startingEquipmentSlots),
-      classProgressionResources: selection.classProgressionResources ?? {},
-      classBonusLanguageCount: newClassLang,
-      classSpellSlots: selection.classSpellSlots ?? [],
-      classResistances: selection.classResistances ?? [],
-      classDarkvisionRadius: selection.classDarkvisionRadius ?? 0,
-      classHasBlindsight: selection.classHasBlindsight ?? false,
-      classBlindsightRadius: selection.classBlindsightRadius ?? 0,
-      bonusLanguageCount: (c.bonusLanguageCount || 0) - prevClassLang + newClassLang,
-      requiredExoticLanguageCount: selection.classRequiredExoticLanguageCount ?? 0,
-      requiredBaseLanguageCount: selection.classRequiredBaseLanguageCount ?? 0,
-      classChoiceAnswers: preserve ? c.classChoiceAnswers : {},
-      asiBonuses: preserve ? c.asiBonuses : {},
-      selectedFeatId: preserve ? c.selectedFeatId : null,
-      selectedFeatIds: preserve ? c.selectedFeatIds : [],
-      asiChoices: preserve ? c.asiChoices : [],
-      expertiseSkills: preserve ? c.expertiseSkills : [],
-      metamagicOptions: preserve ? c.metamagicOptions : [],
-      eldritchInvocations: preserve ? c.eldritchInvocations : [],
-      pactBoon: preserve ? c.pactBoon : null,
-      mysticArcanumPicks: preserve ? c.mysticArcanumPicks : {},
-      spellMasteryPicks: preserve ? c.spellMasteryPicks : {},
-      signatureSpellIds: preserve ? c.signatureSpellIds : [],
-      selectedSkills: preserve ? c.selectedSkills : [],
-      selectedEquipment: preserve ? c.selectedEquipment : [],
-      spellcastingDetails: preserve ? c.spellcastingDetails : {},
-    };
-    });
+    this.creation.update((c) => applyClassSelection(c, selection, opts));
   }
 
   // ==========================================================================
@@ -560,33 +346,17 @@ export class CharacterBuilderService {
 
   /** Ajoute une classe de multiclassage. Aucun effet si la classe est déjà primaire ou déjà ajoutée. */
   addSecondaryClass(selection: SecondaryClassSelection): void {
-    this.creation.update((c) => {
-      const existing = c.secondaryClasses ?? [];
-      if (c.classId === selection.classId) return c;
-      if (existing.some((sc) => sc.classId === selection.classId)) return c;
-      return { ...c, secondaryClasses: [...existing, selection] };
-    });
+    this.creation.update((c) => addSecondaryClassSelection(c, selection));
   }
 
   /** Change le niveau d'une classe secondaire déjà ajoutée (plafonné à 20 - reste des niveaux). */
   updateSecondaryClassLevel(index: number, level: number): void {
-    this.creation.update((c) => {
-      const list = [...(c.secondaryClasses ?? [])];
-      if (!list[index]) return c;
-      const clamped = Math.max(1, Math.floor(Number(level)) || 1);
-      list[index] = { ...list[index], level: clamped };
-      return { ...c, secondaryClasses: list };
-    });
+    this.creation.update((c) => updateSecondaryClassLevelInCreation(c, index, level));
   }
 
   /** Met à jour la sous-classe et/ou les aptitudes recalculées d'une classe secondaire. */
   updateSecondaryClassDetails(index: number, patch: Partial<Omit<SecondaryClassSelection, 'classId'>>): void {
-    this.creation.update((c) => {
-      const list = [...(c.secondaryClasses ?? [])];
-      if (!list[index]) return c;
-      list[index] = { ...list[index], ...patch };
-      return { ...c, secondaryClasses: list };
-    });
+    this.creation.update((c) => patchSecondaryClassInCreation(c, index, patch));
   }
 
   /** Compétences choisies à l'étape Savoirs au titre des maîtrises réduites de multiclassage. */
@@ -595,12 +365,7 @@ export class CharacterBuilderService {
   }
 
   removeSecondaryClass(index: number): void {
-    this.creation.update((c) => {
-      const list = [...(c.secondaryClasses ?? [])];
-      if (!list[index]) return c;
-      list.splice(index, 1);
-      return { ...c, secondaryClasses: list };
-    });
+    this.creation.update((c) => removeSecondaryClassSelection(c, index));
   }
 
   /** Fusionne les maîtrises d'armes/outils choisies à l'étape Savoirs. */
@@ -609,12 +374,9 @@ export class CharacterBuilderService {
     extraTools: string[],
     choiceAnswers: Record<string, string[]>,
   ): void {
-    this.creation.update((c) => ({
-      ...c,
-      weaponProficiencies: mergeWeaponProficiencies(c.weaponProficiencies ?? [], extraWeapons),
-      toolProficiencies: mergeToolProficiencies(c.toolProficiencies ?? [], extraTools),
-      classChoiceAnswers: { ...c.classChoiceAnswers, ...choiceAnswers },
-    }));
+    this.creation.update((c) =>
+      mergeClassProficienciesInCreation(c, extraWeapons, extraTools, choiceAnswers),
+    );
   }
 
   setClassProgressionChoices(payload: {
@@ -624,28 +386,13 @@ export class CharacterBuilderService {
     pactBoon?: string | null;
     extraFeatures?: FeatureInstance[];
   }): void {
-    this.creation.update((c) => {
-      const extras = payload.extraFeatures ?? [];
-      const withoutOld = stripProgressionChoiceFeatures(c.classFeatures ?? [], extras);
-      return {
-        ...c,
-        classChoiceAnswers: payload.classChoiceAnswers,
-        metamagicOptions: payload.metamagicOptions ?? c.metamagicOptions ?? [],
-        eldritchInvocations: payload.eldritchInvocations ?? c.eldritchInvocations ?? [],
-        pactBoon: payload.pactBoon !== undefined ? payload.pactBoon : c.pactBoon,
-        classFeatures: [...withoutOld, ...extras],
-      };
-    });
+    this.creation.update((c) =>
+      applyClassProgressionChoices(c, payload, stripProgressionChoiceFeatures),
+    );
   }
 
   setAsiChoice(bonuses: Partial<AbilityScores>, featId: string | null = null): void {
-    this.creation.update((c) => ({
-      ...c,
-      asiBonuses: bonuses,
-      selectedFeatId: featId,
-      selectedFeatIds: featId ? [featId] : [],
-      asiChoices: [],
-    }));
+    this.creation.update((c) => applyAsiChoiceSimple(c, bonuses, featId));
   }
 
   /** Applique N slots ASI (niveaux 4–20) : somme des bonus + liste des dons. */
@@ -718,55 +465,7 @@ export class CharacterBuilderService {
   }
 
   clearClass(): void {
-    this.creation.update((c) => ({
-      ...c,
-      classId: null,
-      className: null,
-      subclassId: null,
-      subclassName: null,
-      hitDie: 0,
-      hpAtLevel1: 0,
-      hpPerLevelAverage: 0,
-      hasSpellcasting: false,
-      spellcastingKind: null,
-      spellcastingAbility: null,
-      savingThrows: [],
-      armorProficiencies: [],
-      weaponProficiencies: [],
-      toolProficiencies: [],
-      skillOptions: [],
-      skillChooseCount: 0,
-      classFeatures: [],
-      startingEquipmentSlots: [],
-      classProgressionResources: {},
-      classBonusLanguageCount: 0,
-      classSpellSlots: [],
-      classResistances: [],
-      classDarkvisionRadius: 0,
-      classHasBlindsight: false,
-      classBlindsightRadius: 0,
-      bonusLanguageCount: (c.bonusLanguageCount || 0) - (c.classBonusLanguageCount || 0),
-      requiredExoticLanguageCount: 0,
-      requiredBaseLanguageCount: 0,
-      // Changer/retirer la classe primaire invalide toute configuration de multiclassage
-      // (prérequis, maîtrises réduites, sous-classes recalculées à partir d'un autre niveau).
-      secondaryClasses: [],
-      classChoiceAnswers: {},
-      asiBonuses: {},
-      selectedFeatId: null,
-      selectedFeatIds: [],
-      asiChoices: [],
-      expertiseSkills: [],
-      metamagicOptions: [],
-      eldritchInvocations: [],
-      pactBoon: null,
-      mysticArcanumPicks: {},
-      spellMasteryPicks: {},
-      signatureSpellIds: [],
-      selectedSkills: [],
-      selectedEquipment: [],
-      spellcastingDetails: {},
-    }));
+    this.creation.update((c) => clearClassSelection(c));
   }
 
   setProficiencies(
@@ -775,27 +474,13 @@ export class CharacterBuilderService {
     bgTools: string[],
     toolSlots: EquipmentSlot[],
   ): void {
-    this.creation.update((c) => ({
-      ...c,
-      selectedSkills: classSkills,
-      backgroundSkills: bgSkills,
-      backgroundTools: bgTools,
-      toolEquipmentSlots: toolSlots,
-    }));
+    this.creation.update((c) =>
+      applyProficienciesInCreation(c, classSkills, bgSkills, bgTools, toolSlots),
+    );
   }
 
   setAbilityScore(key: AbilityKey, value: number): void {
-    if (value < MIN_ABILITY_SCORE || value > MAX_ABILITY_SCORE) return;
-    const c = this.creation();
-    const current = c.baseAbilities[key];
-    if (!canAffordAbilityScore(current, value, c.pointsRemaining)) return;
-    const currentCost = ABILITY_POINT_COSTS[current] ?? 0;
-    const newCost = ABILITY_POINT_COSTS[value] ?? 0;
-    this.creation.update((state) => ({
-      ...state,
-      baseAbilities: { ...state.baseAbilities, [key]: value },
-      pointsRemaining: state.pointsRemaining + currentCost - newCost,
-    }));
+    this.creation.update((c) => applyAbilityScore(c, key, value) ?? c);
   }
 
   /**
@@ -804,25 +489,7 @@ export class CharacterBuilderService {
    * dépasse le budget point-buy intermédiaire.
    */
   setAbilityScoresBulk(scores: AbilityScores, pointsRemaining = 0): void {
-    const next: AbilityScores = {
-      force: scores.force,
-      dexterite: scores.dexterite,
-      constitution: scores.constitution,
-      intelligence: scores.intelligence,
-      sagesse: scores.sagesse,
-      charisme: scores.charisme,
-    };
-    for (const key of Object.keys(next) as AbilityKey[]) {
-      const v = next[key];
-      if (v < MIN_ABILITY_SCORE || v > MAX_ABILITY_SCORE) {
-        next[key] = DEFAULT_ABILITY_SCORE;
-      }
-    }
-    this.creation.update((c) => ({
-      ...c,
-      baseAbilities: next,
-      pointsRemaining: Math.max(0, Math.floor(pointsRemaining)),
-    }));
+    this.creation.update((c) => applyAbilityScoresBulk(c, scores, pointsRemaining));
   }
 
   incrementAbility(key: AbilityKey): void {
@@ -836,25 +503,11 @@ export class CharacterBuilderService {
   }
 
   resetAbilities(): void {
-    this.creation.update((c) => ({
-      ...c,
-      baseAbilities: {
-        force: DEFAULT_ABILITY_SCORE,
-        dexterite: DEFAULT_ABILITY_SCORE,
-        constitution: DEFAULT_ABILITY_SCORE,
-        intelligence: DEFAULT_ABILITY_SCORE,
-        sagesse: DEFAULT_ABILITY_SCORE,
-        charisme: DEFAULT_ABILITY_SCORE,
-      },
-      pointsRemaining: STARTING_POINTS,
-    }));
+    this.creation.update((c) => resetAbilitiesInCreation(c));
   }
 
   toggleSkill(skill: string): void {
-    this.creation.update((c) => ({
-      ...c,
-      selectedSkills: toggleSkillSelection(c.selectedSkills, skill, c.skillChooseCount),
-    }));
+    this.creation.update((c) => toggleSkillInCreation(c, skill));
   }
 
   clearSkills(): void {
@@ -865,11 +518,7 @@ export class CharacterBuilderService {
     items: EquipmentInstance[],
     wizardPicks?: { alt: Record<string, number>; category: Record<string, string[]> } | null,
   ): void {
-    this.creation.update((c) => ({
-      ...c,
-      selectedEquipment: items,
-      equipmentWizardPicks: wizardPicks ?? c.equipmentWizardPicks ?? null,
-    }));
+    this.creation.update((c) => setEquipmentInCreation(c, items, wizardPicks));
   }
 
   addEquipmentItem(item: EquipmentInstance): void {
@@ -887,21 +536,15 @@ export class CharacterBuilderService {
   }
 
   setCurrency(currency: Partial<Currency>): void {
-    this.creation.update((c) => ({
-      ...c,
-      currency: { ...c.currency, ...currency },
-    }));
+    this.creation.update((c) => applyCurrencyInCreation(c, currency));
   }
 
   setLanguages(languages: string[]): void {
-    this.creation.update((c) => ({ ...c, languages }));
+    this.creation.update((c) => setLanguagesInCreation(c, languages));
   }
 
   addLanguage(language: string): void {
-    this.creation.update((c) => ({
-      ...c,
-      languages: [...new Set([...c.languages, language])],
-    }));
+    this.creation.update((c) => addLanguageInCreation(c, language));
   }
 
   removeLanguage(language: string): void {
@@ -912,7 +555,7 @@ export class CharacterBuilderService {
   }
 
   setIdentity(identity: IdentitySelection): void {
-    this.creation.update((c) => ({ ...c, ...identity }));
+    this.creation.update((c) => applyIdentityInCreation(c, identity));
   }
 
   /** Remplace l’état de création (auto-complète / undo). */
@@ -1075,77 +718,35 @@ export class CharacterBuilderService {
   }
 
   private purgeLegacyDraftKeys(): void {
-    localStorage.removeItem('dragon_character_builder_v5');
-    localStorage.removeItem('dragon_character_builder_v4');
+    purgeLegacyBuilderDraftKeys(localStorage);
   }
 
-  /** Brouillon utile : niveau > 1, étape > 1, ou tout champ identité/build. */
   private isMeaningfulDraft(creation: ExtendedCharacterCreation, step: number): boolean {
-    return (
-      step > 1 ||
-      (creation.targetLevel ?? 1) > 1 ||
-      !!creation.speciesId ||
-      !!creation.classId ||
-      !!creation.civilizationId ||
-      !!creation.backgroundId ||
-      !!(creation.name && creation.name.trim())
-    );
-  }
-
-  private draftStorageKey(): string {
-    const id = this.editingRef()?.id;
-    return id ? `${STORAGE_KEY}_edit_${id}` : STORAGE_KEY;
+    return isMeaningfulBuilderDraft(creation, step);
   }
 
   private restoreDraftFromStorage(): void {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as {
-        creation?: ExtendedCharacterCreation;
-        currentStep?: number;
-        editing?: CharacterBuildEditingRef | null;
-      };
-      if (!parsed?.creation) {
-        this.clearStorage();
-        return;
-      }
-      const step = Number(parsed.currentStep) || 1;
-      const creation = {
-        ...structuredClone(INITIAL_CREATION_STATE),
-        ...parsed.creation,
-      };
-      if (!this.isMeaningfulDraft(creation, step)) {
-        this.clearStorage();
-        return;
-      }
-      this.creation.set(creation);
-      this.currentStep.set(Math.max(1, Math.min(step, 20)));
-      // Brouillon restauré ⇒ le niveau était déjà choisi / en cours.
-      this.levelAcknowledged.set(true);
-      if (parsed.editing?.id) {
-        this.editingRef.set(parsed.editing);
-      }
-    } catch {
-      this.clearStorage();
+    const parsed = readBuilderDraftFromStorage(localStorage);
+    if (!parsed) {
+      if (localStorage.getItem(CHARACTER_BUILDER_STORAGE_KEY)) this.clearStorage();
+      return;
+    }
+    this.creation.set(parsed.creation);
+    this.currentStep.set(parsed.currentStep);
+    this.levelAcknowledged.set(true);
+    if (parsed.editing?.id) {
+      this.editingRef.set(parsed.editing);
     }
   }
 
   private persistDraft(creation: ExtendedCharacterCreation, step: number): void {
     try {
-      const key = this.draftStorageKey();
-      if (!this.isMeaningfulDraft(creation, step)) {
-        localStorage.removeItem(key);
-        return;
-      }
-      localStorage.setItem(
-        key,
-        JSON.stringify({
-          creation,
-          currentStep: step,
-          savedAt: Date.now(),
-          editing: this.editingRef(),
-        }),
+      writeBuilderDraftToStorage(
+        localStorage,
+        builderDraftStorageKey(this.editingRef()?.id),
+        creation,
+        step,
+        this.editingRef(),
       );
     } catch {
       /* quota / private mode */
@@ -1153,8 +754,6 @@ export class CharacterBuilderService {
   }
 
   private clearStorage(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    const id = this.editingRef()?.id;
-    if (id) localStorage.removeItem(`${STORAGE_KEY}_edit_${id}`);
+    clearBuilderDraftStorage(localStorage, this.editingRef()?.id);
   }
 }

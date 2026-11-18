@@ -111,7 +111,7 @@ public class UpsertScheduleRsvpEndpoint(AppDbContext db, CampaignLivePublisher l
             ["at"] = at.ToString("O"),
         });
 
-        campaign.JsonData = root.ToJsonString();
+        CampaignLiveTableStore.Write(campaign, root.ToJsonString());
         campaign.UpdatedAt = at;
         await db.SaveChangesAsync(ct);
         await live.NotifyAsync(campaign.Id, campaign.UpdatedAt, CampaignLiveReasons.Campaign, ct);

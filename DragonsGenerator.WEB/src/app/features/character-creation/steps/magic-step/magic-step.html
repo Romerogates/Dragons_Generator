@@ -9,33 +9,7 @@
       Canalisez les flux arcaniques, divins ou primordiaux. Les mots ont un pouvoir, choisissez les
       vôtres.
     </p>
-    @if (casterSources().length > 1) {
-      <div class="flex flex-wrap justify-center gap-2 mt-4">
-        @for (src of casterSources(); track src.classId; let i = $index) {
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
-            [ngClass]="
-              i === activeCasterIndex()
-                ? 'bg-fuchsia-950/40 text-fuchsia-300 border-fuchsia-700/60'
-                : 'bg-[#1b2028] text-slate-400 border-slate-700 hover:border-slate-500'
-            "
-            (click)="selectCaster(i)"
-            [attr.data-testid]="'magic-caster-tab-' + src.classId"
-          >
-            {{ casterTabLabels()[i] }}
-          </button>
-        }
-      </div>
-    }
-    @if (spellMilestones().length) {
-      <p class="text-[10px] text-slate-500 max-w-xl mx-auto mt-2 leading-relaxed">
-        Jalons de progression (niv. 1–{{ builder.targetLevel() }}) :
-        @for (m of spellMilestones(); track m.level + m.label; let last = $last) {
-          <span class="text-slate-400">niv. {{ m.level }} +{{ m.count }} {{ m.label }}</span>@if (!last) { · }
-        }
-      </p>
-    }
+    <app-magic-caster-tabs [host]="this" />
   </div>
 
   @if (loading()) {
@@ -506,99 +480,7 @@
         </div>
       }
 
-      @if (arcanumSpellLevels().length > 0) {
-        <div class="w-full mb-12">
-          <div class="flex items-center gap-6 mb-6 w-full">
-            <div
-              class="h-px flex-grow bg-gradient-to-r from-transparent via-violet-800 to-violet-800"
-            ></div>
-            <h3
-              class="text-lg font-bold text-violet-300 font-serif tracking-widest text-center uppercase drop-shadow-md"
-            >
-              Arcanes du Suzerain
-            </h3>
-            <div
-              class="h-px flex-grow bg-gradient-to-l from-transparent via-violet-800 to-violet-800"
-            ></div>
-          </div>
-          <p class="text-center text-[11px] text-slate-400 mb-6 max-w-xl mx-auto italic">
-            Un sort de haut niveau par palier, lançable 1 fois par repos long sans emplacement de
-            pacte.
-          </p>
-          <div class="flex justify-center mb-6">
-            <div
-              class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3"
-              [ngClass]="
-                arcanumComplete()
-                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
-                  : 'bg-[#1b2028] text-violet-300 border-violet-900/50'
-              "
-            >
-              @if (arcanumComplete()) {
-                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                Arcanes choisies ({{ arcanumSpellLevels().length }})
-              } @else {
-                <span class="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></span>
-                Choisissez un sort pour chaque Arcane
-              }
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-4 max-w-3xl mx-auto w-full">
-            @for (lvl of arcanumSpellLevels(); track lvl) {
-              <div class="bg-[#171b22] border border-violet-900/40 rounded-xl overflow-hidden">
-                <button
-                  type="button"
-                  class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-violet-950/20 transition-colors"
-                  (click)="toggleArcanumPanel(lvl)"
-                >
-                  <div>
-                    <div class="text-xs font-black uppercase tracking-widest text-violet-300">
-                      Arcane · niveau {{ lvl }}
-                    </div>
-                    <div class="text-sm text-slate-200 mt-0.5">
-                      @if (arcanumPickName(lvl); as name) {
-                        <span class="text-amber-400 font-bold">{{ name }}</span>
-                      } @else {
-                        <span class="text-slate-500 italic">Aucun sort choisi</span>
-                      }
-                    </div>
-                  </div>
-                  <span class="text-violet-400 text-lg">{{
-                    expandedArcanumLevel() === lvl ? '▴' : '▾'
-                  }}</span>
-                </button>
-                @if (expandedArcanumLevel() === lvl) {
-                  <div
-                    class="border-t border-violet-900/30 p-3 grid grid-cols-1 lg:grid-cols-2 gap-2 max-h-72 overflow-y-auto magic-spell-grid"
-                  >
-                    @for (spell of spellsForArcanum(lvl); track spell.id) {
-                      <button
-                        type="button"
-                        class="text-left px-3 py-2.5 rounded-lg border text-xs transition-colors"
-                        [class.border-violet-400]="arcanumPicks()[lvl] === spell.id"
-                        [class.bg-violet-950]="arcanumPicks()[lvl] === spell.id"
-                        [class.border-slate-700]="arcanumPicks()[lvl] !== spell.id"
-                        (click)="pickArcanum(lvl, spell.id)"
-                      >
-                        <div class="font-bold text-amber-400">{{ spell.name }}</div>
-                        <div class="text-[10px] text-slate-400 mt-1">{{ statsLine(spell) }}</div>
-                        <p class="text-[10px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-                          {{ spell.description }}
-                        </p>
-                      </button>
-                    } @empty {
-                      <p class="text-xs text-slate-500 col-span-2 px-2 py-4 text-center">
-                        Aucun sort de niveau {{ lvl }} pour le sorcier dans le catalogue.
-                      </p>
-                    }
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      }
+      <app-magic-arcanum-panel [host]="this" />
 
       @if (domainSpells().length > 0) {
         <div class="w-full mb-10">

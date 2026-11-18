@@ -7,12 +7,20 @@ export function campaignIsSupportInspect(
   return role === 'support' || supportQuery === '1';
 }
 
+/** Propriétaire ou co-MJ (rôle `dm`) : dirige la table, pas le support en inspection. */
+export function campaignIsTableDm(
+  c: { isOwner?: boolean; role?: string | null } | null | undefined,
+): boolean {
+  if (!c) return false;
+  return c.isOwner === true || c.role === 'dm';
+}
+
 export function campaignMjUi(
   c: { isOwner: boolean; role?: string } | null | undefined,
   supportQuery: string | null | undefined,
 ): boolean {
   if (!c) return false;
-  return c.isOwner === true || campaignIsSupportInspect(c.role, supportQuery);
+  return campaignIsTableDm(c) || campaignIsSupportInspect(c.role, supportQuery);
 }
 
 export function campaignLoginReturnUrl(

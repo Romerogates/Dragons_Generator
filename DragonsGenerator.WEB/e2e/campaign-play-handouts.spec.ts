@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -18,7 +18,7 @@ test.describe('Campagne — handouts overlay /play joueur', () => {
   test('publié + épinglé visibles dans overlay Documents depuis /play', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'HoPlay');
     const campaignId = await createCampaignAs(page, owner, `E2E Play HO ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Doc Play');
@@ -52,7 +52,7 @@ test.describe('Campagne — handouts overlay /play joueur', () => {
     expect(putRes.ok()).toBeTruthy();
 
     await applyAuthSession(page, player, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
 

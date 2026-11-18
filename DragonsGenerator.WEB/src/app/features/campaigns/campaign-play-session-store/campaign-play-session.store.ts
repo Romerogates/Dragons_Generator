@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
@@ -21,13 +21,16 @@ import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
 import {
   applyEveningPawnPatch,
   eveningPawnId,
+  canControlTableToken,
   placeEveningPawn,
   seedEveningPawns,
 } from '@core/utils/evening-map.util';
 import {
   isLiveTableSessionPatch,
   liveTablePersistBody,
+  liveTableSnapshotFromSession,
 } from '@core/utils/live-table-persist.util';
+import { CampaignPlayPersistService } from './campaign-play-persist.service';
 import { campaignDataAfterDmDamage } from '@core/utils/play-combat-mutations.util';
 import { sessionPatchAfterPlayEnd } from '@core/utils/play-combat-session.util';
 import { withFogToggled } from '@core/utils/dungeon-fog.util';
@@ -56,7 +59,7 @@ import {
   type CombatFlowPhase,
 } from '@core/utils/combat-tracker.util';
 import { isAllyCombatant, isEnemyCombatant } from '@core/utils/combat-action.util';
-import { stripTableChatForPersist } from '@core/utils/campaign-persist.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 
 export type PlayFeedback = {
   kind: 'ok' | 'err';
@@ -74,11 +77,12 @@ export type PlayConfirmDialog = {
 /**
  * Session live partagée entre le shell play-panel et ses enfants
  * (chat / battle-map / combat-flow). Fourni au niveau du panel
- * (`providers: [CampaignPlaySessionStore]`) pour isoler chaque dock.
+ * (`providers: [CampaignPlayPersistService, CampaignPlaySessionStore]`).
  */
 @Injectable()
 export class CampaignPlaySessionStore {
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly persist = inject(CampaignPlayPersistService);
   private readonly auth = inject(AuthService);
   private readonly characters = inject(CharacterCloudService);
   private readonly notifications = inject(NotificationService);
@@ -111,10 +115,21 @@ export class CampaignPlaySessionStore {
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
-  private persistSeq = 0;
-  private persistTail: Promise<void> = Promise.resolve();
 
-  readonly isDm = computed(() => this._campaign()?.isOwner === true);
+  constructor() {
+    this.persist.attach({
+      getCampaign: () => this._campaign(),
+      applyCampaign: (next) => {
+        this._campaign.set(next);
+        this.campaignChanged$.next(next);
+      },
+      setSaving: (value) => this.saving.set(value),
+      onPersistError: () =>
+        this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', { ttlMs: 6000 }),
+    });
+  }
+
+  readonly isDm = computed(() => campaignIsTableDm(this._campaign()));
   readonly isSpectator = computed(() => this._campaign()?.role === 'spectator');
 
   readonly activeSession = computed(() => {
@@ -262,7 +277,7 @@ export class CampaignPlaySessionStore {
     );
     const data = { ...c.data, sessions, encounters };
     this.patchCampaign(data);
-    this.persist(c.title, data);
+    this.persist.persistFull(c.title, data);
   }
 
   /** Hit MJ : PV + journal + rencontres, une seule écriture. */
@@ -273,7 +288,7 @@ export class CampaignPlaySessionStore {
     if (!session || !combat) return;
     const data = campaignDataAfterDmDamage(c.data, session.id, combat, targetId, damage, logLine);
     this.patchCampaign(data);
-    this.persist(c.title, data);
+    this.persist.persistFull(c.title, data);
   }
 
   patchSession(patch: Partial<CampaignSession>, options?: { immediate?: boolean }): void {
@@ -288,7 +303,11 @@ export class CampaignPlaySessionStore {
     options?: { immediate?: boolean },
   ): void {
     const c = this.requireCampaign();
-    if (!c.isOwner) return;
+    const playerLive =
+      c.role === 'player' &&
+      isLiveTableSessionPatch(patch) &&
+      !('activeMapId' in patch);
+    if (!c.isOwner && !playerLive) return;
     const sessions = (c.data.sessions ?? []).map((s) =>
       s.id === sessionId ? { ...s, ...patch } : s,
     );
@@ -299,14 +318,11 @@ export class CampaignPlaySessionStore {
       const latest = this._campaign();
       if (!latest) return;
       if (tablePatch) {
-        const session = (latest.data.sessions ?? []).find((s) => s.id === sessionId);
-        const snapshot: Partial<CampaignSession> = {
-          activeMapId: session?.activeMapId ?? null,
-        };
-        if (session?.tablePawns) snapshot.tablePawns = session.tablePawns;
-        if (session?.activeCombat) snapshot.activeCombat = session.activeCombat;
-        const body = session ? liveTablePersistBody(sessionId, snapshot) : null;
-        if (body) this.persistLiveTable(body);
+        const snapshot = liveTableSnapshotFromSession(
+          (latest.data.sessions ?? []).find((s) => s.id === sessionId),
+        );
+        const body = snapshot ? liveTablePersistBody(sessionId, snapshot) : null;
+        if (body) this.persist.persistLiveTable(body);
         return;
       }
       this.saveData({ sessions: latest.data.sessions ?? [] });
@@ -332,7 +348,7 @@ export class CampaignPlaySessionStore {
     const c = this.requireCampaign();
     const data = { ...c.data, ...patch };
     this.patchCampaign(data);
-    this.persist(c.title, data, onSuccess);
+    this.persist.persistFull(c.title, data, onSuccess);
   }
 
   patchCampaign(data: CampaignData): void {
@@ -340,63 +356,6 @@ export class CampaignPlaySessionStore {
     const next = { ...c, data };
     this._campaign.set(next);
     this.campaignChanged$.next(next);
-  }
-
-  private persistLiveTable(
-    body: NonNullable<ReturnType<typeof liveTablePersistBody>>,
-    onSuccess?: () => void,
-  ): void {
-    const c = this.requireCampaign();
-    const campaignId = c.id;
-    const seq = ++this.persistSeq;
-    this.saving.set(true);
-    this.persistTail = this.persistTail
-      .catch(() => undefined)
-      .then(async () => {
-        try {
-          const summary = await firstValueFrom(this.campaigns.patchLiveTable(campaignId, body));
-          if (seq !== this.persistSeq) return;
-          const current = this.requireCampaign();
-          const next = { ...current, updatedAt: summary.updatedAt };
-          this._campaign.set(next);
-          this.campaignChanged$.next(next);
-          this.saving.set(false);
-          onSuccess?.();
-        } catch {
-          if (seq === this.persistSeq) {
-            this.saving.set(false);
-            this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', { ttlMs: 6000 });
-          }
-        }
-      });
-  }
-
-  private persist(title: string, data: CampaignData, onSuccess?: () => void): void {
-    const c = this.requireCampaign();
-    const campaignId = c.id;
-    const seq = ++this.persistSeq;
-    this.saving.set(true);
-    const payload = stripTableChatForPersist(data);
-
-    this.persistTail = this.persistTail
-      .catch(() => undefined)
-      .then(async () => {
-        try {
-          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, payload));
-          if (seq !== this.persistSeq) return;
-          const current = this.requireCampaign();
-          const next = { ...current, updatedAt: summary.updatedAt };
-          this._campaign.set(next);
-          this.campaignChanged$.next(next);
-          this.saving.set(false);
-          onSuccess?.();
-        } catch {
-          if (seq === this.persistSeq) {
-            this.saving.set(false);
-            this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', { ttlMs: 6000 });
-          }
-        }
-      });
   }
 
   updateCombatant(
@@ -520,7 +479,7 @@ export class CampaignPlaySessionStore {
     y: number,
     options?: { immediate?: boolean },
   ): void {
-    if (!this.isDm()) return;
+    if (this.isSpectator()) return;
     const session = this.activeSession();
     if (!session) return;
     const combat = session.activeCombat;
@@ -528,6 +487,16 @@ export class CampaignPlaySessionStore {
       combat?.combatants.find((c) => c.id === tokenId)?.memberUserId ??
       session.tablePawns?.find((p) => p.id === tokenId)?.memberUserId ??
       null;
+    if (
+      !canControlTableToken({
+        isDm: this.isDm(),
+        userId: this.auth.user()?.id,
+        tokenId,
+        memberUserId,
+      })
+    ) {
+      return;
+    }
     const pawns = placeEveningPawn(session.tablePawns, tokenId, x, y).map((p) =>
       memberUserId && p.memberUserId === memberUserId ? { ...p, mapX: x, mapY: y } : p,
     );

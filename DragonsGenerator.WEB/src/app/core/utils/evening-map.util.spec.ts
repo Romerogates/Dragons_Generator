@@ -1,5 +1,6 @@
 import {
   applyEveningPawnPatch,
+  canControlTableToken,
   eveningPawnId,
   eveningPawnsToTokens,
   findEveningPawnAtTile,
@@ -146,5 +147,16 @@ describe('evening-map.util', () => {
     expect(eveningPawnsToTokens(null)).toEqual([]);
     expect(findEveningPawnAtTile([], 0, 0)).toBeNull();
     expect(isEveningTileOccupied(undefined, 0, 0)).toBeFalse();
+  });
+
+  it('autorise le MJ sur tout pion et le joueur sur le sien seulement', () => {
+    expect(canControlTableToken({ isDm: true, userId: 'u1', tokenId: 'pawn-u2' })).toBeTrue();
+    expect(
+      canControlTableToken({ isDm: false, userId: 'u1', tokenId: 'pawn-u1', memberUserId: 'u1' }),
+    ).toBeTrue();
+    expect(
+      canControlTableToken({ isDm: false, userId: 'u1', tokenId: 'pawn-u2', memberUserId: 'u2' }),
+    ).toBeFalse();
+    expect(canControlTableToken({ isDm: false, isSpectator: true, userId: 'u1', tokenId: 'pawn-u1' })).toBeFalse();
   });
 });

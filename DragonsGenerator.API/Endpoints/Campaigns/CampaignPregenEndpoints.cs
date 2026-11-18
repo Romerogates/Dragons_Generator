@@ -90,7 +90,7 @@ public class AssignCampaignPregenEndpoint(AppDbContext db) : Endpoint<AssignPreg
         pregen["assignedDisplayName"] = req.DisplayName.Trim();
         pregen["status"] = "assigned";
 
-        campaign.JsonData = data.ToJsonString();
+        CampaignLiveTableStore.Write(campaign, data.ToJsonString());
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
@@ -257,7 +257,7 @@ public class UseCampaignPregenAtTableEndpoint(AppDbContext db) : EndpointWithout
         pregen["assignedUserId"] = userId.Value.ToString();
         pregen["assignedDisplayName"] = displayName;
         pregen["status"] = "assigned";
-        campaign.JsonData = data.ToJsonString();
+        CampaignLiveTableStore.Write(campaign, data.ToJsonString());
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
 
         // Pointe vers le CharacterRecord du MJ — pas de clone dans le pool joueur.

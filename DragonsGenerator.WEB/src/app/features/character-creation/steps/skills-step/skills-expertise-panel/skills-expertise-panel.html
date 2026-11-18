@@ -1,0 +1,42 @@
+    @if (host().expertiseNeeded() > 0) {
+      <div class="dg-panel border-violet-900/50">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-violet-400 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Expertise
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="host().expertiseRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().selectedExpertise().length }} / {{ host().expertiseNeeded() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Doublez votre bonus de maîtrise sur {{ host().expertiseNeeded() }} compétence(s) déjà maîtrisées.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          @for (skill of host().expertiseCandidates(); track skill.id) {
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-colors flex items-center gap-2"
+              [ngClass]="
+                host().isExpertiseSelected(skill.id)
+                  ? 'border-violet-400 bg-violet-950/50 text-violet-200'
+                  : 'border-slate-700 bg-[#171b22] text-slate-300 hover:border-violet-500/50'
+              "
+              (click)="host().toggleExpertise(skill.id)"
+            >
+              {{ skill.label }}
+            </button>
+          }
+        </div>
+        @if (host().expertiseCandidates().length === 0) {
+          <p class="text-xs text-amber-500/80">
+            Sélectionnez d’abord vos compétences de classe / historique.
+          </p>
+        }
+      </div>
+    }
+

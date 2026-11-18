@@ -10,6 +10,22 @@ export function eveningPawnId(userId: string): string {
   return `pawn-${userId}`;
 }
 
+/** MJ : tous les jetons. Joueur : uniquement le sien. Spectateur : aucun. */
+export function canControlTableToken(input: {
+  isDm: boolean;
+  isSpectator?: boolean;
+  userId: string | null | undefined;
+  tokenId?: string | null;
+  memberUserId?: string | null;
+}): boolean {
+  if (input.isSpectator) return false;
+  if (input.isDm) return true;
+  const userId = input.userId?.trim();
+  if (!userId) return false;
+  if (input.memberUserId && input.memberUserId === userId) return true;
+  return !!input.tokenId && input.tokenId === eveningPawnId(userId);
+}
+
 export function listWalkableCells(map: CampaignDungeonMap): { x: number; y: number }[] {
   const cells: { x: number; y: number }[] = [];
   const h = map.gridHeight ?? 0;

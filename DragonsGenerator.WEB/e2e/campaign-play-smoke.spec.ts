@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -32,7 +32,7 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
     const ownerPage = await ownerCtx.newPage();
     const playerPage = await playerCtx.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const player = await registerConfirmAndLogin(playerPage.request, 'Smoke');
     const campaignId = await createCampaignAs(ownerPage, owner, `E2E Smoke ${Date.now()}`);
     const characterId = await createCharacterAs(playerPage, player, 'Héros Smoke');
@@ -55,12 +55,12 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
       await ownerPage.goto(`/campaigns/${campaignId}/play`);
     }
 
-    await expect(ownerPage.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
 
     await applyAuthSession(playerPage, player, `/campaigns/${campaignId}/play`);
-    await expect(playerPage.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(playerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     // Combat déjà seedé : le joueur voit le tour sans CTA Combattre.
@@ -68,7 +68,7 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
     await expect(playerPage.getByText(/En attente que le MJ lance un combat/i)).toHaveCount(0);
 
     await ownerPage.goto(`/campaigns/${campaignId}/play`);
-    await expect(ownerPage.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await ownerPage.getByRole('button', { name: /Combattre|Reprendre/i }).click();
@@ -83,7 +83,7 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
     await expect(ownerPage).toHaveURL(new RegExp(`/campaigns/${campaignId}$`), {
       timeout: 20_000,
     });
-    await expect(ownerPage.getByText('Table de jeu — session en cours')).not.toBeVisible({
+    await expect(ownerPage.getByText(/Table de jeu ·/)).not.toBeVisible({
       timeout: 20_000,
     });
 

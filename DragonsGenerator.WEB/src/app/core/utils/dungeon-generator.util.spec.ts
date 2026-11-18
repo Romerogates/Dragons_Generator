@@ -72,4 +72,34 @@ describe('dungeon-generator.util', () => {
     const room = map.rooms[0];
     expect(map.tiles[room.y][room.x]).toBe('floor');
   });
+
+  it('accepte seed 0, NaN, et borne le nombre de salles', () => {
+    const cramped = generateDungeonMap(
+      {
+        gridWidth: 24,
+        gridHeight: 24,
+        roomCount: 1,
+        corridorDensity: 0,
+        theme: 'generic',
+        seed: 0,
+      },
+      { name: 'Mini' },
+    );
+    expect(cramped.regionId).toBeNull();
+    expect(cramped.regionName).toBe('');
+    expect(cramped.rooms.length).toBeGreaterThan(0);
+    const many = generateDungeonMap(
+      {
+        gridWidth: 40,
+        gridHeight: 40,
+        roomCount: 99,
+        corridorDensity: 100,
+        theme: 'crypt',
+        seed: Number.NaN,
+      },
+      { name: 'Max', regionId: 'r1', regionName: 'Nord' },
+    );
+    expect(many.rooms.length).toBeLessThanOrEqual(24);
+    expect(many.regionId).toBe('r1');
+  });
 });

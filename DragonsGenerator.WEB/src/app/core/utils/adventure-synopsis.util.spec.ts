@@ -131,4 +131,9 @@ describe('parseAdventureSections', () => {
     ).toBe('Hook\n- A\n- B');
     expect(adventureSectionEditorValue({ title: 'X', body: '  ', bullets: [] })).toBe('');
   });
+
+  it('falls back to Synopsis when tagged sections are empty', () => {
+    expect(parseAdventureSections('**Accroche** —   \n\n').length).toBe(1);
+    expect(parseAdventureSections('**Accroche** —   \n\n')[0]!.title).toBe('Synopsis');
+  });
 });

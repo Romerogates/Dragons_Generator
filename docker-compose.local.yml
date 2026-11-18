@@ -2,6 +2,7 @@
 # Frontend : http://localhost:8081
 # API      : http://localhost:8080  (Swagger : /swagger)
 # MailHog  : http://localhost:8025  (boîte mail de test)
+# SMTP 1025 : interne au réseau Docker uniquement (API → service mailhog)
 #
 # Admin par défaut : admin@dragons.local / AdminDragons!2026
 
@@ -10,7 +11,6 @@ services:
     container_name: dragons-mailhog-local
     image: mailhog/mailhog:v1.0.1
     ports:
-      - "1025:1025"
       - "8025:8025"
     networks:
       - dragons-network

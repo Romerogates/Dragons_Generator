@@ -1,0 +1,83 @@
+    <p class="text-sm text-slate-300 mb-3">Clique un ticket pour ouvrir la conversation <span class="text-amber-300 font-semibold">plein écran</span>. File triée du plus ancien, « À traiter » d’abord.</p>
+    <div class="flex flex-wrap gap-2 mb-3">
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="queueFilter()"
+        (ngModelChange)="queueFilter.set($event)"
+        name="ticketQueueFilter"
+      >
+        <option value="staff">À traiter</option>
+        <option value="player">En attente du joueur</option>
+        <option value="all">Toute la file</option>
+      </select>
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event)"
+        name="ticketStatusFilter"
+      >
+        <option value="all">Tous les statuts</option>
+        <option value="open">Ouverts</option>
+        <option value="in_progress">En cours</option>
+        <option value="closed">Fermés</option>
+      </select>
+      <select
+        class="rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        [ngModel]="categoryFilter()"
+        (ngModelChange)="categoryFilter.set($event)"
+        name="ticketCategoryFilter"
+      >
+        <option value="all">Toutes catégories</option>
+        @for (c of categories(); track c) {
+          <option [value]="c">{{ categoryLabel(c) }}</option>
+        }
+      </select>
+      <label class="inline-flex items-center gap-2 text-xs text-slate-400">
+        <input type="checkbox" [ngModel]="mineOnly()" (ngModelChange)="mineOnly.set($event)" name="ticketMine" />
+        À moi
+      </label>
+      <input
+        type="search"
+        class="min-w-[12rem] flex-1 rounded-lg bg-[#171b22] border border-slate-700 px-2 py-1.5 text-xs text-slate-100"
+        placeholder="Recherche (sujet, mail, id)"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        name="ticketSearch"
+      />
+    </div>
+    <div class="flex flex-col gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar">
+      @for (t of tickets(); track t.id) {
+        <button
+          type="button"
+          class="text-left bg-[#1b2028] border-2 rounded-xl p-3 hover:border-amber-400"
+          [class.border-amber-400]="selectedId() === t.id"
+          [class.border-orange-500]="selectedId() !== t.id && isStale(t)"
+          [class.border-slate-700]="selectedId() !== t.id && !isStale(t)"
+          (click)="openTicket.emit(t.id)"
+        >
+          <div class="flex justify-between gap-2">
+            <span class="font-bold text-amber-300 text-sm">{{ t.subject }}</span>
+            <span class="flex flex-wrap gap-1 justify-end">
+              <span [class]="statusBadgeClass(t.status)">{{ statusLabel(t.status) }}</span>
+            </span>
+          </div>
+          <p class="text-[11px] mt-1" [class.text-amber-300]="waitingLabel(t) === 'À traiter'" [class.text-slate-400]="waitingLabel(t) !== 'À traiter'">
+            {{ waitingLabel(t) }} · {{ formatTicketAge(t.updatedAt || t.createdAt) }}
+          </p>
+          <p class="text-[11px] text-slate-300 mt-1">{{ categoryLabel(t.category) }} · {{ t.userEmail }} · {{ t.messageCount || 0 }} msg</p>
+          <span class="mt-2 inline-block text-[10px] font-bold uppercase tracking-wide text-sky-300">Ouvrir la conversation</span>
+          <button
+            type="button"
+            class="ml-3 text-[10px] font-bold uppercase tracking-wide text-slate-400 hover:text-sky-300"
+            (click)="$event.stopPropagation(); copyDiagnostic.emit(t.id)"
+          >
+            Pack Cursor
+          </button>
+        </button>
+      } @empty {
+        <p class="text-xs text-slate-500">Aucun ticket dans cette file — élargis les filtres ou cherche autrement.</p>
+      }
+    </div>
+    @if (diagnostic()) {
+      <pre class="mt-4 text-[10px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{{ diagnostic() }}</pre>
+    }

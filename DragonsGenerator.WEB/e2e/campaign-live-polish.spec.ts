@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -21,7 +21,7 @@ test.describe('Campagne — initiative joueur (jet)', () => {
   test('banner → Envoyer jet → confirmation', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Jet');
     const { campaignId } = await createXpReadyCampaignAs(page, owner, `E2E Jet ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Kael Jet');
@@ -70,7 +70,7 @@ test.describe('Campagne — documents publié / épinglé', () => {
   test('MJ publie + épingle ; joueur voit publié, pas le brouillon', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Doc');
     const campaignId = await createCampaignAs(page, owner, `E2E Pin ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Doc Hero');
@@ -107,13 +107,13 @@ test.describe('Campagne — mode session', () => {
   test('mode Autre affiche Encoder / Lancer le dé en combat', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Mode ${Date.now()}`);
     const sessionId = await startActiveSessionAs(page, owner, campaignId);
     await setSessionModeAs(page, owner, campaignId, sessionId, 'other');
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await expect(page.getByText(/Autre/i).first()).toBeVisible();
@@ -128,7 +128,7 @@ test.describe('Campagne — XP offline', () => {
   test('Distribuer XP hors ligne → erreur, pas de xpAwarded', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Off');
     const { campaignId } = await createXpReadyCampaignAs(page, owner);
     const characterId = await createCharacterAs(page, player, 'Offline XP');
@@ -138,7 +138,7 @@ test.describe('Campagne — XP offline', () => {
     await startActiveSessionAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page
@@ -157,7 +157,7 @@ test.describe('Campagne — XP offline', () => {
     await page.context().setOffline(false);
 
     await page.reload();
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page
@@ -179,7 +179,7 @@ test.describe('Campagne — roster live joueur', () => {
     const dm = await dmCtx.newPage();
     const player = await playerCtx.newPage();
 
-    const owner = await loginSeedSession(dm.request);
+    const owner = await uniqueOwnerSession(dm.request);
     const pj = await registerConfirmAndLogin(player.request, 'Live');
     const { campaignId } = await createXpReadyCampaignAs(dm, owner, `E2E Live ${Date.now()}`);
     const charId = await createCharacterAs(player, pj, 'Lyra Live');
@@ -209,7 +209,7 @@ test.describe('Campagne — roster live joueur', () => {
     await expect(roster.getByText('PV 20/20')).toBeVisible();
 
     await applyAuthSession(dm, owner, `/campaigns/${campaignId}/play`);
-    await expect(dm.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(dm.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await dm.getByRole('button', { name: 'Combattre' }).click();

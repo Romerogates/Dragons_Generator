@@ -59,6 +59,7 @@ describe('PlayBattleMap', () => {
           provide: CampaignPlaySessionStore,
           useValue: {
             isDm,
+            isSpectator: () => false,
             activeCombat,
             activeSessionMap,
             combatTurnOrder: signal([]),
@@ -139,5 +140,26 @@ describe('PlayBattleMap', () => {
     );
     expect(setFeedback).toHaveBeenCalled();
     expect(placeEveningToken).not.toHaveBeenCalled();
+  });
+
+  it('laisse un joueur déplacer son pion, pas celui d’un autre', () => {
+    isDm.set(false);
+    tablePawns.set([
+      { id: 'pawn-u1', name: 'Aria', mapX: 1, mapY: 1, memberUserId: 'u1' },
+      { id: 'pawn-u2', name: 'Lila', mapX: 2, mapY: 1, memberUserId: 'u2' },
+    ]);
+    fixture.detectChanges();
+    const place = (
+      cmp as unknown as { placeCombatantOnMap: (id: string, x: number, y: number) => void }
+    ).placeCombatantOnMap.bind(cmp);
+    place('pawn-u2', 1, 1);
+    expect(placeEveningToken).not.toHaveBeenCalled();
+    place('pawn-u1', 2, 1);
+    expect(setFeedback).toHaveBeenCalled();
+    placeEveningToken.calls.reset();
+    tablePawns.set([{ id: 'pawn-u1', name: 'Aria', mapX: 1, mapY: 1, memberUserId: 'u1' }]);
+    fixture.detectChanges();
+    place('pawn-u1', 2, 1);
+    expect(placeEveningToken).toHaveBeenCalledWith('pawn-u1', 2, 1, { immediate: true });
   });
 });

@@ -73,107 +73,16 @@
             (contextmenu)="onRightClick($event, card.id)"
             (click)="pickCard(card.id)"
           >
-            <div
-              class="relative w-full h-full transition-transform duration-200 ease-out rounded-xl"
-              style="transform-style: preserve-3d"
-              [style.transform]="flippedCards().has(card.id) ? 'rotateY(180deg)' : 'rotateY(0deg)'"
-            >
-              <div
-                class="absolute inset-0 flex p-1.5 rounded-xl transition-[colors,box-shadow] duration-200 bg-[#171b22]"
-                [ngClass]="
-                  i === currentIndex()
-                    ? 'border-2 border-amber-500 shadow-[inset_0_0_20px_rgba(245,158,11,0.15)]'
-                    : 'border border-slate-800'
-                "
-                style="backface-visibility: hidden"
-              >
-                <div
-                  class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col items-center p-5 sm:p-6"
-                >
-                  <div
-                    class="text-6xl sm:text-7xl mb-5 sm:mb-6 mt-3 sm:mt-4 transition-transform duration-300 drop-shadow-lg"
-                    [ngClass]="{ 'scale-110 sm:scale-125': i === currentIndex() }"
-                  >
-                    <iconify-icon [icon]="card.icon"></iconify-icon>
-                  </div>
-
-                  <h3
-                    class="text-xl sm:text-2xl font-bold text-amber-500 font-serif tracking-widest text-center mb-2 uppercase"
-                  >
-                    {{ card.title }}
-                  </h3>
-
-                  @if (card.badge && card.badge !== '—') {
-                    <div
-                      class="border border-amber-900/50 rounded-full px-4 py-0.5 mb-5 sm:mb-6 bg-[#1e232b]"
-                    >
-                      <span
-                        class="text-amber-500/60 text-[10px] font-black uppercase tracking-widest"
-                      >
-                        Taille {{ card.badge }}
-                      </span>
-                    </div>
-                  }
-
-                  <div class="mt-auto flex flex-col items-center gap-2">
-                    @if (i === currentIndex()) {
-                      <button
-                        type="button"
-                        class="text-[10px] text-amber-400/90 uppercase tracking-[0.15em] font-bold px-3 py-1.5 rounded-full border border-amber-800/50 bg-amber-950/30"
-                        (click)="onRightClick($event, card.id)"
-                      >
-                        {{ flippedCards().has(card.id) ? 'Retourner' : 'Voir le verso' }}
-                      </button>
-                    } @else {
-                      <div
-                        class="text-[9px] text-slate-500 text-center uppercase tracking-[0.2em] font-bold hidden sm:block"
-                      >
-                        Clic droit : verso
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="absolute inset-0 flex p-1.5 rounded-xl bg-[#1b2028] border-2 border-amber-600 shadow-2xl"
-                style="backface-visibility: hidden; transform: rotateY(180deg)"
-              >
-                <div class="w-full h-full border border-amber-800/20 rounded-lg flex flex-col p-4 sm:p-5">
-                  <h4
-                    class="text-base sm:text-lg font-bold text-amber-400 mb-3 border-b border-amber-900/40 pb-2 text-center font-serif"
-                  >
-                    {{ card.title }}
-                  </h4>
-
-                  @if (card.stats) {
-                    <div
-                      class="bg-slate-900/80 rounded-lg px-3 py-2.5 mb-4 border border-slate-700/50 shadow-inner"
-                    >
-                      <p class="text-[11px] font-black text-emerald-400 text-center leading-relaxed">
-                        {{ card.stats }}
-                      </p>
-                    </div>
-                  }
-
-                  <div class="overflow-y-auto pr-1 sm:pr-2 flex-grow custom-scrollbar">
-                    <p
-                      class="text-[11px] text-slate-300 leading-relaxed text-justify whitespace-pre-line"
-                    >
-                      {{ card.desc }}
-                    </p>
-                  </div>
-
-                  <div class="mt-4 flex justify-center">
-                    <span
-                      class="bg-amber-500 text-slate-950 px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-[0.99] transition-transform"
-                    >
-                      Forger ce destin
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <app-forge-flip-card
+              [card]="card"
+              [centered]="i === currentIndex()"
+              [flipped]="flippedCards().has(card.id)"
+              badgePrefix="Taille "
+              infoLabel="Voir le verso"
+              backLabel="Retourner"
+              confirmLabel="Forger ce destin"
+              (flip)="onRightClick($event, card.id)"
+            />
           </div>
         }
       </div>

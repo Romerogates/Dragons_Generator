@@ -33,6 +33,7 @@ import {
   pixelToTile,
 } from '@core/utils/dungeon-battle.util';
 import {
+  canControlTableToken,
   eveningPawnId,
   eveningPawnsToTokens,
   findEveningPawnAtTile,
@@ -231,8 +232,17 @@ export class PlayBattleMap implements OnDestroy {
     this.store.updateEveningPawn(tokenId, { tokenImageUrl: url }, { immediate: true });
   }
 
+  private controlsToken(tokenId: string, memberUserId?: string | null): boolean {
+    return canControlTableToken({
+      isDm: this.isDm(),
+      isSpectator: this.store.isSpectator(),
+      userId: this.auth.user()?.id,
+      tokenId,
+      memberUserId,
+    });
+  }
+
   onBattleMapPointerDown(event: PointerEvent): void {
-    if (!this.isDm()) return;
     const map = this.activeSessionMap();
     const canvas = this.liveDungeonCanvas()?.nativeElement;
     if (!map || !canvas) return;
@@ -243,7 +253,7 @@ export class PlayBattleMap implements OnDestroy {
     const combat = this.activeCombat();
     if (combat) {
       const occupant = findCombatantAtTile(combat.combatants, tile.x, tile.y);
-      if (occupant) {
+      if (occupant && this.controlsToken(occupant.id, occupant.memberUserId)) {
         this.selectedTokenCombatantId.set(occupant.id);
         this.tokenDrag = { combatantId: occupant.id, pointerId: event.pointerId, moved: false };
         canvas.setPointerCapture(event.pointerId);
@@ -251,6 +261,7 @@ export class PlayBattleMap implements OnDestroy {
         return;
       }
 
+      if (!this.isDm()) return;
       const placeId = this.selectedTokenCombatantId() ?? this.currentTurn()?.id ?? null;
       if (placeId) {
         const clamped = clampTokenToFloor(map, tile.x, tile.y);
@@ -260,13 +271,14 @@ export class PlayBattleMap implements OnDestroy {
       }
     } else {
       const occupant = findEveningPawnAtTile(this.eveningPawns(), tile.x, tile.y);
-      if (occupant) {
+      if (occupant && this.controlsToken(occupant.id, occupant.memberUserId)) {
         this.selectedTokenCombatantId.set(occupant.id);
         this.tokenDrag = { combatantId: occupant.id, pointerId: event.pointerId, moved: false };
         canvas.setPointerCapture(event.pointerId);
         event.preventDefault();
         return;
       }
+      if (!this.isDm()) return;
       const placeId = this.selectedTokenCombatantId();
       if (placeId) {
         const clamped = clampTokenToFloor(map, tile.x, tile.y);
@@ -280,7 +292,7 @@ export class PlayBattleMap implements OnDestroy {
   }
 
   onBattleMapPointerMove(event: PointerEvent): void {
-    if (!this.isDm() || !this.tokenDrag || this.tokenDrag.pointerId !== event.pointerId) return;
+    if (!this.tokenDrag || this.tokenDrag.pointerId !== event.pointerId) return;
     const map = this.activeSessionMap();
     const canvas = this.liveDungeonCanvas()?.nativeElement;
     if (!map || !canvas) return;
@@ -383,8 +395,12 @@ export class PlayBattleMap implements OnDestroy {
     y: number,
     options?: { immediate?: boolean; silentOccupancy?: boolean },
   ): void {
-    if (!this.isDm()) return;
     const combat = this.activeCombat();
+    const memberUserId =
+      combat?.combatants.find((c) => c.id === combatantId)?.memberUserId ??
+      this.eveningPawns().find((p) => p.id === combatantId)?.memberUserId ??
+      null;
+    if (!this.controlsToken(combatantId, memberUserId)) return;
     const occupied = combat
       ? isTileOccupied(combat.combatants, x, y, combatantId)
       : isEveningTileOccupied(this.eveningPawns(), x, y, combatantId);

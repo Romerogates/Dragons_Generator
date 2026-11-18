@@ -38,12 +38,13 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
             campaign.Title = req.Title.Trim();
         if (req.Data.ValueKind != JsonValueKind.Undefined)
         {
-            var merged = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
+            var storedJson = CampaignLiveTableStore.Read(campaign);
+            var merged = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, storedJson, isOwner);
             var incomingRaw = merged.GetRawText();
-            var newJson = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(incomingRaw, campaign.JsonData);
+            var newJson = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(incomingRaw, storedJson);
             if (isOwner)
             {
-                var change = CampaignJsonHelpers.AnalyzeSessionChanges(campaign.JsonData, newJson);
+                var change = CampaignJsonHelpers.AnalyzeSessionChanges(storedJson, newJson);
                 if (change.Changed)
                 {
                     sessionChange = change;
@@ -61,7 +62,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                         }, ct);
                 }
 
-                var handout = CampaignJsonHelpers.AnalyzeHandoutChanges(campaign.JsonData, newJson);
+                var handout = CampaignJsonHelpers.AnalyzeHandoutChanges(storedJson, newJson);
                 if (handout.Changed)
                 {
                     handoutChange = handout;
@@ -76,7 +77,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                         }, ct);
                 }
 
-                var initiative = CampaignJsonHelpers.AnalyzeInitiativeCollectionOpened(campaign.JsonData, newJson);
+                var initiative = CampaignJsonHelpers.AnalyzeInitiativeCollectionOpened(storedJson, newJson);
                 if (initiative.Changed)
                 {
                     initiativeChange = initiative;
@@ -90,7 +91,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                         }, ct);
                 }
 
-                var combatEnded = CampaignJsonHelpers.AnalyzeCombatEnded(campaign.JsonData, newJson);
+                var combatEnded = CampaignJsonHelpers.AnalyzeCombatEnded(storedJson, newJson);
                 if (combatEnded.Changed)
                 {
                     await CampaignActivityService.LogAsync(
@@ -105,7 +106,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                         }, ct);
                 }
             }
-            campaign.JsonData = newJson;
+            CampaignLiveTableStore.Write(campaign, newJson);
         }
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         for (var attempt = 0; ; attempt++)
@@ -123,8 +124,10 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                 {
                     var incomingRaw = req.Data.GetRawText();
                     var replay = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
-                    campaign.JsonData = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(
-                        replay.GetRawText(), campaign.JsonData);
+                    CampaignLiveTableStore.Write(
+                        campaign,
+                        CampaignJsonHelpers.MergeLiveCombatIntoIncoming(
+                            replay.GetRawText(), CampaignLiveTableStore.Read(campaign)));
                 }
                 campaign.UpdatedAt = DateTimeOffset.UtcNow;
             }

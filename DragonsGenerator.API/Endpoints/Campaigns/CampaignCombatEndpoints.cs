@@ -52,7 +52,7 @@ public class ResolveCombatAttackEndpoint(AppDbContext db, CampaignLivePublisher 
             }
 
             var newJson = CampaignJsonHelpers.TryApplyPlayerCombatAttack(
-                campaign.JsonData,
+                CampaignLiveTableStore.Read(campaign),
                 userId.Value,
                 req.ActorId,
                 req.TargetId,
@@ -68,7 +68,7 @@ public class ResolveCombatAttackEndpoint(AppDbContext db, CampaignLivePublisher 
                 return;
             }
 
-            campaign.JsonData = newJson;
+            CampaignLiveTableStore.Write(campaign, newJson);
             campaign.UpdatedAt = DateTimeOffset.UtcNow;
             try
             {

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
+import { PdfSheetPages } from '@core/services/pdf/pdf-sheet-pages';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import {
   createClericPdfCharacter,
@@ -98,12 +99,9 @@ describe('PdfGeneratorService', () => {
     let weaponSpecs: (ids: string[]) => string[];
 
     beforeEach(() => {
-      const svc = service as unknown as {
-        prioritizeCategoryTokens: (ids: string[]) => string[];
-        weaponSpecializationIds: (ids: string[]) => string[];
-      };
-      prioritize = svc.prioritizeCategoryTokens.bind(service);
-      weaponSpecs = svc.weaponSpecializationIds.bind(service);
+      const pages = new PdfSheetPages();
+      prioritize = pages.prioritizeCategoryTokens.bind(pages);
+      weaponSpecs = pages.weaponSpecializationIds.bind(pages);
     });
 
     it('moves weapon category tokens to the front while keeping relative order', () => {

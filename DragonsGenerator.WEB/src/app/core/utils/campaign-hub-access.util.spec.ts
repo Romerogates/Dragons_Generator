@@ -1,5 +1,6 @@
 import {
   campaignIsSupportInspect,
+  campaignIsTableDm,
   campaignJoinSharePayload,
   campaignJoinUrl,
   campaignLoginReturnUrl,
@@ -18,12 +19,21 @@ describe('campaign-hub-access.util', () => {
     expect(campaignIsSupportInspect('player', '0')).toBeFalse();
   });
 
-  it('shows MJ screens for owner or support inspect', () => {
+  it('shows MJ screens for owner, co-MJ or support inspect', () => {
     expect(campaignMjUi(null, null)).toBeFalse();
     expect(campaignMjUi({ isOwner: true }, null)).toBeTrue();
+    expect(campaignMjUi({ isOwner: false, role: 'dm' }, null)).toBeTrue();
     expect(campaignMjUi({ isOwner: false, role: 'support' }, null)).toBeTrue();
     expect(campaignMjUi({ isOwner: false, role: 'player' }, '1')).toBeTrue();
     expect(campaignMjUi({ isOwner: false, role: 'player' }, null)).toBeFalse();
+  });
+
+  it('treats owner or role dm as table DM (not support)', () => {
+    expect(campaignIsTableDm(null)).toBeFalse();
+    expect(campaignIsTableDm({ isOwner: true, role: 'player' })).toBeTrue();
+    expect(campaignIsTableDm({ isOwner: false, role: 'dm' })).toBeTrue();
+    expect(campaignIsTableDm({ isOwner: false, role: 'support' })).toBeFalse();
+    expect(campaignIsTableDm({ isOwner: false, role: 'player' })).toBeFalse();
   });
 
   it('builds a login return URL to the campaign', () => {

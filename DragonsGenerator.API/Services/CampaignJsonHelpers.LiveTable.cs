@@ -16,6 +16,20 @@ public static partial class CampaignJsonHelpers
         IReadOnlyList<LiveTableCombatantPosition>? combatantPositions,
         string? activeMapId,
         bool clearActiveMapId,
+        out string? error) =>
+        TryPatchLiveTable(
+            json, sessionId, tablePawns, combatantPositions, activeMapId, clearActiveMapId,
+            actorUserId: null, restrictToActor: false, out error);
+
+    public static string? TryPatchLiveTable(
+        string json,
+        string sessionId,
+        JsonElement tablePawns,
+        IReadOnlyList<LiveTableCombatantPosition>? combatantPositions,
+        string? activeMapId,
+        bool clearActiveMapId,
+        string? actorUserId,
+        bool restrictToActor,
         out string? error)
     {
         error = null;
@@ -27,7 +41,9 @@ public static partial class CampaignJsonHelpers
 
         var hasPawns = tablePawns.ValueKind is JsonValueKind.Array or JsonValueKind.Null;
         var hasPositions = combatantPositions is { Count: > 0 };
-        var hasMap = clearActiveMapId || activeMapId is not null;
+        var hasMap = !restrictToActor && (clearActiveMapId || activeMapId is not null);
+        if (restrictToActor)
+            hasPawns = tablePawns.ValueKind is JsonValueKind.Array;
         if (!hasPawns && !hasPositions && !hasMap)
         {
             error = "Rien à mettre à jour.";
@@ -61,18 +77,27 @@ public static partial class CampaignJsonHelpers
                 return null;
             }
 
-            if (tablePawns.ValueKind == JsonValueKind.Null)
-                target["tablePawns"] = new JsonArray();
-            else if (tablePawns.ValueKind == JsonValueKind.Array)
-                target["tablePawns"] = JsonNode.Parse(tablePawns.GetRawText());
+            if (restrictToActor)
+            {
+                MergeActorPawns(target, tablePawns, actorUserId ?? "");
+                if (hasPositions)
+                    ApplyCombatantPositions(target, FilterActorPositions(target, combatantPositions!, actorUserId ?? ""));
+            }
+            else
+            {
+                if (tablePawns.ValueKind == JsonValueKind.Null)
+                    target["tablePawns"] = new JsonArray();
+                else if (tablePawns.ValueKind == JsonValueKind.Array)
+                    target["tablePawns"] = JsonNode.Parse(tablePawns.GetRawText());
 
-            if (clearActiveMapId)
-                target["activeMapId"] = null;
-            else if (!string.IsNullOrWhiteSpace(activeMapId))
-                target["activeMapId"] = activeMapId;
+                if (clearActiveMapId)
+                    target["activeMapId"] = null;
+                else if (!string.IsNullOrWhiteSpace(activeMapId))
+                    target["activeMapId"] = activeMapId;
 
-            if (hasPositions)
-                ApplyCombatantPositions(target, combatantPositions!);
+                if (hasPositions)
+                    ApplyCombatantPositions(target, combatantPositions!);
+            }
 
             return root.ToJsonString();
         }
@@ -81,6 +106,76 @@ public static partial class CampaignJsonHelpers
             error = "JSON campagne invalide.";
             return null;
         }
+    }
+
+    private static bool OwnsToken(string actorUserId, string? memberUserId, string? tokenId)
+    {
+        if (string.IsNullOrWhiteSpace(actorUserId)) return false;
+        if (!string.IsNullOrWhiteSpace(memberUserId) &&
+            string.Equals(memberUserId, actorUserId, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return string.Equals(tokenId, "pawn-" + actorUserId, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void MergeActorPawns(JsonObject session, JsonElement incoming, string actorUserId)
+    {
+        if (incoming.ValueKind != JsonValueKind.Array) return;
+        if (session["tablePawns"] is not JsonArray existing)
+            return;
+
+        foreach (var item in incoming.EnumerateArray())
+        {
+            if (item.ValueKind != JsonValueKind.Object) continue;
+            var id = item.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+            var member = item.TryGetProperty("memberUserId", out var memEl) ? memEl.GetString() : null;
+            if (!OwnsToken(actorUserId, member, id)) continue;
+
+            JsonObject? targetPawn = null;
+            foreach (var node in existing)
+            {
+                if (node is not JsonObject pawn) continue;
+                var pid = pawn["id"]?.GetValue<string>();
+                var pMember = pawn["memberUserId"]?.GetValue<string>();
+                if (OwnsToken(actorUserId, pMember, pid))
+                {
+                    targetPawn = pawn;
+                    break;
+                }
+            }
+            if (targetPawn is null) continue;
+            if (item.TryGetProperty("mapX", out var x) && x.ValueKind == JsonValueKind.Number)
+                targetPawn["mapX"] = x.GetInt32();
+            if (item.TryGetProperty("mapY", out var y) && y.ValueKind == JsonValueKind.Number)
+                targetPawn["mapY"] = y.GetInt32();
+        }
+    }
+
+    private static List<LiveTableCombatantPosition> FilterActorPositions(
+        JsonObject session,
+        IReadOnlyList<LiveTableCombatantPosition> positions,
+        string actorUserId)
+    {
+        var allowed = new HashSet<string>(StringComparer.Ordinal);
+        if (session["activeCombat"] is JsonObject combat && combat["combatants"] is JsonArray combatants)
+        {
+            foreach (var item in combatants)
+            {
+                if (item is not JsonObject cb) continue;
+                var id = cb["id"]?.GetValue<string>();
+                var member = cb["memberUserId"]?.GetValue<string>();
+                if (id is not null && OwnsToken(actorUserId, member, id))
+                    allowed.Add(id);
+            }
+        }
+
+        var filtered = new List<LiveTableCombatantPosition>();
+        foreach (var pos in positions)
+        {
+            if (string.IsNullOrWhiteSpace(pos.Id)) continue;
+            if (allowed.Contains(pos.Id) || OwnsToken(actorUserId, null, pos.Id))
+                filtered.Add(pos);
+        }
+        return filtered;
     }
 
     private static void ApplyCombatantPositions(

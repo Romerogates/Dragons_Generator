@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import { createCampaignAs, createJoinLinkAs } from './helpers/campaign';
@@ -20,7 +20,7 @@ test.describe('Lien /join — preview invité', () => {
     const ownerPage = await ownerCtx.newPage();
     const guestPage = await guestCtx.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const title = `E2E Join Guest ${Date.now()}`;
     const campaignId = await createCampaignAs(ownerPage, owner, title);
     const { token } = await createJoinLinkAs(ownerPage, owner, campaignId);

@@ -35,19 +35,23 @@ public class PatchLiveTableEndpoint(AppDbContext db, CampaignLivePublisher live)
         for (var attempt = 0; attempt < 3; attempt++)
         {
             var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
-            if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership, campaign))
+            if (campaign is null || !CampaignAccess.CanPatchLiveTable(isOwner, membership, campaign))
             {
                 await Send.NotFoundAsync(ct);
                 return;
             }
 
+            var restrictToActor = !CampaignAccess.CanEdit(isOwner, membership, campaign);
+            var hydrated = CampaignLiveTableStore.Hydrate(campaign.JsonData, campaign.LiveTableJson);
             var newJson = CampaignJsonHelpers.TryPatchLiveTable(
-                campaign.JsonData,
+                hydrated,
                 (req.SessionId ?? "").Trim(),
                 req.TablePawns,
                 req.CombatantPositions,
                 req.ActiveMapId,
                 req.ClearActiveMapId,
+                restrictToActor ? userId.Value.ToString() : null,
+                restrictToActor,
                 out var error);
 
             if (newJson is null)
@@ -56,7 +60,7 @@ public class PatchLiveTableEndpoint(AppDbContext db, CampaignLivePublisher live)
                 break;
             }
 
-            campaign.JsonData = newJson;
+            CampaignLiveTableStore.Write(campaign, newJson);
             campaign.UpdatedAt = DateTimeOffset.UtcNow;
             try
             {

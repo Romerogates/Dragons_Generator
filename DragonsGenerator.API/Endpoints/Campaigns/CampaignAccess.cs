@@ -36,6 +36,10 @@ public static class CampaignAccess
         return isOwner || membership?.Role == CampaignMemberRoles.Dm;
     }
 
+    /// <summary>MJ : table complète. Joueur actif : pion / positions de combat (restreint côté JSON).</summary>
+    public static bool CanPatchLiveTable(bool isOwner, CampaignMember? membership, CampaignRecord campaign) =>
+        CanEdit(isOwner, membership, campaign) || CanPlay(isOwner, membership, campaign);
+
     public static bool CanPlay(bool isOwner, CampaignMember? membership, CampaignRecord campaign)
     {
         if (IsSupportInspect(membership)) return false;

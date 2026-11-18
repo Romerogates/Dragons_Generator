@@ -1,0 +1,162 @@
+    <div class="dg-panel" data-testid="wizard-class-skills">
+      <div class="flex justify-between items-center mb-2">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+        >
+          <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon> Compétences de Classe
+        </h4>
+        <span
+          class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+          [ngClass]="host().classSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+        >
+          {{ host().selectedClassSkills().length }} / {{ host().classSkillChooseCount() }}
+        </span>
+      </div>
+      <p class="text-xs text-slate-500 mb-5">
+        Choisissez {{ host().classSkillChooseCount() }} compétence(s) liées à votre vocation.
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        @for (skill of host().classSkillOptions(); track skill.id) {
+          <button
+            class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
+            [ngClass]="
+              host().selectedClassSkills().includes(skill.id)
+                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                : host().selectedBgSkills().includes(skill.id) || host().classBlockedBySubclass().has(skill.id)
+                  ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                  : host().classSkillsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+            "
+            [disabled]="
+              (!host().selectedClassSkills().includes(skill.id) && host().classSkillsRemaining() === 0) ||
+              host().selectedBgSkills().includes(skill.id) ||
+              host().classBlockedBySubclass().has(skill.id)
+            "
+            [attr.title]="
+              host().classBlockedBySubclass().has(skill.id)
+                ? 'Déjà accordée par votre sous-classe'
+                : null
+            "
+            (click)="host().toggleClassSkill(skill.id)"
+          >
+            <iconify-icon [icon]="skill.icon"></iconify-icon>
+            {{ skill.label }}
+            @if (host().classBlockedBySubclass().has(skill.id)) {
+              <span class="text-[9px] uppercase tracking-widest text-emerald-500/80">Sous-classe</span>
+            } @else {
+              <span
+                class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                [ngClass]="
+                  host().selectedClassSkills().includes(skill.id)
+                    ? 'bg-emerald-600 text-emerald-950'
+                    : 'bg-slate-800 text-slate-400'
+                "
+              >
+                {{ host().getModifierForSkill(skill.id) }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (host().secondaryClassSkillChooseCount() > 0) {
+      <div class="dg-panel">
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+            <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon> Compétences de Multiclassage
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+            [ngClass]="host().secondaryClassSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ host().selectedSecondaryClassSkills().length }} / {{ host().secondaryClassSkillChooseCount() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Compétence(s) supplémentaire(s) accordée(s) par vos classes de multiclassage (maîtrises
+          réduites).
+        </p>
+
+        <div class="flex flex-wrap gap-3">
+          @for (skill of host().secondaryClassSkillOptions(); track skill.id) {
+            <button
+              class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
+              [ngClass]="
+                host().selectedSecondaryClassSkills().includes(skill.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : host().isSecondarySkillBlocked(skill.id)
+                    ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                    : host().secondaryClassSkillsRemaining() === 0
+                      ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (!host().selectedSecondaryClassSkills().includes(skill.id) &&
+                  host().secondaryClassSkillsRemaining() === 0) ||
+                host().isSecondarySkillBlocked(skill.id)
+              "
+              [attr.title]="
+                host().isSecondarySkillBlocked(skill.id) ? 'Déjà accordée ailleurs' : null
+              "
+              (click)="host().toggleSecondaryClassSkill(skill.id)"
+            >
+              <iconify-icon [icon]="skill.icon"></iconify-icon>
+              {{ skill.label }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (host().subclassGrantedSkillChips().length > 0) {
+      <div class="dg-panel">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-2"
+        >
+          <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon> Accordées par votre
+          sous-classe
+        </h4>
+        <p class="text-xs text-slate-500 mb-5">
+          Automatiques — ne comptent pas dans vos choix de classe. L’expertise double le bonus de
+          maîtrise.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          @for (chip of host().subclassGrantedSkillChips(); track chip.id) {
+            <span
+              class="px-3 py-2 rounded-xl border text-sm font-bold flex items-center gap-2 cursor-default"
+              [ngClass]="
+                chip.expertise
+                  ? 'border-amber-700/60 bg-amber-950/30 text-amber-300'
+                  : 'border-slate-600/80 bg-slate-900/70 text-slate-300'
+              "
+              [attr.title]="
+                chip.expertise
+                  ? 'Maîtrise + expertise (sous-classe) — non modifiable'
+                  : 'Maîtrise accordée par votre sous-classe — non modifiable'
+              "
+            >
+              <span class="text-[10px]" [class.text-amber-500]="chip.expertise" [class.text-slate-500]="!chip.expertise">
+                {{ chip.expertise ? '⭐' : '🔒' }}
+              </span>
+              {{ host().prettifySkill(chip.id) }}
+              <span
+                class="text-[9px] ml-0.5 px-1.5 rounded"
+                [ngClass]="chip.expertise ? 'bg-amber-900/40 text-amber-400' : 'bg-slate-800 text-slate-400'"
+              >
+                {{ host().getModifierForSkill(chip.id) }}
+              </span>
+              @if (chip.expertise) {
+                <span
+                  class="text-[9px] uppercase tracking-widest text-amber-500 border border-amber-700/60 rounded px-1.5 py-0.5"
+                  >Expertise</span
+                >
+              }
+            </span>
+          }
+        </div>
+      </div>
+    }
+

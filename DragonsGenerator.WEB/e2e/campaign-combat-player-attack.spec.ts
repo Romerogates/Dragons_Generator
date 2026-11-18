@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -19,7 +19,7 @@ test.describe('Campagne — attaque joueur sur son tour', () => {
   test('tour joueur → Attaquer → encode → dégâts → PV', async ({ page }) => {
     test.setTimeout(150_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'AtkPj');
     const campaignId = await createCampaignAs(page, owner, `E2E PjAtk ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Héros Attaque');
@@ -35,7 +35,7 @@ test.describe('Campagne — attaque joueur sur son tour', () => {
     });
 
     await applyAuthSession(page, player, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     // Joueur : le combat s’affiche sans bouton Combattre (réservé MJ).
@@ -70,7 +70,7 @@ test.describe('Campagne — attaque joueur sur son tour', () => {
   test('jet raté joueur → pas de baisse PV', async ({ page }) => {
     test.setTimeout(150_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'MissPj');
     const campaignId = await createCampaignAs(page, owner, `E2E PjMiss ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Héros Raté');
@@ -86,7 +86,7 @@ test.describe('Campagne — attaque joueur sur son tour', () => {
     });
 
     await applyAuthSession(page, player, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await expect(page.getByText(/Tour de/i).first()).toBeVisible({ timeout: 20_000 });

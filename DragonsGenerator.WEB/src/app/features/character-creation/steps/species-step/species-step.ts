@@ -34,42 +34,23 @@ import {
 import { labelForGameId } from '@core/utils/game-id-labels';
 import { resistanceLabel } from '@core/utils/equipment-display.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
-
-const BREATH_SHAPE_FR: Record<string, string> = {
-  cone: 'Cône',
-  line: 'Ligne',
-  ligne: 'Ligne',
-  sphere: 'Sphère',
-  sphère: 'Sphère',
-};
-
-interface CardOption {
-  id: string;
-  title: string;
-  subtitle?: string;
-  desc: string;
-  stats?: string;
-  badge?: string;
-  icon: string;
-}
-
-type Phase = 'species' | 'subspecies' | 'choice';
-
-interface ChoiceOptionView {
-  id: string;
-  name: string;
-  desc?: string;
-  note?: string;
-  damageType?: string;
-  areaShape?: string;
-  areaLengthM?: number;
-  group?: string;
-}
+import { ForgeFlipCard } from '../forge-flip-card/forge-flip-card';
+import {
+  breathShapeLabel,
+  type SpeciesChoiceOptionView as ChoiceOptionView,
+  type SpeciesStepCardOption as CardOption,
+  type SpeciesStepPhase as Phase,
+} from './species-step.types';
+import {
+  carouselIndexFromScroll,
+  carouselScrollDeltaToIndex,
+  toggleFlipId,
+} from '@core/utils/forge-carousel.util';
 
 @Component({
   selector: 'app-species-step',
   standalone: true,
-  imports: [CommonModule, ConfirmDialog],
+  imports: [CommonModule, ConfirmDialog, ForgeFlipCard],
   templateUrl: './species-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -268,7 +249,7 @@ export class SpeciesStep implements OnInit {
             : opt.damageType
               ? `${resistanceLabel(opt.damageType)}${
                   opt.areaShape
-                    ? ` · ${BREATH_SHAPE_FR[opt.areaShape.toLowerCase()] ?? opt.areaShape} ${opt.areaLengthM} m`
+                    ? ` · ${breathShapeLabel(opt.areaShape)} ${opt.areaLengthM} m`
                     : ''
                 }`
               : opt.note,
@@ -569,25 +550,8 @@ export class SpeciesStep implements OnInit {
   private syncIndexFromScroll(): void {
     const viewport = this.carouselViewport()?.nativeElement;
     if (!viewport) return;
-
-    const viewportCenter =
-      viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
-    let best = 0;
-    let bestDist = Number.POSITIVE_INFINITY;
-
-    viewport.querySelectorAll<HTMLElement>('[data-carousel-index]').forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      const mid = rect.left + rect.width / 2;
-      const dist = Math.abs(mid - viewportCenter);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = Number(el.dataset['carouselIndex'] ?? 0);
-      }
-    });
-
-    if (best !== this.currentIndex()) {
-      this.currentIndex.set(best);
-    }
+    const best = carouselIndexFromScroll(viewport);
+    if (best !== this.currentIndex()) this.currentIndex.set(best);
   }
 
   private scrollToIndex(index: number, behavior: ScrollBehavior = 'smooth'): void {
@@ -597,14 +561,9 @@ export class SpeciesStep implements OnInit {
     this.currentIndex.set(safe);
 
     const viewport = this.carouselViewport()?.nativeElement;
-    const card = viewport?.querySelector<HTMLElement>(`[data-carousel-index="${safe}"]`);
-    if (!viewport || !card) return;
-
-    // scrollLeft only — avoid scrollIntoView (it can shift the whole page)
-    const viewportRect = viewport.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const delta =
-      cardRect.left + cardRect.width / 2 - (viewportRect.left + viewport.clientWidth / 2);
+    if (!viewport) return;
+    const delta = carouselScrollDeltaToIndex(viewport, safe);
+    if (delta == null) return;
 
     this.suppressScrollSync = true;
     viewport.scrollBy({ left: delta, behavior });
@@ -620,15 +579,7 @@ export class SpeciesStep implements OnInit {
   onRightClick(event: Event, cardId: string): void {
     event.preventDefault();
     event.stopPropagation();
-    this.flippedCards.update((set) => {
-      const newSet = new Set(set);
-      if (newSet.has(cardId)) {
-        newSet.delete(cardId);
-      } else {
-        newSet.add(cardId);
-      }
-      return newSet;
-    });
+    this.flippedCards.update((set) => toggleFlipId(set, cardId));
   }
 
   pickCard(cardId: string): void {

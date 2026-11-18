@@ -16,15 +16,30 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
-import { SupportTicket, SupportTicketThread } from '@core/models/support-ticket';
-import { SUPPORT_CATEGORIES, supportCategoryLabel } from '@core/utils/support-category.util';
+import { AdminAnnouncements } from './admin-announcements/admin-announcements';
+import { AdminStatsPanel } from './admin-stats/admin-stats';
+import { AdminTicketsPanel } from './admin-tickets/admin-tickets';
+import { AdminOpsPanel } from './admin-ops/admin-ops';
+import { AdminMailsPanel } from './admin-mails/admin-mails';
+import { AdminUsersPanel } from './admin-users/admin-users';
+import {
+  ADMIN_TABS,
+  type AdminStats,
+  type AdminTab,
+  type AdminTicket,
+  type AdminUser,
+  type AdminUserEdit,
+  type HostBackupFile,
+  type InboxMail,
+  type OutboundEmail,
+  type Overview,
+  type TicketThread,
+} from './admin.types';
+import type { SupportTicket } from '@core/models/support-ticket';
+import { SUPPORT_CATEGORIES } from '@core/utils/support-category.util';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
-import { supportStatusBadgeClass, supportStatusLabel, supportWaitingLabel } from '@core/utils/support-status.util';
 import {
   filterAdminTickets,
-  formatTicketAge,
-  ticketIsStale,
-  ticketQueue,
   type TicketQueueFilter,
 } from './admin-tickets.filter';
 import {
@@ -32,224 +47,21 @@ import {
   SupportReplyPayload,
 } from '@shared/components/support-conversation/support-conversation';
 import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-list';
-import { AdminAnnouncements } from './admin-announcements/admin-announcements';
-import {
-  adminRamPercent,
-  formatAdminBytes,
-  formatAdminCount,
-  formatAdminDuration,
-} from './admin-stats.format';
-
-interface AdminUser {
-  id: string;
-  email: string;
-  displayName: string;
-  role: string;
-  emailConfirmed: boolean;
-  createdAt: string;
-  lastLoginAt?: string;
-  characterCount: number;
-  passwordStatus: string;
-  disabled?: boolean;
-}
-
-type AdminTicket = SupportTicket;
-
-interface HostBackupFile {
-  name: string;
-  size: number;
-  modified: string;
-}
-
-interface InboxMail {
-  id: string;
-  from: string;
-  to: string;
-  subject: string;
-  snippet: string;
-  date: string;
-}
-
-type TicketThread = SupportTicketThread;
-
-interface OpsEvent {
-  id: string;
-  kind: string;
-  title: string;
-  detail: string;
-  createdAt: string;
-}
-
-interface CronRow {
-  name: string;
-  schedule: string;
-  lastKind: string;
-}
-
-interface OutboundEmail {
-  id: string;
-  toEmail: string;
-  fromEmail: string;
-  subject: string;
-  htmlBody: string;
-  status: string;
-  error?: string | null;
-  createdAt: string;
-}
-
-interface Overview {
-  users: number;
-  confirmedUsers: number;
-  campaigns: number;
-  ticketsOpen: number;
-  ticketsInProgress: number;
-  ticketsClosed: number;
-  remindersLast24h: number;
-  lastBackup: OpsEvent | null;
-  lastAlert: OpsEvent | null;
-  recentOps: OpsEvent[];
-  crons: CronRow[];
-}
-
-interface AdminStatsKind {
-  kind: string;
-  total: number;
-  ok: number;
-  tokens: number;
-}
-
-interface AdminStatsProvider {
-  provider: string;
-  total: number;
-  ok: number;
-  tokens: number;
-}
-
-interface AdminServer {
-  machineName: string;
-  framework: string;
-  osDescription: string;
-  environmentName: string;
-  startedAt: string;
-  uptimeSeconds: number;
-  cpuProcessPercent: number;
-  threadCount: number;
-  processorCount: number;
-  workingSetBytes: number;
-  privateMemoryBytes: number;
-  gcHeapBytes: number;
-  availableMemoryBytes: number | null;
-  containerMemoryBytes: number | null;
-  containerMemoryLimitBytes: number | null;
-  hostMemoryTotalBytes: number | null;
-  hostMemoryAvailableBytes: number | null;
-  hostDiskTotalBytes: number | null;
-  hostDiskAvailableBytes: number | null;
-  load1: number | null;
-  load5: number | null;
-  load15: number | null;
-}
-
-interface AdminHttpPath {
-  path: string;
-  count: number;
-  errors: number;
-  avgDurationMs: number;
-}
-
-interface AdminHttpRecent {
-  method: string;
-  path: string;
-  status: number;
-  durationMs: number;
-  at: string;
-}
-
-interface AdminHttp {
-  requestsSinceStart: number;
-  status2xx: number;
-  status4xx: number;
-  status5xx: number;
-  inFlight: number;
-  topPaths: AdminHttpPath[];
-  recent: AdminHttpRecent[];
-}
-
-interface AdminStats {
-  users: number;
-  confirmedUsers: number;
-  googleUsers: number;
-  usersLast7Days: number;
-  characters: number;
-  charactersLast7Days: number;
-  campaigns: number;
-  campaignsActive: number;
-  campaignsLast7Days: number;
-  campaignMembers: number;
-  dungeons: number;
-  dungeonsLast7Days: number;
-  friendshipsAccepted: number;
-  friendMessages: number;
-  supportTickets: number;
-  supportMessages: number;
-  guideComments: number;
-  generations: number;
-  generationsOk: number;
-  generationsLast24h: number;
-  generationsLast7Days: number;
-  promptTokens: number;
-  completionTokens: number;
-  totalTokens: number;
-  tokensLast24h: number;
-  tokensLast7Days: number;
-  generationsByKind: AdminStatsKind[];
-  generationsByProvider: AdminStatsProvider[];
-  server: AdminServer;
-  http: AdminHttp;
-  supportDesk: AdminSupportDesk;
-}
-
-interface AdminSupportCategory {
-  category: string;
-  total: number;
-  waitingOnStaff: number;
-}
-
-interface AdminSupportDesk {
-  open: number;
-  inProgress: number;
-  closed: number;
-  waitingOnStaff: number;
-  waitingOnPlayer: number;
-  oldestWaitingHours: number | null;
-  byCategory: AdminSupportCategory[];
-}
-
-type AdminTab =
-  | 'overview'
-  | 'stats'
-  | 'tickets'
-  | 'ops'
-  | 'mails'
-  | 'users'
-  | 'announcements'
-  | 'patchnotes';
-
-const ADMIN_TABS: readonly AdminTab[] = [
-  'overview',
-  'stats',
-  'tickets',
-  'ops',
-  'mails',
-  'users',
-  'announcements',
-  'patchnotes',
-];
-
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, SupportConversation, AdminAnnouncements, PatchNotesList],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SupportConversation,
+    AdminAnnouncements,
+    AdminStatsPanel,
+    AdminTicketsPanel,
+    AdminOpsPanel,
+    AdminMailsPanel,
+    AdminUsersPanel,
+    PatchNotesList,
+  ],
   templateUrl: './admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -264,10 +76,6 @@ export class AdminPage implements OnInit, OnDestroy {
   private readonly convo = viewChild(SupportConversation);
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private statsPoll: ReturnType<typeof setInterval> | null = null;
-  readonly formatBytes = formatAdminBytes;
-  readonly formatDuration = formatAdminDuration;
-  readonly formatCount = formatAdminCount;
-  readonly formatTicketAge = formatTicketAge;
   readonly ticketStatusFilter = signal<'all' | 'open' | 'in_progress' | 'closed'>('all');
   readonly ticketCategoryFilter = signal<'all' | string>('all');
   readonly ticketQueueFilter = signal<TicketQueueFilter>('staff');
@@ -302,17 +110,7 @@ export class AdminPage implements OnInit, OnDestroy {
   replyBody = '';
   adminNotesDraft = '';
 
-  edits: Record<
-    string,
-    {
-      email: string;
-      displayName: string;
-      role: string;
-      newPassword: string;
-      emailConfirmed: boolean;
-      disabled: boolean;
-    }
-  > = {};
+  edits: Record<string, AdminUserEdit> = {};
 
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
@@ -439,59 +237,6 @@ export class AdminPage implements OnInit, OnDestroy {
     this.stopStatsPoll();
   }
 
-  ramPercent(s: AdminStats): number | null {
-    return adminRamPercent(this.ramUsed(s), this.ramLimit(s));
-  }
-
-  ramUsed(s: AdminStats): number {
-    return s.server.containerMemoryBytes ?? s.server.workingSetBytes;
-  }
-
-  ramLimit(s: AdminStats): number | null {
-    return s.server.containerMemoryLimitBytes;
-  }
-
-  vpsRamUsed(s: AdminStats): number | null {
-    const total = s.server.hostMemoryTotalBytes;
-    const available = s.server.hostMemoryAvailableBytes;
-    if (total == null || available == null) return null;
-    return Math.max(0, total - available);
-  }
-
-  vpsRamPercent(s: AdminStats): number | null {
-    return adminRamPercent(this.vpsRamUsed(s), s.server.hostMemoryTotalBytes);
-  }
-
-  diskUsed(s: AdminStats): number | null {
-    const total = s.server.hostDiskTotalBytes;
-    const free = s.server.hostDiskAvailableBytes;
-    if (total == null || free == null) return null;
-    return Math.max(0, total - free);
-  }
-
-  diskPercent(s: AdminStats): number | null {
-    return adminRamPercent(this.diskUsed(s), s.server.hostDiskTotalBytes);
-  }
-
-  waitingLabel(ticket: AdminTicket): string {
-    return supportWaitingLabel(ticketQueue(ticket), 'staff');
-  }
-
-  isStale(ticket: AdminTicket): boolean {
-    return ticketIsStale(ticket);
-  }
-
-  oldestWaitingLabel(hours: number | null): string {
-    if (hours == null) return '—';
-    return formatAdminDuration(hours * 3600);
-  }
-
-  statusTone(status: number): string {
-    if (status >= 500) return 'text-red-400';
-    if (status >= 400) return 'text-amber-400';
-    return 'text-emerald-400';
-  }
-
   private startStatsPoll(): void {
     this.loadStats();
     if (this.statsPoll) return;
@@ -503,10 +248,6 @@ export class AdminPage implements OnInit, OnDestroy {
       clearInterval(this.statsPoll);
       this.statsPoll = null;
     }
-  }
-
-  categoryLabel(category: string | undefined): string {
-    return supportCategoryLabel(category);
   }
 
   private startPoll(): void {
@@ -718,11 +459,4 @@ export class AdminPage implements OnInit, OnDestroy {
     );
   }
 
-  statusLabel(status: string): string {
-    return supportStatusLabel(status, 'staff');
-  }
-
-  statusBadgeClass(status: string): string {
-    return supportStatusBadgeClass(status);
-  }
 }

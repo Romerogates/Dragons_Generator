@@ -1,0 +1,96 @@
+@if (overview(); as o) {
+      <div class="mb-6 rounded-xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 text-sm text-slate-300 leading-relaxed">
+        <p class="font-semibold text-amber-400 mb-1">À quoi sert le backup ?</p>
+        <p>
+          Tous les jours à 3 h, le serveur copie la base SQLite (comptes, campagnes, héros, tickets)
+          et les fichiers uploadés dans <code class="text-amber-200/90">~/backups/dragons/</code>,
+          gardés 14 jours. Ce n’est <strong>pas</strong> un mail à ouvrir : c’est un filet si le VPS
+          casse. Tu télécharges ici. Un mail ne part que si la copie a plus de 36 h de retard (alerte,
+          une fois par jour max).
+        </p>
+      </div>
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Crons VPS</h2>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Tâche</th>
+              <th class="px-3 py-2">Planning</th>
+              <th class="px-3 py-2">Dernier événement lié</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of o.crons; track c.name) {
+              <tr class="border-t border-slate-800">
+                <td class="px-3 py-2">{{ c.name }}</td>
+                <td class="px-3 py-2 font-mono text-slate-400">{{ c.schedule }}</td>
+                <td class="px-3 py-2">
+                  @if (c.lastKind === 'backup') {
+                    {{ (o.lastBackup?.createdAt | date: 'short') || '—' }}
+                  } @else if (c.lastKind === 'alert') {
+                    {{ (o.lastAlert?.createdAt | date: 'short') || '—' }}
+                  } @else {
+                    —
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Fichiers sur le VPS</h2>
+      <p class="text-xs text-slate-500 mb-2">Télécharge ici (gratuit, pas de zip Hotmail). Dossier <code>~/backups/dragons/</code>.</p>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Fichier</th>
+              <th class="px-3 py-2">Taille</th>
+              <th class="px-3 py-2">Date</th>
+              <th class="px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of hostBackups(); track b.name) {
+              <tr class="border-t border-slate-800">
+                <td class="px-3 py-2 font-mono">{{ b.name }}</td>
+                <td class="px-3 py-2 text-slate-400">{{ b.size }} o</td>
+                <td class="px-3 py-2 text-slate-500">{{ b.modified | date: 'short' }}</td>
+                <td class="px-3 py-2">
+                  <button type="button" class="text-amber-400 hover:underline" (click)="downloadBackup.emit(b.name)">Télécharger</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="px-3 py-4 text-slate-500">Aucun fichier monté (volume host-backups).</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-2">Journal (backups, alertes, mails)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-[#171b22] text-[10px] uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Quand</th>
+              <th class="px-3 py-2">Type</th>
+              <th class="px-3 py-2">Titre</th>
+              <th class="px-3 py-2">Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of o.recentOps; track e.id) {
+              <tr class="border-t border-slate-800 align-top">
+                <td class="px-3 py-2 whitespace-nowrap text-slate-500">{{ e.createdAt | date: 'short' }}</td>
+                <td class="px-3 py-2 font-mono text-amber-400/80">{{ e.kind }}</td>
+                <td class="px-3 py-2">{{ e.title }}</td>
+                <td class="px-3 py-2 text-slate-400">{{ e.detail }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="px-3 py-4 text-slate-500">Aucun événement encore.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+}

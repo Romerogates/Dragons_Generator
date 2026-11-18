@@ -15,4 +15,14 @@ describe('supportReportHref', () => {
     expect(q.get('subject')).toBe('Échec génération IA (adventure)');
     expect(q.get('message')).toBe('502');
   });
+
+  it('omits empty fields and can include a character', () => {
+    expect(supportReportHref({ subject: '   ', message: '' })).toBe('/support');
+    const href = supportReportHref({
+      subject: 'x',
+      message: 'y',
+      characterId: 'char-1',
+    });
+    expect(href).toContain('characterId=char-1');
+  });
 });

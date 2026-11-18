@@ -48,7 +48,7 @@ public class PostTableChatEndpoint(AppDbContext db, CampaignLivePublisher live)
                 ?? "Joueur";
 
             var newJson = CampaignJsonHelpers.TryAppendTableChat(
-                campaign.JsonData,
+                CampaignLiveTableStore.Read(campaign),
                 req.SessionId.Trim(),
                 userId.Value.ToString("D"),
                 author,
@@ -61,7 +61,7 @@ public class PostTableChatEndpoint(AppDbContext db, CampaignLivePublisher live)
                 break;
             }
 
-            campaign.JsonData = newJson;
+            CampaignLiveTableStore.Write(campaign, newJson);
             campaign.UpdatedAt = DateTimeOffset.UtcNow;
             try
             {

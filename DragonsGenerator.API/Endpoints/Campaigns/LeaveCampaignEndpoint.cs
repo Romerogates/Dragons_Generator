@@ -65,7 +65,7 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
         if (data["pregenCharacters"] is System.Text.Json.Nodes.JsonArray)
         {
             CampaignPregenHelpers.UnassignUser(data, userId.Value.ToString());
-            campaign.JsonData = data.ToJsonString();
+            CampaignLiveTableStore.Write(campaign, data.ToJsonString());
         }
 
         CampaignHistoryHelpers.SealLeft(member, campaign.JsonData);

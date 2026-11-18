@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -15,7 +15,7 @@ test.describe('Onboarding rôle', () => {
   test('choisir MJ ouvre le guide filtré', async ({ page }) => {
     test.setTimeout(60_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     expect(owner.token, 'seed JWT').toBeTruthy();
 
     const reset = await page.request.put('/api/me/guide-preferences', {
@@ -51,7 +51,7 @@ test.describe('Campagne — roster joueur', () => {
   test('inviter → proposer → valider fiche → retirer', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Pl');
 
     const campaignId = await createCampaignAs(page, owner, `E2E Roster ${Date.now()}`);

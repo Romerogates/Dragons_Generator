@@ -140,6 +140,7 @@
               "src/app/shared/**",
               "src/testing/**",
               "src/app/core/utils/progression-choices.util.ts",
+              "src/app/core/utils/progression-choices/**",
               "src/app/core/utils/class-resource-labels.ts",
               "src/app/core/utils/catalog-display.util.ts",
               "src/app/core/utils/equipment-detail-cards.util.ts",

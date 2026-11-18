@@ -30,7 +30,8 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
             return;
         }
 
-        using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(campaign.JsonData) ? "{}" : campaign.JsonData);
+        var hydratedJson = CampaignLiveTableStore.Hydrate(campaign.JsonData, campaign.LiveTableJson);
+        using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(hydratedJson) ? "{}" : hydratedJson);
         var supportInspect = CampaignAccess.IsSupportInspect(membership);
         var role = isOwner ? CampaignMemberRoles.Dm : membership!.Role;
         var isHistory = CampaignHistoryHelpers.IsHistoryView(campaign, membership);

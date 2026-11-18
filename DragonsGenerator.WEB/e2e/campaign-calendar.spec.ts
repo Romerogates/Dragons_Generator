@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import { createCampaignAs } from './helpers/campaign';
 
 test.describe('Campagne — calendrier de table', () => {
   test('MJ ouvre Calendrier, ajoute une date et voit le panneau', async ({ page }) => {
     test.setTimeout(90_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Cal ${Date.now()}`);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}?tab=calendar`);

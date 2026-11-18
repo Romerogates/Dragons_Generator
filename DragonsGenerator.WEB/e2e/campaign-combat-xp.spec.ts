@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -18,7 +18,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
   test('import party → Distribuer XP une fois (persiste après refresh)', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Xp');
     const { campaignId } = await createXpReadyCampaignAs(page, owner);
     const characterId = await createCharacterAs(page, player, 'Borin XP');
@@ -28,7 +28,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     await startActiveSessionAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
 
@@ -56,7 +56,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
       .toBe(0);
 
     await page.reload();
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page
@@ -76,7 +76,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     const ownerPage = await ownerCtx.newPage();
     const playerPage = await playerCtx.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const player = await registerConfirmAndLogin(playerPage.request, 'XpVis');
     const { campaignId } = await createXpReadyCampaignAs(ownerPage, owner);
     const characterId = await createCharacterAs(playerPage, player, 'Kael XP');
@@ -91,7 +91,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     });
 
     await applyAuthSession(ownerPage, owner, `/campaigns/${campaignId}/play`);
-    await expect(ownerPage.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await ownerPage.getByRole('button', { name: 'Combattre' }).click();
@@ -119,7 +119,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
   test('joueur lié : banner initiative ; non lié : pas de faux prompt', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'In');
     const { campaignId } = await createXpReadyCampaignAs(page, owner, `E2E Init ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Lyra Init');
@@ -156,7 +156,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
   test('/init : Encoder + Envoyer enregistre le jet', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'InitSub');
     const { campaignId } = await createXpReadyCampaignAs(page, owner, `E2E InitSub ${Date.now()}`);
     const characterId = await createCharacterAs(page, player, 'Lyra Submit');

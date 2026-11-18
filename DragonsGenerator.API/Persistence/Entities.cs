@@ -181,6 +181,8 @@ public class CampaignRecord
     public string Title { get; set; } = "";
     /// <summary>JSON: setting, adventure, creatures, encounters, notes, tone, partyLevel...</summary>
     public string JsonData { get; set; } = "{}";
+    /// <summary>JSON live-table (pions / carte / combat par session), hors blob JsonData.</summary>
+    public string LiveTableJson { get; set; } = "{}";
     /// <summary>Token opaque pour deep-link /join/{token}. Null = lien désactivé.</summary>
     public string? JoinToken { get; set; }
     public DateTimeOffset? JoinTokenCreatedAt { get; set; }

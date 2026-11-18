@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import {
   createCampaignAs,
   seedFightCombatAs,
@@ -11,14 +11,14 @@ test.describe('Campagne — attaque sur le tour (MJ)', () => {
   test('Attaquer → carte cible → encode → dégâts → PV + journal', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Atk ${Date.now()}`);
     const sessionId = await startActiveSessionAs(page, owner, campaignId);
     await setSessionModeAs(page, owner, campaignId, sessionId, 'in_person');
     await seedFightCombatAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page.getByRole('button', { name: /Combattre|Reprendre/i }).click();
@@ -54,14 +54,14 @@ test.describe('Campagne — attaque sur le tour (MJ)', () => {
   test('jet raté → pas de baisse PV, retour menu', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Miss ${Date.now()}`);
     const sessionId = await startActiveSessionAs(page, owner, campaignId);
     await setSessionModeAs(page, owner, campaignId, sessionId, 'in_person');
     await seedFightCombatAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page.getByRole('button', { name: /Combattre|Reprendre/i }).click();

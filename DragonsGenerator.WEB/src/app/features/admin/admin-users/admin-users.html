@@ -1,0 +1,76 @@
+    <div class="flex flex-col gap-4">
+      @for (u of users(); track u.id) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <div class="flex flex-wrap justify-between gap-2 mb-3">
+            <div>
+              <div class="text-sm font-bold text-slate-100">{{ u.displayName }}</div>
+              <div class="text-[10px] text-slate-500">
+                {{ u.characterCount }} perso(s) · créé {{ u.createdAt | date: 'short' }}
+              </div>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider text-violet-400">{{ u.role }}</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3 text-xs">
+            <label class="text-slate-500"
+              >Email
+              <input
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits()[u.id].email"
+                [name]="'email-' + u.id"
+              />
+            </label>
+            <label class="text-slate-500"
+              >Pseudo
+              <input
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits()[u.id].displayName"
+                [name]="'name-' + u.id"
+              />
+            </label>
+            <label class="text-slate-500"
+              >Rôle
+              <select
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits()[u.id].role"
+                [name]="'role-' + u.id"
+              >
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </label>
+            <label class="text-slate-500"
+              >Nouveau mot de passe
+              <input
+                type="password"
+                placeholder="laisser vide pour ne pas changer"
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits()[u.id].newPassword"
+                [name]="'pwd-' + u.id"
+              />
+            </label>
+          </div>
+          <p class="text-[10px] text-slate-600 mt-2">{{ u.passwordStatus }}</p>
+          <label class="flex items-center gap-2 text-xs text-slate-400 mt-2">
+            <input type="checkbox" [(ngModel)]="edits()[u.id].emailConfirmed" [name]="'conf-' + u.id" />
+            Email confirmé
+          </label>
+          <label class="flex items-center gap-2 text-xs text-red-300/80 mt-2">
+            <input type="checkbox" [(ngModel)]="edits()[u.id].disabled" [name]="'dis-' + u.id" />
+            Compte désactivé (bloque la connexion)
+          </label>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5" (click)="saveUser.emit(u.id)">
+              Enregistrer
+            </button>
+            <button
+              type="button"
+              class="text-xs px-3 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:border-sky-500"
+              (click)="sendReset.emit(u.id)"
+            >
+              Envoyer mail d'oubli
+            </button>
+          </div>
+        </div>
+      }
+    </div>

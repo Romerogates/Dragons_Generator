@@ -3,6 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
+import { CampaignPlayPersistService } from './campaign-play-persist.service';
 import { CampaignPlaySessionStore } from './campaign-play-session.store';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
@@ -73,6 +74,7 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
         ...zonelessTestProviders,
         provideHttpClient(),
         provideHttpClientTesting(),
+        CampaignPlayPersistService,
         CampaignPlaySessionStore,
         {
           provide: CampaignCloudService,
@@ -109,6 +111,13 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
     store.bindCampaign(campaign('dm'));
     expect(store.combatFlowPhase()).toBe('fight');
     expect(resolveCombatFlowPhase(store.activeCombat()!)).toBe('fight');
+  });
+
+  it('isDm pour le co-MJ (rôle dm sans isOwner)', () => {
+    store.bindCampaign({ ...campaign('dm'), isOwner: false, role: 'dm' });
+    expect(store.isDm()).toBeTrue();
+    store.bindCampaign(campaign('player'));
+    expect(store.isDm()).toBeFalse();
   });
 
   it('blocks spectator shareDiceRoll (no POST)', () => {
@@ -344,6 +353,22 @@ describe('CampaignPlaySessionStore — flowPhase + spectator lock', () => {
     expect(store.activeSession()?.tablePawns?.[0].tokenImageUrl).toBe('https://img.example/p.png');
     expect(patchLiveTable).toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
+  });
+
+  it('placeEveningToken déplace le pion du joueur connecté', async () => {
+    const c = campaign('player');
+    c.data.sessions[0].activeCombat = null;
+    c.data.sessions[0].tablePawns = [
+      { id: 'pawn-u1', name: 'Alice', mapX: 1, mapY: 1, memberUserId: 'u1' },
+      { id: 'pawn-u2', name: 'Lila', mapX: 2, mapY: 1, memberUserId: 'u2' },
+    ];
+    store.bindCampaign(c);
+    store.placeEveningToken('pawn-u2', 1, 1, { immediate: true });
+    expect(store.activeSession()?.tablePawns?.find((p) => p.id === 'pawn-u2')?.mapX).toBe(2);
+    store.placeEveningToken('pawn-u1', 2, 1, { immediate: true });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(store.activeSession()?.tablePawns?.find((p) => p.id === 'pawn-u1')?.mapX).toBe(2);
+    expect(patchLiveTable).toHaveBeenCalled();
   });
 
   it('ensureEveningPawns et placeEveningToken sont no-op pour un spectateur', () => {

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import { createCampaignAs } from './helpers/campaign';
@@ -20,7 +20,7 @@ test.describe('Amis & invitations campagne (UI)', () => {
     const ownerPage = await ownerContext.newPage();
     const playerPage = await playerContext.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const player = await registerConfirmAndLogin(playerPage.request, 'Ami');
     const campaignId = await createCampaignAs(ownerPage, owner, `E2E Amis ${Date.now()}`);
 
@@ -63,7 +63,7 @@ test.describe('Amis & invitations campagne (UI)', () => {
     const aPage = await aCtx.newPage();
     const bPage = await bCtx.newPage();
 
-    const a = await loginSeedSession(aPage.request);
+    const a = await uniqueOwnerSession(aPage.request);
     const b = await registerConfirmAndLogin(bPage.request, 'Ref');
 
     const friendReq = await aPage.request.post('/api/me/friends/request', {
@@ -91,7 +91,7 @@ test.describe('Amis & invitations campagne (UI)', () => {
     const aPage = await aCtx.newPage();
     const bPage = await bCtx.newPage();
 
-    const a = await loginSeedSession(aPage.request);
+    const a = await uniqueOwnerSession(aPage.request);
     const b = await registerConfirmAndLogin(bPage.request, 'Disc');
 
     const friendReq = await aPage.request.post('/api/me/friends/request', {

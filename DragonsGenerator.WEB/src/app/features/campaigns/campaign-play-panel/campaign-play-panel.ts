@@ -8,6 +8,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
+import { CampaignPlayPersistService } from '../campaign-play-session-store/campaign-play-persist.service';
 import { CampaignPlaySessionStore } from '../campaign-play-session-store/campaign-play-session.store';
 import { PlayTableShellService } from './play-table-shell.service';
 import { PlayImportService } from './play-import.service';
@@ -29,6 +30,7 @@ export type { PlaySessionView };
   standalone: true,
   imports: [PlayTableChrome, PlaySessionViews, PlayPlayerRail, PlayTableOverlays],
   providers: [
+    CampaignPlayPersistService,
     CampaignPlaySessionStore,
     PlayTableShellService,
     PlayImportService,

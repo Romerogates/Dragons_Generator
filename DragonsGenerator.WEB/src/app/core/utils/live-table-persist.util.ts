@@ -22,6 +22,18 @@ export function isLiveTableSessionPatch(patch: Partial<CampaignSession>): boolea
   return 'tablePawns' in patch || 'activeMapId' in patch;
 }
 
+export function liveTableSnapshotFromSession(
+  session: CampaignSession | undefined,
+): Partial<CampaignSession> | null {
+  if (!session) return null;
+  const snapshot: Partial<CampaignSession> = {
+    activeMapId: session.activeMapId ?? null,
+  };
+  if (session.tablePawns) snapshot.tablePawns = session.tablePawns;
+  if (session.activeCombat) snapshot.activeCombat = session.activeCombat;
+  return snapshot;
+}
+
 export function liveTablePersistBody(
   sessionId: string,
   patch: Partial<CampaignSession>,

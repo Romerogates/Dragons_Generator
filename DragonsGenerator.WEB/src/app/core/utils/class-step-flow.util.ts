@@ -65,6 +65,17 @@ export function wrapCarouselIndex(index: number, total: number): number {
   return ((index % total) + total) % total;
 }
 
+export function wrapCarouselOffsetPx(
+  index: number,
+  currentIndex: number,
+  total: number,
+  stridePx: number,
+): string {
+  if (total === 0) return '0px';
+  const wraps = Math.floor((currentIndex - index + total / 2) / total);
+  return `${wraps * total * stridePx}px`;
+}
+
 export function classStepCarouselTargetId(input: {
   phase: ClassStepPhase;
   classId: string | null;

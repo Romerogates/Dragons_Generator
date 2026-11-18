@@ -48,6 +48,7 @@ public static class DbMigrationRunner
         new("024_user_disabled", Apply024UserDisabledAsync),
         new("025_site_announcements", Apply025SiteAnnouncementsAsync),
         new("026_ai_generation_tokens", Apply026AiGenerationTokensAsync),
+        new("027_campaign_live_table_json", Apply027CampaignLiveTableJsonAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -487,6 +488,11 @@ public static class DbMigrationRunner
         await TryAddColumnAsync(db, "AiGenerationLogs", "Model", "TEXT NULL", ct);
     }
 
+    private static async Task Apply027CampaignLiveTableJsonAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Campaigns", "LiveTableJson", "TEXT NOT NULL DEFAULT ''", ct);
+    }
+
     private static async Task Apply025SiteAnnouncementsAsync(AppDbContext db, CancellationToken ct)
     {
         await db.Database.ExecuteSqlRawAsync(
@@ -548,6 +554,7 @@ public static class DbMigrationRunner
             or "TEXT NOT NULL DEFAULT 'violet'"
             or "TEXT NOT NULL DEFAULT 'half'"
             or "TEXT NOT NULL DEFAULT 'autre'"
-            or "INTEGER NOT NULL DEFAULT 0";
+            or "INTEGER NOT NULL DEFAULT 0"
+            or "TEXT NOT NULL DEFAULT ''";
 }
 

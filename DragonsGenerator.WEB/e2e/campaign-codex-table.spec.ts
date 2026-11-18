@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { applyAuthSession, loginSeedSession } from './helpers/auth';
+import { applyAuthSession, uniqueOwnerSession } from './helpers/auth';
 import {
   createCampaignAs,
   setSessionModeAs,
@@ -11,7 +11,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
   test('importe Maître assassin + Guerrier gobelin, combat visible', async ({ page }) => {
     test.setTimeout(150_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Codex Table ${Date.now()}`);
     const sessionId = await startActiveSessionAs(page, owner, campaignId);
     await setSessionModeAs(page, owner, campaignId, sessionId, 'in_person');
@@ -144,7 +144,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
     expect(putRes.ok(), await putRes.text()).toBeTruthy();
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page.getByRole('button', { name: /Combattre|Reprendre/i }).click();
@@ -175,7 +175,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
   test('fiche Codex → Ajouter à la table → gobelin visible en combat', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Codex Click ${Date.now()}`);
     await startActiveSessionAs(page, owner, campaignId);
 
@@ -193,7 +193,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
     await expect(page.getByText(/ajouté à la table/i)).toBeVisible({ timeout: 15_000 });
 
     await page.goto(`/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
     await page.getByRole('button', { name: /Combattre|Reprendre/i }).click();
@@ -204,12 +204,12 @@ test.describe('Campagne — table avec créatures Codex', () => {
   test('dock survit à /play → Codex → retour (sessionStorage)', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Dock Persist ${Date.now()}`);
     await startActiveSessionAs(page, owner, campaignId);
 
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
 
@@ -238,7 +238,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
   test('fiche Codex → Ajouter à une rencontre → groupe créé', async ({ page }) => {
     test.setTimeout(120_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Codex Encounter ${Date.now()}`);
     await startActiveSessionAs(page, owner, campaignId);
 
@@ -274,7 +274,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
   test('fiche Codex → rencontre → Lancer le combat sur /play', async ({ page }) => {
     test.setTimeout(150_000);
 
-    const owner = await loginSeedSession(page.request);
+    const owner = await uniqueOwnerSession(page.request);
     const campaignId = await createCampaignAs(page, owner, `E2E Codex Launch ${Date.now()}`);
     await startActiveSessionAs(page, owner, campaignId);
 
@@ -293,7 +293,7 @@ test.describe('Campagne — table avec créatures Codex', () => {
     });
 
     await page.goto(`/campaigns/${campaignId}/play`);
-    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+    await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
 

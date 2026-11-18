@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
-  loginSeedSession,
+  uniqueOwnerSession,
   registerConfirmAndLogin,
   type AuthSession,
 } from './helpers/auth';
@@ -48,7 +48,7 @@ test.describe('Chat amis — partage fiche & invitation', () => {
     const ownerPage = await ownerCtx.newPage();
     const playerPage = await playerCtx.newPage();
 
-    const owner = await loginSeedSession(ownerPage.request);
+    const owner = await uniqueOwnerSession(ownerPage.request);
     const player = await registerConfirmAndLogin(playerPage.request, 'Chat');
     const title = `E2E Chat Share ${Date.now()}`;
     const campaignId = await createCampaignAs(ownerPage, owner, title);

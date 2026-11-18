@@ -24,6 +24,7 @@ import {
 import * as hubView from '@core/utils/campaign-hub-view.util';
 import {
   campaignIsSupportInspect,
+  campaignIsTableDm,
   campaignLoginReturnUrl,
   campaignMjUi,
 } from '@core/utils/campaign-hub-access.util';
@@ -124,7 +125,7 @@ export class CampaignHubViewService {
 
   readonly showOverviewRoster = computed(() => {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return false;
+    if (!campaignIsTableDm(c)) return false;
     return (
       this.approvedPlayersWithCharacter().length > 0 ||
       this.pendingProposals().length > 0 ||
@@ -133,7 +134,7 @@ export class CampaignHubViewService {
   });
 
   readonly playersTabBadgeCount = computed(() => {
-    if (!this.hub.campaign()?.isOwner) return 0;
+    if (!campaignIsTableDm(this.hub.campaign())) return 0;
     return this.pendingProposals().length;
   });
 
@@ -195,11 +196,11 @@ export class CampaignHubViewService {
 
   readonly visibleTabs = computed((): TabDef[] =>
     visibleCampaignHubTabs(
-      this.hub.campaign()?.isOwner === true,
+      campaignIsTableDm(this.hub.campaign()),
       this.hub.campaign()?.data.pregenCharacters?.length ?? 0,
     ),
   );
-  readonly prepSubTabs = computed(() => campaignPrepSubTabs(this.hub.campaign()?.isOwner === true));
+  readonly prepSubTabs = computed(() => campaignPrepSubTabs(campaignIsTableDm(this.hub.campaign())));
   readonly plannedSessionCount = computed(() =>
     hubView.countSessionsByStatus(this.hub.campaign()?.data.sessions, 'planned'),
   );
@@ -209,7 +210,10 @@ export class CampaignHubViewService {
   readonly documentCount = computed(() => hubView.documentCount(this.hub.campaign()));
   readonly pinnedHandout = computed(() => hubView.pinnedPublishedHandout(this.hub.campaign()));
   readonly showPinnedOverlay = computed(
-    () => !this.hub.campaign()?.isOwner && !!this.pinnedHandout() && !this.table.pinnedOverlayDismissed(),
+    () =>
+      !campaignIsTableDm(this.hub.campaign()) &&
+      !!this.pinnedHandout() &&
+      !this.table.pinnedOverlayDismissed(),
   );
   readonly lastPublishedHandoutTitle = computed(() =>
     hubView.lastPublishedHandoutTitle(this.hub.campaign()?.data.handouts),

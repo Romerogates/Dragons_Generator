@@ -88,7 +88,9 @@
   }
 
   @if (!hideSiteChrome()) {
-    <app-navbar />
+    @defer (on immediate) {
+      <app-navbar />
+    }
   }
 
   <main
@@ -101,12 +103,16 @@
   </main>
 
   @if (!hideSiteChrome()) {
-    <app-site-footer />
+    @defer (on idle) {
+      <app-site-footer />
+    }
   }
 
-  <app-ai-generation-dock />
-  <app-context-menu />
-  <app-ai-rate-limit-dialog />
+  @defer (on idle) {
+    <app-ai-generation-dock />
+    <app-context-menu />
+    <app-ai-rate-limit-dialog />
+  }
   @if (!hideSiteChrome()) {
     @defer (on idle) {
       <app-campaign-session-dock />
