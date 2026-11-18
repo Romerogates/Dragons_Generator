@@ -1,36 +1,5 @@
-import {
-  pickRandomSubset,
-  buildAutoSpeciesSelection,
-  buildAutoCivilizationSelection,
-  buildAutoBackgroundSelection,
-  primaryAbilityKeys,
-  buildStandardAbilityScores,
-  buildAutoClassSelection,
-  autoPickClassSkills,
-  autoResolveClassProficiencies,
-  resolveBgToolToConcrete,
-  buildBackgroundToolSlots,
-  buildAutoEquipment,
-  buildAutoSpellcastingDetails,
-  pickBonusLanguages,
-  normalizeEquipmentCatalog,
-  createSkillMapFromList,
-  pickPlayableSpecies,
-  pickPresetBackgrounds,
-  CLASS_SPELLCASTING,
-} from '../character-auto-build.util';
-import {
-  makeGuerrierCls,
-  makeMagicienCls,
-  makePretreLikeCls,
-  makeElfSpecies,
-  makeDrakeideLikeSpecies,
-  makeCivilisation,
-  makeErudBackground,
-  SKILLS,
-  TOOL_CATALOG,
-} from './spec-helpers';
-import type { CharacterClass, Species, Spell, Language, EquipmentCatalogItem } from './spec-helpers';
+import { autoPickClassSkills, autoResolveClassProficiencies, createSkillMapFromList, CLASS_SPELLCASTING } from '../character-auto-build.util';
+import { makeGuerrierCls, makeMagicienCls, makePretreLikeCls, SKILLS } from './spec-helpers';
 
 describe('character-auto-build skills', () => {
   afterEach(() => {

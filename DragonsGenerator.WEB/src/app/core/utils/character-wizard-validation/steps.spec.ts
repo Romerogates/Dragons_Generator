@@ -1,6 +1,6 @@
 import { isWizardStepValid, racialSpellsComplete } from '../character-wizard-validation.util';
 import type { CharacterCreation } from '@core/models/Character/character';
-import { base, WIZARD_CANTRIPS, WIZARD_SPELLS, CLERIC_CANTRIPS } from './spec-helpers';
+import { base } from './spec-helpers';
 
 describe('character-wizard-validation steps', () => {
   it('isWizardStepValid always accepts the level step (default value always set)', () => {
@@ -662,6 +662,173 @@ describe('character-wizard-validation steps', () => {
       ),
     ).toBeFalse();
   });
+  it('covers remaining class, language and identity branches', () => {
+    expect(isWizardStepValid(12, base, { needsMagicStep: false })).toBeTrue();
+    expect(isWizardStepValid(99, base, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(9, { ...base, languages: [] }, { needsMagicStep: false })).toBeFalse();
+    expect(
+      isWizardStepValid(
+        5,
+        { ...base, classId: 'cls-sorcier', hitDie: 8, targetLevel: 2, eldritchInvocations: [] },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        5,
+        { ...base, classId: 'cls-ensorceleur', hitDie: 6, targetLevel: 3, subclassId: 'sub', metamagicOptions: [] },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          secondaryClasses: [{ classId: 'cls-barde', className: 'Barde', level: 3 }],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        2,
+        { ...base, speciesId: 'sp-elfe', speciesChoiceAnswers: { racial: [] } },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        6,
+        {
+          ...base,
+          pointsRemaining: 0,
+          asiChoices: [{ level: 4, mode: 'plus1plus1', primary: 'force', secondary: 'force', featId: null }],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        11,
+        { ...base, name: 'Héros' },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+    expect(isWizardStepValid(11, { ...base, name: '  ' }, { needsMagicStep: true })).toBeFalse();
+    expect(isWizardStepValid(11, base, { needsMagicStep: false })).toBeTrue();
+  });
+
+  it('isWizardStepValid exige pacte / métamagie / outils d’historique et refuse les choix non résolus', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        { ...base, classId: 'cls-sorcier', hitDie: 8, targetLevel: 3, subclassId: 'hex', pactBoon: null },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-sorcier',
+          hitDie: 8,
+          targetLevel: 3,
+          subclassId: 'hex',
+          pactBoon: 'pact-chaine',
+          eldritchInvocations: ['inv-1'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-sorcier',
+              className: 'Sorcier',
+              level: 3,
+              subclassId: 'hex',
+              pactBoon: null,
+              eldritchInvocations: ['inv-1'],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 0,
+          selectedSkills: [],
+          weaponProficiencies: ['wp-any'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 0,
+          selectedSkills: [],
+          toolProficiencies: ['any'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 0,
+          selectedSkills: [],
+          backgroundProficiencies: { tools: { choose: [{ chooseCount: 1, options: ['tl-a'] }] } },
+          backgroundTools: [],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        6,
+        {
+          ...base,
+          pointsRemaining: 0,
+          asiChoices: [
+            {
+              level: 4,
+              mode: 'feat',
+              primary: null,
+              secondary: null,
+              featId: 'feat-alerte',
+              featTalentSpends: [{ id: 's1', type: 'skill' }],
+            },
+          ],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
   it('isWizardStepValid rejects equipment step when no slots and nothing selected', () => {
     expect(
       isWizardStepValid(

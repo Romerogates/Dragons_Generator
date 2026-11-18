@@ -55,95 +55,31 @@ jobs:
         working-directory: DragonsGenerator.WEB
         run: npm run lint
 
-  # Runs in parallel with `test` — deploy still gates on both.
-  e2e:
+  # Parallel with `test` and with each other — deploy gates on all three.
+  e2e-forge:
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
+      - name: E2E forge / compte
+        uses: ./.github/actions/e2e-run
         with:
-          node-version: '24'
-          cache: npm
-          cache-dependency-path: DragonsGenerator.WEB/package-lock.json
+          suite: forge
 
-      # One ECR pull only: a second anonymous public.ecr.aws pull 429s on GitHub IPs.
-      # Stubs + Dockerfile.e2e reuse node:24-alpine (nginx comes from Alpine apk).
-      - name: Prefetch web base images
-        run: |
-          set -euo pipefail
-          src=public.ecr.aws/docker/library/node:24-alpine
-          echo "prefetch $src -> node:24-alpine"
-          attempt=1
-          max=5
-          while [ "$attempt" -le "$max" ]; do
-            if docker pull "$src"; then
-              docker tag "$src" node:24-alpine
-              exit 0
-            fi
-            echo "WARN: pull failed (attempt ${attempt}/${max}) — retry"
-            sleep $((attempt * 20))
-            attempt=$((attempt + 1))
-          done
-          exit 1
-
-      - name: Start local stack
-        run: |
-          export APP_BUILD_COUNT
-          APP_BUILD_COUNT="$(git rev-list --count HEAD)"
-          compose() {
-            docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml "$@"
-          }
-          compose up -d --pull never mailhog
-          compose up -d --build --pull never dragons-api dragons-web
-          for i in $(seq 1 60); do
-            if curl -sf http://localhost:8081/ >/dev/null \
-              && curl -sf http://localhost:8081/api/health >/dev/null; then
-              echo "Stack ready after ${i} attempt(s)"
-              exit 0
-            fi
-            echo "Waiting for stack… ($i/60)"
-            sleep 5
-          done
-          echo "Stack failed to become ready"
-          docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml logs
-          exit 1
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v5
+  e2e-table:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: E2E table / session
+        uses: ./.github/actions/e2e-run
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('DragonsGenerator.WEB/package-lock.json') }}
-
-      - name: Playwright E2E (CI smoke)
-        working-directory: DragonsGenerator.WEB
-        env:
-          E2E_BASE_URL: http://localhost:8081
-          CI: 'true'
-        run: |
-          npm ci
-          # ubuntu-latest ships Google Chrome apt sources that flake with
-          # "Hash Sum mismatch" during `playwright install --with-deps`.
-          # Playwright bundles its own Chromium; that repo is unused.
-          sudo rm -f /etc/apt/sources.list.d/google-chrome*.list \
-            /etc/apt/sources.list.d/google-chrome*.sources 2>/dev/null || true
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
-            npx playwright install chromium
-          else
-            npx playwright install --with-deps chromium
-          fi
-          npm run e2e:ci
-
-      - name: Stop local stack
-        if: always()
-        run: docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml down -v
+          suite: table
 
   deploy:
-    needs: [test, e2e]
+    needs: [test, e2e-forge, e2e-table]
     runs-on: ubuntu-24.04
     steps:
       - name: Deploy over SSH

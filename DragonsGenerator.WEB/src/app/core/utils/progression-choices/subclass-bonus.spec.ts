@@ -4,17 +4,9 @@ import {
   classBonusSenses,
   classRootSavingThrowGrants,
   extractSubclassSkillProficiencyChoices,
-  multiclassPrerequisitesMet,
-  multiclassPrerequisiteLabel,
-  multiclassPrerequisitesPossibleAtMaxBuy,
-  multiclassProficiencies,
-  combinedCasterLevel,
-  multiclassSpellSlotsForCasterLevel,
-  MULTICLASS_SPELL_SLOTS_TABLE,
   extractProgressionChoices,
   collectProgressionPicksFromAnswers,
 } from '../progression-choices.util';
-import type { AbilityScores } from '@core/models/Character/character';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { createLettreClass } from '@testing/lettre-fixtures';
 

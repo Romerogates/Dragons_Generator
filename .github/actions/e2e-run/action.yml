@@ -1,0 +1,87 @@
+name: 'E2E Playwright suite'
+description: 'Start the Docker e2e stack and run one Playwright suite (forge or table).'
+inputs:
+  suite:
+    description: 'npm script: e2e:ci:forge or e2e:ci:table'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v5
+      with:
+        node-version: '24'
+        cache: npm
+        cache-dependency-path: DragonsGenerator.WEB/package-lock.json
+
+    - name: Prefetch web base images
+      shell: bash
+      run: |
+        set -euo pipefail
+        src=public.ecr.aws/docker/library/node:24-alpine
+        echo "prefetch $src -> node:24-alpine"
+        attempt=1
+        max=5
+        while [ "$attempt" -le "$max" ]; do
+          if docker pull "$src"; then
+            docker tag "$src" node:24-alpine
+            exit 0
+          fi
+          echo "WARN: pull failed (attempt ${attempt}/${max}) — retry"
+          sleep $((attempt * 20))
+          attempt=$((attempt + 1))
+        done
+        exit 1
+
+    - name: Start local stack
+      shell: bash
+      run: |
+        export APP_BUILD_COUNT
+        APP_BUILD_COUNT="$(git rev-list --count HEAD)"
+        compose() {
+          docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml "$@"
+        }
+        compose up -d --pull never mailhog
+        compose up -d --build --pull never dragons-api dragons-web
+        for i in $(seq 1 60); do
+          if curl -sf http://localhost:8081/ >/dev/null \
+            && curl -sf http://localhost:8081/api/health >/dev/null; then
+            echo "Stack ready after ${i} attempt(s)"
+            exit 0
+          fi
+          echo "Waiting for stack… ($i/60)"
+          sleep 5
+        done
+        echo "Stack failed to become ready"
+        docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml logs
+        exit 1
+
+    - name: Cache Playwright browsers
+      id: playwright-cache
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('DragonsGenerator.WEB/package-lock.json') }}
+
+    - name: Playwright E2E
+      shell: bash
+      working-directory: DragonsGenerator.WEB
+      env:
+        E2E_BASE_URL: http://localhost:8081
+        CI: 'true'
+      run: |
+        npm ci
+        sudo rm -f /etc/apt/sources.list.d/google-chrome*.list \
+          /etc/apt/sources.list.d/google-chrome*.sources 2>/dev/null || true
+        if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+          npx playwright install chromium
+        else
+          npx playwright install --with-deps chromium
+        fi
+        npm run e2e:ci:${{ inputs.suite }}
+
+    - name: Stop local stack
+      if: always()
+      shell: bash
+      run: docker compose -f docker-compose.local.yml -f docker-compose.e2e.yml down -v

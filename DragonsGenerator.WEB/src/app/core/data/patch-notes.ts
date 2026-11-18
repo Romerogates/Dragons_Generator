@@ -13,6 +13,22 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.477',
+    date: '2026-11-18',
+    title: 'Connexion plus claire, tests et e2e',
+    player: [
+      'À la connexion, le message d’erreur reste court : email ou mot de passe incorrect.',
+      '« Mot de passe oublié » est juste sous le champ mot de passe.',
+      'Le bouton Google et « Créer un compte » sont plus visibles, sur le modèle d’une page de connexion classique.',
+    ],
+    tech: [
+      'Login : plus de `withGoogleLoginHint` sur l’erreur mot de passe ; lien forgot sous le champ ; CTA register outline + GSI `outline`/`pill`.',
+      'Lint : imports morts (auto-build specs, builder, modèles).',
+      'Karma : specs kit / derived / creation / auto-complete / hub-view / wizard steps / hub-write / evening-map (~91,8 % branches, seuil toujours 90 %).',
+      'CI : jobs `e2e-forge` et `e2e-table` en parallèle (`e2e:ci:forge` / `e2e:ci:table`, action `.github/actions/e2e-run`). Playwright `workers: 2` aussi en local.',
+    ],
+  },
+  {
     version: '1.476',
     date: '2026-11-18',
     title: 'Table, forge et second MJ',

@@ -22,10 +22,7 @@ import {
 import {
   buildClassFeaturesForLevel,
 } from '../utils/character-class-features.util';
-import {
-  normalizeBackgroundSkillId,
-  stripProgressionChoiceFeatures,
-} from '../utils/character-proficiencies.util';
+import { stripProgressionChoiceFeatures } from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import type { RawFeatData } from '../utils/feat-benefits.util';
 import type { Spell } from '../models/Spells/spell';

@@ -1,4 +1,4 @@
-import { isWizardStepValid, racialSpellsComplete } from '../character-wizard-validation.util';
+import { isWizardStepValid } from '../character-wizard-validation.util';
 import type { CharacterCreation } from '@core/models/Character/character';
 import { base, WIZARD_CANTRIPS, WIZARD_SPELLS, CLERIC_CANTRIPS } from './spec-helpers';
 

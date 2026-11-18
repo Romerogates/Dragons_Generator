@@ -1,5 +1,5 @@
 import type { Ability } from '../CharacterClasses/character-class';
-import type { AbilityKey, AbilityScores, AsiChoiceSlot } from './character-ability';
+import type { AbilityScores, AsiChoiceSlot } from './character-ability';
 import type { CatalogRef, ClassRef, Size, SpeciesRef } from './character-refs';
 import type { FeatureInstance } from './character-features';
 import type {

@@ -1,38 +1,6 @@
-import {
-  pickRandomSubset,
-  buildAutoSpeciesSelection,
-  buildAutoCivilizationSelection,
-  buildAutoBackgroundSelection,
-  primaryAbilityKeys,
-  buildStandardAbilityScores,
-  buildAutoClassSelection,
-  autoPickClassSkills,
-  autoResolveClassProficiencies,
-  resolveBgToolToConcrete,
-  buildBackgroundToolSlots,
-  buildAutoEquipment,
-  buildAutoSpellcastingDetails,
-  pickBonusLanguages,
-  normalizeEquipmentCatalog,
-  createSkillMapFromList,
-  pickPlayableSpecies,
-  pickPresetBackgrounds,
-  CLASS_SPELLCASTING,
-} from '../character-auto-build.util';
-import {
-  makeGuerrierCls,
-  makeMagicienCls,
-  makePretreLikeCls,
-  makeElfSpecies,
-  makeDrakeideLikeSpecies,
-  makeCivilisation,
-  makeErudBackground,
-  SKILLS,
-  TOOL_CATALOG,
-  createLettreClass,
-} from './spec-helpers';
-import type { CharacterClass, Species, Spell, Language, EquipmentCatalogItem } from './spec-helpers';
-
+import { buildAutoClassSelection, CLASS_SPELLCASTING } from '../character-auto-build.util';
+import { makeGuerrierCls, makeMagicienCls, makePretreLikeCls, createLettreClass } from './spec-helpers';
+import type { CharacterClass } from './spec-helpers';
 describe('character-auto-build class', () => {
   afterEach(() => {
     delete (CLASS_SPELLCASTING as Record<string, unknown>)['cls-test-inconnu'];
@@ -565,6 +533,52 @@ describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
         } as unknown as CharacterClass;
         const { extraFeatures } = buildAutoClassSelection(cls, 1);
         expect(extraFeatures[0]?.name).toBe('Sans Fiche');
+      });
+
+      it('ignore un objet subclasses verrouillé ou sans options, et un pool de styles vide', () => {
+        const locked: CharacterClass = {
+          id: 'cls-locked',
+          name: 'Locked',
+          data: {
+            hit_die: 8,
+            primary_abilities: [],
+            proficiencies: { armor: 'none', weapons: 'none', tools: 'none', saving_throws: [], skills: { count: 0 } },
+            starting_equipment: [],
+            progression: [{ level: 1, prof_bonus: 2, features: ['feat-absent'], resources: {} }],
+            features_details: [],
+            subclasses: { options: [], unlocked_at_level: 10 },
+            choice_pools: undefined,
+          } as any,
+        } as unknown as CharacterClass;
+        expect(buildAutoClassSelection(locked, 5).selection.subclassId).toBeUndefined();
+
+        spyOn(Math, 'random').and.returnValue(0);
+        const delayed: CharacterClass = {
+          id: 'cls-delayed',
+          name: 'Delayed',
+          data: {
+            hit_die: 8,
+            primary_abilities: [],
+            proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+            starting_equipment: [],
+            progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+            features_details: [],
+            subclasses: {
+              level_unlocked: 1,
+              options: [
+                {
+                  id: 'sub-x',
+                  name: 'X',
+                  sub_choices: [
+                    { id: 'late', options: ['a'], count: 1, level_required: 9 },
+                    { id: 'empty', options: [], count: 1, level_required: 1 },
+                  ],
+                },
+              ],
+            },
+          } as any,
+        } as unknown as CharacterClass;
+        expect(buildAutoClassSelection(delayed, 3).selection.subclassId).toBe('sub-x');
       });
   });
 

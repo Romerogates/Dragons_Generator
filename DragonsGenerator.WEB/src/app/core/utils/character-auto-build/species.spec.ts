@@ -1,37 +1,6 @@
-import {
-  pickRandomSubset,
-  buildAutoSpeciesSelection,
-  buildAutoCivilizationSelection,
-  buildAutoBackgroundSelection,
-  primaryAbilityKeys,
-  buildStandardAbilityScores,
-  buildAutoClassSelection,
-  autoPickClassSkills,
-  autoResolveClassProficiencies,
-  resolveBgToolToConcrete,
-  buildBackgroundToolSlots,
-  buildAutoEquipment,
-  buildAutoSpellcastingDetails,
-  pickBonusLanguages,
-  normalizeEquipmentCatalog,
-  createSkillMapFromList,
-  pickPlayableSpecies,
-  pickPresetBackgrounds,
-  CLASS_SPELLCASTING,
-} from '../character-auto-build.util';
-import {
-  makeGuerrierCls,
-  makeMagicienCls,
-  makePretreLikeCls,
-  makeElfSpecies,
-  makeDrakeideLikeSpecies,
-  makeCivilisation,
-  makeErudBackground,
-  SKILLS,
-  TOOL_CATALOG,
-} from './spec-helpers';
-import type { CharacterClass, Species, Spell, Language, EquipmentCatalogItem } from './spec-helpers';
-
+import { buildAutoSpeciesSelection, CLASS_SPELLCASTING } from '../character-auto-build.util';
+import { makeElfSpecies, makeDrakeideLikeSpecies } from './spec-helpers';
+import type { Species, Spell } from './spec-helpers';
 describe('character-auto-build species', () => {
   afterEach(() => {
     delete (CLASS_SPELLCASTING as Record<string, unknown>)['cls-test-inconnu'];

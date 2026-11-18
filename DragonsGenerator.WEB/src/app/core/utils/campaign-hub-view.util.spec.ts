@@ -384,5 +384,40 @@ describe('campaign-hub-view.util', () => {
       ).map((o) => o.label),
     ).toEqual(['Thorn (MJ)', 'Pré-tiré (pré-tiré)']);
     expect(readyPregenCount([pregen(), pregen({ status: 'claimed', id: 'x' })])).toBe(1);
+    expect(pdfUnassignedPregens(undefined, [])).toEqual([]);
+    expect(pastSessions(undefined)).toEqual([]);
+    expect(pastSessions([session({ status: 'cancelled' })]).length).toBe(1);
+    expect(nextPlannedSession([], now)).toBeNull();
+    expect(pendingHubRsvp(null, 'u1', () => '', now)).toBeNull();
+    expect(pendingHubRsvp(campaign(), null, () => '', now)).toBeNull();
+    expect(creaturesByRoleBucket(undefined, 'ally')).toEqual([]);
+    expect(sortedHandouts(undefined, 'all')).toEqual([]);
+    expect(lastPublishedHandoutTitle(undefined)).toBeNull();
+    expect(
+      pendingHubRsvp(
+        campaign({
+          data: {
+            ...emptyCampaignData(),
+            scheduleEvents: [{ id: 'prep', title: '', startsAt: '2026-10-20T19:00:00.000Z', kind: 'prep' }],
+          },
+        }),
+        'u1',
+        () => 'x',
+        now,
+      ),
+    ).toBeNull();
+    expect(
+      pendingHubRsvp(
+        campaign({
+          data: {
+            ...emptyCampaignData(),
+            scheduleEvents: [{ id: 'e9', title: '', startsAt: '2026-10-20T19:00:00.000Z', kind: 'game' }],
+          },
+        }),
+        'u1',
+        () => 'quand',
+        now,
+      )?.title,
+    ).toBe('Soirée de table');
   });
 });

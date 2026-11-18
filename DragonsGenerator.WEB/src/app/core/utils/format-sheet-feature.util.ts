@@ -19,7 +19,7 @@ export function formatFeatureSheetLabel(feat: Pick<FeatureInstance, 'name' | 're
     return `Style : ${COMBAT_STYLE_FALLBACK[fallbackId]?.name ?? labelForGameId(fallbackId)}`;
   }
 
-  let name = (feat.name ?? '').trim();
+  const name = (feat.name ?? '').trim();
   const styleMatch = name.match(/^Style\s*:\s*(.+)$/i);
   if (styleMatch) {
     const raw = styleMatch[1].trim();

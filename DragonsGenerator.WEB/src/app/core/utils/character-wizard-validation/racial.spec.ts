@@ -1,6 +1,5 @@
-import { isWizardStepValid, racialSpellsComplete } from '../character-wizard-validation.util';
-import type { CharacterCreation } from '@core/models/Character/character';
-import { base, WIZARD_CANTRIPS, WIZARD_SPELLS, CLERIC_CANTRIPS } from './spec-helpers';
+import { racialSpellsComplete } from '../character-wizard-validation.util';
+import { base } from './spec-helpers';
 
 describe('character-wizard-validation racial', () => {
   it('racialSpellsComplete requires each grant to be picked', () => {

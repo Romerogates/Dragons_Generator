@@ -10,28 +10,7 @@ import type { Species } from '@core/models/Species/species';
 import type { Background } from '@core/models/Backgrounds/background';
 import type { Civilisation } from '@core/models/Civilisations/civilisations';
 import type { Skill } from '@core/models/Skills/skill';
-import {
-  pickRandomSubset,
-  buildAutoSpeciesSelection,
-  buildAutoCivilizationSelection,
-  buildAutoBackgroundSelection,
-  primaryAbilityKeys,
-  buildStandardAbilityScores,
-  buildAutoClassSelection,
-  autoPickClassSkills,
-  autoResolveClassProficiencies,
-  resolveBgToolToConcrete,
-  buildBackgroundToolSlots,
-  buildAutoEquipment,
-  buildAutoSpellcastingDetails,
-  pickBonusLanguages,
-  normalizeEquipmentCatalog,
-  createSkillMapFromList,
-  pickPlayableSpecies,
-  pickPresetBackgrounds,
-  CLASS_SPELLCASTING,
-  type EquipmentCatalogItem,
-} from '../character-auto-build.util';
+import { type EquipmentCatalogItem } from '../character-auto-build.util';
 export type { EquipmentCatalogItem };
 export { createLettreClass } from '../../../../testing/lettre-fixtures';
 export {

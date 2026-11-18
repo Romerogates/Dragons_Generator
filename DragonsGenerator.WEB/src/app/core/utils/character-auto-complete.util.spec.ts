@@ -58,6 +58,25 @@ describe('character-auto-complete.util', () => {
     expect(roublard.creation.languages).not.toContain('Argot des voleurs');
   });
 
+  it('treats missing language arrays as empty and still fills skills', () => {
+    const { filled } = autoCompleteRemainingCreation(
+      base({
+        languages: undefined,
+        speciesLanguages: undefined,
+        civilizationLanguages: undefined,
+        backgroundLanguages: undefined,
+        bonusLanguageCount: undefined,
+        skillChooseCount: undefined,
+        speciesBonusSkillCount: 1,
+        skillOptions: ['skill-nature'],
+        selectedSkills: undefined,
+        hasSpellcasting: false,
+      } as never),
+      { languages: LANGS, spells: [] },
+    );
+    expect(filled).toContain('compétences');
+  });
+
   it('skips languages when gap is already filled or catalog empty', () => {
     const filled = autoCompleteRemainingCreation(
       base({

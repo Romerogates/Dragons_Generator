@@ -5,10 +5,10 @@ const baseURL = process.env['E2E_BASE_URL'] ?? 'http://localhost:8081';
 export default defineConfig({
   testDir: './e2e',
   // Specs CI smoke are independent files; parallelize on CI to cut wall time.
-  fullyParallel: !!process.env['CI'],
+  fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
-  workers: process.env['CI'] ? 2 : 1,
+  workers: Number(process.env['E2E_WORKERS'] ?? 2),
   timeout: 60_000,
   globalTimeout: process.env['CI'] ? 10 * 60_000 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],

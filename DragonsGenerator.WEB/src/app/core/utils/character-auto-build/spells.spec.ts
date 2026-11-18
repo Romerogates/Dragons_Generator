@@ -1,53 +1,6 @@
-import {
-  pickRandomSubset,
-  buildAutoSpeciesSelection,
-  buildAutoCivilizationSelection,
-  buildAutoBackgroundSelection,
-  primaryAbilityKeys,
-  buildStandardAbilityScores,
-  buildAutoClassSelection,
-  autoPickClassSkills,
-  autoResolveClassProficiencies,
-  resolveBgToolToConcrete,
-  buildBackgroundToolSlots,
-  buildAutoEquipment,
-  buildAutoSpellcastingDetails,
-  pickBonusLanguages,
-  normalizeEquipmentCatalog,
-  createSkillMapFromList,
-  pickPlayableSpecies,
-  pickPresetBackgrounds,
-  CLASS_SPELLCASTING,
-} from '../character-auto-build.util';
-import {
-  makeGuerrierCls,
-  makeMagicienCls,
-  makePretreLikeCls,
-  makeElfSpecies,
-  makeDrakeideLikeSpecies,
-  makeCivilisation,
-  makeErudBackground,
-  SKILLS,
-  TOOL_CATALOG,
-  evaluatePreparedFormula,
-  resolveSpellQuota,
-  spellPickCount,
-  extractSubclassBonusSpells,
-  featAsiAbilityOptions,
-  featAsiNeedsAbilityChoice,
-  featBonusArmorProficiencies,
-  featBonusToolProficiencies,
-  featDarkvisionRadius,
-  featFlexiblePointsTotal,
-  featIsFlexiblePoints,
-  featNeedsResistanceChoice,
-  featResistanceOptions,
-  isTalentSpendComplete,
-  resolveFeatAsiAbilityKey,
-  talentSpendsTotalCost,
-} from './spec-helpers';
-import type { CharacterClass, Species, Spell, Language, EquipmentCatalogItem } from './spec-helpers';
-
+import { buildAutoSpellcastingDetails, CLASS_SPELLCASTING } from '../character-auto-build.util';
+import { makeGuerrierCls, makeMagicienCls, evaluatePreparedFormula, resolveSpellQuota, spellPickCount, extractSubclassBonusSpells, featAsiAbilityOptions, featAsiNeedsAbilityChoice, featBonusArmorProficiencies, featBonusToolProficiencies, featDarkvisionRadius, featFlexiblePointsTotal, featIsFlexiblePoints, featNeedsResistanceChoice, featResistanceOptions, isTalentSpendComplete, resolveFeatAsiAbilityKey, talentSpendsTotalCost } from './spec-helpers';
+import type { CharacterClass, Spell } from './spec-helpers';
 describe('character-auto-build spells', () => {
   afterEach(() => {
     delete (CLASS_SPELLCASTING as Record<string, unknown>)['cls-test-inconnu'];

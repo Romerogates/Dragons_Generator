@@ -158,5 +158,22 @@ describe('evening-map.util', () => {
       canControlTableToken({ isDm: false, userId: 'u1', tokenId: 'pawn-u2', memberUserId: 'u2' }),
     ).toBeFalse();
     expect(canControlTableToken({ isDm: false, isSpectator: true, userId: 'u1', tokenId: 'pawn-u1' })).toBeFalse();
+    expect(canControlTableToken({ isDm: false, userId: '  ', tokenId: 'pawn-u1' })).toBeFalse();
+    expect(canControlTableToken({ isDm: false, userId: null, tokenId: 'pawn-u1' })).toBeFalse();
+    expect(canControlTableToken({ isDm: false, userId: 'u1', tokenId: 'pawn-u1' })).toBeTrue();
+  });
+
+  it('gère grilles vides et pawns absents', () => {
+    expect(listWalkableCells({ ...floorMap(), gridHeight: undefined, gridWidth: undefined } as never)).toEqual([]);
+    expect(findEveningPawnAtTile(undefined, 1, 1)).toBeNull();
+    expect(placeEveningPawn(undefined, 'pawn-u1', 2, 2)).toEqual([]);
+    expect(applyEveningPawnPatch(undefined, 'pawn-u1', { name: 'X' })).toEqual([]);
+    expect(eveningPawnsToTokens(undefined)).toEqual([]);
+    expect(
+      seedEveningPawns({
+        map: floorMap(),
+        players: [{ ...player('u1', 'Aria'), proposalStatus: 'pending' }, player('', 'Sans id')],
+      }),
+    ).toBeNull();
   });
 });

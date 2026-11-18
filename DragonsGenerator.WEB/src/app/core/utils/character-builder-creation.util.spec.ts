@@ -145,6 +145,44 @@ describe('character-builder-creation.util', () => {
     expect(withHpFallback.hpPerLevelAverage).toBe(6);
   });
 
+  it('fills species optional arrays and ignores missing background skills', () => {
+    const applied = applySpeciesSelection(
+      { ...structuredClone(INITIAL_CREATION_STATE), speciesBonusLangApplied: undefined, bonusLanguageCount: 0 },
+      species({
+        bonusSkills: undefined,
+        bonusWeapons: undefined,
+        bonusArmor: undefined,
+        bonusTools: undefined,
+        innateSpells: undefined,
+        bonusToolPoolIds: undefined,
+        bonusToolChoiceLabel: undefined,
+      }),
+    );
+    expect(applied.speciesFixedSkills).toEqual([]);
+    expect(applied.speciesBonusToolChoiceLabel).toBe('');
+    expect(clearSpeciesSelection({ ...applied, speciesBonusLangApplied: undefined }).speciesId).toBeNull();
+    const bg = applyBackgroundSelection(structuredClone(INITIAL_CREATION_STATE), {
+      backgroundId: 'bg-x',
+      backgroundName: 'X',
+      backgroundPreset: true,
+      skills: undefined,
+      tools: [],
+      languages: [],
+      bonusLanguageCount: 0,
+      equipmentSlots: [],
+      equipment: [],
+      currency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
+      privilegeId: null,
+      privilegeName: null,
+      privilegeDesc: null,
+      selectedHandicaps: [],
+      handicapCompensationType: null,
+      backgroundText: '',
+    } as never);
+    expect(bg.backgroundSkills).toEqual([]);
+    expect(bg.background).toBe(INITIAL_CREATION_STATE.background);
+  });
+
   it('merges progression extras after stripping previous picks', () => {
     const withClass = applyClassSelection(structuredClone(INITIAL_CREATION_STATE), cls());
     const next = applyClassProgressionChoices(
@@ -158,5 +196,19 @@ describe('character-builder-creation.util', () => {
     );
     expect(next.metamagicOptions).toEqual(['mm-soigneuse']);
     expect(next.classFeatures.some((f) => f.refId === 'mm-soigneuse')).toBeTrue();
+    const noExtras = applyClassProgressionChoices(
+      { ...withClass, classFeatures: undefined as never, metamagicOptions: undefined as never, eldritchInvocations: undefined as never },
+      { classChoiceAnswers: {} },
+      stripProgressionChoiceFeatures,
+    );
+    expect(noExtras.metamagicOptions).toEqual([]);
+    expect(addSecondaryClassSelection({ ...INITIAL_CREATION_STATE, secondaryClasses: undefined }, {
+      classId: 'cls-barde',
+      className: 'Barde',
+      level: 1,
+    } as SecondaryClassSelection).secondaryClasses?.length).toBe(1);
+    expect(
+      removeSecondaryClassSelection({ ...INITIAL_CREATION_STATE, secondaryClasses: undefined }, 0).secondaryClasses,
+    ).toBeUndefined();
   });
 });

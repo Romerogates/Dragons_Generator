@@ -1,9 +1,4 @@
 import {
-  subclassBonusProficiencies,
-  subclassBonusResistances,
-  classBonusSenses,
-  classRootSavingThrowGrants,
-  extractSubclassSkillProficiencyChoices,
   multiclassPrerequisitesMet,
   multiclassPrerequisiteLabel,
   multiclassPrerequisitesPossibleAtMaxBuy,
@@ -11,12 +6,9 @@ import {
   combinedCasterLevel,
   multiclassSpellSlotsForCasterLevel,
   MULTICLASS_SPELL_SLOTS_TABLE,
-  extractProgressionChoices,
-  collectProgressionPicksFromAnswers,
-} from './progression-choices.util';
+} from './progression-multiclass.util';
 import type { AbilityScores } from '@core/models/Character/character';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
-import { createLettreClass } from '@testing/lettre-fixtures';
 
 function makeAbilities(overrides: Partial<AbilityScores> = {}): AbilityScores {
   return {
@@ -41,27 +33,6 @@ function makeMulticlassCls(
     data: { multiclass_prerequisites, multiclass_proficiencies } as any,
   } as unknown as CharacterClass;
 }
-
-function makeCls(subclasses: unknown): CharacterClass {
-  return {
-    id: 'cls-pretre',
-    name: 'Prêtre',
-    data: { subclasses } as any,
-  } as unknown as CharacterClass;
-}
-
-const EMPTY_BONUS = {
-  armor: [],
-  weapons: [],
-  skills: [],
-  expertise: [],
-  tools: [],
-  languages: [],
-  savingThrows: [],
-  bonusLanguages: 0,
-  requiredExoticLanguages: 0,
-  conditionalSkills: [],
-};
 
 describe('multiclassPrerequisitesMet', () => {
   it('returns true when the class has no multiclass_prerequisites field', () => {

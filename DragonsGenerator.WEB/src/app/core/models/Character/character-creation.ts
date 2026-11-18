@@ -3,7 +3,7 @@ import type { AbilityScores, AsiChoiceSlot } from './character-ability';
 import type { Size } from './character-refs';
 import type { FeatureInstance } from './character-features';
 import type { Currency, EquipmentInstance } from './character-sheet';
-import type { SpellcastingKind, SpellInstance } from './character-spellcasting';
+import type { SpellcastingKind } from './character-spellcasting';
 
 // =============================================================================
 // ÉTAT DE CRÉATION - intermédiaire

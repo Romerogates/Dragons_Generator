@@ -8,7 +8,6 @@ import {
   resolveEquipmentRefId,
 } from '@core/utils/equipment.utils';
 import { pickRandom } from '@core/utils/pregen-random.util';
-import { pickRandomSubset } from './random';
 import type { EquipmentCatalogItem } from './types';
 
 export function resolveBgToolToConcrete(toolRef: string, toolCatalog: EquipmentCatalogItem[]): string {

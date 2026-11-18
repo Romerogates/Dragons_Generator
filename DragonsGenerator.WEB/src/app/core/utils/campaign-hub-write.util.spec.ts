@@ -251,4 +251,43 @@ describe('campaign-hub-write.util', () => {
     expect(bulk[0]!.role).toBe('neutral');
     expect(bulk[1]!.role).toBe('antagonist');
   });
+
+  it('tolère collections absentes et titres vides', () => {
+    expect(plannedSessionFromScheduleEvent({ title: '  ', location: '', notes: '' }, 't', 's').title).toBe(
+      'Session',
+    );
+    expect(withMappedSession(undefined, 's1', { title: 'X' })).toEqual([]);
+    expect(withMappedEncounter(undefined, 'e1', { name: 'X' })).toEqual([]);
+    expect(withMappedHandout(undefined, 'h1', { title: 'X' }, 'now')).toEqual([]);
+    expect(scheduleYesInviteUserIds(undefined, new Set())).toEqual([]);
+    expect(atlasAlreadyHasCiv(undefined, 'civ1')).toBeFalse();
+    expect(atlasAlreadyHasName(undefined, 'Val')).toBeFalse();
+    const keepActive = dataAfterRemovingSession(
+      {
+        sessions: [{ id: 's1', title: 'A', scheduledAt: '', status: 'planned' }],
+        activeSessionId: 'other',
+      },
+      's1',
+    );
+    expect(keepActive.clearedActive).toBeFalse();
+    expect(keepActive.patch.activeSessionId).toBeUndefined();
+    const afterHo = dataAfterDeletingHandout(
+      { handouts: undefined, pinnedHandoutId: 'other', dungeonMaps: undefined } as never,
+      'h1',
+    );
+    expect(afterHo.handouts).toEqual([]);
+    expect(afterHo.pinnedHandoutId).toBe('other');
+    const enc: EncounterGroup[] = [
+      {
+        id: 'e1',
+        name: 'A',
+        creatures: [
+          { creatureId: 'c1', creatureName: 'A', challengeRating: '1', xp: 1, quantity: 1, defeated: 0 },
+          { creatureId: 'c2', creatureName: 'B', challengeRating: '1', xp: 1, quantity: 1, defeated: 0 },
+        ],
+      },
+    ];
+    expect(bumpEncounterCreatureDefeated(enc, 'e1', 1, 1)[0]!.creatures[1]!.defeated).toBe(1);
+    expect(bumpEncounterCreatureDefeated(enc, 'e1', 1, 1)[0]!.creatures[0]!.defeated).toBe(0);
+  });
 });

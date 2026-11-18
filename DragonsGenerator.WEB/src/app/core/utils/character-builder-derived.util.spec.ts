@@ -8,7 +8,9 @@ import {
 
 describe('character-builder-derived.util', () => {
   it('sums secondary class levels and caps total at 20', () => {
-    expect(secondaryClassesTotalLevel([{ level: 3 } as never, { level: 2 } as never])).toBe(5);
+    expect(secondaryClassesTotalLevel(undefined)).toBe(0);
+    expect(secondaryClassesTotalLevel([{ level: 0 } as never, { level: 3 } as never])).toBe(3);
+    expect(totalCharacterLevel(0, 0)).toBe(1);
     expect(totalCharacterLevel(18, 5)).toBe(20);
   });
 
@@ -32,5 +34,24 @@ describe('character-builder-derived.util', () => {
       selectedSkills: ['skill-perception'],
     });
     expect(withPerception.passivePerception).toBeGreaterThan(without.passivePerception);
+    const fromBg = deriveBuilderCombatSnapshot({
+      ...structuredClone(INITIAL_CREATION_STATE),
+      backgroundSkills: ['skill-perception'],
+      selectedSkills: [],
+    });
+    expect(fromBg.passivePerception).toBe(withPerception.passivePerception);
+  });
+
+  it('uses empty fallbacks when optional creation fields are missing', () => {
+    const snap = deriveBuilderCombatSnapshot({
+      ...structuredClone(INITIAL_CREATION_STATE),
+      targetLevel: 0,
+      asiBonuses: {},
+      classFeatures: [],
+      secondaryClasses: undefined,
+      backgroundEquipment: [{ refId: 'it-armure', name: 'Cuir' } as never],
+    });
+    expect(snap.totalCharacterLevel).toBe(1);
+    expect(snap.hitPointsMax).toBeGreaterThan(0);
   });
 });
