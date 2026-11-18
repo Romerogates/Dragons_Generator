@@ -204,11 +204,11 @@
 
             <div
               class="relative z-10 text-sm md:text-base text-slate-300 leading-relaxed prose-codex"
-              [innerHTML]="formatDescription(s.description) | lightMarkdown"
+              [innerHTML]="formatDescription(s) | lightMarkdown"
             ></div>
           </section>
 
-          @if (s.higherLevels) {
+          @if (higherLevelsText(s); as higher) {
             <section
               class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl relative border-t-4 border-t-fuchsia-900/50"
             >
@@ -221,7 +221,7 @@
                 Aux niveaux supérieurs
               </h2>
               <p class="text-sm text-slate-300 leading-relaxed italic">
-                {{ s.higherLevels }}
+                {{ higher }}
               </p>
             </section>
           }

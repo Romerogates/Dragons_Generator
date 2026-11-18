@@ -126,9 +126,9 @@
         }
       </header>
 
-      @if (c.description) {
+      @if (lore(c.description); as loreText) {
         <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl mb-8">
-          <p class="text-slate-300 leading-relaxed italic font-serif">{{ c.description }}</p>
+          <p class="text-slate-300 leading-relaxed italic font-serif">{{ loreText }}</p>
         </section>
       }
 
@@ -166,56 +166,64 @@
         </div>
 
         <div class="col-span-1 lg:col-span-2 flex flex-col gap-6">
-          @if (c.traits.length) {
+          @if (visibleBlocks(c.traits).length) {
             <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
               <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Traits</h2>
               <div class="space-y-4">
-                @for (trait of c.traits; track trait.name) {
+                @for (trait of visibleBlocks(c.traits); track trait.name) {
                   <div>
                     <h3 class="font-bold text-red-300 mb-1">{{ trait.name }}</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ trait.description }}</p>
+                    @if (blockBody(trait.description); as body) {
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+                    }
                   </div>
                 }
               </div>
             </section>
           }
 
-          @if (c.actions.length) {
+          @if (visibleBlocks(c.actions).length) {
             <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
               <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Actions</h2>
               <div class="space-y-4">
-                @for (action of c.actions; track action.name) {
+                @for (action of visibleBlocks(c.actions); track action.name) {
                   <div>
                     <h3 class="font-bold text-orange-300 mb-1">{{ action.name }}</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ action.description }}</p>
+                    @if (blockBody(action.description); as body) {
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+                    }
                   </div>
                 }
               </div>
             </section>
           }
 
-          @if (c.reactions.length) {
+          @if (visibleBlocks(c.reactions).length) {
             <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
               <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Réactions</h2>
               <div class="space-y-4">
-                @for (reaction of c.reactions; track reaction.name) {
+                @for (reaction of visibleBlocks(c.reactions); track reaction.name) {
                   <div>
                     <h3 class="font-bold text-amber-300 mb-1">{{ reaction.name }}</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ reaction.description }}</p>
+                    @if (blockBody(reaction.description); as body) {
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+                    }
                   </div>
                 }
               </div>
             </section>
           }
 
-          @if (c.legendaryActions.length) {
+          @if (visibleBlocks(c.legendaryActions).length) {
             <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
               <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Actions légendaires</h2>
               <div class="space-y-4">
-                @for (action of c.legendaryActions; track action.name) {
+                @for (action of visibleBlocks(c.legendaryActions); track action.name) {
                   <div>
                     <h3 class="font-bold text-yellow-300 mb-1">{{ action.name }}</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ action.description }}</p>
+                    @if (blockBody(action.description); as body) {
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+                    }
                   </div>
                 }
               </div>

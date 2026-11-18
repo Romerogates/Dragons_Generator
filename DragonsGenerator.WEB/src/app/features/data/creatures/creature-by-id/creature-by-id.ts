@@ -17,8 +17,11 @@ import { Creature } from '@core/models/Creatures/creature';
 import type { CampaignDetail, EncounterGroup } from '@core/models/Campaign/campaign';
 import {
   ABILITY_LABELS,
+  creatureBlockBody,
   formatChallengeRating,
   getCreatureCategoryLabel,
+  tidyCreatureLore,
+  visibleCreatureBlocks,
 } from '@core/utils/creature-display.util';
 import {
   appendCreatureCombatantToSession,
@@ -88,6 +91,9 @@ export class CreatureById {
   protected abilityLabels = ABILITY_LABELS;
   protected categoryLabel = getCreatureCategoryLabel;
   protected formatCr = formatChallengeRating;
+  protected lore = tidyCreatureLore;
+  protected visibleBlocks = visibleCreatureBlocks;
+  protected blockBody = creatureBlockBody;
 
   protected abilityKeys(creature: Creature): string[] {
     return ['str', 'dex', 'con', 'int', 'wis', 'cha'].filter((k) => creature.abilities[k]);

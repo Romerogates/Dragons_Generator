@@ -12,7 +12,10 @@ import { DataService } from '@core/services/data.service';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import { GameIdLabelPipe } from '@shared/pipes/game-id-label.pipe';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
-import { normalizeSpellDescription } from '@core/utils/spell-grimoire-effect.util';
+import {
+  normalizeSpellDescription,
+  peelHigherLevels,
+} from '@core/utils/spell-grimoire-effect.util';
 import {
   spellCastTimeLabel,
   spellDurationLabel,
@@ -58,8 +61,15 @@ export class SpellById {
     { initialValue: undefined },
   );
 
-  protected formatDescription(description: string | null | undefined): string {
-    return normalizeSpellDescription(description ?? '');
+  protected formatDescription(spell: Spell): string {
+    return peelHigherLevels(normalizeSpellDescription(spell.description ?? '', spell.name)).body;
+  }
+
+  protected higherLevelsText(spell: Spell): string | null {
+    const fromField = spell.higherLevels?.trim() || null;
+    if (fromField) return fromField;
+    return peelHigherLevels(normalizeSpellDescription(spell.description ?? '', spell.name))
+      .higherLevels;
   }
 
   protected schoolLabel = spellSchoolLabel;

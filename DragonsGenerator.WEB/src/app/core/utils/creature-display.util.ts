@@ -68,3 +68,34 @@ export const ABILITY_LABELS: Record<string, string> = {
   wis: 'SAG',
   cha: 'CHA',
 };
+
+/** En-tête OCR / livre (« Le dragon utilise l’un des deux souffles suivants : ») sans contenu. */
+export function isDanglingCodexIntro(description: string | null | undefined): boolean {
+  const text = (description ?? '').trim();
+  if (!text.endsWith(':')) return false;
+  if (text.includes('\n')) return false;
+  return text.length <= 140;
+}
+
+export function visibleCreatureBlocks<T extends { name: string; description: string }>(
+  blocks: T[] | null | undefined,
+): T[] {
+  return (blocks ?? []).filter(
+    (block) => block.name.trim().length > 0 || creatureBlockBody(block.description) !== null,
+  );
+}
+
+/** Corps de particularité / action : masque les phrases d’intro coupées, garde le titre (ex. recharge). */
+export function creatureBlockBody(description: string | null | undefined): string | null {
+  const text = (description ?? '').trim();
+  if (!text || isDanglingCodexIntro(text)) return null;
+  return text;
+}
+
+/** Retire une phrase d’intro tronquée en fin de lore (« En voici quelques variantes : »). */
+export function tidyCreatureLore(description: string | null | undefined): string {
+  const text = (description ?? '').trim();
+  if (!text.endsWith(':')) return text;
+  const cut = text.replace(/\s+[^.!?\n]+:$/, '').trim();
+  return cut || text;
+}

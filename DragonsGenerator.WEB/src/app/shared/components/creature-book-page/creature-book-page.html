@@ -117,15 +117,15 @@
       </section>
     </div>
 
-    @if (c.description) {
+    @if (lore(c.description); as loreText) {
       <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
         <p class="text-slate-300 leading-relaxed italic font-serif whitespace-pre-line">
-          {{ c.description }}
+          {{ loreText }}
         </p>
       </section>
     }
 
-    @if (c.traits.length) {
+    @if (visibleBlocks(c.traits).length) {
       <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
         <h2
           class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
@@ -133,17 +133,19 @@
           Particularités
         </h2>
         <ul class="space-y-4">
-          @for (t of c.traits; track t.name) {
+          @for (t of visibleBlocks(c.traits); track t.name) {
             <li>
               <h3 class="font-bold text-red-300 mb-1">{{ t.name }}</h3>
-              <p class="text-sm text-slate-400 leading-relaxed">{{ t.description }}</p>
+              @if (blockBody(t.description); as body) {
+                <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+              }
             </li>
           }
         </ul>
       </section>
     }
 
-    @if (c.actions.length) {
+    @if (visibleBlocks(c.actions).length) {
       <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
         <h2
           class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
@@ -151,17 +153,19 @@
           Actions
         </h2>
         <ul class="space-y-4">
-          @for (a of c.actions; track a.name) {
+          @for (a of visibleBlocks(c.actions); track a.name) {
             <li>
               <h3 class="font-bold text-orange-300 mb-1">{{ a.name }}</h3>
-              <p class="text-sm text-slate-400 leading-relaxed">{{ a.description }}</p>
+              @if (blockBody(a.description); as body) {
+                <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+              }
             </li>
           }
         </ul>
       </section>
     }
 
-    @if (c.reactions.length) {
+    @if (visibleBlocks(c.reactions).length) {
       <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
         <h2
           class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
@@ -169,17 +173,19 @@
           Réactions
         </h2>
         <ul class="space-y-4">
-          @for (r of c.reactions; track r.name) {
+          @for (r of visibleBlocks(c.reactions); track r.name) {
             <li>
               <h3 class="font-bold text-amber-300 mb-1">{{ r.name }}</h3>
-              <p class="text-sm text-slate-400 leading-relaxed">{{ r.description }}</p>
+              @if (blockBody(r.description); as body) {
+                <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+              }
             </li>
           }
         </ul>
       </section>
     }
 
-    @if (c.legendaryActions.length) {
+    @if (visibleBlocks(c.legendaryActions).length) {
       <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800">
         <h2
           class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
@@ -187,10 +193,12 @@
           Actions légendaires
         </h2>
         <ul class="space-y-4">
-          @for (l of c.legendaryActions; track l.name) {
+          @for (l of visibleBlocks(c.legendaryActions); track l.name) {
             <li>
               <h3 class="font-bold text-yellow-300 mb-1">{{ l.name }}</h3>
-              <p class="text-sm text-slate-400 leading-relaxed">{{ l.description }}</p>
+              @if (blockBody(l.description); as body) {
+                <p class="text-sm text-slate-400 leading-relaxed">{{ body }}</p>
+              }
             </li>
           }
         </ul>

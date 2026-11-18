@@ -2,8 +2,67 @@ import type { Spell } from '@core/models/Spells/spell';
 import type { SpellInstance } from '@core/models/Character/character';
 import { spellDurationLabel } from './spell-display.util';
 
+const SCHOOL_LEVEL_BLEED =
+  /\b(évocation|invocation|abjuration|transmutation|divination|enchantement|illusion|nécromancie)\s+du\s+\d/i;
+
+function stripLeadingOcrJunk(text: string): string {
+  let next = text.trim();
+  for (let i = 0; i < 6; i += 1) {
+    const stripped = next
+      .replace(/^level\s+\w+\s+/i, '')
+      .replace(
+        /^[, ]*((logo|icon|stamp|photograph)s?)([, ]+(and|other|logo|icon|stamp|photograph)s?)*[, ]*/i,
+        '',
+      )
+      .replace(/^[, ]+/, '')
+      .trim();
+    if (stripped === next) break;
+    next = stripped;
+  }
+  return next;
+}
+
+function cutBleedSpellCards(text: string, spellName?: string): string {
+  const parts = text.split(/\n\n## /);
+  if (parts.length < 2) return text;
+  const self = (spellName ?? '').trim().toLowerCase();
+  const kept = [parts[0]];
+  for (const part of parts.slice(1)) {
+    const heading = (part.split('\n')[0] ?? '').replace(/\s+/g, ' ').trim();
+    const headingLower = heading.toLowerCase();
+    const isSelfHeading = self.length > 0 && headingLower.startsWith(self);
+    if (isSelfHeading) {
+      kept.push(part);
+      continue;
+    }
+    if (SCHOOL_LEVEL_BLEED.test(heading)) break;
+    if (headingLower.startsWith('arme spirituelle') && self !== 'arme spirituelle') break;
+    if (headingLower.startsWith('arme vengeresse') && self !== 'arme vengeresse') break;
+    if (
+      headingLower.startsWith('provenance de la nourriture') &&
+      self !== 'provenance de la nourriture' &&
+      /festin des héros/i.test(part)
+    ) {
+      break;
+    }
+    kept.push(part);
+  }
+  return kept[0] + kept.slice(1).map((p) => `\n\n## ${p}`).join('');
+}
+
+/** Sépare le bloc « À plus hauts niveaux » collé en fin de description. */
+export function peelHigherLevels(description: string): { body: string; higherLevels: string | null } {
+  const match = description.match(/[ÀA]\s+plus\s+hauts\s+niveaux\.?\s*/i);
+  if (!match || match.index === undefined) {
+    return { body: description.trim(), higherLevels: null };
+  }
+  const body = description.slice(0, match.index).trim();
+  const higherLevels = description.slice(match.index + match[0].length).trim() || null;
+  return { body, higherLevels };
+}
+
 /** Corrige OCR / artefacts de source (icônes décoratives, titres collés, « Vous » tronqué). */
-export function normalizeSpellDescription(description: string): string {
+export function normalizeSpellDescription(description: string, spellName?: string): string {
   let text = description.trim();
 
   // Artefacts OCR des livres sources (alt text d’images).
@@ -18,6 +77,10 @@ export function normalizeSpellDescription(description: string): string {
   text = text.replace(/\bdecorative divider\b/gi, ' ');
   text = text.replace(/Anthony Martin Romero\s*\(Order\s*#\d+\)/gi, ' ');
   text = text.replace(/<page_number>.*?<\/page_number>/gi, ' ');
+  text = text.replace(/Signature and handwritten notes/gi, ' ');
+  text = text.replace(/\bLogo de sort\b/gi, ' ');
+
+  text = stripLeadingOcrJunk(text);
 
   // Préfixes OCR restants (logo / stamp / lettre ornée / and icons).
   text = text.replace(
@@ -29,10 +92,13 @@ export function normalizeSpellDescription(description: string): string {
   text = text.replace(/\band\s+icons?\b/gi, ' ');
   text = text.replace(/\bstamp\b/gi, ' ');
   text = text.replace(/\bLettre ornée D\b/gi, ' ');
+  text = text.replace(/\bIcon\s+(?=[A-ZÀ-Ÿ])/g, '');
 
   // Titres markdown collés au milieu d’un paragraphe.
   text = text.replace(/\s*##\s+/g, '\n\n## ');
   text = text.replace(/\s*###\s+/g, '\n\n### ');
+
+  text = cutBleedSpellCards(text, spellName);
 
   text = text.replace(/\.\s+D Jous\b/g, '. Vous');
   text = text.replace(/\bD Jous\b/g, 'Vous');
@@ -87,7 +153,7 @@ export function buildGrimoireEffectSummary(spell: Spell): string {
   if (dur) parts.push(dur);
 
   if (spell.description) {
-    const normalized = normalizeSpellDescription(spell.description);
+    const normalized = normalizeSpellDescription(spell.description, spell.name);
     const firstSentence = `${normalized.split(/\.\s/)[0]}.`;
     parts.push(firstSentence);
   }

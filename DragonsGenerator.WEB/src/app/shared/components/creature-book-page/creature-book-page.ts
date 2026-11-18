@@ -4,6 +4,9 @@ import {
   ABILITY_LABELS,
   formatChallengeRating,
   getCreatureCategoryLabel,
+  creatureBlockBody,
+  tidyCreatureLore,
+  visibleCreatureBlocks,
 } from '@core/utils/creature-display.util';
 
 @Component({
@@ -24,6 +27,9 @@ export class CreatureBookPage {
   protected readonly abilityLabels = ABILITY_LABELS;
   protected readonly categoryLabel = getCreatureCategoryLabel;
   protected readonly formatCr = formatChallengeRating;
+  protected readonly lore = tidyCreatureLore;
+  protected readonly visibleBlocks = visibleCreatureBlocks;
+  protected readonly blockBody = creatureBlockBody;
 
   protected abilityKeys(creature: Creature): string[] {
     return this.abilityOrder.filter((k) => creature.abilities[k]);

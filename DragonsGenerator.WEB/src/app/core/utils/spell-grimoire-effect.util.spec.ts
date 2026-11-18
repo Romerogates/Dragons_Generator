@@ -2,6 +2,7 @@ import {
   buildGrimoireEffectSummary,
   layoutGrimoireEffect,
   normalizeSpellDescription,
+  peelHigherLevels,
   paginateGrimoireOverflow,
   planGrimoireTable,
   splitEffectForGrimoire,
@@ -69,6 +70,31 @@ describe('spell-grimoire-effect.util', () => {
     expect(normalizeSpellDescription('V ous invoquez des esprits.')).toBe(
       'Vous invoquez des esprits.',
     );
+  });
+
+  it('normalizeSpellDescription strips leftover ", icon, and" prefixes', () => {
+    expect(normalizeSpellDescription(', icon, and Vous créez un capteur.')).toBe(
+      'Vous créez un capteur.',
+    );
+    expect(normalizeSpellDescription(', icon, and , L\'objet est chauffé.')).toBe(
+      'L\'objet est chauffé.',
+    );
+  });
+
+  it('normalizeSpellDescription cuts a bled next-spell card', () => {
+    const raw =
+      'Dès que vous cessez de tenir une arme psychique, elle se dissipe.\n\n## Arme spirituelle Évocation du 2e niveau Une arme spectrale flottante apparaît.';
+    expect(normalizeSpellDescription(raw, 'Arme psychique')).toBe(
+      'Dès que vous cessez de tenir une arme psychique, elle se dissipe.',
+    );
+  });
+
+  it('peelHigherLevels splits a trailing À plus hauts niveaux block', () => {
+    const peeled = peelHigherLevels(
+      'Vous créez un capteur. À plus hauts niveaux. La durée augmente de 10 minutes.',
+    );
+    expect(peeled.body).toBe('Vous créez un capteur.');
+    expect(peeled.higherLevels).toBe('La durée augmente de 10 minutes.');
   });
 
   it('buildGrimoireEffectSummary uses Instantanée and first sentence', () => {

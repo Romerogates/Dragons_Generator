@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.480',
+    date: '2026-11-18',
+    title: 'Fiches Codex plus lisibles',
+    player: [
+      'Plusieurs sorts du grimoire n’affichent plus de bouts de texte parasites ni le sort suivant collé dessous.',
+      'Feuille morte a retrouvé sa vraie montée de puissance ; Clairvoyance, Clone, Métal brûlant, Verrou du mage et Résurrection se lisent d’un bout à l’autre.',
+      'Sur une fiche de créature, les en-têtes vides (« les souffles suivants : », « handicaps suivants : ») ne s’affichent plus ; le lore ne s’arrête plus sur une phrase coupée.',
+    ],
+    tech: [
+      '`normalizeSpellDescription` : préfixe `, icon, and`, cartes collées (`## … du Xe niveau`), `peelHigherLevels`.',
+      'JSON Spells : `spl-arme-psychique`, `spl-feuille-morte`, `spl-clairvoyance`, `spl-clone`, `spl-metal-brulant`, `spl-verrou-du-mage`, `spl-resurrection`, `spl-resurrection-supreme`.',
+      'Bestiaire : `creatureBlockBody` / `tidyCreatureLore` sur `creature-by-id` et `creature-book-page` ; traits vampire / bandit vampirien.',
+    ],
+  },
+  {
     version: '1.479',
     date: '2026-11-18',
     title: 'Forge plus claire, accueil selon le rôle',
