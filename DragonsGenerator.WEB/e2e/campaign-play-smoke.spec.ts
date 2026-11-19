@@ -44,16 +44,11 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
     await seedFightCombatAs(ownerPage, owner, campaignId);
 
     await applyAuthSession(ownerPage, owner, `/campaigns/${campaignId}`);
-    await expect(ownerPage.getByText(/Session en cours|Entrer en session|Table/i).first()).toBeVisible({
-      timeout: 30_000,
+    const tableCta = ownerPage.getByRole('button', {
+      name: /Ouvrir la table|Entrer en session|Rejoindre la table/i,
     });
-
-    const tableCta = ownerPage.getByRole('button', { name: /Table|Entrer en session|Rejoindre la table/i });
-    if (await tableCta.count()) {
-      await tableCta.first().click();
-    } else {
-      await ownerPage.goto(`/campaigns/${campaignId}/play`);
-    }
+    await expect(tableCta).toBeVisible({ timeout: 30_000 });
+    await tableCta.click();
 
     await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,

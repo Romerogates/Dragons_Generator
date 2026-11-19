@@ -35,6 +35,7 @@ export interface CodexNextEntry {
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="title()"
+      [attr.data-codex-accent]="accent()"
     >
       <header
         class="shrink-0 sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 bg-[#12161c]/95 px-3 py-2.5 backdrop-blur-sm"
@@ -121,27 +122,6 @@ export class CodexDetailShell implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.restoreBody();
-  }
-
-  accentTextClass(): string {
-    switch (this.accent()) {
-      case 'red':
-        return 'text-red-300';
-      case 'fuchsia':
-        return 'text-fuchsia-300';
-      case 'sky':
-        return 'text-sky-300';
-      case 'amber':
-        return 'text-amber-300';
-      case 'emerald':
-        return 'text-emerald-300';
-      case 'violet':
-        return 'text-violet-300';
-      case 'orange':
-        return 'text-orange-300';
-      default:
-        return 'text-slate-200';
-    }
   }
 
   close(): void {

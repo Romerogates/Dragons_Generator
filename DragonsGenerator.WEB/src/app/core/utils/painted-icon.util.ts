@@ -77,8 +77,8 @@ const EXACT: Record<string, string> = {
   'fluent-emoji:camping': A('adv-tent.png'),
 };
 
-/** Mots-clés dans l’id Iconify → portrait de famille. */
-const GROUPS: readonly (readonly [readonly string[], string])[] = [
+/** Mots-clés dans l’id Iconify → portrait de famille. Exporté pour les tests. */
+export const PAINTED_ICON_GROUPS: readonly (readonly [readonly string[], string])[] = [
   [['vampire', 'zombie', 'ghost', 'skull'], A('ui-skull.png')],
   [['dragon'], A('ui-dragon.png')],
   [['wolf', 'fox', 'paw', 'lion', 'bear', 'cat', 'boar', 'deer', 'goat', 'ox', 'rat'], A('ui-wolf.png')],
@@ -128,6 +128,10 @@ const GROUPS: readonly (readonly [readonly string[], string])[] = [
   [['spider-web'], A('net.png')],
 ];
 
+const KEYWORD_FILES: readonly { key: string; file: string }[] = PAINTED_ICON_GROUPS.flatMap(
+  ([keys, file]) => keys.map((key) => ({ key, file })),
+).sort((a, b) => b.key.length - a.key.length || a.key.localeCompare(b.key));
+
 export function isPaintedAssetPath(icon: string): boolean {
   return icon.startsWith('/assets/');
 }
@@ -140,8 +144,13 @@ export function resolvePaintedIcon(icon: string | null | undefined): string {
   const mapped = EXACT[raw];
   if (mapped) return mapped;
   const id = raw.startsWith('fluent-emoji:') ? raw.slice('fluent-emoji:'.length) : raw;
-  for (const [keys, file] of GROUPS) {
-    if (keys.some((k) => id.includes(k))) return file;
+  for (const { key, file } of KEYWORD_FILES) {
+    if (iconIdHasKeyword(id, key)) return file;
   }
   return A('ui-sparkles.png');
+}
+
+function iconIdHasKeyword(id: string, key: string): boolean {
+  if (id === key) return true;
+  return id.startsWith(`${key}-`) || id.endsWith(`-${key}`) || id.includes(`-${key}-`);
 }

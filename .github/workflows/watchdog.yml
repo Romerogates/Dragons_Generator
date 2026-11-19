@@ -33,7 +33,7 @@ jobs:
 
       - name: Restart API + web over SSH
         if: steps.probe.outcome == 'failure'
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}

@@ -172,6 +172,26 @@ describe('Navbar', () => {
     expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeTruthy();
   });
 
+  it('formats badge counts and highlights Codex routes', () => {
+    expect(component.formatBadgeCount(3)).toBe('3');
+    expect(component.formatBadgeCount(10)).toBe('9+');
+    const router = TestBed.inject(Router);
+    const url = spyOnProperty(router, 'url', 'get');
+    url.and.returnValue('/spells/spl-arme-psychique');
+    expect(component.isCodexActive()).toBeTrue();
+    url.and.returnValue('/campaigns');
+    expect(component.isCodexActive()).toBeFalse();
+    url.and.returnValue('/codex');
+    expect(component.isCodexActive()).toBeTrue();
+  });
+
+  it('closes menus on Escape', () => {
+    component.toggleMobile();
+    expect(component.mobileOpen()).toBeTrue();
+    component.onEscape();
+    expect(component.mobileOpen()).toBeFalse();
+  });
+
   it('badges unseen announcements until the banner is dismissed', () => {
     const announcement = (id: string): NotificationItem => ({
       key: `announcement-${id}`,

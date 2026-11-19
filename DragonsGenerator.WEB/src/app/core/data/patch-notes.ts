@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.482',
+    date: '2026-11-19',
+    title: 'CI et table plus stables',
+    player: [
+      'Rien de visible côté table : le menu du bas n’empêche plus d’ouvrir une session de jeu.',
+    ],
+    tech: [
+      'E2E `campaign-play-smoke` : CTA hub `getByRole(button, Ouvrir la table|Entrer en session)` au lieu de `getByText(/Table/)` (collision `bottom-nav-campaigns`).',
+      'Karma : couverture branches des familles `PAINTED_ICON_GROUPS` + `tidyPlayerFacingCopy` serment.',
+      'Actions Node 24 : `dorny/paths-filter@v4`, `docker/setup-buildx-action@v4`, `docker/login-action@v4`, `docker/build-push-action@v7`, `actions/upload-artifact@v6`, `appleboy/ssh-action@v1.2.5`, `browser-actions/setup-chrome@v2.2.0`.',
+    ],
+  },
+  {
     version: '1.481',
     date: '2026-11-19',
     title: 'Codex peint, listes plus lisibles',

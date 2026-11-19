@@ -1,4 +1,4 @@
-import { resolvePaintedIcon } from './painted-icon.util';
+import { PAINTED_ICON_GROUPS, resolvePaintedIcon } from './painted-icon.util';
 
 describe('resolvePaintedIcon', () => {
   it('keeps asset paths', () => {
@@ -15,5 +15,21 @@ describe('resolvePaintedIcon', () => {
 
   it('never returns a fluent-emoji id', () => {
     expect(resolvePaintedIcon('fluent-emoji:red-question-mark').startsWith('/assets/')).toBeTrue();
+  });
+
+  it('falls back for empty and unknown ids', () => {
+    expect(resolvePaintedIcon(null)).toBe('/assets/equipment/adv-backpack.png');
+    expect(resolvePaintedIcon('')).toBe('/assets/equipment/adv-backpack.png');
+    expect(resolvePaintedIcon('  ')).toBe('/assets/equipment/adv-backpack.png');
+    expect(resolvePaintedIcon('mdi:cog-outline')).toBe('/assets/equipment/ui-sparkles.png');
+  });
+
+  it('matches every keyword family without substring false positives', () => {
+    expect(resolvePaintedIcon('fluent-emoji:clipboard')).not.toBe('/assets/equipment/ui-wolf.png');
+    for (const [keys, file] of PAINTED_ICON_GROUPS) {
+      for (const key of keys) {
+        expect(resolvePaintedIcon(`fluent-emoji:extra-${key}-mark`)).toBe(file);
+      }
+    }
   });
 });

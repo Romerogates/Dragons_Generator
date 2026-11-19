@@ -71,5 +71,10 @@ describe('catalog-display.util', () => {
         "Lance des dés bonus. Nombre de dés dicté par la colonne 'brutalite_critique_extra_dice' de la progression.",
       ),
     ).toContain('dépend de votre niveau');
+    expect(
+      tidyPlayerFacingCopy('Aptitude octroyée par le serment sacré choisi au niveau 3.'),
+    ).toBe('Aptitude de votre serment, au niveau 3.');
+    expect(tidyPlayerFacingCopy(null)).toBe('');
+    expect(tidyPlayerFacingCopy('')).toBe('');
   });
 });

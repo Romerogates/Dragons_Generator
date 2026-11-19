@@ -23,7 +23,7 @@ runs:
         cache: npm
         cache-dependency-path: DragonsGenerator.WEB/package-lock.json
 
-    - uses: docker/setup-buildx-action@v3
+    - uses: docker/setup-buildx-action@v4
 
     - name: Prefetch web base images
       shell: bash
@@ -94,7 +94,7 @@ runs:
 
     - name: Upload Playwright report
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: playwright-${{ inputs.report-name }}
         path: |
