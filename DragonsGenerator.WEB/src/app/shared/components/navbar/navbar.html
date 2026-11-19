@@ -20,10 +20,9 @@
             class="h-8 w-8 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.55)] group-hover:scale-[1.01] transition-transform"
           />
           <span
-            class="font-serif font-bold text-base sm:text-lg text-slate-100 group-hover:text-amber-400 transition-colors tracking-wide whitespace-nowrap"
+            class="font-serif font-bold text-[13px] leading-none sm:text-lg sm:leading-normal text-slate-100 group-hover:text-amber-400 transition-colors tracking-wide whitespace-nowrap"
           >
-            <span class="sm:hidden text-amber-500">Dragons</span>
-            <span class="hidden sm:inline">Dragons <span class="text-amber-500">Generator</span></span>
+            Dragons <span class="text-amber-500">Generator</span>
           </span>
         </a>
 
@@ -363,39 +362,13 @@
           }
         </div>
 
-        @if (forgeRoute()) {
-          <button
-            type="button"
-            class="lg:hidden relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
-            [attr.aria-expanded]="mobileOpen()"
-            aria-label="Ouvrir le menu"
-            data-testid="nav-hamburger"
-            (click)="toggleMobile()"
-          >
-            @if (mobileOpen()) {
-              <span class="text-lg leading-none">✕</span>
-            } @else {
-              <span class="flex flex-col gap-1.5 w-4">
-                <span class="block h-0.5 w-full bg-current rounded-full"></span>
-                <span class="block h-0.5 w-full bg-current rounded-full"></span>
-                <span class="block h-0.5 w-full bg-current rounded-full"></span>
-              </span>
-            }
-            @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0) {
-              <span
-                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
-                >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
-              >
-            }
-          </button>
-        }
       </div>
     </div>
   </div>
 
 </nav>
 
-<!-- Mobile panel : monté une fois, puis masqué (évite de recharger Iconify à chaque burger). -->
+<!-- Mobile Plus : monté une fois, puis masqué (évite de recharger Iconify à chaque ouverture). -->
 @if (mobileMenuMounted()) {
   <button
     type="button"
@@ -408,10 +381,8 @@
     (click)="closeMenus()"
   ></button>
   <div
-    class="lg:hidden fixed inset-x-0 z-[46] flex max-h-[min(70dvh,calc(100dvh-5rem))] flex-col overflow-y-auto overscroll-contain rounded-t-2xl border-t border-slate-700 bg-[#171b22]/98 shadow-[0_-12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+    class="lg:hidden fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-[46] flex max-h-[min(70dvh,calc(100dvh-5rem))] flex-col overflow-y-auto overscroll-contain rounded-t-2xl border-t border-slate-700 bg-[#171b22]/98 shadow-[0_-12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
     [class.hidden]="!mobileOpen()"
-    [class.bottom-0]="forgeRoute()"
-    [class.bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))]]="!forgeRoute()"
     [attr.aria-hidden]="mobileOpen() ? null : 'true'"
     [attr.inert]="mobileOpen() ? null : ''"
     role="dialog"
@@ -420,27 +391,6 @@
     data-testid="mobile-more-sheet"
   >
     <div class="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-1">
-        @if (forgeRoute()) {
-          <a
-            routerLink="/campaigns"
-            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="flex items-center gap-3">
-              <span class="text-xl"
-                ><iconify-icon noobserver icon="fluent-emoji:crossed-swords"></iconify-icon
-              ></span>
-              <span class="text-sm font-bold tracking-wide">Table</span>
-            </span>
-            @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
-              <span
-                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
-                >{{ formatBadgeCount(campaignsActionCount()) }}</span
-              >
-            }
-          </a>
-        }
-
         @for (link of workshopLinks; track link.path) {
           <a
             [routerLink]="link.path"
@@ -528,74 +478,6 @@
               >
             }
           </a>
-          <a
-            routerLink="/profile"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette"></iconify-icon
-            ></span>
-            <span class="text-sm font-bold tracking-wide">Mon profil</span>
-          </a>
-        }
-
-        <p class="px-4 pt-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Codex</p>
-        <div class="px-4 pb-2">
-          <input
-            type="search"
-            placeholder="Chercher dans le Codex…"
-            class="w-full min-h-9 rounded-lg bg-[var(--dg-bg)] border border-slate-700 px-3 text-sm text-slate-200 placeholder:text-slate-500 outline-none"
-            [value]="codexFilter()"
-            (input)="onCodexFilter($any($event.target).value)"
-          />
-        </div>
-        @if (searchingCodex() && filteredCodexLinks().length) {
-          <p class="px-4 pt-1 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
-            Rubriques
-          </p>
-        }
-        @for (link of filteredCodexLinks(); track link.path) {
-          <a
-            [routerLink]="link.path"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-transparent text-slate-300 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="text-lg w-6 text-center"
-              ><iconify-icon noobserver [icon]="link.icon"></iconify-icon
-            ></span>
-            <span class="text-sm tracking-wide">{{ link.label }}</span>
-          </a>
-        }
-        @if (searchingCodex()) {
-          @if (codexSearchLoading() && !codexEntryHits().length) {
-            <p class="px-4 py-2 text-xs text-slate-500">Recherche…</p>
-          }
-          @if (codexEntryHits().length) {
-            <p class="px-4 pt-2 pb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-600">
-              Entrées
-            </p>
-          }
-          @for (hit of codexEntryHits(); track hit.path) {
-            <a
-              [routerLink]="hit.path"
-              class="flex items-center gap-3 px-4 py-2 rounded-xl border border-transparent text-slate-300 hover:bg-slate-800/70 transition-colors"
-              (click)="closeMenus()"
-            >
-              <span class="text-lg w-6 text-center"
-                ><iconify-icon noobserver [icon]="hit.icon"></iconify-icon
-              ></span>
-              <span class="min-w-0">
-                <span class="block text-sm tracking-wide truncate">{{ hit.label }}</span>
-                @if (hit.category) {
-                  <span class="block text-[10px] text-slate-500 truncate">{{ hit.category }}</span>
-                }
-              </span>
-            </a>
-          }
-          @if (!filteredCodexLinks().length && !codexEntryHits().length && !codexSearchLoading()) {
-            <p class="px-4 py-2 text-xs text-slate-500">Aucun résultat.</p>
-          }
         }
 
         @if (auth.isLoggedIn()) {
@@ -671,90 +553,78 @@
             ></span>
             <span class="text-sm font-bold tracking-wide">Nouveautés</span>
           </a>
-          <a
-            routerLink="/login"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="text-sm font-bold tracking-wide">Connexion</span>
-          </a>
-          <a
-            routerLink="/register"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="text-sm font-bold tracking-wide">Créer un compte</span>
-          </a>
         }
     </div>
   </div>
 }
 
-@if (!forgeRoute()) {
-  <nav
-    class="lg:hidden fixed bottom-0 inset-x-0 z-[47] border-t border-slate-800 bg-[var(--dg-surface)]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)]"
-    data-testid="mobile-bottom-nav"
-    aria-label="Navigation principale"
-  >
-    <div class="grid grid-cols-5 h-14">
-      <a
-        routerLink="/campaigns"
-        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-        [class]="isNavPathActive('/campaigns') ? 'text-amber-300' : 'text-slate-400'"
-        data-testid="bottom-nav-campaigns"
-      >
-        <iconify-icon noobserver icon="fluent-emoji:crossed-swords" width="1.25em" height="1.25em"></iconify-icon>
-        Table
-      </a>
-      <a
-        routerLink="/create"
-        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-        [class]="isNavPathActive('/create') ? 'text-amber-300' : 'text-slate-400'"
-        data-testid="bottom-nav-forge"
-      >
-        <iconify-icon noobserver icon="fluent-emoji:hammer-and-pick" width="1.25em" height="1.25em"></iconify-icon>
-        Forge
-      </a>
-      <a
-        routerLink="/codex"
-        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-        [class]="isCodexActive() ? 'text-amber-300' : 'text-slate-400'"
-        data-testid="bottom-nav-codex"
-      >
-        <iconify-icon noobserver icon="fluent-emoji:open-book" width="1.25em" height="1.25em"></iconify-icon>
-        Codex
-      </a>
-      <a
-        [routerLink]="auth.isLoggedIn() ? '/profile' : '/login'"
-        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-        [class]="isNavPathActive('/profile') || isNavPathActive('/login') ? 'text-amber-300' : 'text-slate-400'"
-        data-testid="bottom-nav-account"
-      >
-        <iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette" width="1.25em" height="1.25em"></iconify-icon>
-        Compte
-      </a>
-      <button
-        type="button"
-        class="relative flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-        [class]="mobileOpen() ? 'text-amber-300' : 'text-slate-400'"
-        [attr.aria-expanded]="mobileOpen()"
-        aria-label="Plus"
-        data-testid="bottom-nav-more"
-        (click)="toggleMobile(); $event.stopPropagation()"
-      >
-        @if (mobileOpen()) {
-          <span class="text-base leading-none">✕</span>
-        } @else {
-          <span class="text-base leading-none" aria-hidden="true">⋯</span>
-        }
-        Plus
-        @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0 && !mobileOpen()) {
-          <span
-            class="absolute top-1 right-[18%] min-w-[1rem] h-4 px-0.5 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
-            >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
-          >
-        }
-      </button>
-    </div>
-  </nav>
-}
+<nav
+  class="lg:hidden fixed bottom-0 inset-x-0 z-[47] border-t border-slate-800 bg-[var(--dg-surface)]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)]"
+  data-testid="mobile-bottom-nav"
+  aria-label="Navigation principale"
+>
+  <div class="grid grid-cols-5 h-14">
+    <a
+      routerLink="/campaigns"
+      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isNavPathActive('/campaigns') ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Table"
+      data-testid="bottom-nav-campaigns"
+    >
+      <iconify-icon noobserver icon="fluent-emoji:crossed-swords" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Table</span>
+    </a>
+    <a
+      routerLink="/create"
+      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isNavPathActive('/create') ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Forge"
+      data-testid="bottom-nav-forge"
+    >
+      <iconify-icon noobserver icon="fluent-emoji:hammer-and-pick" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Forge</span>
+    </a>
+    <a
+      routerLink="/codex"
+      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isCodexActive() ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Codex"
+      data-testid="bottom-nav-codex"
+    >
+      <iconify-icon noobserver icon="fluent-emoji:open-book" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Codex</span>
+    </a>
+    <a
+      [routerLink]="auth.isLoggedIn() ? '/profile' : '/login'"
+      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isNavPathActive('/profile') || isNavPathActive('/login') ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Compte"
+      data-testid="bottom-nav-account"
+    >
+      <iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Compte</span>
+    </a>
+    <button
+      type="button"
+      class="relative flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="mobileOpen() ? 'text-amber-300' : 'text-slate-400'"
+      [attr.aria-expanded]="mobileOpen()"
+      aria-label="Plus"
+      data-testid="bottom-nav-more"
+      (click)="toggleMobile(); $event.stopPropagation()"
+    >
+      @if (mobileOpen()) {
+        <span class="text-lg leading-none">✕</span>
+      } @else {
+        <span class="text-lg leading-none" aria-hidden="true">⋯</span>
+      }
+      <span class="hidden sm:block">Plus</span>
+      @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0 && !mobileOpen()) {
+        <span
+          class="absolute top-1 right-[18%] min-w-[1rem] h-4 px-0.5 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
+          >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
+        >
+      }
+    </button>
+  </div>
+</nav>

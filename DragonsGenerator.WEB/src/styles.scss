@@ -296,8 +296,13 @@
   }
 
   @media (max-width: 1023px) {
-    .dg-has-bottom-nav:not(:has(.forge-route)) {
+    .dg-has-bottom-nav {
       padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .wizard-step-nav {
+      bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: 0.75rem;
     }
   }
 

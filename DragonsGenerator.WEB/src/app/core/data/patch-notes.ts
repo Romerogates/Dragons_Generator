@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.485',
+    date: '2026-11-19',
+    title: 'Nom en haut, plus de burger',
+    player: [
+      'En haut de l’écran, le nom complet « Dragons Generator » reste visible, un peu plus petit sur téléphone.',
+      'Plus de bouton menu en haut à droite, même dans la forge : Table, Forge, Codex, Compte et Plus restent en bas. Sur un petit écran, ce sont seulement les icônes.',
+      'Le menu Plus ne recopie plus le Codex ni le compte : seulement ce qui n’est pas déjà en bas (héros, donjons, guide, agenda, amis…).',
+    ],
+    tech: [
+      'Navbar brand : titre unique `text-[13px] sm:text-lg`. Plus de `nav-hamburger`. Rail `mobile-bottom-nav` aussi sur `forgeRoute`. Labels rail `hidden sm:block`. Sheet Plus : plus de catalogue Codex / profil / login (déjà rail ou `/codex`). `wizard-step-nav` / récap décalés du rail.',
+    ],
+  },
+  {
     version: '1.484',
     date: '2026-11-19',
     title: 'Avertissement SSH de déploiement',

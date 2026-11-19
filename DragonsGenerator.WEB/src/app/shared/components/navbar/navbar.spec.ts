@@ -155,21 +155,28 @@ describe('Navbar', () => {
     expect(component.mobileMenuMounted()).toBeTrue();
   });
 
-  it('opens the Plus sheet from the bottom rail and hides the header burger', () => {
+  it('opens the Plus sheet from the bottom rail and has no header burger', () => {
     expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeNull();
     const more = fixture.nativeElement.querySelector('[data-testid="bottom-nav-more"]') as HTMLButtonElement | null;
     expect(more).toBeTruthy();
     more?.click();
     fixture.detectChanges();
     expect(component.mobileOpen()).toBeTrue();
-    expect(fixture.nativeElement.querySelector('[data-testid="mobile-more-sheet"]')).toBeTruthy();
+    const sheet = fixture.nativeElement.querySelector('[data-testid="mobile-more-sheet"]') as HTMLElement | null;
+    expect(sheet).toBeTruthy();
+    const hrefs = [...(sheet?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href') ?? '');
+    expect(hrefs.some((h) => h.startsWith('/campaigns'))).toBeFalse();
+    expect(hrefs.some((h) => h === '/create' || h.startsWith('/create/'))).toBeFalse();
+    expect(hrefs.some((h) => h === '/codex' || h.startsWith('/species'))).toBeFalse();
+    expect(hrefs.some((h) => h === '/profile' || h === '/login')).toBeFalse();
   });
 
-  it('keeps the header burger on the forge where the bottom rail is hidden', () => {
+  it('keeps the bottom rail on the forge without a header burger', () => {
     component.forgeRoute.set(true);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('[data-testid="mobile-bottom-nav"]')).toBeNull();
-    expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="mobile-bottom-nav"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-more"]')).toBeTruthy();
   });
 
   it('formats badge counts and highlights Codex routes', () => {
