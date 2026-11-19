@@ -24,9 +24,7 @@ import {
 } from '../character-auto-build.util';
 import { parseAiRateLimitError } from '../ai-rate-limit.util';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
-import type { Background } from '@core/models/Backgrounds/background';
-import type { Species } from '@core/models/Species/species';
+import { CURRENT_SCHEMA_VERSION } from '@core/models/Character/character';
 import {
   canOpenFightPhase,
   createActiveCombat,

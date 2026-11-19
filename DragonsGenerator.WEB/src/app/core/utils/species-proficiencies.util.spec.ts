@@ -1,5 +1,5 @@
 import { testSpecies, testSubspecies } from '@testing/typed-fixtures';
-import type { Species, Subspecies, Trait } from '@core/models/Species/species';
+import type { Trait } from '@core/models/Species/species';
 import {
   resolveLineageDamageType,
   speciesResistancesFromTraits,

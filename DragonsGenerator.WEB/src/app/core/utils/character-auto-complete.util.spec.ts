@@ -2,8 +2,6 @@ import { testClass, testSpell } from '@testing/typed-fixtures';
 import { autoCompleteRemainingCreation } from './character-auto-complete.util';
 import type { CharacterCreation } from '@core/models/Character/character';
 import { INITIAL_CREATION_STATE } from '@core/models/Character/character-builder.types';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
-import type { Spell } from '@core/models/Spells/spell';
 
 function base(partial: Partial<CharacterCreation>): CharacterCreation {
   return { ...INITIAL_CREATION_STATE, ...partial };

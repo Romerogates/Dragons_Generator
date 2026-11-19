@@ -1,6 +1,5 @@
 import { testClass } from '@testing/typed-fixtures';
 import { extractSubclassBonusSpells } from './subclass-bonus-spells.util';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 
 describe('subclass-bonus-spells.util', () => {
   const cls = testClass({

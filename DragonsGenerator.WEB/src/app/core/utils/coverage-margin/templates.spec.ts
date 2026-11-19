@@ -12,7 +12,6 @@ import {
   rollDie,
 } from '../combat-roll.util';
 import { extractSubclassBonusSpells } from '../subclass-bonus-spells.util';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { STORAGE_KEY } from './helpers';
 
 describe('custom-background-templates', () => {

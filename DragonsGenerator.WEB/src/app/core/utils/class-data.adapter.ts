@@ -481,21 +481,21 @@ function normalizeSubclasses(subclasses: unknown): SubclassCatalog | Subclass[] 
   }
 
   if (!isRecord(subclasses)) return undefined;
-  const catalog = subclasses;
-  const rawOptions = Array.isArray(catalog['options'])
-    ? catalog['options'].filter(isRawSubclassOption)
+  const catalog = subclasses as RawSubclassCatalog;
+  const rawOptions = Array.isArray(catalog.options)
+    ? catalog.options.filter(isRawSubclassOption)
     : [];
   const levelUnlocked =
-    (typeof catalog['level_unlocked'] === 'number' ? catalog['level_unlocked'] : undefined) ??
-    (typeof catalog['unlocked_at_level'] === 'number' ? catalog['unlocked_at_level'] : undefined) ??
-    (typeof catalog['subclass_level_unlocked'] === 'number'
-      ? catalog['subclass_level_unlocked']
+    (typeof catalog.level_unlocked === 'number' ? catalog.level_unlocked : undefined) ??
+    (typeof catalog.unlocked_at_level === 'number' ? catalog.unlocked_at_level : undefined) ??
+    (typeof catalog.subclass_level_unlocked === 'number'
+      ? catalog.subclass_level_unlocked
       : undefined) ??
     3;
 
   return {
     unlocked_at_level:
-      typeof catalog['unlocked_at_level'] === 'number' ? catalog['unlocked_at_level'] : undefined,
+      typeof catalog.unlocked_at_level === 'number' ? catalog.unlocked_at_level : undefined,
     level_unlocked: levelUnlocked,
     options: rawOptions.map((sub) => ({
       ...sub,

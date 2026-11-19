@@ -44,9 +44,7 @@ test.describe('Campagne — smoke hub → combat → terminer', () => {
     await seedFightCombatAs(ownerPage, owner, campaignId);
 
     await applyAuthSession(ownerPage, owner, `/campaigns/${campaignId}`);
-    const tableCta = ownerPage.getByRole('button', {
-      name: /Ouvrir la table|Entrer en session|Rejoindre la table/i,
-    });
+    const tableCta = ownerPage.getByTestId('hub-open-play');
     await expect(tableCta).toBeVisible({ timeout: 30_000 });
     await tableCta.click();
 

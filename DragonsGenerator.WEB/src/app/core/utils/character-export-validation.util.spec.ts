@@ -9,7 +9,7 @@ import {
   formatCharacterExportErrors,
   validateCharacterExport,
 } from './character-export-validation.util';
-import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
+import { CURRENT_SCHEMA_VERSION } from '@core/models/Character/character';
 
 describe('character-export-validation.util', () => {
   it('accepts a complete Lettré export', () => {

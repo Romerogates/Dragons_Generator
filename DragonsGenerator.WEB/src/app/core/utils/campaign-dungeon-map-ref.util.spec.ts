@@ -136,8 +136,10 @@ describe('campaign-dungeon-map-ref.util', () => {
     expect(
       hasEmbeddedGeometry({ ...m, gridWidth: 0 as number, tiles: m.tiles }),
     ).toBe(false);
-    const { gridWidth: _w, gridHeight: _h, ...withoutGrid } = m;
-    expect(hasEmbeddedGeometry({ ...withoutGrid, tiles: m.tiles })).toBe(false);
+    const withoutGrid = { ...m, tiles: m.tiles };
+    delete (withoutGrid as { gridWidth?: number }).gridWidth;
+    delete (withoutGrid as { gridHeight?: number }).gridHeight;
+    expect(hasEmbeddedGeometry(withoutGrid)).toBe(false);
   });
 
   it('stripGeometryForPersist defaults fog/handout/rooms', () => {

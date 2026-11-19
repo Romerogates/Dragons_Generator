@@ -1,6 +1,6 @@
 import { testCreation } from '@testing/typed-fixtures';
 import { buildCharacterFromCreation } from './character-build.util';
-import type { AbilityScores, CharacterCreation, EquipmentInstance } from '@core/models/Character/character';
+import type { AbilityScores, EquipmentInstance } from '@core/models/Character/character';
 import {
   buildCharacterAttacks,
   computeCharacterArmorClass,

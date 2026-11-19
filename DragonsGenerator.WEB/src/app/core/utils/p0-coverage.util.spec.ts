@@ -1,7 +1,7 @@
 import { testCharacter } from '@testing/typed-fixtures';
 import { validateCharacterExport } from './character-export-validation.util';
 import { magicDetailsComplete } from './character-wizard-validation.util';
-import { CURRENT_SCHEMA_VERSION, type Character, type CharacterCreation } from '@core/models/Character/character';
+import { CURRENT_SCHEMA_VERSION, type CharacterCreation } from '@core/models/Character/character';
 import { INITIAL_CREATION_STATE } from '@core/models/Character/character-builder.types';
 
 const base = INITIAL_CREATION_STATE as CharacterCreation;

@@ -10,56 +10,6 @@ export const PROGRESSION_MAX_LEVEL = 20;
 export type { ClassChoicePool } from '@core/models/CharacterClasses/character-class';
 import type { ClassChoicePool } from '@core/models/CharacterClasses/character-class';
 
-interface ProgressionChoicePoolActive {
-  type?: string;
-  quantity?: number;
-  cumulative_total?: number;
-  pool?: unknown[];
-  label?: string;
-  name?: string;
-}
-
-interface ProgressionSpellChoice {
-  count?: number;
-  quantity?: number;
-  label?: string;
-  name?: string;
-}
-
-interface ExtendedProgressionLevel {
-  level: number;
-  features?: string[];
-  choice_pools_active?: ProgressionChoicePoolActive[];
-  invocation_choices?: { count?: number }[];
-  resources?: Record<string, number | string>;
-  spell_choices?: ProgressionSpellChoice[];
-  pact_boon_choices?: PactBoonChoice[];
-  skill_choices?: SkillChoiceEntry[];
-  level_up_choice_pools?: LevelUpChoicePool[];
-}
-
-interface PactBoonChoice {
-  id?: string;
-  pool?: string[];
-  options?: string[];
-  label?: string;
-  count?: number;
-  quantity?: number;
-}
-
-interface SkillChoiceEntry {
-  id?: string;
-  type?: string;
-  label?: string;
-  name?: string;
-  quantity?: number;
-  count?: number;
-}
-
-interface LevelUpChoicePool extends ClassChoicePool {
-  pool_ref?: string;
-}
-
 type ProgressionClassData = CharacterClass['data'];
 
 interface MetamagicFeatureDetail extends FeatureDetail {

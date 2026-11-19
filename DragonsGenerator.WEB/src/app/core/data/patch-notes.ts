@@ -13,6 +13,18 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.483',
+    date: '2026-11-19',
+    title: 'Lint et ouverture de table',
+    player: [
+      'Ouvrir une session depuis le hub de campagne reste le même geste, sans confusion avec d’autres boutons de la page.',
+    ],
+    tech: [
+      'E2E `campaign-play-smoke` : `data-testid="hub-open-play"` (overview only) — plus de strict-mode sur 2 CTA.',
+      'ESLint unused-vars (specs + `RawSubclassCatalog` + `ExtendedProgressionLevel`) ; `ng lint` `maxWarnings: 0`.',
+    ],
+  },
+  {
     version: '1.482',
     date: '2026-11-19',
     title: 'CI et table plus stables',

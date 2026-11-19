@@ -1,5 +1,4 @@
 import { testClass } from '@testing/typed-fixtures';
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { labelForGameId, labelForItemRef, registerGameLabel } from './game-id-labels';
 import { getEanaMapCoordinates, EANA_MAP_COORDS } from './eana-map';
 import { countAsiSlots, warlockArcanumSpellLevels } from './progression-choices.util';
