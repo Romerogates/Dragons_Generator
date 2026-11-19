@@ -13,6 +13,15 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.484',
+    date: '2026-11-19',
+    title: 'Avertissement SSH de déploiement',
+    player: [],
+    tech: [
+      '`appleboy/ssh-action@v1.2.5` : suppression de `script_stop` (input retiré). Les scripts SSH ont déjà `set -euo pipefail`.',
+    ],
+  },
+  {
     version: '1.483',
     date: '2026-11-19',
     title: 'Lint et ouverture de table',

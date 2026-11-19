@@ -219,7 +219,6 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: true
           command_timeout: 30m
           envs: GHCR_TOKEN,GHCR_USER,DRAGONS_API_IMAGE,DRAGONS_WEB_IMAGE
           script: |
