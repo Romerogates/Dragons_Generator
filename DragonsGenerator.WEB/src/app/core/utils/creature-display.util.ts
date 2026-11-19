@@ -57,7 +57,8 @@ export function getCategoryIcon(category: string): string {
   if (key.includes('laboratoire') || key.includes('biblioth')) return 'fluent-emoji:books';
   if (key.includes('askamor')) return 'fluent-emoji:fire';
   if (key.includes('cit')) return 'fluent-emoji:cityscape';
-  return 'fluent-emoji:dragon';
+  if (key.includes('divers')) return 'fluent-emoji:paw-prints';
+  return 'fluent-emoji:paw-prints';
 }
 
 export type CreatureIconSource = {
@@ -79,6 +80,17 @@ function hayHas(hay: string, needle: string): boolean {
 
 function hayWord(hay: string, word: string): boolean {
   return new RegExp(`(^|[^a-z])${word}([^a-z]|$)`).test(hay);
+}
+
+/** Portrait dragon teinté d’après la couleur dans le nom (argent, blanc, cuivre…). */
+function dragonIconForHay(hay: string): string {
+  if (hayHas(hay, 'argent')) return 'fluent-emoji:dragon-silver';
+  if (hayHas(hay, 'agate')) return 'fluent-emoji:dragon-agate';
+  if (hayHas(hay, 'cuivre') || hayHas(hay, 'laiton') || hayHas(hay, 'bronze')) {
+    return 'fluent-emoji:dragon-copper';
+  }
+  if (hayWord(hay, 'blanc') || hayHas(hay, 'blanche')) return 'fluent-emoji:dragon-white';
+  return 'fluent-emoji:dragon';
 }
 
 /** Icône portrait d’une fiche (nom d’abord, puis type, puis catégorie). */
@@ -105,14 +117,27 @@ export function getCreatureIcon(source: CreatureIconSource): string {
     return 'fluent-emoji:wolf';
   }
   if (hayWord(hay, 'loup')) return 'fluent-emoji:wolf';
-  if (hayHas(hay, 'renard')) return 'fluent-emoji:fox';
+  if (hayHas(hay, 'renard') || hayHas(hay, 'belette') || hayHas(hay, 'blaireau')) {
+    return 'fluent-emoji:fox';
+  }
   if (hayHas(hay, 'chauve-souris') || hayHas(hay, 'chauves-souris')) return 'fluent-emoji:bat';
-  if (hayHas(hay, 'ours')) return 'fluent-emoji:bear';
+  if (hayHas(hay, 'gobelours') || hayHas(hay, 'kobold')) return 'fluent-emoji:goblin';
+  if (hayWord(hay, 'ours')) return 'fluent-emoji:bear';
   if (hayHas(hay, 'sanglier')) return 'fluent-emoji:boar';
-  if (hayHas(hay, 'aigle') || hayHas(hay, 'faucon')) return 'fluent-emoji:eagle';
+  if (
+    hayHas(hay, 'aigle') ||
+    hayHas(hay, 'faucon') ||
+    hayHas(hay, 'griffon') ||
+    hayHas(hay, 'hippogriffe')
+  ) {
+    return 'fluent-emoji:eagle';
+  }
   if (hayHas(hay, 'hibou') || hayHas(hay, 'chouette')) return 'fluent-emoji:owl';
-  if (hayHas(hay, 'araignee') || hayHas(hay, 'ankheg') || hayHas(hay, 'kheg')) {
+  if (hayHas(hay, 'araignee') || hayHas(hay, 'lycose')) {
     return 'fluent-emoji:spider';
+  }
+  if (hayHas(hay, 'ankheg') || hayHas(hay, 'kheg') || hayHas(hay, 'insecte')) {
+    return 'fluent-emoji:bug';
   }
   if (hayWord(hay, 'rat') || hayHas(hay, 'rats')) return 'fluent-emoji:rat';
   if (hayHas(hay, 'lezard') || hayHas(hay, 'salamandre')) return 'fluent-emoji:lizard';
@@ -120,26 +145,58 @@ export function getCreatureIcon(source: CreatureIconSource): string {
   if (hayHas(hay, 'crocodile') || hayHas(hay, 'alligator')) return 'fluent-emoji:crocodile';
   if (hayHas(hay, 'grenouille') || hayHas(hay, 'crapaud')) return 'fluent-emoji:frog';
   if (hayHas(hay, 'scorpion')) return 'fluent-emoji:scorpion';
-  if (hayHas(hay, 'cheval') || hayHas(hay, 'destrier') || hayHas(hay, 'poney') || hayHas(hay, 'renne')) {
+  if (hayHas(hay, 'chameau')) return 'fluent-emoji:camel';
+  if (hayWord(hay, 'mule') || hayWord(hay, 'ane')) return 'fluent-emoji:donkey';
+  if (
+    hayWord(hay, 'cheval') ||
+    hayHas(hay, 'destrier') ||
+    hayHas(hay, 'poney') ||
+    hayHas(hay, 'renne')
+  ) {
     return 'fluent-emoji:horse';
   }
-  if (hayHas(hay, 'chevre') || hayHas(hay, 'bouc')) return 'fluent-emoji:goat';
-  if (hayHas(hay, 'cerf') || hayHas(hay, 'biche') || hayHas(hay, 'gregaire')) return 'fluent-emoji:deer';
+  if (hayHas(hay, 'chevre') || hayHas(hay, 'bouc') || hayHas(hay, 'capricorne')) {
+    return 'fluent-emoji:goat';
+  }
+  if (
+    hayHas(hay, 'cerf') ||
+    hayHas(hay, 'biche') ||
+    hayHas(hay, 'gregaire') ||
+    hayHas(hay, 'elan')
+  ) {
+    return 'fluent-emoji:deer';
+  }
   if (hayHas(hay, 'taureau') || hayHas(hay, 'vache') || hayHas(hay, 'gorgone')) return 'fluent-emoji:ox';
   if (hayHas(hay, 'minotaure')) return 'fluent-emoji:ox';
   if (hayHas(hay, 'elephant')) return 'fluent-emoji:elephant';
   if (hayHas(hay, 'molosse') || hayHas(hay, 'chien')) return 'fluent-emoji:dog';
-  if (hayHas(hay, 'chat') || hayHas(hay, 'panthere') || hayHas(hay, 'tigre')) return 'fluent-emoji:cat';
-  if (hayHas(hay, 'corbeau') || hayHas(hay, 'oiseau')) return 'fluent-emoji:bird';
+  if (
+    hayWord(hay, 'chat') ||
+    hayHas(hay, 'panthere') ||
+    hayHas(hay, 'tigre') ||
+    hayHas(hay, 'smilodon') ||
+    hayHas(hay, 'lion')
+  ) {
+    return 'fluent-emoji:cat';
+  }
+  if (hayHas(hay, 'corbeau') || hayHas(hay, 'oiseau') || hayHas(hay, 'vautour')) {
+    return 'fluent-emoji:bird';
+  }
   if (hayHas(hay, 'poisson') || hayHas(hay, 'requin')) return 'fluent-emoji:shark';
   if (hayHas(hay, 'pieuvre') || hayHas(hay, 'kraken') || hayHas(hay, 'poulpe')) {
     return 'fluent-emoji:octopus';
   }
-  if (hayHas(hay, 'abeille') || hayHas(hay, 'guepe') || hayHas(hay, 'insecte')) return 'fluent-emoji:bug';
+  if (hayHas(hay, 'abeille') || hayHas(hay, 'guepe')) return 'fluent-emoji:bug';
   if (hayHas(hay, 'nuee')) return 'fluent-emoji:ant';
 
-  if (hayHas(hay, 'dragonnet') || hayHas(hay, 'dragon')) return 'fluent-emoji:dragon';
-  if (hayHas(hay, 'wyverne') || hayHas(hay, 'drake')) return 'fluent-emoji:dragon-face';
+  if (
+    hayHas(hay, 'dragonnet') ||
+    hayHas(hay, 'dragon') ||
+    hayHas(hay, 'wyverne') ||
+    hayHas(hay, 'drake')
+  ) {
+    return dragonIconForHay(hay);
+  }
 
   if (hayHas(hay, 'gobelin')) return 'fluent-emoji:goblin';
   if (hayWord(hay, 'orc') || hayHas(hay, 'ogre')) return 'fluent-emoji:ogre';
@@ -161,6 +218,20 @@ export function getCreatureIcon(source: CreatureIconSource): string {
     return 'fluent-emoji:angry-face-with-horns';
   }
 
+  if (
+    hayHas(hay, 'basilic') ||
+    hayHas(hay, 'cocatrice') ||
+    hayHas(hay, 'remorhaz') ||
+    hayHas(hay, 'tarasque') ||
+    hayHas(hay, 'bulette')
+  ) {
+    return 'fluent-emoji:t-rex';
+  }
+  if (hayHas(hay, 'gargouille')) return 'fluent-emoji:moai';
+  if (hayHas(hay, 'arbre') || hayHas(hay, 'treant')) {
+    return 'fluent-emoji:deciduous-tree';
+  }
+  if (hayHas(hay, 'inane')) return 'fluent-emoji:ghost';
   if (hayHas(hay, 'golem') || hayHas(hay, 'artificielle') || hayHas(hay, 'armure animee')) {
     return 'fluent-emoji:robot';
   }
@@ -169,7 +240,12 @@ export function getCreatureIcon(source: CreatureIconSource): string {
     return 'fluent-emoji:microbe';
   }
   if (hayHas(hay, 'chaine animee')) return 'fluent-emoji:link';
-  if (hayHas(hay, 'mephite') || hayHas(hay, 'azer') || hayHas(hay, 'elementaire')) {
+  if (
+    hayHas(hay, 'mephite') ||
+    hayHas(hay, 'azer') ||
+    hayHas(hay, 'elementaire') ||
+    hayHas(hay, 'schatz')
+  ) {
     if (hayHas(hay, 'feu') || hayHas(hay, 'magma') || hayHas(hay, 'cendre')) return 'fluent-emoji:fire';
     if (hayHas(hay, 'glace') || hayHas(hay, 'froid') || hayHas(hay, 'eau') || hayHas(hay, 'vapeur')) {
       return 'fluent-emoji:snowflake';
@@ -186,7 +262,9 @@ export function getCreatureIcon(source: CreatureIconSource): string {
   ) {
     return 'fluent-emoji:man-mage';
   }
-  if (hayHas(hay, 'druide') || hayHas(hay, 'chamane')) return 'fluent-emoji:herb';
+  if (hayHas(hay, 'druide') || hayHas(hay, 'chamane') || hayHas(hay, 'sorcier')) {
+    return 'fluent-emoji:man-mage';
+  }
   if (hayHas(hay, 'barde')) return 'fluent-emoji:musical-notes';
   if (hayHas(hay, 'paladin') || hayHas(hay, 'acolyte') || hayHas(hay, 'ecclesiast') || hayHas(hay, 'adorateur') || hayHas(hay, 'pretre')) {
     return 'fluent-emoji:folded-hands';

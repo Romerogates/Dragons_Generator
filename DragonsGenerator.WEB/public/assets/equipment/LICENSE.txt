@@ -35,7 +35,11 @@ Adventure gear portraits (adv-*.png)
 
 UI / Codex portraits (ui-*.png)
   Dragon, sparkles, scroll, skull, fire, search, map, temple, trophy, eye, person,
-  wolf, goblin, folder, star, impact, crown, dna, warning, calendar.
+  wolf, goblin, folder, star, impact, crown, dna, warning, calendar, eagle,
+  spider, tree, mage, bear, cat, boar, deer, goat, ox, rat, fox, bat, lizard,
+  golem, vampire, zombie, ghost, devil, angel, ogre, slime, insect, warrior,
+  basilisk, gargoyle, priest, fairy,
+  dragon-silver, dragon-white, dragon-copper, dragon-agate.
   Created for Dragons Generator. No third-party copyrighted art was copied.
 
 Category tiles (cat-*.png) and remaining families

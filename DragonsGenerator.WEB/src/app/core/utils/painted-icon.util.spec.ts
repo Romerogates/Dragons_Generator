@@ -7,10 +7,34 @@ describe('resolvePaintedIcon', () => {
 
   it('maps Codex smileys to painted portraits', () => {
     expect(resolvePaintedIcon('fluent-emoji:dragon')).toBe('/assets/equipment/ui-dragon.png');
+    expect(resolvePaintedIcon('fluent-emoji:dragon-silver')).toBe(
+      '/assets/equipment/ui-dragon-silver.png',
+    );
+    expect(resolvePaintedIcon('fluent-emoji:dragon-white')).toBe(
+      '/assets/equipment/ui-dragon-white.png',
+    );
+    expect(resolvePaintedIcon('fluent-emoji:dragon-copper')).toBe(
+      '/assets/equipment/ui-dragon-copper.png',
+    );
+    expect(resolvePaintedIcon('fluent-emoji:dragon-agate')).toBe(
+      '/assets/equipment/ui-dragon-agate.png',
+    );
+    expect(resolvePaintedIcon('fluent-emoji:camel')).toBe('/assets/equipment/mnt-camel.png');
+    expect(resolvePaintedIcon('fluent-emoji:eagle')).toBe('/assets/equipment/ui-eagle.png');
+    expect(resolvePaintedIcon('fluent-emoji:bird')).toBe('/assets/equipment/ui-eagle.png');
+    expect(resolvePaintedIcon('fluent-emoji:honeybee')).not.toBe('/assets/equipment/ui-dragon.png');
+    expect(resolvePaintedIcon('fluent-emoji:spider')).toBe('/assets/equipment/ui-spider.png');
+    expect(resolvePaintedIcon('fluent-emoji:deciduous-tree')).toBe('/assets/equipment/ui-tree.png');
+    expect(resolvePaintedIcon('fluent-emoji:man-mage')).toBe('/assets/equipment/ui-mage.png');
+    expect(resolvePaintedIcon('fluent-emoji:herb')).toBe('/assets/equipment/adv-hay.png');
     expect(resolvePaintedIcon('fluent-emoji:sparkles')).toBe('/assets/equipment/ui-sparkles.png');
     expect(resolvePaintedIcon('fluent-emoji:crossed-swords')).toBe(
-      '/assets/equipment/cat-weapon.png',
+      '/assets/equipment/ui-warrior.png',
     );
+    expect(resolvePaintedIcon('fluent-emoji:bear')).toBe('/assets/equipment/ui-bear.png');
+    expect(resolvePaintedIcon('fluent-emoji:man-vampire')).toBe('/assets/equipment/ui-vampire.png');
+    expect(resolvePaintedIcon('fluent-emoji:robot')).toBe('/assets/equipment/ui-golem.png');
+    expect(resolvePaintedIcon('fluent-emoji:ogre')).toBe('/assets/equipment/ui-ogre.png');
   });
 
   it('never returns a fluent-emoji id', () => {

@@ -13,6 +13,29 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.486',
+    date: '2026-11-19',
+    title: 'Portraits du Codex',
+    player: [
+      'Sur téléphone, le bouton retour ferme d’abord la conversation, puis la fenêtre des messages — plus besoin de quitter l’appli.',
+      'Le chameau n’a plus une tête de dragon : c’est bien un chameau. Aigles, corbeaux et faucons ont un portrait d’oiseau, et non plus le dragon vert.',
+      'Les autres bêtes (mule, vautour, griffon, lion…) ont un portrait d’animal, et non plus le dragon par défaut.',
+      'Les portraits du chameau et de l’aigle n’ont plus de carré noir autour, et les listes du Codex n’ont plus de bande noire derrière l’image.',
+      'Les araignées ont une vraie araignée, les arbres animés un arbre hanté, et l’archidruide un sorcier — plus un gobelin ou une botte de foin.',
+      'Le bestiaire n’emprunte plus le même loup ou le même gobelin pour tout : ours, chats, cerfs, rats, chauves-souris, lézards, golems, vampires, fantômes, diables, anges, orcs, vases, insectes, basilics, gargouilles, prêtres et guerriers ont chacun un portrait qui leur ressemble.',
+      'Les dragons ont un portrait de leur couleur : argent, blanc, cuivre, agate — plus le même vert pour tout le monde, et plus de carré noir autour de la tête.',
+    ],
+    tech: [
+      '`FriendChatDockService` : 2 `pushState` (`#dg-chat`, `#dg-chat-thread`). Back : fil → liste → close. Plus de `rearmHistory` à 1 entrée.',
+      '`getCreatureIcon` : `chameau`/`mule`/`âne` ; catégorie `divers` → `paw-prints` (plus `dragon`).',
+      '`resolvePaintedIcon` : `camel` → `mnt-camel.png`, oiseaux → `ui-eagle.png` (plus `ui-dragon.png`).',
+      '`mnt-camel.png` / `ui-eagle.png` : fond noir opaque → alpha. `.dg-entry-art` : plus de fond `rgba(12,16,22)`.',
+      '`spider` → `ui-spider.png` ; `arbre` → `ui-tree.png` ; `druide`/`chamane` → `man-mage`/`ui-mage.png`.',
+      'Portraits famille `ui-bear/cat/boar/deer/goat/ox/rat/fox/bat/lizard/golem/vampire/zombie/ghost/devil/angel/ogre/slime/insect/warrior/basilisk/gargoyle/priest/fairy`. Faux positifs : `chevalier`≠cheval, `gobelours`≠ours, `schatz`≠chat.',
+      '`dragonIconForHay` + `ui-dragon-silver/white/copper/agate.png` ; EXACT `fluent-emoji:dragon-*` ; fond noir opaque → alpha (flood coins, chroma).',
+    ],
+  },
+  {
     version: '1.485',
     date: '2026-11-19',
     title: 'Nom en haut, plus de burger',
