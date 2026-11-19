@@ -21,9 +21,11 @@ import { coerceEquipmentSlots } from '@core/utils/class-data.adapter';
 import {
   equipmentDescription,
   equipmentSummaryText,
+  getEquipmentIcon,
   type EquipmentDisplayLike,
 } from '@core/utils/equipment-display.util';
 import { registerGameLabels } from '@core/utils/game-id-labels';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import type { EquipmentInstance } from '../../../../core/models/Character/character';
 import type { EquipmentSlot } from '../../../../core/models/Character/character';
 
@@ -74,7 +76,7 @@ interface ResolvedSlot {
 @Component({
   selector: 'app-equipment-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CodexGlyph],
   templateUrl: './equipment-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -433,9 +435,8 @@ export class EquipmentStep implements OnInit {
       if (id.includes('vehicle')) return 'fluent-emoji:horse';
       return 'fluent-emoji:hammer-and-wrench';
     }
-    return item.equipment?.type === 'WEAPON'
-      ? 'fluent-emoji:crossed-swords'
-      : 'fluent-emoji:package';
+    if (item.equipment) return getEquipmentIcon(item.equipment);
+    return 'fluent-emoji:package';
   }
 
   itemName(item: ResolvedItem): string {

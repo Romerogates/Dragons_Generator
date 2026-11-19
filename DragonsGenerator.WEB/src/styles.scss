@@ -25,7 +25,7 @@
   /* Forge : navbar non-sticky → étapes collées en haut d’écran (+ flèches + raccourcis). */
   .forge-route {
     /* Mobile : chrome plus bas pour laisser de la place au contenu. */
-    --dg-wizard-chrome-height: 5.5rem;
+    --dg-wizard-chrome-height: 4.25rem;
     --dg-sticky-top: env(safe-area-inset-top, 0px);
     --dg-sticky-below-wizard: calc(
       env(safe-area-inset-top, 0px) + var(--dg-wizard-chrome-height)
@@ -176,6 +176,129 @@
   .dg-card-foot {
     @apply px-5 py-3 border-t border-slate-800/80 flex justify-between items-center;
     background: rgba(12, 16, 22, 0.35);
+  }
+
+  /* Codex / listes — titres lisibles, cartes en rangée portrait */
+  .dg-page-title {
+    @apply text-3xl md:text-5xl font-extrabold text-slate-100 font-serif tracking-tight text-center;
+  }
+
+  .dg-page-lead {
+    @apply text-sm md:text-base text-slate-400 italic max-w-xl leading-relaxed font-serif text-center;
+  }
+
+  .dg-toolbar-link {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+      border border-slate-700 text-slate-300 transition-colors;
+  }
+
+  .dg-toolbar-link:hover {
+    @apply border-amber-500/55 text-amber-300;
+  }
+
+  .dg-count {
+    @apply text-sm text-slate-500;
+  }
+
+  .dg-entry {
+    @apply relative flex flex-row items-stretch overflow-hidden rounded-2xl border border-slate-800/90
+      no-underline text-inherit cursor-pointer transition-[colors,transform,opacity,box-shadow] duration-200;
+    background: linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.035),
+      0 10px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .dg-entry:hover {
+    @apply border-amber-500/45 -translate-y-0.5;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 24px rgba(245, 158, 11, 0.1),
+      0 14px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .dg-entry-arcane:hover {
+    @apply border-violet-500/45;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 24px rgba(139, 92, 246, 0.12),
+      0 14px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .dg-entry-bestiary:hover {
+    @apply border-rose-500/40;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 24px rgba(244, 63, 94, 0.1),
+      0 14px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .dg-entry-art {
+    @apply shrink-0 w-[4.5rem] sm:w-[5.5rem] flex items-center justify-center border-r border-slate-800/80;
+    background: rgba(12, 16, 22, 0.45);
+  }
+
+  .dg-entry-body {
+    @apply min-w-0 flex-1 p-4 sm:p-5 flex flex-col gap-1;
+  }
+
+  .dg-entry-title {
+    @apply text-lg sm:text-xl font-bold font-serif tracking-wide text-amber-400 leading-tight;
+  }
+
+  .dg-entry-arcane .dg-entry-title {
+    @apply text-violet-300;
+  }
+
+  .dg-entry-bestiary .dg-entry-title {
+    @apply text-slate-100;
+  }
+
+  .dg-entry-meta {
+    @apply text-xs text-slate-500;
+  }
+
+  .dg-entry-facts {
+    @apply flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400;
+  }
+
+  .dg-entry-blurb {
+    @apply text-sm text-slate-400 leading-relaxed line-clamp-2 mt-0.5;
+  }
+
+  .dg-entry-tags {
+    @apply flex flex-wrap gap-1.5 mt-1;
+  }
+
+  .dg-tag {
+    @apply px-2 py-0.5 rounded-md text-[11px] font-medium border border-slate-700/80 text-slate-400;
+  }
+
+  .dg-section {
+    @apply rounded-2xl border border-slate-800/90 p-5 sm:p-6 mb-6;
+    background: linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+  }
+
+  .dg-section-title {
+    @apply font-serif text-lg text-slate-100 mb-4;
+  }
+
+  .dg-facts {
+    @apply grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3;
+  }
+
+  .dg-facts dt {
+    @apply text-xs text-slate-500 mb-0.5;
+  }
+
+  .dg-facts dd {
+    @apply text-sm text-slate-200;
+  }
+
+  @media (max-width: 1023px) {
+    .dg-has-bottom-nav:not(:has(.forge-route)) {
+      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    }
   }
 
   .dg-chip-bar {

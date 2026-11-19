@@ -15,6 +15,7 @@ import { listSubclassOptions } from '@core/utils/character-class-features.util';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import {
   GameIdLabelPipe,
   GameIdLabelsPipe,
@@ -28,7 +29,14 @@ import {
 @Component({
   selector: 'app-character-class-detail',
   standalone: true,
-  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe, CodexDetailShell],
+  imports: [
+    RouterLink,
+    GameIdLabelPipe,
+    GameIdLabelsPipe,
+    GameItemLabelPipe,
+    CodexDetailShell,
+    CodexGlyph,
+  ],
   templateUrl: './character-class-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -69,5 +77,17 @@ export class CharacterClassDetail {
 
   protected subclassOptions(cls: CharacterClass) {
     return listSubclassOptions(cls.data);
+  }
+
+  protected groupedItems(
+    items: { id?: string; qty?: number }[] | null | undefined,
+  ): { id: string; qty: number }[] {
+    const map = new Map<string, number>();
+    for (const item of items ?? []) {
+      const id = item.id ?? '';
+      if (!id) continue;
+      map.set(id, (map.get(id) ?? 0) + (item.qty ?? 1));
+    }
+    return [...map.entries()].map(([id, qty]) => ({ id, qty }));
   }
 }

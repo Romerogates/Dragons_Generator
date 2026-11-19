@@ -22,14 +22,8 @@
     <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl">
       <div class="flex items-center gap-6 mb-8 w-full">
         <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
-        <h1
-          class="text-4xl md:text-6xl font-extrabold text-slate-100 font-serif tracking-widest uppercase drop-shadow-2xl text-center"
-        >
-          L'Arsenal
-          <span
-            class="text-amber-500 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600"
-            >d'Eana</span
-          >
+        <h1 class="dg-page-title">
+          L'Arsenal <span class="text-amber-500">d'Eana</span>
         </h1>
         <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
       </div>
@@ -42,18 +36,13 @@
       </p>
 
       <div class="flex flex-wrap justify-center gap-4 mb-8">
-        <a
-          routerLink="/equipments/summary"
-          class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-amber-500 hover:text-amber-400 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-lg flex items-center gap-2"
-        >
-          <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span> Résumé
+        <a routerLink="/equipments/summary" class="dg-toolbar-link">
+          <app-codex-glyph icon="fluent-emoji:scroll" size="1.1em"></app-codex-glyph>
+          Résumé
         </a>
-        <a
-          routerLink="/equipments/types"
-          class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-amber-500 hover:text-amber-400 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-lg flex items-center gap-2"
-        >
-          <span><iconify-icon icon="fluent-emoji:file-folder"></iconify-icon></span> Parcourir par
-          catégories
+        <a routerLink="/equipments/types" class="dg-toolbar-link">
+          <app-codex-glyph icon="fluent-emoji:file-folder" size="1.1em"></app-codex-glyph>
+          Parcourir par catégories
         </a>
       </div>
 
@@ -114,66 +103,36 @@
         </div>
       }
       <div class="w-full mb-6 flex justify-between items-end border-b border-slate-800 pb-2">
-        <p class="text-amber-500/80 text-[10px] font-black uppercase tracking-widest">
-          {{ filtered().length }} équipement(s) disponible(s)
-        </p>
+        <p class="dg-count">{{ filtered().length }} équipements</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         @for (eq of filtered(); track eq.id) {
-          <a
-            [routerLink]="['/equipments', eq.id]"
-            class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
-          >
-            <div
-              class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
-            >
-              <iconify-icon [icon]="getTypeIcon(eq)"></iconify-icon>
+          <a [routerLink]="['/equipments', eq.id]" class="dg-entry">
+            <div class="dg-entry-art">
+              <app-codex-glyph [icon]="getTypeIcon(eq)" [alt]="eq.name" size="2.75rem"></app-codex-glyph>
             </div>
-
-            <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
-              <header class="mb-4 flex items-start gap-3">
-                <span class="text-3xl drop-shadow-md leading-none shrink-0 pt-1">
-                  <iconify-icon [icon]="getTypeIcon(eq)" width="1em" height="1em"></iconify-icon>
-                </span>
-                <div class="min-w-0">
-                  <h2 class="text-2xl font-bold text-amber-500 font-serif tracking-wide mb-1 group-hover:underline decoration-amber-500/30 underline-offset-4">
-                    {{ eq.name }}
-                  </h2>
-                  <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                    {{ translateType(eq.type) }}
-                    @if (eq.subtype) {
-                      · {{ translateSubtype(eq.subtype) }}
-                    }
-                  </p>
-                </div>
-              </header>
-
-              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
-                « {{ equipmentSummary(eq) }} »
+            <div class="dg-entry-body">
+              <h2 class="dg-entry-title">{{ eq.name }}</h2>
+              <p class="dg-entry-meta">
+                {{ translateType(eq.type) }}
+                @if (eq.subtype) {
+                  · {{ translateSubtype(eq.subtype) }}
+                }
               </p>
-
-              <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >Valeur</span
-                  >
-                  <span class="text-xs text-amber-400 font-medium">{{ formatCost(eq) }}</span>
-                </div>
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >Poids</span
-                  >
-                  <span class="text-xs text-slate-200 font-medium">
-                    @if (eq.wKg !== null && eq.wKg !== undefined) {
-                      {{ eq.wKg }} kg
-                    } @else {
-                      —
-                    }
-                  </span>
-                </div>
-              </div>
-
+              <p class="dg-entry-facts">
+                <span>{{ formatCost(eq) }}</span>
+                <span>
+                  @if (eq.wKg !== null && eq.wKg !== undefined) {
+                    {{ eq.wKg }} kg
+                  } @else {
+                    —
+                  }
+                </span>
+              </p>
+              @if (equipmentSummary(eq); as blurb) {
+                <p class="dg-entry-blurb">{{ blurb }}</p>
+              }
             </div>
           </a>
         } @empty {

@@ -30,6 +30,9 @@
       </div>
     } @else if (equipment(); as eq) {
       <header class="text-center mb-12">
+        <span class="mb-4 flex justify-center">
+          <app-codex-glyph [icon]="portraitIcon(eq)" [alt]="eq.name" size="5rem"></app-codex-glyph>
+        </span>
         <h1
           class="text-5xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
         >

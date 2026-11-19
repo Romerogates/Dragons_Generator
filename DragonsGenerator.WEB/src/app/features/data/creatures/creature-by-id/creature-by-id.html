@@ -7,7 +7,7 @@
     @if (creature() === undefined) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-red-500">
         <span class="text-6xl mb-6"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
-        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">Consultation de la fiche...</p>
+        <p class="dg-page-lead">Consultation de la fiche…</p>
       </div>
     } @else if (notFound()) {
       <div class="flex flex-col items-center justify-center py-32 text-center">
@@ -19,9 +19,11 @@
       <div class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center">{{ errorMsg }}</div>
     } @else if (creature(); as c) {
       <header class="text-center mb-12">
-        <span class="text-5xl mb-4 block"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
-        <h1 class="text-4xl md:text-6xl font-extrabold text-red-400 font-serif tracking-wide mb-4">{{ c.name }}</h1>
-        <p class="text-sm italic text-slate-400 max-w-2xl mx-auto mb-6">{{ c.type }}</p>
+        <span class="mb-3 block">
+          <app-codex-glyph [icon]="portraitIcon(c)" [alt]="c.name" size="3.5rem"></app-codex-glyph>
+        </span>
+        <h1 class="dg-page-title text-rose-300 mb-3">{{ c.name }}</h1>
+        <p class="dg-page-lead mx-auto mb-4">{{ c.type }}</p>
         <div class="flex flex-wrap items-center justify-center gap-3">
           <a
             [routerLink]="['/creatures/category', c.category]"

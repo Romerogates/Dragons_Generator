@@ -13,14 +13,15 @@ import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { Spell } from '@core/models/Spells/spell';
-import { spellSchoolLabel } from '@core/utils/spell-display.util';
+import { spellCastTimeLabel, spellRangeLabel, spellSchoolLabel } from '@core/utils/spell-display.util';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import { labelForGameId } from '@core/utils/game-id-labels';
 
 @Component({
   selector: 'app-spells',
   standalone: true,
-  imports: [CommonModule, RouterLink, CodexEmptyState],
+  imports: [CommonModule, RouterLink, CodexEmptyState, CodexGlyph],
   templateUrl: './spells.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -34,6 +35,8 @@ export class Spells {
   protected error = signal<string | null>(null);
   protected offlineBanner = signal(false);
   protected readonly schoolLabel = spellSchoolLabel;
+  protected readonly castTimeLabel = spellCastTimeLabel;
+  protected readonly rangeLabel = spellRangeLabel;
 
   readonly search = signal('');
   readonly classFilter = signal('');
@@ -121,13 +124,6 @@ export class Spells {
   classLabel(id: string): string {
     const found = this.classOptions().find((c) => c.id === id);
     return found?.name ?? labelForGameId(id);
-  }
-
-  protected formatMeta(meta: { amount: number | string | null; unit: string | null }): string {
-    if (meta.amount === null && meta.unit === null) return '—';
-    if (meta.amount === null) return meta.unit ?? '—';
-    if (meta.unit === null) return String(meta.amount);
-    return `${meta.amount} ${meta.unit}`;
   }
 
   protected formatComponents(c: { v: boolean; s: boolean; m: string | null }): string {

@@ -5,6 +5,7 @@ import {
   formatFeatPrerequisites,
   humanizeKey,
   resolveFeatureNames,
+  tidyPlayerFacingCopy,
 } from './catalog-display.util';
 
 describe('catalog-display.util', () => {
@@ -57,5 +58,18 @@ describe('catalog-display.util', () => {
 
   it('humanizes keys', () => {
     expect(humanizeKey('spell_slots')).toBe('Spell slots');
+  });
+
+  it('strips technical sentences from class copy', () => {
+    expect(
+      tidyPlayerFacingCopy(
+        "Aptitude octroyée par la sous-classe choisie au niveau 6. Résolution dynamique via l'ID de sous-classe active.",
+      ),
+    ).toBe('Aptitude de votre voie, au niveau 6.');
+    expect(
+      tidyPlayerFacingCopy(
+        "Lance des dés bonus. Nombre de dés dicté par la colonne 'brutalite_critique_extra_dice' de la progression.",
+      ),
+    ).toContain('dépend de votre niveau');
   });
 });

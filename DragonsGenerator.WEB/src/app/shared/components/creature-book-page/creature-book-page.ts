@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, input } from '@angular/core';
 import type { Creature } from '@core/models/Creatures/creature';
 import {
   ABILITY_LABELS,
   formatChallengeRating,
   getCreatureCategoryLabel,
+  getCreatureIcon,
   creatureBlockBody,
   tidyCreatureLore,
   visibleCreatureBlocks,
@@ -15,6 +16,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './creature-book-page.html',
   styleUrl: './creature-book-page.scss',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CreatureBookPage {
   readonly creature = input.required<Creature>();
@@ -30,6 +32,7 @@ export class CreatureBookPage {
   protected readonly lore = tidyCreatureLore;
   protected readonly visibleBlocks = visibleCreatureBlocks;
   protected readonly blockBody = creatureBlockBody;
+  protected readonly portraitIcon = getCreatureIcon;
 
   protected abilityKeys(creature: Creature): string[] {
     return this.abilityOrder.filter((k) => creature.abilities[k]);

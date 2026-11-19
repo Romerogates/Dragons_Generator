@@ -10,6 +10,7 @@ import type {
 import type { Ability } from '@core/models/CharacterClasses/character-class';
 import { normalizeSkillId } from './skill.utils';
 import { normalizeItemRef } from './equipment.utils';
+import { tidyPlayerFacingCopy } from './catalog-display.util';
 
 interface RawFeatureDetail {
   id?: string;
@@ -196,7 +197,7 @@ function normalizeFeaturesDetails(features: RawFeatureDetail[]): FeatureDetail[]
       ...f,
       id: f.id ?? '',
       name: f.name ?? '',
-      desc: description || f.desc || f.flavor?.summary || '',
+      desc: tidyPlayerFacingCopy(description || f.desc || f.flavor?.summary || ''),
       level: f.level ?? f.unlocks_at_level ?? 1,
       rechargeType: mapRecharge(f.recharge),
       uses: f.uses ?? undefined,
@@ -473,7 +474,7 @@ function normalizeSubclasses(subclasses: unknown): SubclassCatalog | Subclass[] 
   if (Array.isArray(subclasses)) {
     return subclasses.filter(isRawSubclassOption).map((sub) => ({
       ...sub,
-      desc: sub.desc ?? sub.flavor?.summary ?? '',
+      desc: tidyPlayerFacingCopy(sub.desc ?? sub.flavor?.summary ?? ''),
       features: normalizeFeaturesDetails(sub.features_details ?? sub.features ?? []),
       sub_choices: normalizeSubChoices(sub),
     }));
@@ -498,7 +499,7 @@ function normalizeSubclasses(subclasses: unknown): SubclassCatalog | Subclass[] 
     level_unlocked: levelUnlocked,
     options: rawOptions.map((sub) => ({
       ...sub,
-      desc: sub.desc ?? sub.flavor?.summary ?? '',
+      desc: tidyPlayerFacingCopy(sub.desc ?? sub.flavor?.summary ?? ''),
       features: normalizeFeaturesDetails(sub.features_details ?? sub.features ?? []),
       sub_choices: normalizeSubChoices(sub),
     })),

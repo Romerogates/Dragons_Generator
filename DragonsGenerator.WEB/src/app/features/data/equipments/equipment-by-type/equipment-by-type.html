@@ -99,13 +99,13 @@
             <div
               class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
             >
-              <iconify-icon [icon]="getTypeIcon(eq)"></iconify-icon>
+              <app-codex-glyph [icon]="getTypeIcon(eq)" size="1em"></app-codex-glyph>
             </div>
 
             <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
               <header class="mb-4 flex items-start gap-3">
-                <span class="text-3xl drop-shadow-md leading-none shrink-0 pt-1">
-                  <iconify-icon [icon]="getTypeIcon(eq)" width="1em" height="1em"></iconify-icon>
+                <span class="w-12 h-12 drop-shadow-md leading-none shrink-0 pt-0.5">
+                  <app-codex-glyph [icon]="getTypeIcon(eq)" [alt]="eq.name" size="3rem"></app-codex-glyph>
                 </span>
                 <div class="min-w-0">
                   <h2 class="text-2xl font-bold text-amber-500 font-serif tracking-wide mb-1 group-hover:underline decoration-amber-500/30 underline-offset-4">
@@ -119,9 +119,13 @@
                 </div>
               </header>
 
-              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
-                « {{ equipmentSummary(eq) }} »
-              </p>
+              @if (equipmentSummary(eq); as blurb) {
+                <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
+                  {{ blurb }}
+                </p>
+              } @else {
+                <div class="mb-6 flex-grow"></div>
+              }
 
               <div class="grid grid-cols-2 gap-3 mb-6">
                 <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">

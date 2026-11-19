@@ -126,3 +126,24 @@ export function resolveFeatureNames(
     .map((id) => map.get(id) || humanizeKey(id.replace(/^feat-/, '')))
     .join(', ');
 }
+
+/** Retire les phrases techniques (colonnes JSON, IDs) des textes joueur. */
+export function tidyPlayerFacingCopy(text: string | null | undefined): string {
+  if (!text) return '';
+  return text
+    .replace(/\s*Résolution dynamique[^.]*\./gi, '')
+    .replace(
+      /Nombre de dés dicté par la colonne '[^']+' de la progression\./gi,
+      'Le nombre de dés dépend de votre niveau.',
+    )
+    .replace(
+      /Aptitude octroyée par la sous-classe choisie au niveau (\d+)\./gi,
+      'Aptitude de votre voie, au niveau $1.',
+    )
+    .replace(
+      /Aptitude octroyée par le serment sacré choisi au niveau (\d+)\./gi,
+      'Aptitude de votre serment, au niveau $1.',
+    )
+    .replace(/\s+/g, ' ')
+    .trim();
+}

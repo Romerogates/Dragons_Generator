@@ -242,7 +242,10 @@
                           [disabled]="h.state.importingParty() || h.state.importingCreatureId() === cr.id"
                           (click)="h.playImport.addCodexCreatureEnemy(cr)"
                         >
-                          <span class="font-serif block">{{ cr.name }}</span>
+                          <span class="font-serif block">
+                            <iconify-icon [icon]="portraitIcon(cr)" class="mr-1 align-middle"></iconify-icon>
+                            {{ cr.name }}
+                          </span>
                           <span class="text-[10px] text-slate-500">
                             {{ cr.category }}
                             @if (cr.challengeRating) {

@@ -20,6 +20,7 @@ import {
   formatChallengeRating,
   getCategoryIcon,
   getCreatureCategoryLabel,
+  getCreatureIcon,
   getCrTier,
 } from '@core/utils/creature-display.util';
 import {
@@ -166,6 +167,7 @@ export class SelectCreaturesStep implements OnInit {
   protected categoryLabel = getCreatureCategoryLabel;
   protected formatCr = formatChallengeRating;
   protected categoryIcon = getCategoryIcon;
+  protected portraitIcon = getCreatureIcon;
   protected crTierLabels = CR_TIER_LABELS;
   protected crTiers: CrTier[] = ['low', 'mid', 'high', 'legendary'];
 }

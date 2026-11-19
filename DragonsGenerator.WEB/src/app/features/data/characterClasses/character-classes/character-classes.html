@@ -1,33 +1,26 @@
 <div class="w-full min-h-screen bg-[#171b22] flex flex-col animate-fade-in select-none pb-20">
-  <section class="w-full py-16 px-4 max-w-7xl mx-auto flex flex-col items-center">
-    <div class="flex items-center gap-6 mb-4 w-full max-w-3xl">
-      <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
-      <h1
-        class="text-3xl md:text-4xl font-bold text-slate-200 font-serif tracking-widest uppercase drop-shadow-md text-center"
-      >
-        Classes de <span class="text-amber-500">Héros</span>
-      </h1>
-      <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
-    </div>
+  <section class="w-full py-12 px-4 max-w-7xl mx-auto flex flex-col items-center">
+    <h1 class="dg-page-title mb-3">
+      Classes de <span class="text-amber-500">héros</span>
+    </h1>
 
-    <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto italic text-center mb-6">
+    <p class="dg-page-lead mb-5">
       Parcourez les voies d’aventure — choisissez une classe pour en voir le détail.
     </p>
 
-    <div class="flex flex-wrap justify-center gap-3 mb-10">
-      <a
-        routerLink="/classes/summary"
-        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500 hover:text-amber-400"
-      >
-        Résumé
-      </a>
+    <div class="flex flex-wrap justify-center gap-2 mb-6">
+      <a routerLink="/classes/summary" class="dg-toolbar-link">Résumé</a>
     </div>
 
-    <div class="relative w-full max-w-md group mb-12">
+    <div class="relative w-full max-w-md group mb-8">
       <span
         class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-focus-within:text-amber-500 transition-colors"
-        ><iconify-icon icon="fluent-emoji:magnifying-glass-tilted-right"></iconify-icon
-      ></span>
+      >
+        <app-codex-glyph
+          icon="fluent-emoji:magnifying-glass-tilted-right"
+          size="1.15em"
+        ></app-codex-glyph>
+      </span>
       <input
         type="search"
         placeholder="Rechercher une classe (ex: Guerrier)..."
@@ -37,65 +30,29 @@
       />
     </div>
 
-    <div class="w-full mb-6 flex justify-between items-end border-b border-slate-800 pb-2">
-      <p class="text-amber-500/80 text-[10px] font-black uppercase tracking-widest">
-        {{ filtered().length }} classe(s) recensée(s)
-      </p>
+    <div class="w-full mb-5 flex justify-between items-end border-b border-slate-800 pb-2">
+      <p class="dg-count">{{ filtered().length }} classes</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
       @for (cls of filtered(); track cls.id) {
-        <a
-          [routerLink]="['/classes', cls.id]"
-          class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
-        >
-          <div
-            class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
-          >
-            <iconify-icon [icon]="iconFor(cls.id)"></iconify-icon>
+        <a [routerLink]="['/classes', cls.id]" class="dg-entry">
+          <div class="dg-entry-art">
+            <app-codex-glyph [icon]="iconFor(cls.id)" [alt]="cls.name" size="2.75rem"></app-codex-glyph>
           </div>
-
-          <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
-            <header class="mb-4 flex items-start gap-3">
-              <span class="text-3xl drop-shadow-md leading-none shrink-0 pt-1">
-                <iconify-icon [icon]="iconFor(cls.id)" width="1em" height="1em"></iconify-icon>
-              </span>
-              <div class="min-w-0">
-                <h2 class="text-2xl font-bold text-amber-500 font-serif tracking-wide mb-1 group-hover:underline decoration-amber-500/30 underline-offset-4">
-                  {{ cls.name }}
-                </h2>
-                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                  d{{ cls.data.hit_die }}
-                  @if (cls.data.primary_abilities.length) {
-                    · {{ cls.data.primary_abilities | gameIdLabels }}
-                  }
-                </p>
-              </div>
-            </header>
-
-            <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
-              « {{ classSummary(cls) }} »
+          <div class="dg-entry-body">
+            <h2 class="dg-entry-title">{{ cls.name }}</h2>
+            <p class="dg-entry-meta">
+              d{{ cls.data.hit_die }}
+              @if (cls.data.primary_abilities.length) {
+                · {{ cls.data.primary_abilities | gameIdLabels }}
+              }
             </p>
-
-            <div class="grid grid-cols-2 gap-3 mb-6">
-              <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                  >Jets de sauv.</span
-                >
-                <span class="text-xs text-slate-200 font-medium line-clamp-2">
-                  {{ cls.data.proficiencies.saving_throws | gameIdLabels : ', ' : '—' }}
-                </span>
-              </div>
-              <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                  >Armures</span
-                >
-                <span class="text-xs text-slate-200 font-medium line-clamp-2">
-                  {{ cls.data.proficiencies.armor | gameIdLabels : ', ' : 'Aucune' }}
-                </span>
-              </div>
-            </div>
-
+            <p class="dg-entry-facts">
+              <span>{{ cls.data.proficiencies.saving_throws | gameIdLabels : ', ' : '—' }}</span>
+              <span>{{ cls.data.proficiencies.armor | gameIdLabels : ', ' : 'Aucune armure' }}</span>
+            </p>
+            <p class="dg-entry-blurb">{{ classSummary(cls) }}</p>
           </div>
         </a>
       } @empty {

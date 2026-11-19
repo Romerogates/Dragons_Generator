@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import { GameIdLabelPipe } from '@shared/pipes/game-id-label.pipe';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import {
@@ -28,7 +29,7 @@ import type { Spell } from '@core/models/Spells/spell';
 @Component({
   selector: 'app-spell-by-id',
   standalone: true,
-  imports: [RouterLink, GameIdLabelPipe, CodexDetailShell, LightMarkdownPipe],
+  imports: [RouterLink, GameIdLabelPipe, CodexDetailShell, LightMarkdownPipe, CodexGlyph],
   templateUrl: './spell-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

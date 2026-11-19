@@ -12,7 +12,7 @@
     <div class="flex items-center gap-6 mb-12 w-full max-w-3xl">
       <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
       <h1
-        class="text-3xl md:text-4xl font-bold text-slate-200 font-serif tracking-widest uppercase drop-shadow-md text-center"
+        class="dg-page-title"
       >
         Catégories <span class="text-amber-500">Marchandes</span>
       </h1>
@@ -40,16 +40,16 @@
             <div
               class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
             >
-              <iconify-icon [icon]="getTypeIcon(t)"></iconify-icon>
+              <app-codex-glyph [icon]="getTypeIcon(t)" size="4.5rem"></app-codex-glyph>
             </div>
 
             <span
-              class="text-5xl mb-4 drop-shadow-sm group-hover:scale-[1.01] transition-transform origin-bottom relative z-10"
+              class="mb-4 drop-shadow-sm group-hover:scale-[1.01] transition-transform origin-bottom relative z-10"
             >
-              <iconify-icon [icon]="getTypeIcon(t)"></iconify-icon>
+              <app-codex-glyph [icon]="getTypeIcon(t)" [alt]="translateType(t)" size="4.5rem"></app-codex-glyph>
             </span>
             <h2
-              class="text-lg font-bold text-slate-300 font-serif tracking-widest uppercase group-hover:text-amber-400 transition-colors relative z-10"
+              class="text-lg font-bold text-slate-200 font-serif group-hover:text-amber-400 transition-colors relative z-10"
             >
               {{ translateType(t) }}
             </h2>

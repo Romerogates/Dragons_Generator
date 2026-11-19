@@ -20,6 +20,7 @@ import {
   creatureBlockBody,
   formatChallengeRating,
   getCreatureCategoryLabel,
+  getCreatureIcon,
   tidyCreatureLore,
   visibleCreatureBlocks,
 } from '@core/utils/creature-display.util';
@@ -29,11 +30,12 @@ import {
   combatantFromCreature,
 } from '@core/utils/combat-creature-import.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-creature-by-id',
   standalone: true,
-  imports: [RouterLink, CodexDetailShell],
+  imports: [RouterLink, CodexDetailShell, CodexGlyph],
   templateUrl: './creature-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -94,6 +96,7 @@ export class CreatureById {
   protected lore = tidyCreatureLore;
   protected visibleBlocks = visibleCreatureBlocks;
   protected blockBody = creatureBlockBody;
+  protected portraitIcon = getCreatureIcon;
 
   protected abilityKeys(creature: Creature): string[] {
     return ['str', 'dex', 'con', 'int', 'wis', 'cha'].filter((k) => creature.abilities[k]);

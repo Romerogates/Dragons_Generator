@@ -155,6 +155,23 @@ describe('Navbar', () => {
     expect(component.mobileMenuMounted()).toBeTrue();
   });
 
+  it('opens the Plus sheet from the bottom rail and hides the header burger', () => {
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeNull();
+    const more = fixture.nativeElement.querySelector('[data-testid="bottom-nav-more"]') as HTMLButtonElement | null;
+    expect(more).toBeTruthy();
+    more?.click();
+    fixture.detectChanges();
+    expect(component.mobileOpen()).toBeTrue();
+    expect(fixture.nativeElement.querySelector('[data-testid="mobile-more-sheet"]')).toBeTruthy();
+  });
+
+  it('keeps the header burger on the forge where the bottom rail is hidden', () => {
+    component.forgeRoute.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="mobile-bottom-nav"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-testid="nav-hamburger"]')).toBeTruthy();
+  });
+
   it('badges unseen announcements until the banner is dismissed', () => {
     const announcement = (id: string): NotificationItem => ({
       key: `announcement-${id}`,

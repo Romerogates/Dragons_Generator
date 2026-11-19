@@ -9,11 +9,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
+import { getEquipmentCategoryIcon } from '@core/utils/equipment-display.util';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-equipment-types',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexGlyph],
   templateUrl: './equipment-types.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -48,25 +50,7 @@ export class EquipmentTypes implements OnInit {
     return map[type.toUpperCase()] || type;
   }
 
-  /** Associe une icône Iconify selon le type de la catégorie */
   getTypeIcon(type: string): string {
-    switch (type.toUpperCase()) {
-      case 'WEAPON':
-        return 'fluent-emoji:crossed-swords';
-      case 'ARMOR':
-        return 'fluent-emoji:shield';
-      case 'MOUNT':
-        return 'fluent-emoji:horse';
-      case 'VEHICLE':
-        return 'fluent-emoji:sailboat';
-      case 'TOOL':
-        return 'fluent-emoji:hammer-and-wrench';
-      case 'GEAR':
-        return 'fluent-emoji:backpack';
-      case 'SERVICE':
-        return 'fluent-emoji:beer-mug'; // La pinte de bière pour la taverne/les services, un classique !
-      default:
-        return 'fluent-emoji:package';
-    }
+    return getEquipmentCategoryIcon(type);
   }
 }

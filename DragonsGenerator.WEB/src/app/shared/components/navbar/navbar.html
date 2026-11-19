@@ -39,7 +39,7 @@
             (click)="closeMenus()"
             data-testid="nav-campaigns"
           >
-            <span class="text-[10px] font-black uppercase tracking-widest">Campagnes</span>
+            <span class="text-sm font-semibold tracking-wide">Campagnes</span>
             @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
               <span
                 class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[var(--dg-surface)]"
@@ -60,7 +60,7 @@
               (click)="closeMenus()"
               [attr.data-testid]="'nav-' + (link.path === '/characters' ? 'characters' : 'dungeons')"
             >
-              <span class="text-[10px] font-black uppercase tracking-widest">{{ link.label }}</span>
+              <span class="text-sm font-semibold tracking-wide">{{ link.label }}</span>
             </a>
           }
 
@@ -72,7 +72,7 @@
               (click)="closeMenus()"
               data-testid="nav-agenda"
             >
-              <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Agenda</span>
+              <span class="text-sm font-semibold tracking-wide text-slate-200">Agenda</span>
             </a>
           }
         </div>
@@ -84,7 +84,7 @@
           <a
             routerLink="/guide"
             routerLinkActive="text-emerald-400"
-            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors"
+            class="relative h-10 flex items-center px-3 rounded-lg text-sm font-semibold tracking-wide text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors"
             (click)="closeMenus()"
             data-testid="nav-guide"
           >
@@ -100,7 +100,7 @@
           <a
             routerLink="/friends"
             routerLinkActive="text-violet-400"
-            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            class="relative h-10 flex items-center px-3 rounded-lg text-sm font-semibold tracking-wide text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
             (click)="closeMenus()"
             data-testid="nav-friends"
           >
@@ -116,7 +116,7 @@
           <div class="relative" data-codex-menu>
             <button
               type="button"
-              class="h-10 flex items-center gap-1.5 px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] transition-colors"
+              class="h-10 flex items-center gap-1.5 px-3 rounded-lg text-sm font-semibold tracking-wide transition-colors"
               [class]="
                 codexOpen() || isCodexActive()
                   ? 'text-amber-400 bg-amber-950/25'
@@ -240,7 +240,7 @@
         <div class="relative hidden sm:block" data-account-menu>
           <button
             type="button"
-            class="h-10 flex items-center gap-2 px-2 sm:px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            class="h-10 flex items-center gap-2 px-2 sm:px-3 rounded-lg text-sm font-semibold tracking-wide text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
             (click)="toggleAccount($event)"
           >
             @if (auth.isLoggedIn() && auth.user(); as u) {
@@ -363,60 +363,83 @@
           }
         </div>
 
-        <button
-          type="button"
-          class="lg:hidden relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
-          [attr.aria-expanded]="mobileOpen()"
-          aria-label="Ouvrir le menu"
-          (click)="toggleMobile()"
-        >
-          @if (mobileOpen()) {
-            <span class="text-lg leading-none">✕</span>
-          } @else {
-            <span class="flex flex-col gap-1.5 w-4">
-              <span class="block h-0.5 w-full bg-current rounded-full"></span>
-              <span class="block h-0.5 w-full bg-current rounded-full"></span>
-              <span class="block h-0.5 w-full bg-current rounded-full"></span>
-            </span>
-          }
-          @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0) {
-            <span
-              class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
-              >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
-            >
-          }
-        </button>
+        @if (forgeRoute()) {
+          <button
+            type="button"
+            class="lg:hidden relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+            [attr.aria-expanded]="mobileOpen()"
+            aria-label="Ouvrir le menu"
+            data-testid="nav-hamburger"
+            (click)="toggleMobile()"
+          >
+            @if (mobileOpen()) {
+              <span class="text-lg leading-none">✕</span>
+            } @else {
+              <span class="flex flex-col gap-1.5 w-4">
+                <span class="block h-0.5 w-full bg-current rounded-full"></span>
+                <span class="block h-0.5 w-full bg-current rounded-full"></span>
+                <span class="block h-0.5 w-full bg-current rounded-full"></span>
+              </span>
+            }
+            @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0) {
+              <span
+                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
+              >
+            }
+          </button>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Mobile panel : monté une fois, puis masqué (évite de recharger Iconify à chaque burger). -->
-  @if (mobileMenuMounted()) {
-    <div
-      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
-      [class.hidden]="!mobileOpen()"
-      [attr.aria-hidden]="mobileOpen() ? null : 'true'"
-      [attr.inert]="mobileOpen() ? null : ''"
-    >
-      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
-        <a
-          routerLink="/campaigns"
-          class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-          (click)="closeMenus()"
-        >
-          <span class="flex items-center gap-3">
-            <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:crossed-swords"></iconify-icon
-            ></span>
-            <span class="text-sm font-bold tracking-wide">Campagnes</span>
-          </span>
-          @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
-            <span
-              class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
-              >{{ formatBadgeCount(campaignsActionCount()) }}</span
-            >
-          }
-        </a>
+</nav>
+
+<!-- Mobile panel : monté une fois, puis masqué (évite de recharger Iconify à chaque burger). -->
+@if (mobileMenuMounted()) {
+  <button
+    type="button"
+    class="lg:hidden fixed inset-0 z-[44] bg-black/50"
+    [class.hidden]="!mobileOpen()"
+    [attr.aria-hidden]="mobileOpen() ? null : 'true'"
+    [attr.tabindex]="mobileOpen() ? 0 : -1"
+    data-testid="mobile-more-backdrop"
+    aria-label="Fermer le menu"
+    (click)="closeMenus()"
+  ></button>
+  <div
+    class="lg:hidden fixed inset-x-0 z-[46] flex max-h-[min(70dvh,calc(100dvh-5rem))] flex-col overflow-y-auto overscroll-contain rounded-t-2xl border-t border-slate-700 bg-[#171b22]/98 shadow-[0_-12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+    [class.hidden]="!mobileOpen()"
+    [class.bottom-0]="forgeRoute()"
+    [class.bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))]]="!forgeRoute()"
+    [attr.aria-hidden]="mobileOpen() ? null : 'true'"
+    [attr.inert]="mobileOpen() ? null : ''"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Plus"
+    data-testid="mobile-more-sheet"
+  >
+    <div class="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-1">
+        @if (forgeRoute()) {
+          <a
+            routerLink="/campaigns"
+            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="flex items-center gap-3">
+              <span class="text-xl"
+                ><iconify-icon noobserver icon="fluent-emoji:crossed-swords"></iconify-icon
+              ></span>
+              <span class="text-sm font-bold tracking-wide">Table</span>
+            </span>
+            @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
+              <span
+                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
+                >{{ formatBadgeCount(campaignsActionCount()) }}</span
+              >
+            }
+          </a>
+        }
 
         @for (link of workshopLinks; track link.path) {
           <a
@@ -663,7 +686,75 @@
             <span class="text-sm font-bold tracking-wide">Créer un compte</span>
           </a>
         }
-      </div>
     </div>
-  }
-</nav>
+  </div>
+}
+
+@if (!forgeRoute()) {
+  <nav
+    class="lg:hidden fixed bottom-0 inset-x-0 z-[47] border-t border-slate-800 bg-[var(--dg-surface)]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)]"
+    data-testid="mobile-bottom-nav"
+    aria-label="Navigation principale"
+  >
+    <div class="grid grid-cols-5 h-14">
+      <a
+        routerLink="/campaigns"
+        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+        [class]="isNavPathActive('/campaigns') ? 'text-amber-300' : 'text-slate-400'"
+        data-testid="bottom-nav-campaigns"
+      >
+        <iconify-icon noobserver icon="fluent-emoji:crossed-swords" width="1.25em" height="1.25em"></iconify-icon>
+        Table
+      </a>
+      <a
+        routerLink="/create"
+        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+        [class]="isNavPathActive('/create') ? 'text-amber-300' : 'text-slate-400'"
+        data-testid="bottom-nav-forge"
+      >
+        <iconify-icon noobserver icon="fluent-emoji:hammer-and-pick" width="1.25em" height="1.25em"></iconify-icon>
+        Forge
+      </a>
+      <a
+        routerLink="/codex"
+        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+        [class]="isCodexActive() ? 'text-amber-300' : 'text-slate-400'"
+        data-testid="bottom-nav-codex"
+      >
+        <iconify-icon noobserver icon="fluent-emoji:open-book" width="1.25em" height="1.25em"></iconify-icon>
+        Codex
+      </a>
+      <a
+        [routerLink]="auth.isLoggedIn() ? '/profile' : '/login'"
+        class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+        [class]="isNavPathActive('/profile') || isNavPathActive('/login') ? 'text-amber-300' : 'text-slate-400'"
+        data-testid="bottom-nav-account"
+      >
+        <iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette" width="1.25em" height="1.25em"></iconify-icon>
+        Compte
+      </a>
+      <button
+        type="button"
+        class="relative flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+        [class]="mobileOpen() ? 'text-amber-300' : 'text-slate-400'"
+        [attr.aria-expanded]="mobileOpen()"
+        aria-label="Plus"
+        data-testid="bottom-nav-more"
+        (click)="toggleMobile(); $event.stopPropagation()"
+      >
+        @if (mobileOpen()) {
+          <span class="text-base leading-none">✕</span>
+        } @else {
+          <span class="text-base leading-none" aria-hidden="true">⋯</span>
+        }
+        Plus
+        @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0 && !mobileOpen()) {
+          <span
+            class="absolute top-1 right-[18%] min-w-[1rem] h-4 px-0.5 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
+            >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
+          >
+        }
+      </button>
+    </div>
+  </nav>
+}

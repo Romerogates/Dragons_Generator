@@ -1,0 +1,44 @@
+Vendored equipment portraits. Painterly Flare / OSARE family, CC0.
+
+Armor torsos (cloth, robes, leather, mail, plate)
+  https://opengameart.org/content/armor-icons-by-equipment-slot-with-transparency
+  Original: https://opengameart.org/content/armor-icons-by-equipment-slot
+  Artists: Clint Bellanger, Blarumyrran, crowline (CrowLineStudio), Justin Nichol
+  License: CC0 1.0
+  Full sheet: source-flare-armor.png
+
+OSARE weapons, clothes, shields
+  https://opengameart.org/content/osare-weapon-icons
+  Artist: Blarumyrran (over 3D renders by pfunked)
+  License: CC0 1.0
+  Files: dagger, shortsword, longsword, greatsword, shortbow, longbow, greatbow,
+  staff, greatstaff, wand, rod, slingshot, clothes, shield, buckler
+
+Flare weapon icons 2 (axes, hammers, clubs, zweihander)
+  https://opengameart.org/content/flare-weapon-icons-2
+  Artists: Clint Bellanger, Justin Nichol
+  License: CC0 1.0
+
+Books (book.png cropped from the sheet)
+  https://opengameart.org/content/flare-item-variation-60x60-only
+  Artist: Mumu (edits of Flare icons)
+  License: CC0 1.0
+
+Original portraits for missing weapons (cestus.png, whip.png, net.png)
+  Painted item icons created for Dragons Generator (ceste, fouet, filet).
+  Not from Flare / OSARE. No third-party copyrighted art was copied.
+
+Adventure gear portraits (adv-*.png)
+  Item icons created for Dragons Generator (sac, corde, lanterne, bélier, billes…).
+  Family portraits: several objects may share one image when they look alike.
+  Not from Flare / OSARE. No third-party copyrighted art was copied.
+
+UI / Codex portraits (ui-*.png)
+  Dragon, sparkles, scroll, skull, fire, search, map, temple, trophy, eye, person,
+  wolf, goblin, folder, star, impact, crown, dna, warning, calendar.
+  Created for Dragons Generator. No third-party copyrighted art was copied.
+
+Category tiles (cat-*.png) and remaining families
+  cat-weapon, cat-armor, cat-gear, cat-mount, cat-tool, cat-vehicle, cat-service.
+  Mounts mnt-*, vehicles vhc-*, tools tl-*, services sv-*.
+  Created for Dragons Generator. No third-party copyrighted art was copied.

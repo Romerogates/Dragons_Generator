@@ -5,9 +5,7 @@
     class="relative w-full flex flex-col items-center border-b border-slate-800 pt-16 pb-12 md:pt-24 md:pb-16"
   >
     <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-100 font-serif tracking-widest uppercase mb-4">
-        Dons
-      </h1>
+      <h1 class="dg-page-title mb-4">Dons</h1>
       <p class="text-sm text-slate-400 italic mb-8 max-w-xl font-serif">
         Aptitudes optionnelles obtenues en lieu et place d'une augmentation de caractéristique.
       </p>
@@ -69,62 +67,18 @@
     } @else if (feats() === null) {
       <p class="text-center text-slate-500 py-20 animate-pulse">Chargement...</p>
     } @else {
-      <p class="text-amber-500/80 text-[10px] font-black uppercase tracking-widest mb-6">
-        {{ filteredFeats().length }} don(s)
-      </p>
+      <p class="dg-count mb-5">{{ filteredFeats().length }} dons</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         @for (feat of filteredFeats(); track feat.id) {
-          <a
-            [routerLink]="['/feats', feat.id]"
-            class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
-          >
-            <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
-              <div class="flex items-start gap-3 mb-4">
-                <span class="text-3xl shrink-0 leading-none pt-0.5"
-                  ><iconify-icon [icon]="featIcon(feat.category)"></iconify-icon
-                ></span>
-                <div>
-                  <h2 class="text-xl font-bold text-amber-400 font-serif group-hover:underline">
-                    {{ feat.name }}
-                  </h2>
-                  <div class="flex flex-wrap gap-2 mt-1">
-                    @if (feat.category) {
-                      <span class="text-[9px] font-black uppercase tracking-wider text-slate-500">{{
-                        categoryLabel(feat.category)
-                      }}</span>
-                    }
-                    @if (feat.requiresMagic) {
-                      <span class="bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase">Magie</span>
-                    }
-                    @if (feat.repeatable) {
-                      <span class="bg-sky-950/40 text-sky-400 border border-sky-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase">Répétable</span>
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
-                « {{ featSummary(feat) }} »
-              </p>
-
-              <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >Catégorie</span
-                  >
-                  <span class="text-xs text-amber-300 font-medium">{{
-                    categoryLabel(feat.category)
-                  }}</span>
-                </div>
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >Tags</span
-                  >
-                  <span class="text-xs text-slate-200 font-medium">{{ feat.tags.length || '—' }}</span>
-                </div>
-              </div>
-
+          <a [routerLink]="['/feats', feat.id]" class="dg-entry">
+            <div class="dg-entry-art">
+              <iconify-icon [icon]="featIcon(feat.category)" width="2.5em" height="2.5em"></iconify-icon>
+            </div>
+            <div class="dg-entry-body">
+              <h2 class="dg-entry-title">{{ feat.name }}</h2>
+              <p class="dg-entry-meta">{{ categoryLabel(feat.category) }}</p>
+              <p class="dg-entry-blurb">{{ featSummary(feat) }}</p>
             </div>
           </a>
         }

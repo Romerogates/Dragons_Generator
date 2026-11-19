@@ -16,6 +16,7 @@ const TIME_UNIT_LABELS: Record<string, string> = {
   action: 'action',
   actions: 'actions',
   bonus_action: 'action bonus',
+  action_bonus: 'action bonus',
   bonus: 'action bonus',
   reaction: 'réaction',
   minute: 'min',

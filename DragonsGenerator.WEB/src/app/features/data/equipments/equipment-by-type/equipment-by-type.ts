@@ -11,11 +11,17 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Equipment } from '@core/models/Equipments/equipment';
+import {
+  equipmentCardBlurb,
+  equipmentSubtypeLabel,
+  getEquipmentIcon,
+} from '@core/utils/equipment-display.util';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-equipments-by-type',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexGlyph],
   templateUrl: './equipment-by-type.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -99,33 +105,15 @@ export class EquipmentsByType implements OnInit {
   }
 
   translateSubtype(subtype: string | null): string {
-    if (!subtype) return '—';
-    const map: Record<string, string> = {
-      SIMPLE_MELEE: 'Courante (Mêlée)',
-      SIMPLE_RANGED: 'Courante (Distance)',
-      MARTIAL_MELEE: 'Guerre (Mêlée)',
-      MARTIAL_RANGED: 'Guerre (Distance)',
-      LIGHT: 'Légère',
-      MEDIUM: 'Intermédiaire',
-      HEAVY: 'Lourde',
-      SHIELD: 'Bouclier',
-      ANIMAL: 'Animal',
-      LAND: 'Terrestre',
-      WATER: 'Maritime',
-      AIR: 'Aérien',
-      CONTAINER: 'Contenant',
-    };
-    return map[subtype] || subtype;
+    return equipmentSubtypeLabel(subtype) || '—';
   }
 
-  equipmentSummary(eq: Equipment): string {
-    const desc = eq.data?.desc?.trim();
-    if (desc) {
-      const short = desc.slice(0, 180);
-      return short + (desc.length > 180 ? '…' : '');
-    }
-    const subtype = eq.subtype ? this.translateSubtype(eq.subtype) : '';
-    return `${this.translateType(eq.type)}${subtype !== '—' ? ` · ${subtype}` : ''}.`;
+  equipmentSummary(eq: Equipment): string | null {
+    return equipmentCardBlurb({
+      type: eq.type,
+      subtype: eq.subtype,
+      data: (eq.data ?? undefined) as unknown as Record<string, unknown> | undefined,
+    });
   }
 
   formatCost(eq: Equipment): string {
@@ -134,29 +122,6 @@ export class EquipmentsByType implements OnInit {
   }
 
   getTypeIcon(eq: Equipment): string {
-    switch (eq.type) {
-      case 'WEAPON':
-        return eq.subtype?.includes('RANGED')
-          ? 'fluent-emoji:bow-and-arrow'
-          : 'fluent-emoji:crossed-swords';
-      case 'ARMOR':
-        return eq.subtype === 'SHIELD' ? 'fluent-emoji:shield' : 'fluent-emoji:military-helmet';
-      case 'MOUNT':
-        return 'fluent-emoji:horse';
-      case 'VEHICLE':
-        return eq.subtype === 'WATER'
-          ? 'fluent-emoji:sailboat'
-          : eq.subtype === 'AIR'
-            ? 'fluent-emoji:cloud'
-            : 'fluent-emoji:shopping-cart';
-      case 'TOOL':
-        return 'fluent-emoji:hammer-and-wrench';
-      case 'GEAR':
-        return eq.subtype === 'CONTAINER' ? 'fluent-emoji:backpack' : 'fluent-emoji:compass';
-      case 'SERVICE':
-        return 'fluent-emoji:beer-mug';
-      default:
-        return 'fluent-emoji:backpack';
-    }
+    return getEquipmentIcon(eq);
   }
 }

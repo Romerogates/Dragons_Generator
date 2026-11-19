@@ -1,0 +1,147 @@
+/** Mappe un id Iconify `fluent-emoji:*` vers un portrait peint `/assets/equipment/…`. */
+
+const A = (file: string) => `/assets/equipment/${file}`;
+
+const EXACT: Record<string, string> = {
+  'fluent-emoji:dragon': A('ui-dragon.png'),
+  'fluent-emoji:dragon-face': A('ui-dragon.png'),
+  'fluent-emoji:sparkles': A('ui-sparkles.png'),
+  'fluent-emoji:magic-wand': A('wand.png'),
+  'fluent-emoji:glowing-star': A('ui-star.png'),
+  'fluent-emoji:star': A('ui-star.png'),
+  'fluent-emoji:scroll': A('ui-scroll.png'),
+  'fluent-emoji:shield': A('cat-armor.png'),
+  'fluent-emoji:crossed-swords': A('cat-weapon.png'),
+  'fluent-emoji:skull': A('ui-skull.png'),
+  'fluent-emoji:skull-and-crossbones': A('ui-skull.png'),
+  'fluent-emoji:fire': A('ui-fire.png'),
+  'fluent-emoji:high-voltage': A('ui-fire.png'),
+  'fluent-emoji:collision': A('ui-impact.png'),
+  'fluent-emoji:magnifying-glass-tilted-right': A('ui-search.png'),
+  'fluent-emoji:magnifying-glass-tilted-left': A('ui-search.png'),
+  'fluent-emoji:world-map': A('ui-map.png'),
+  'fluent-emoji:globe-showing-europe-africa': A('ui-map.png'),
+  'fluent-emoji:compass': A('ui-map.png'),
+  'fluent-emoji:classical-building': A('ui-temple.png'),
+  'fluent-emoji:castle': A('ui-temple.png'),
+  'fluent-emoji:japanese-castle': A('ui-temple.png'),
+  'fluent-emoji:hindu-temple': A('ui-temple.png'),
+  'fluent-emoji:place-of-worship': A('ui-temple.png'),
+  'fluent-emoji:dna': A('ui-dna.png'),
+  'fluent-emoji:trophy': A('ui-trophy.png'),
+  'fluent-emoji:eye': A('ui-eye.png'),
+  'fluent-emoji:crystal-ball': A('adv-orb.png'),
+  'fluent-emoji:bust-in-silhouette': A('ui-person.png'),
+  'fluent-emoji:busts-in-silhouette': A('ui-person.png'),
+  'fluent-emoji:person': A('ui-person.png'),
+  'fluent-emoji:speaking-head': A('ui-person.png'),
+  'fluent-emoji:wolf': A('ui-wolf.png'),
+  'fluent-emoji:goblin': A('ui-goblin.png'),
+  'fluent-emoji:ogre': A('ui-goblin.png'),
+  'fluent-emoji:troll': A('ui-goblin.png'),
+  'fluent-emoji:file-folder': A('ui-folder.png'),
+  'fluent-emoji:card-index-dividers': A('ui-folder.png'),
+  'fluent-emoji:file-cabinet': A('ui-folder.png'),
+  'fluent-emoji:crown': A('ui-crown.png'),
+  'fluent-emoji:warning': A('ui-warning.png'),
+  'fluent-emoji:calendar': A('ui-calendar.png'),
+  'fluent-emoji:spiral-calendar': A('ui-calendar.png'),
+  'fluent-emoji:books': A('book.png'),
+  'fluent-emoji:open-book': A('book.png'),
+  'fluent-emoji:bookmark-tabs': A('book.png'),
+  'fluent-emoji:horse': A('mnt-horse.png'),
+  'fluent-emoji:dog': A('mnt-dog.png'),
+  'fluent-emoji:elephant': A('mnt-elephant.png'),
+  'fluent-emoji:game-die': A('tl-dice.png'),
+  'fluent-emoji:hammer-and-wrench': A('cat-tool.png'),
+  'fluent-emoji:hammer-and-pick': A('smith-hammer.png'),
+  'fluent-emoji:gear': A('cat-tool.png'),
+  'fluent-emoji:wrench': A('adv-crowbar.png'),
+  'fluent-emoji:backpack': A('adv-backpack.png'),
+  'fluent-emoji:package': A('adv-backpack.png'),
+  'fluent-emoji:axe': A('battle-axe.png'),
+  'fluent-emoji:bow-and-arrow': A('longbow.png'),
+  'fluent-emoji:dagger': A('dagger.png'),
+  'fluent-emoji:banjo': A('tl-lute.png'),
+  'fluent-emoji:violin': A('tl-lute.png'),
+  'fluent-emoji:musical-note': A('tl-lute.png'),
+  'fluent-emoji:musical-notes': A('tl-lute.png'),
+  'fluent-emoji:herb': A('adv-hay.png'),
+  'fluent-emoji:sailboat': A('vhc-ship.png'),
+  'fluent-emoji:bell': A('adv-bell.png'),
+  'fluent-emoji:key': A('tl-key.png'),
+  'fluent-emoji:locked': A('adv-lock.png'),
+  'fluent-emoji:locked-with-key': A('adv-lock.png'),
+  'fluent-emoji:test-tube': A('adv-vial.png'),
+  'fluent-emoji:hot-beverage': A('sv-tankard.png'),
+  'fluent-emoji:camping': A('adv-tent.png'),
+};
+
+/** Mots-clés dans l’id Iconify → portrait de famille. */
+const GROUPS: readonly (readonly [readonly string[], string])[] = [
+  [['vampire', 'zombie', 'ghost', 'skull'], A('ui-skull.png')],
+  [['dragon'], A('ui-dragon.png')],
+  [['wolf', 'fox', 'paw', 'lion', 'bear', 'cat', 'boar', 'deer', 'goat', 'ox', 'rat'], A('ui-wolf.png')],
+  [['spider', 'bug', 'ant', 'scorpion', 'microbe', 'snake', 'lizard', 'frog', 'bat'], A('ui-goblin.png')],
+  [['bird', 'eagle', 'owl', 'honeybee'], A('ui-dragon.png')],
+  [['shark', 'dolphin', 'octopus', 'crocodile'], A('vhc-ship.png')],
+  [['elf', 'fairy', 'angel', 'halo', 'mage', 'ninja', 'fairy'], A('ui-person.png')],
+  [['horns', 'angry', 'ogre', 'troll', 'goblin', 'disguised'], A('ui-goblin.png')],
+  [['sparkle', 'wand', 'magic', 'star', 'sun', 'glow'], A('ui-sparkles.png')],
+  [['scroll', 'page', 'memo', 'clipboard', 'newspaper', 'envelope', 'pencil', 'writing', 'label'], A('ui-scroll.png')],
+  [['book'], A('book.png')],
+  [['shield'], A('cat-armor.png')],
+  [['sword', 'dagger', 'axe', 'bow'], A('cat-weapon.png')],
+  [['fire', 'voltage', 'collision', 'anger'], A('ui-fire.png')],
+  [['search', 'magnifying'], A('ui-search.png')],
+  [['map', 'globe', 'compass', 'mountain', 'desert', 'island', 'city', 'house', 'door'], A('ui-map.png')],
+  [['temple', 'castle', 'worship', 'building', 'latin-cross', 'prayer'], A('ui-temple.png')],
+  [['dna'], A('ui-dna.png')],
+  [['trophy', 'crown'], A('ui-trophy.png')],
+  [['eye', 'crystal', 'orb'], A('ui-eye.png')],
+  [['bust', 'person', 'handshake', 'hand', 'fist', 'biceps', 'cartwheel', 'lotus', 'running', 'raising', 'waving', 'folded'], A('ui-person.png')],
+  [['folder', 'cabinet', 'dividers', 'inbox', 'floppy', 'printer', 'wastebasket'], A('ui-folder.png')],
+  [['calendar', 'hourglass', 'stopwatch'], A('ui-calendar.png')],
+  [['warning', 'information', 'question', 'cross-mark'], A('ui-warning.png')],
+  [['die', 'joker', 'circus'], A('tl-dice.png')],
+  [['hammer', 'gear', 'wrench', 'pick', 'ruler'], A('cat-tool.png')],
+  [['backpack', 'package', 'gift'], A('adv-backpack.png')],
+  [['horse', 'dog', 'elephant'], A('mnt-horse.png')],
+  [['herb', 'clover', 'seedling', 'tree', 'four-leaf'], A('adv-hay.png')],
+  [['lute', 'banjo', 'violin', 'musical'], A('tl-lute.png')],
+  [['bell', 'loudspeaker', 'speech'], A('adv-bell.png')],
+  [['lock', 'key', 'link'], A('adv-lock.png')],
+  [['boat', 'sail'], A('vhc-ship.png')],
+  [['tent', 'camping'], A('adv-tent.png')],
+  [['heart', 'medical', 'anatomical'], A('adv-kit.png')],
+  [['coin', 'balance'], A('ui-crown.png')],
+  [['cyclone', 'cloud', 'snowflake', 'butterfly', 'new-moon'], A('ui-sparkles.png')],
+  [['robot', 'rocket', 'mobile', 'chart', 'bar-chart'], A('cat-tool.png')],
+  [['film', 'framed', 'picture'], A('ui-folder.png')],
+  [['check-mark'], A('ui-star.png')],
+  [['identification', 'input-latin'], A('ui-scroll.png')],
+  [['performing-arts'], A('clothes.png')],
+  [['brain', 'ear'], A('ui-person.png')],
+  [['rock', 'flexed'], A('ui-impact.png')],
+  [['counterclockwise'], A('ui-search.png')],
+  [['test-tube'], A('adv-vial.png')],
+  [['spider-web'], A('net.png')],
+];
+
+export function isPaintedAssetPath(icon: string): boolean {
+  return icon.startsWith('/assets/');
+}
+
+/** Portrait peint pour un id Iconify ou un chemin déjà `/assets/…`. */
+export function resolvePaintedIcon(icon: string | null | undefined): string {
+  const raw = (icon ?? '').trim();
+  if (!raw) return A('adv-backpack.png');
+  if (raw.startsWith('/assets/')) return raw;
+  const mapped = EXACT[raw];
+  if (mapped) return mapped;
+  const id = raw.startsWith('fluent-emoji:') ? raw.slice('fluent-emoji:'.length) : raw;
+  for (const [keys, file] of GROUPS) {
+    if (keys.some((k) => id.includes(k))) return file;
+  }
+  return A('ui-sparkles.png');
+}

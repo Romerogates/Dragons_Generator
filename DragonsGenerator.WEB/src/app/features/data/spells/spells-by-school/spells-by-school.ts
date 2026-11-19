@@ -13,12 +13,11 @@ import { DataService } from '@core/services/data.service';
 import { Spell } from '@core/models/Spells/spell';
 import { CommonModule } from '@angular/common';
 import { spellSchoolLabel } from '@core/utils/spell-display.util';
-import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-spells-by-school',
   standalone: true,
-  imports: [CommonModule, RouterLink, GameIdLabelsPipe],
+  imports: [CommonModule, RouterLink],
   templateUrl: './spells-by-school.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

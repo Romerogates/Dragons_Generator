@@ -41,13 +41,11 @@ export interface CodexNextEntry {
       >
         <a
           [routerLink]="backLink()"
-          class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-200"
+          class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
         >
           ← {{ backLabel() }}
         </a>
         <div class="min-w-0 flex-1 text-center px-2">
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Codex · Échap</p>
-          <p class="text-sm font-serif truncate" [class]="accentTextClass()">{{ title() }}</p>
           @if (breadcrumbs().length) {
             <nav
               class="mt-1 flex flex-wrap items-center justify-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-600"
@@ -69,7 +67,7 @@ export interface CodexNextEntry {
         @if (nextEntry(); as next) {
           <a
             [routerLink]="next.path"
-            class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-200 max-w-[9rem] truncate"
+            class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-sm font-semibold text-slate-400 hover:text-slate-200 max-w-[9rem] truncate"
             [attr.title]="next.label"
           >
             Suivant →

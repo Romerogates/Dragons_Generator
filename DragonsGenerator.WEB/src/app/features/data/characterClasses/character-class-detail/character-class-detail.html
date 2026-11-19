@@ -4,73 +4,36 @@
   [title]="c?.name ?? 'Classe'"
   backLink="/classes"
   backLabel="Classes"
-  accent="sky"
+  accent="amber"
 >
     @if (!c) {
-      <p class="text-center py-32 text-slate-500 animate-pulse font-serif tracking-widest uppercase">
-        Consultation des archives...
+      <p class="text-center py-32 text-slate-500 animate-pulse font-serif">
+        Consultation des archives…
       </p>
     } @else {
-      <header class="text-center mb-12">
-        <span class="text-5xl mb-4 block drop-shadow-md">
-          <iconify-icon [icon]="iconFor(c.id)" width="1em" height="1em"></iconify-icon>
+      <header class="text-center mb-8">
+        <span class="mb-3 block">
+          <app-codex-glyph [icon]="iconFor(c.id)" [alt]="c.name" size="3.5rem"></app-codex-glyph>
         </span>
-        <h1
-          class="text-4xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
-        >
-          {{ c.name }}
-        </h1>
+        <h1 class="dg-page-title text-amber-400 mb-3">{{ c.name }}</h1>
         @if (c.data.flavor?.summary) {
-          <p class="text-sm md:text-base text-slate-400 italic max-w-2xl mx-auto mb-6 leading-relaxed">
+          <p class="dg-page-lead mx-auto mb-4">
             {{ c.data.flavor?.summary }}
           </p>
         }
-        <div class="flex flex-wrap justify-center gap-3">
-          <div
-            class="bg-rose-950/30 border border-rose-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
-          >
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:game-die"></iconify-icon></span>
-            <div class="text-left">
-              <span class="block text-[9px] text-rose-500/80 font-black uppercase tracking-widest"
-                >Dé de vie</span
-              >
-              <span class="text-rose-400 font-bold">d{{ c.data.hit_die }}</span>
-            </div>
-          </div>
-          <div
-            class="bg-emerald-950/30 border border-emerald-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
-          >
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
-            <div class="text-left">
-              <span
-                class="block text-[9px] text-emerald-500/80 font-black uppercase tracking-widest"
-                >Caractéristiques clés</span
-              >
-              <span class="text-emerald-400 font-bold text-sm tracking-wider">{{
-                c.data.primary_abilities | gameIdLabels
-              }}</span>
-            </div>
-          </div>
-        </div>
+        <p class="dg-entry-meta mb-4">
+          d{{ c.data.hit_die }} · {{ c.data.primary_abilities | gameIdLabels }}
+        </p>
         @if (playGuidePath(c.id); as guidePath) {
-          <p class="mt-6">
-            <a
-              [routerLink]="guidePath"
-              class="inline-flex items-center min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-amber-700/50 text-amber-200 hover:border-amber-500/70 hover:bg-amber-950/30 transition-colors"
-            >
-              Comment jouer cette classe →
-            </a>
+          <p class="mt-2">
+            <a [routerLink]="guidePath" class="dg-toolbar-link">Comment jouer cette classe →</a>
           </p>
         }
         @if (c.data.spellcasting) {
-          <p class="mt-3">
-            <a
-              [routerLink]="['/spells']"
-              [queryParams]="{ class: c.id }"
-              class="inline-flex items-center min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-fuchsia-700/50 text-fuchsia-200 hover:border-fuchsia-500/70 hover:bg-fuchsia-950/30 transition-colors"
+          <p class="mt-2">
+            <a [routerLink]="['/spells']" [queryParams]="{ class: c.id }" class="dg-toolbar-link"
+              >Sorts de cette classe →</a
             >
-              Sorts de cette classe →
-            </a>
           </p>
         }
       </header>
@@ -79,7 +42,7 @@
         class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-amber-500/30 transition-colors"
       >
         <h2
-          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+          class="dg-section-title border-b border-slate-800 pb-3 mb-4 flex items-center gap-2"
         >
           <span class="text-amber-500"><iconify-icon icon="fluent-emoji:shield"></iconify-icon></span>
           Maîtrises
@@ -128,7 +91,7 @@
           class="bg-fuchsia-950/20 border border-fuchsia-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden"
         >
           <h2
-            class="text-xl font-bold text-fuchsia-400 font-serif tracking-widest uppercase mb-4"
+            class="dg-section-title text-violet-300 mb-4"
           >
             Incantation
           </h2>
@@ -165,7 +128,7 @@
         class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-sky-500/30 transition-colors"
       >
         <h2
-          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+          class="dg-section-title border-b border-slate-800 pb-3 mb-4 flex items-center gap-2"
         >
           <span class="text-sky-500"><iconify-icon icon="fluent-emoji:backpack"></iconify-icon></span>
           Équipement de départ
@@ -178,7 +141,7 @@
               }
               @if (slot.fixed) {
                 <ul class="mt-2 space-y-1 text-slate-400">
-                  @for (item of slot.fixed; track item.id) {
+                  @for (item of groupedItems(slot.fixed); track item.id) {
                     <li>• {{ item | gameItemLabel }}</li>
                   }
                 </ul>
@@ -190,7 +153,7 @@
                   </p>
                   @for (alt of slot.alternatives; track $index) {
                     <p class="text-slate-400">
-                      @for (item of alt; track item.id; let last = $last) {
+                      @for (item of groupedItems(alt); track item.id; let last = $last) {
                         <span>{{ item | gameItemLabel }}</span>@if (!last) {
                           <span class="text-slate-600"> · </span>
                         }
@@ -208,7 +171,7 @@
         class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-amber-500/30 transition-colors"
       >
         <h2
-          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+          class="dg-section-title border-b border-slate-800 pb-3 mb-4 flex items-center gap-2"
         >
           <span class="text-amber-500"
             ><iconify-icon icon="fluent-emoji:chart-increasing"></iconify-icon
@@ -267,7 +230,7 @@
       @if (c.data.features_details?.length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
           <h2
-            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6"
+            class="dg-section-title border-b border-slate-800 pb-3 mb-4"
           >
             Aptitudes détaillées
           </h2>
@@ -294,7 +257,7 @@
       @if (subclassOptions(c).length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
           <h2
-            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6"
+            class="dg-section-title border-b border-slate-800 pb-3 mb-4"
           >
             Sous-classes
           </h2>
@@ -334,7 +297,7 @@
 
       @if (c.data.ki_powers?.length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
-          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+          <h2 class="dg-section-title mb-4">
             Dons du Ki
           </h2>
           <div class="space-y-3">
@@ -350,7 +313,7 @@
 
       @if (c.data.pact_boons?.length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
-          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+          <h2 class="dg-section-title mb-4">
             Faveurs de pacte
           </h2>
           <div class="space-y-3">
@@ -366,7 +329,7 @@
 
       @if (c.data.invocations?.length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
-          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+          <h2 class="dg-section-title mb-4">
             Invocations occultes
           </h2>
           <div class="space-y-3">

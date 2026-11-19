@@ -14,6 +14,7 @@ import { Equipment } from '@core/models/Equipments/equipment';
 import {
   equipmentSubtypeLabel,
   equipmentTypeLabel,
+  getEquipmentIcon,
   type EquipmentDisplayLike,
 } from '@core/utils/equipment-display.util';
 import {
@@ -21,11 +22,12 @@ import {
   equipmentDetailDescription,
 } from '@core/utils/equipment-detail-cards.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-equipment-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, CodexDetailShell],
+  imports: [CommonModule, RouterLink, CodexDetailShell, CodexGlyph],
   templateUrl: './equipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -69,6 +71,8 @@ export class EquipmentDetail implements OnInit {
       },
     });
   }
+
+  protected portraitIcon = getEquipmentIcon;
 
   translateType(type: string): string {
     return equipmentTypeLabel(type);

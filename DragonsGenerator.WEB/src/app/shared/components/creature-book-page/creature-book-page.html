@@ -10,6 +10,7 @@
       @if (campaignAlias(); as alias) {
         <p class="text-sm font-semibold text-amber-300/90 mb-1">{{ alias }}</p>
       }
+      <span class="text-5xl mb-4 block"><iconify-icon [icon]="portraitIcon(c)"></iconify-icon></span>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-red-400 font-serif tracking-wide mb-3">
         {{ c.name }}
       </h1>
