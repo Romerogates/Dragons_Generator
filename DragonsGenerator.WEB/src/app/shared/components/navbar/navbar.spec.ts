@@ -17,10 +17,16 @@ describe('Navbar', () => {
   let fixture: ComponentFixture<Navbar>;
   const notifItems = signal<NotificationItem[]>([]);
   const bannerDismissed = new Set<string>();
+  const isLoggedIn = signal(false);
+  const user = signal<{ displayName: string; email: string; avatarEmoji?: string; accentColor?: string } | null>(
+    null,
+  );
 
   beforeEach(async () => {
     notifItems.set([]);
     bannerDismissed.clear();
+    isLoggedIn.set(false);
+    user.set(null);
     await TestBed.configureTestingModule({
       imports: [Navbar],
       providers: [
@@ -29,9 +35,9 @@ describe('Navbar', () => {
         {
           provide: AuthService,
           useValue: {
-            isLoggedIn: signal(false),
+            isLoggedIn,
             isAdmin: () => false,
-            user: signal(null),
+            user,
             logout: jasmine.createSpy('logout'),
           },
         },
@@ -164,20 +170,50 @@ describe('Navbar', () => {
     expect(component.mobileOpen()).toBeTrue();
     const sheet = fixture.nativeElement.querySelector('[data-testid="mobile-more-sheet"]') as HTMLElement | null;
     expect(sheet).toBeTruthy();
+    expect(sheet?.className).toContain('right-0');
+    expect(sheet?.className).not.toContain('inset-x-0');
+    expect(sheet?.className).not.toContain('top-0');
     const hrefs = [...(sheet?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href') ?? '');
     expect(hrefs.some((h) => h.startsWith('/campaigns'))).toBeFalse();
     expect(hrefs.some((h) => h === '/create' || h.startsWith('/create/'))).toBeFalse();
     expect(hrefs.some((h) => h === '/codex' || h.startsWith('/species'))).toBeFalse();
-    expect(hrefs.some((h) => h === '/profile' || h === '/login')).toBeFalse();
+    expect(hrefs.some((h) => h === '/characters')).toBeFalse();
+    expect(hrefs.some((h) => h === '/dungeons')).toBeTrue();
+    expect(hrefs.some((h) => h === '/guide')).toBeFalse();
+    expect(hrefs.some((h) => h === '/settings')).toBeTrue();
+    expect(hrefs.some((h) => h === '/patch-notes')).toBeTrue();
+    expect(hrefs.some((h) => h === '/login')).toBeTrue();
   });
 
-  it('sends the second bottom-rail item to the heroes list, not the forge wizard', () => {
+  it('keeps table, heroes, codex and guide on the rail', () => {
     const heroes = fixture.nativeElement.querySelector(
       '[data-testid="bottom-nav-heroes"]',
     ) as HTMLAnchorElement | null;
-    expect(heroes).toBeTruthy();
+    const guide = fixture.nativeElement.querySelector(
+      '[data-testid="bottom-nav-guide"]',
+    ) as HTMLAnchorElement | null;
     expect(heroes?.getAttribute('href')).toBe('/characters');
+    expect(guide?.getAttribute('href')).toBe('/guide');
+    expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-notifications"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-account"]')).toBeNull();
     expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-forge"]')).toBeNull();
+    expect(component.plusSheetLinks.map((l) => l.path)).toEqual(['/dungeons']);
+  });
+
+  it('puts notifications with profile, support and logout in Plus when signed in', () => {
+    isLoggedIn.set(true);
+    user.set({ displayName: 'Test', email: 'test@dragons.local' });
+    fixture.detectChanges();
+    component.toggleMobile();
+    fixture.detectChanges();
+    const sheet = fixture.nativeElement.querySelector('[data-testid="mobile-more-sheet"]') as HTMLElement;
+    const hrefs = [...sheet.querySelectorAll('a')].map((a) => a.getAttribute('href') ?? '');
+    expect(hrefs).toContain('/notifications');
+    expect(hrefs).toContain('/profile');
+    expect(hrefs).toContain('/support');
+    expect(hrefs).toContain('/friends');
+    expect(hrefs.some((h) => h === '/guide')).toBeFalse();
+    expect(sheet.querySelector('[data-testid="mobile-account-logout"]')).toBeTruthy();
   });
 
   it('keeps the bottom rail on the forge without a header burger', () => {

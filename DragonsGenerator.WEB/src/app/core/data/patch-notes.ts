@@ -13,6 +13,22 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.491',
+    date: '2026-11-20',
+    title: 'Téléphone : Table, Héros, Codex, Guide, Plus',
+    player: [
+      'En bas du téléphone : Table, Héros, Codex, Guide, puis Plus.',
+      'Plus s’ouvre en tiroir depuis le bas à droite, collé au-dessus de Plus, et s’arrête avant le haut de l’écran.',
+      'La lettre des messages est en bas à droite, juste au-dessus de la barre.',
+      'Plus d’engrenage à côté du nom.',
+    ],
+    tech: [
+      'Rail `bottom-nav-guide` → `/guide` ; plus de `bottom-nav-notifications` / `bottom-nav-account`.',
+      'Plus : tiroir `right-0` ancré `bottom` rail, `max-h` hors header, pas `top-0`. `plusSheetLinks` + compte. Logout `mdi:logout`.',
+      'FAB messages `max-lg:mb-[calc(3.5rem+safe)]` ; `body.dg-mobile-sheet-open` masque les FAB.',
+    ],
+  },
+  {
     version: '1.490',
     date: '2026-11-20',
     title: 'Couleurs de profil : aucune, blanc, or…',

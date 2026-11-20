@@ -224,18 +224,6 @@
           </a>
         }
 
-        @if (auth.isLoggedIn()) {
-          <a
-            routerLink="/settings"
-            routerLinkActive="text-amber-400 border-amber-700/50"
-            class="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
-            title="Paramètres"
-            (click)="closeMenus()"
-          >
-            <iconify-icon noobserver icon="mdi:cog-outline" class="text-lg"></iconify-icon>
-          </a>
-        }
-
         <div class="relative hidden sm:block" data-account-menu>
           <button
             type="button"
@@ -372,8 +360,9 @@
 @if (mobileMenuMounted()) {
   <button
     type="button"
-    class="lg:hidden fixed inset-0 z-[44] bg-black/50"
-    [class.hidden]="!mobileOpen()"
+    class="lg:hidden fixed inset-0 z-[44] bg-black/50 transition-opacity duration-200"
+    [class.opacity-0]="!mobileOpen()"
+    [class.pointer-events-none]="!mobileOpen()"
     [attr.aria-hidden]="mobileOpen() ? null : 'true'"
     [attr.tabindex]="mobileOpen() ? 0 : -1"
     data-testid="mobile-more-backdrop"
@@ -381,8 +370,9 @@
     (click)="closeMenus()"
   ></button>
   <div
-    class="lg:hidden fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-[46] flex max-h-[min(70dvh,calc(100dvh-5rem))] flex-col overflow-y-auto overscroll-contain rounded-t-2xl border-t border-slate-700 bg-[#171b22]/98 shadow-[0_-12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
-    [class.hidden]="!mobileOpen()"
+    class="lg:hidden fixed right-0 z-[46] flex w-[min(19rem,82vw)] max-h-[calc(100dvh-7.25rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] flex-col overflow-y-auto overscroll-contain rounded-tl-2xl rounded-tr-2xl border border-b-0 border-slate-700 bg-[#171b22]/98 shadow-[-12px_-8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] transition-transform duration-200 ease-out"
+    [class.translate-x-full]="!mobileOpen()"
+    [class.pointer-events-none]="!mobileOpen()"
     [attr.aria-hidden]="mobileOpen() ? null : 'true'"
     [attr.inert]="mobileOpen() ? null : ''"
     role="dialog"
@@ -390,8 +380,8 @@
     aria-label="Plus"
     data-testid="mobile-more-sheet"
   >
-    <div class="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-1">
-        @for (link of workshopLinks; track link.path) {
+    <div class="px-3 py-4 flex flex-col gap-1">
+        @for (link of plusSheetLinks; track link.path) {
           <a
             [routerLink]="link.path"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
@@ -418,47 +408,7 @@
           </a>
         }
 
-        <div class="my-2 border-t border-slate-800"></div>
-
-        <a
-          routerLink="/guide"
-          routerLinkActive="bg-emerald-950/30 text-emerald-400 border-emerald-900/40"
-          class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-          (click)="closeMenus()"
-        >
-          <span class="flex items-center gap-3">
-            <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:open-book"></iconify-icon
-            ></span>
-            <span class="text-sm font-bold tracking-wide">Guide</span>
-          </span>
-          @if (auth.isLoggedIn() && guideNewsCount() > 0) {
-            <span
-              class="bg-emerald-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
-              >{{ formatBadgeCount(guideNewsCount()) }}</span
-            >
-          }
-        </a>
-
         @if (auth.isLoggedIn()) {
-          <a
-            routerLink="/notifications"
-            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="flex items-center gap-3">
-              <span class="text-xl"
-                ><iconify-icon noobserver icon="mdi:bell-outline"></iconify-icon
-              ></span>
-              <span class="text-sm font-bold tracking-wide">Notifications</span>
-            </span>
-            @if (notificationCount() > 0) {
-              <span
-                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
-                >{{ formatBadgeCount(notificationCount()) }}</span
-              >
-            }
-          </a>
           <a
             routerLink="/friends"
             routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
@@ -480,30 +430,42 @@
           </a>
         }
 
+        <div class="my-2 border-t border-slate-800"></div>
         @if (auth.isLoggedIn()) {
-          <div class="my-2 border-t border-slate-800"></div>
           <a
-            routerLink="/settings"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            routerLink="/notifications"
+            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            data-testid="mobile-notifications"
             (click)="closeMenus()"
           >
-            <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
-            <span class="text-sm font-bold tracking-wide">Paramètres</span>
+            <span class="flex items-center gap-3">
+              <span class="text-xl"
+                ><iconify-icon noobserver icon="mdi:bell-outline"></iconify-icon
+              ></span>
+              <span class="text-sm font-bold tracking-wide">Notifications</span>
+            </span>
+            @if (notificationCount() > 0) {
+              <span
+                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
+                >{{ formatBadgeCount(notificationCount()) }}</span
+              >
+            }
           </a>
           <a
-            routerLink="/patch-notes"
+            routerLink="/profile"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            data-testid="mobile-patch-notes"
+            data-testid="mobile-account-profile"
             (click)="closeMenus()"
           >
             <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:sparkles"></iconify-icon
+              ><iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette"></iconify-icon
             ></span>
-            <span class="text-sm font-bold tracking-wide">Nouveautés</span>
+            <span class="text-sm font-bold tracking-wide">Mon profil</span>
           </a>
           <a
             routerLink="/support"
             class="relative flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            data-testid="mobile-account-support"
             (click)="closeMenus()"
           >
             <span class="text-xl"
@@ -511,9 +473,10 @@
             ></span>
             <span class="text-sm font-bold tracking-wide">Support</span>
             @if (supportReplyCount() > 0) {
-              <span class="ml-auto min-w-[1rem] rounded-full bg-amber-500 px-1.5 text-center text-[9px] font-black text-slate-950">{{
-                formatBadgeCount(supportReplyCount())
-              }}</span>
+              <span
+                class="ml-auto min-w-[1rem] rounded-full bg-amber-500 px-1.5 text-center text-[9px] font-black text-slate-950"
+                >{{ formatBadgeCount(supportReplyCount()) }}</span
+              >
             }
           </a>
           @if (auth.isAdmin()) {
@@ -528,31 +491,62 @@
               ></span>
               <span class="text-sm font-bold tracking-wide">Desk</span>
               @if (supportInboxCount() > 0) {
-                <span class="ml-auto min-w-[1rem] rounded-full bg-amber-500 px-1.5 text-center text-[9px] font-black text-slate-950">{{
-                  formatBadgeCount(supportInboxCount())
-                }}</span>
+                <span
+                  class="ml-auto min-w-[1rem] rounded-full bg-amber-500 px-1.5 text-center text-[9px] font-black text-slate-950"
+                  >{{ formatBadgeCount(supportInboxCount()) }}</span
+                >
               }
             </a>
           }
-          <button
-            type="button"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800/70 text-left"
-            (click)="logout()"
-          >
-            <span class="text-sm font-bold tracking-wide">Déconnexion</span>
-          </button>
         } @else {
           <a
-            routerLink="/patch-notes"
+            routerLink="/login"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            data-testid="mobile-patch-notes"
+            data-testid="mobile-account-login"
             (click)="closeMenus()"
           >
-            <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:sparkles"></iconify-icon
-            ></span>
-            <span class="text-sm font-bold tracking-wide">Nouveautés</span>
+            <span class="text-sm font-bold tracking-wide">Connexion</span>
           </a>
+          <a
+            routerLink="/register"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-sm font-bold tracking-wide">Créer un compte</span>
+          </a>
+        }
+        <a
+          routerLink="/settings"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          data-testid="mobile-settings"
+          (click)="closeMenus()"
+        >
+          <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
+          <span class="text-sm font-bold tracking-wide">Paramètres</span>
+        </a>
+        <a
+          routerLink="/patch-notes"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          data-testid="mobile-patch-notes"
+          (click)="closeMenus()"
+        >
+          <span class="text-xl"
+            ><iconify-icon noobserver icon="fluent-emoji:sparkles"></iconify-icon
+          ></span>
+          <span class="text-sm font-bold tracking-wide">Nouveautés</span>
+        </a>
+        @if (auth.isLoggedIn()) {
+          <button
+            type="button"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800/70 text-left w-full"
+            data-testid="mobile-account-logout"
+            (click)="logout()"
+          >
+            <span class="text-xl"
+              ><iconify-icon noobserver icon="mdi:logout"></iconify-icon
+            ></span>
+            <span class="text-sm font-bold tracking-wide">Déconnexion</span>
+          </button>
         }
     </div>
   </div>
@@ -595,14 +589,20 @@
       <span class="hidden sm:block">Codex</span>
     </a>
     <a
-      [routerLink]="auth.isLoggedIn() ? '/profile' : '/login'"
-      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
-      [class]="isNavPathActive('/profile') || isNavPathActive('/login') ? 'text-amber-300' : 'text-slate-400'"
-      aria-label="Compte"
-      data-testid="bottom-nav-account"
+      routerLink="/guide"
+      class="relative flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isNavPathActive('/guide') ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Guide"
+      data-testid="bottom-nav-guide"
     >
-      <iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette" width="1.35em" height="1.35em"></iconify-icon>
-      <span class="hidden sm:block">Compte</span>
+      <iconify-icon noobserver icon="fluent-emoji:open-book" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Guide</span>
+      @if (auth.isLoggedIn() && guideNewsCount() > 0) {
+        <span
+          class="absolute top-1 right-[18%] min-w-[1rem] h-4 px-0.5 flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950 leading-none"
+          >{{ formatBadgeCount(guideNewsCount()) }}</span
+        >
+      }
     </a>
     <button
       type="button"

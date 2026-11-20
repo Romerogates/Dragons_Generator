@@ -118,9 +118,9 @@ export class Navbar implements OnInit, OnDestroy {
       this.announcementCount(),
   );
   readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
-  /** Badge hamburger (md–lg) : notifs + demandes + campagnes + guide. */
+  /** Badge Plus : notifs / amis / support (le guide est sur le rail). */
   readonly hamburgerBadgeCount = computed(
-    () => this.notificationCount() + this.guideNewsCount(),
+    () => this.notificationCount() + this.supportInboxCount(),
   );
 
   private savedScrollY = 0;
@@ -131,6 +131,8 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Héros', path: '/characters', icon: 'fluent-emoji:busts-in-silhouette' },
     { label: 'Donjons', path: '/dungeons', icon: 'fluent-emoji:japanese-castle' },
   ];
+  /** Plus : donjons seulement (Héros est déjà sur le rail). */
+  readonly plusSheetLinks: NavLink[] = this.workshopLinks.filter((l) => l.path !== '/characters');
 
   readonly codexLinks: NavLink[] = CODEX_NAV_LINKS.map((l) => ({
     label: l.label,
@@ -255,7 +257,12 @@ export class Navbar implements OnInit, OnDestroy {
   private syncBodyScrollLock(): void {
     if (typeof document === 'undefined') return;
 
-    if (this.mobileOpen()) {
+    const sheetOpen = this.mobileOpen();
+    if (typeof document !== 'undefined') {
+      document.body.classList.toggle('dg-mobile-sheet-open', sheetOpen);
+    }
+
+    if (sheetOpen) {
       if (this.bodyScrollLocked) return;
       this.savedScrollY = window.scrollY;
       const body = document.body;
@@ -275,6 +282,7 @@ export class Navbar implements OnInit, OnDestroy {
   private unlockBodyScroll(): void {
     if (typeof document === 'undefined' || !this.bodyScrollLocked) return;
 
+    document.body.classList.remove('dg-mobile-sheet-open');
     const body = document.body;
     body.style.position = '';
     body.style.top = '';

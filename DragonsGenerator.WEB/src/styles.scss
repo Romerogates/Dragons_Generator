@@ -127,6 +127,12 @@
     @apply w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_28px_rgba(0,0,0,0.45)] border transition-transform active:scale-95;
   }
 
+  body.dg-mobile-sheet-open .friend-chat-fab,
+  body.dg-mobile-sheet-open .session-dock-fab {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   /* Surfaces partagées (Paramètres, Campagnes…) */
   .dg-hero {
     @apply relative overflow-hidden rounded-2xl border px-5 py-5 sm:px-6 sm:py-6;
