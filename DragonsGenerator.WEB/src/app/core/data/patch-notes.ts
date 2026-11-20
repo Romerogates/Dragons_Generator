@@ -13,6 +13,18 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.495',
+    date: '2026-11-20',
+    title: 'Lieux et carte plus utilisables',
+    player: [
+      'Ajouter un lieu à une campagne ouvre un panneau au premier plan, plus caché derrière les onglets.',
+      'La carte d’Eana laisse défiler la page ; une fois un lieu choisi, vous pouvez glisser pour voir le reste de la carte.',
+    ],
+    tech: [
+      'Picker Atlas `fixed z-[70]` hors `.dg-hero` `overflow-hidden`. `eana-map-picker` : molette sans Ctrl = scroll page ; `touch-action: pan-y` à l’échelle 1 ; pan depuis les pins après zoom.',
+    ],
+  },
+  {
     version: '1.494',
     date: '2026-11-20',
     title: 'Scénario : bandeau collé en bas',

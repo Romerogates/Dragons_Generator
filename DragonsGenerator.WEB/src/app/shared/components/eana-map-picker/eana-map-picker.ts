@@ -174,16 +174,14 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   onPinPointerDown(event: PointerEvent): void {
-    event.stopPropagation();
     this.pinGesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
-    this.moved = false;
   }
 
   onPinPointerUp(civ: Civilisation, event: PointerEvent): void {
-    event.stopPropagation();
     const gesture = this.pinGesture;
     this.pinGesture = null;
     if (!gesture || gesture.pointerId !== event.pointerId) return;
+    if (this.moved) return;
     const dist = Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y);
     if (dist > MOVE_THRESHOLD_PX) return;
     this.emitCivilization(civ);
@@ -232,6 +230,9 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   onWheel(event: WheelEvent): void {
+    if (!event.ctrlKey && !event.metaKey) {
+      return;
+    }
     event.preventDefault();
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return;
@@ -242,7 +243,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
 
   onPointerDown(event: PointerEvent): void {
     const target = event.target as HTMLElement;
-    if (target.closest('[data-map-pin], [data-map-ui]')) {
+    if (target.closest('[data-map-ui]')) {
       this.moved = false;
       return;
     }
@@ -250,9 +251,18 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return;
 
-    viewport.setPointerCapture(event.pointerId);
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     this.moved = false;
+
+    const zoomed = this.scale() > MIN_SCALE + 0.01;
+    const touchOnFit = event.pointerType === 'touch' && !zoomed && this.pointers.size === 1;
+    if (touchOnFit) {
+      this.panOrigin = null;
+      this.isPanning.set(false);
+      return;
+    }
+
+    viewport.setPointerCapture(event.pointerId);
 
     if (this.pointers.size === 1) {
       this.panOrigin = {
@@ -265,6 +275,13 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     } else if (this.pointers.size === 2) {
       this.isPanning.set(false);
       this.panOrigin = null;
+      for (const id of this.pointers.keys()) {
+        try {
+          viewport.setPointerCapture(id);
+        } catch {
+          /* already captured or released */
+        }
+      }
       const pts = [...this.pointers.values()];
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
       this.pinchOrigin = {

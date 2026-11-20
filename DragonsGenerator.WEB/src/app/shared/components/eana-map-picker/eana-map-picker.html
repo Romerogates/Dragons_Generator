@@ -38,6 +38,7 @@
         #mapViewport
         class="eana-map-viewport eana-map-stage relative bg-[#171b22] overflow-hidden cursor-grab select-none"
         [class.cursor-grabbing]="isPanning()"
+        [style.touch-action]="canZoomOut() ? 'none' : 'pan-y'"
         (wheel)="onWheel($event)"
         (pointerdown)="onPointerDown($event)"
         (pointermove)="onPointerMove($event)"
