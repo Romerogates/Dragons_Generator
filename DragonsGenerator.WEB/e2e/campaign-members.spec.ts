@@ -29,6 +29,7 @@ test.describe('Onboarding rôle', () => {
       timeout: 20_000,
     });
     await page.getByRole('button', { name: /Je suis MJ/i }).click();
+    await page.getByRole('button', { name: /Guide MJ/i }).click();
     await expect(page).toHaveURL(/\/guide/, { timeout: 15_000 });
 
     await expect

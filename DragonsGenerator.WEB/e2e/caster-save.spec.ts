@@ -38,7 +38,7 @@ test.describe('Caster forge — Magie + save', () => {
     await incrementAbility(page, 'Intelligence', 5);
     await incrementAbility(page, 'Constitution', 4);
     await incrementAbility(page, 'Dextérité', 3);
-    await page.getByRole('button', { name: 'Valider et continuer' }).click();
+    await page.getByRole('button', { name: 'Valider et continuer' }).first().click();
 
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
     const bgSkills = page.getByTestId('wizard-bg-skills');
@@ -109,7 +109,7 @@ test.describe('Caster forge — Magie + save', () => {
     await incrementAbility(page, 'Sagesse', 5);
     await incrementAbility(page, 'Constitution', 4);
     await incrementAbility(page, 'Dextérité', 3);
-    await page.getByRole('button', { name: 'Valider et continuer' }).click();
+    await page.getByRole('button', { name: 'Valider et continuer' }).first().click();
 
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
     const classSkills = page.getByTestId('wizard-class-skills');

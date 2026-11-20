@@ -39,7 +39,29 @@ UI / Codex portraits (ui-*.png)
   spider, tree, mage, bear, cat, boar, deer, goat, ox, rat, fox, bat, lizard,
   golem, vampire, zombie, ghost, devil, angel, ogre, slime, insect, warrior,
   basilisk, gargoyle, priest, fairy,
-  dragon-silver, dragon-white, dragon-copper, dragon-agate.
+  dragon-silver, dragon-white, dragon-copper, dragon-agate,
+  druid, wizard, paladin, ranger, monk, warlock, sorcerer, scholar, bard, barbarian,
+  elf, dwarf, halfling, gnome, human, dragonborn, tiefling, orc, halfelf,
+  giant, medusa, assassin, bandit, mimic, flyingsword, homunculus, noble,
+  nature, mephit, gladiator, livingchain, azer, carpet,
+  commoner, ulkan, hauntedhouse, shapeshifter, assangui, locust,
+  icewraith, icewarden, revenant, familiar,
+  drow, suiadacayi, ikhworg, delsednae, talsednae,
+  tarasque, schatz, magmatique, pomoshch, holyguard, remorhaz, bulette,
+  cocatrice, spy, celestial,
+  owl, raven, vulture, griffon, hippogriff, owlbear, ochrejelly, knight,
+  champion, tribal,
+  guard, elitesoldier, veteran, fanatic, highpriest, fleshgolem, irongolem,
+  animatedarmor, bantu, falcon,
+  claygolem, stonegolem, worshipper, cleric, askinos, kushu, kentigern, lion,
+  salamanderqueen, gadai,
+  ghoul, spectre, werewolf, minotaur, smilodon, polarbear, worg, inane, bleme,
+  morhave,
+  lich, sunsutaa, wraith, ogrezombie, harrozombie, kobold, hobgoblin, bugbear,
+  wererat, elk,
+  pony, reindeer, weasel, badger, salamander, itelgini, synthia, frostgiant,
+  holyberserker, skeletonhorse,
+  thug, crimebaron, gangleader, skeletonminotaur, skeletongiant.
   Created for Dragons Generator. No third-party copyrighted art was copied.
 
 Category tiles (cat-*.png) and remaining families

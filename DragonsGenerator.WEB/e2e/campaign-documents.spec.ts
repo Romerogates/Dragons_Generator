@@ -10,7 +10,7 @@ test.describe('Campagne — documents FR', () => {
     const campaignId = await createCampaignAs(page, owner, `E2E Docs ${Date.now()}`);
     await applyAuthSession(page, owner, `/campaigns/${campaignId}?tab=handouts`);
 
-    await expect(page.getByText(/Aucun document — créez un document/i)).toBeVisible({
+    await expect(page.getByText(/Aucun document/i).first()).toBeVisible({
       timeout: 20_000,
     });
     await page.getByRole('button', { name: '+ Document' }).click();

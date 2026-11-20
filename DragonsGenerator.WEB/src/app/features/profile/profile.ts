@@ -17,11 +17,12 @@ import {
   accentGradient,
   profileInitial,
 } from '@core/utils/profile.util';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexGlyph],
   templateUrl: './profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

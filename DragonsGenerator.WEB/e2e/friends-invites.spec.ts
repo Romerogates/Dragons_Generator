@@ -101,10 +101,10 @@ test.describe('Amis & invitations campagne (UI)', () => {
     expect(friendReq.ok(), await friendReq.text()).toBeTruthy();
 
     await applyAuthSession(bPage, b, '/friends');
-    const search = bPage.locator('input').first();
+    await bPage.getByRole('button', { name: 'Découvrir' }).click();
+    const search = bPage.getByPlaceholder(/Pseudo exact/i);
     await search.fill(a.user.displayName);
-    await bPage.waitForTimeout(800);
-    await expect(bPage.getByText(/Vous a demandé en ami/i).first()).toBeVisible({ timeout: 20_000 });
+    await expect(bPage.getByText(/Vous a demandé/i).first()).toBeVisible({ timeout: 20_000 });
     await bPage.getByRole('button', { name: 'Accepter' }).first().click();
     await expect(bPage.getByText(/Demande d’ami acceptée/i)).toBeVisible({ timeout: 15_000 });
 

@@ -32,6 +32,7 @@ import {
   speciesTraitBonusProficiencies,
 } from '@core/utils/species-proficiencies.util';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import { getSpeciesIcon } from '@core/utils/species-icons';
 import { resistanceLabel } from '@core/utils/equipment-display.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { ForgeFlipCard } from '../forge-flip-card/forge-flip-card';
@@ -186,28 +187,7 @@ export class SpeciesStep implements OnInit {
 
   // Modification ici pour renvoyer les codes Iconify
   getIconForSpecies(id: string): string {
-    switch (id) {
-      case 'sp-drakeide':
-        return 'fluent-emoji:dragon-face';
-      case 'sp-elfe':
-        return 'fluent-emoji:bow-and-arrow';
-      case 'sp-nain':
-        return 'fluent-emoji:axe';
-      case 'sp-humain':
-        return 'fluent-emoji:shield';
-      case 'sp-halfelin':
-        return 'fluent-emoji:four-leaf-clover';
-      case 'sp-melesse':
-        return 'fluent-emoji:sparkles';
-      case 'sp-merosi':
-        return 'fluent-emoji:skull';
-      case 'sp-tieffelin':
-        return 'fluent-emoji:fire';
-      case 'sp-gnome':
-        return 'fluent-emoji:gear';
-      default:
-        return 'fluent-emoji:bust-in-silhouette';
-    }
+    return getSpeciesIcon(id);
   }
 
   readonly currentCards = computed<CardOption[]>(() => {

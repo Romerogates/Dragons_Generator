@@ -1,26 +1,26 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { accentGradient, profileInitial } from '@core/utils/profile.util';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-profile-avatar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CodexGlyph],
   template: `
     <span
-      class="inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-black text-white shadow-inner"
+      class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br font-black text-white shadow-inner"
       [class]="sizeClass()"
       [ngClass]="gradient()"
     >
       @if (avatarEmoji()) {
-        <iconify-icon [icon]="avatarEmoji()!" [class]="emojiClass()"></iconify-icon>
+        <app-codex-glyph [icon]="avatarEmoji()!" [size]="glyphSize()" [alt]="displayName()" />
       } @else {
         {{ initial() }}
       }
     </span>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ProfileAvatarComponent {
   readonly displayName = input.required<string>();
@@ -49,16 +49,16 @@ export class ProfileAvatarComponent {
     }
   }
 
-  emojiClass(): string {
+  glyphSize(): string {
     switch (this.size()) {
       case 'xs':
-        return 'text-base';
+        return '1.35rem';
       case 'sm':
-        return 'text-lg';
+        return '1.7rem';
       case 'lg':
-        return 'text-3xl';
+        return '3.25rem';
       default:
-        return 'text-xl';
+        return '2.15rem';
     }
   }
 }

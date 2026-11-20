@@ -28,7 +28,7 @@ test.describe('Mode table MJ', () => {
 
     await expect(page.getByText(/Table de jeu ·/)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('navigation', { name: 'Sections de la session' })).toBeVisible();
-    await page.getByRole('button', { name: 'Combattre' }).click();
+    await page.getByTestId('play-next-action-cta').or(page.getByTestId('dock-combat')).first().click();
 
     await page.getByRole('button', { name: '+ Allié PNJ' }).click();
     await page.getByRole('button', { name: '+ Adversaire', exact: true }).click();
@@ -45,7 +45,7 @@ test.describe('Mode table MJ', () => {
     await expect(
       page.getByRole('navigation', { name: 'Sections de la session' }).getByRole('button', { name: 'Résumé' }),
     ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole('button', { name: 'Combattre' })).toBeVisible();
+    await expect(page.getByTestId('play-next-action-cta').or(page.getByTestId('dock-combat')).first()).toBeVisible();
     await expect(
       page.getByRole('navigation', { name: 'Sections de la session' }).getByRole('button', { name: 'Donjon' }),
     ).toBeVisible();

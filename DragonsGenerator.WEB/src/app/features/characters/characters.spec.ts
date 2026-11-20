@@ -330,30 +330,30 @@ describe('Characters', () => {
 
     it('maps class and species icons', () => {
       expect(component.getClassIcon('')).toBe('fluent-emoji:crossed-swords');
-      expect(component.getClassIcon('Barbare')).toBe('fluent-emoji:axe');
-      expect(component.getClassIcon('Barde')).toBe('fluent-emoji:musical-note');
-      expect(component.getClassIcon('Druide')).toBe('fluent-emoji:herb');
-      expect(component.getClassIcon('Ensorceleur')).toBe('fluent-emoji:sparkles');
-      expect(component.getClassIcon('Magicien')).toBe('fluent-emoji:crystal-ball');
-      expect(component.getClassIcon('Lettré')).toBe('fluent-emoji:crystal-ball');
-      expect(component.getClassIcon('Moine')).toBe('fluent-emoji:oncoming-fist');
-      expect(component.getClassIcon('Paladin')).toBe('fluent-emoji:shield');
-      expect(component.getClassIcon('Prêtre')).toBe('fluent-emoji:latin-cross');
-      expect(component.getClassIcon('Rôdeur')).toBe('fluent-emoji:bow-and-arrow');
+      expect(component.getClassIcon('Barbare')).toBe('fluent-emoji:barbarian');
+      expect(component.getClassIcon('Barde')).toBe('fluent-emoji:bard');
+      expect(component.getClassIcon('Druide')).toBe('fluent-emoji:druid');
+      expect(component.getClassIcon('Ensorceleur')).toBe('fluent-emoji:sorcerer');
+      expect(component.getClassIcon('Magicien')).toBe('fluent-emoji:man-mage');
+      expect(component.getClassIcon('Lettré')).toBe('fluent-emoji:scholar');
+      expect(component.getClassIcon('Moine')).toBe('fluent-emoji:monk');
+      expect(component.getClassIcon('Paladin')).toBe('fluent-emoji:paladin');
+      expect(component.getClassIcon('Prêtre')).toBe('fluent-emoji:folded-hands');
+      expect(component.getClassIcon('Rôdeur')).toBe('fluent-emoji:ranger');
       expect(component.getClassIcon('Roublard')).toBe('fluent-emoji:dagger');
-      expect(component.getClassIcon('Sorcier')).toBe('fluent-emoji:eye');
+      expect(component.getClassIcon('Sorcier')).toBe('fluent-emoji:warlock');
       expect(component.getClassIcon('Guerrier')).toBe('fluent-emoji:crossed-swords');
 
       expect(component.getSpeciesIcon('')).toBe('fluent-emoji:bust-in-silhouette');
       expect(component.getSpeciesIcon('Elfe')).toBe('fluent-emoji:man-elf');
-      expect(component.getSpeciesIcon('Nain')).toBe('fluent-emoji:pick');
-      expect(component.getSpeciesIcon('Halfelin')).toBe('fluent-emoji:four-leaf-clover');
-      expect(component.getSpeciesIcon('Gnome')).toBe('fluent-emoji:wrench');
-      expect(component.getSpeciesIcon('Drakéide')).toBe('fluent-emoji:dragon-face');
-      expect(component.getSpeciesIcon('Tieffelin')).toBe('fluent-emoji:smiling-face-with-horns');
-      expect(component.getSpeciesIcon('Mélancolia')).toBe('fluent-emoji:smiling-face-with-horns');
-      expect(component.getSpeciesIcon('Demi-orc')).toBe('fluent-emoji:ogre');
-      expect(component.getSpeciesIcon('Humain')).toBe('fluent-emoji:bust-in-silhouette');
+      expect(component.getSpeciesIcon('Nain')).toBe('fluent-emoji:dwarf');
+      expect(component.getSpeciesIcon('Halfelin')).toBe('fluent-emoji:halfling');
+      expect(component.getSpeciesIcon('Gnome')).toBe('fluent-emoji:gnome');
+      expect(component.getSpeciesIcon('Drakéide')).toBe('fluent-emoji:dragonborn');
+      expect(component.getSpeciesIcon('Tieffelin')).toBe('fluent-emoji:tiefling');
+      expect(component.getSpeciesIcon('Mélancolia')).toBe('fluent-emoji:tiefling');
+      expect(component.getSpeciesIcon('Demi-orc')).toBe('fluent-emoji:orc');
+      expect(component.getSpeciesIcon('Humain')).toBe('fluent-emoji:human');
     });
 
     it('formats dates and rejects invalid ones', () => {

@@ -73,7 +73,7 @@
         @for (skill of filteredSkills(); track skill.id) {
           <a [routerLink]="['/skills', skill.id]" class="dg-entry">
             <div class="dg-entry-art">
-              <iconify-icon [icon]="skillIcon(skill)" width="2.5em" height="2.5em"></iconify-icon>
+              <app-codex-glyph [icon]="skillIcon(skill)" [alt]="skill.name" size="2.5em"></app-codex-glyph>
             </div>
             <div class="dg-entry-body">
               <h2 class="dg-entry-title">{{ skill.name }}</h2>

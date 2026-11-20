@@ -183,7 +183,7 @@ export function clampHubTabsForViewer(
   let nextSub = prepSub;
   if (pregenCount === 0 && tab === 'prep') nextTab = 'overview';
   else if (tab === 'prep' && prepSub !== 'pregens') nextSub = 'pregens';
-  if (tab === 'sessions' || tab === 'calendar') nextTab = 'overview';
+  if (tab === 'sessions') nextTab = 'overview';
   if (
     nextSub === 'creatures' ||
     nextSub === 'encounters' ||
@@ -205,11 +205,12 @@ export function visibleCampaignHubTabs(
   if (!isOwner) {
     const tabs: CampaignHubTabDef[] = [
       { id: 'overview', label: 'Ce soir', icon: 'fluent-emoji:fire' },
+      { id: 'calendar', label: 'Calendrier', icon: 'fluent-emoji:spiral-calendar' },
       { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
       { id: 'players', label: 'Héros', icon: 'fluent-emoji:busts-in-silhouette' },
     ];
     if (pregenCount > 0) {
-      tabs.splice(2, 0, { id: 'prep', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
+      tabs.splice(3, 0, { id: 'prep', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
     }
     return tabs;
   }

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
@@ -26,7 +27,7 @@ const ABILITY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-skills-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexGlyph],
   templateUrl: './skills-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

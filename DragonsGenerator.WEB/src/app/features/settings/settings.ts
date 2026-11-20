@@ -24,6 +24,7 @@ import { UiBannerPreferencesService } from '@core/services/ui-banner-preferences
 import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 import { AiSettingsService, type AiProviderOption, type AiSettingsDto } from '@core/services/ai-settings.service';
 import {
   PROFILE_ACCENTS,
@@ -37,7 +38,7 @@ type SettingsTab = 'account' | 'ai' | 'notifications' | 'app' | 'security' | 'da
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, PasswordFieldComponent, RouterLink],
+  imports: [CommonModule, FormsModule, PasswordFieldComponent, RouterLink, CodexGlyph],
   templateUrl: './settings.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -64,6 +65,7 @@ export class SettingsPage implements OnInit {
   accentColor = 'violet';
 
   readonly avatarOptions = PROFILE_AVATAR_OPTIONS;
+  avatarQuery = '';
   readonly accentOptions = PROFILE_ACCENTS;
   readonly prefOptions = NOTIFICATION_PREF_OPTIONS;
   readonly notifPreferences = this.notifPrefs.prefs;
@@ -331,6 +333,14 @@ export class SettingsPage implements OnInit {
 
   previewInitial(): string {
     return profileInitial(this.displayName);
+  }
+
+  filteredAvatarOptions(): typeof PROFILE_AVATAR_OPTIONS {
+    const q = this.avatarQuery.trim().toLowerCase();
+    if (!q) return this.avatarOptions;
+    return this.avatarOptions.filter(
+      (o) => o.label.toLowerCase().includes(q) || o.id.toLowerCase().includes(q),
+    );
   }
 
   selectAvatar(icon: string | null): void {

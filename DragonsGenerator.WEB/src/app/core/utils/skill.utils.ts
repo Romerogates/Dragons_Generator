@@ -41,7 +41,7 @@ const SKILL_ICONS: Record<string, string> = {
   'skill-intuition': 'fluent-emoji:eye',
   'skill-investigation': 'fluent-emoji:magnifying-glass-tilted-right',
   'skill-medecine': 'fluent-emoji:medical-symbol',
-  'skill-nature': 'fluent-emoji:herb',
+  'skill-nature': 'fluent-emoji:evergreen-tree',
   'skill-perception': 'fluent-emoji:ear',
   'skill-persuasion': 'fluent-emoji:handshake',
   'skill-religion': 'fluent-emoji:prayer-beads',

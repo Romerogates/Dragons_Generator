@@ -32,7 +32,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
       timeout: 30_000,
     });
 
-    await page.getByRole('button', { name: 'Combattre' }).click();
+    await page.getByTestId('play-next-action-cta').or(page.getByTestId('dock-combat')).first().click();
     await page.getByRole('button', { name: '+ Toute la party' }).click();
     await expect(page.getByText(/Borin XP|\+1 PJ importé/i).first()).toBeVisible({
       timeout: 20_000,
@@ -94,7 +94,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
-    await ownerPage.getByRole('button', { name: 'Combattre' }).click();
+    await ownerPage.getByTestId('play-next-action-cta').or(ownerPage.getByTestId('dock-combat')).first().click();
     await ownerPage.getByRole('button', { name: '+ Toute la party' }).click();
     await expect(ownerPage.getByText(/Kael XP|\+1 PJ importé/i).first()).toBeVisible({
       timeout: 20_000,

@@ -16,7 +16,7 @@
     } @else if (skill(); as s) {
       <header class="text-center mb-10">
         <span class="text-5xl mb-4 block"
-          ><iconify-icon [icon]="skillIcon(s.id)"></iconify-icon
+          ><app-codex-glyph [icon]="skillIcon(s.id)" [alt]="s.name" size="3.5rem"></app-codex-glyph
         ></span>
         <h1 class="text-4xl font-extrabold text-sky-400 font-serif mb-4">{{ s.name }}</h1>
         <span

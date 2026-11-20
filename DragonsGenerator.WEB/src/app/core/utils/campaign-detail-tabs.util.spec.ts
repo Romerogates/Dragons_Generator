@@ -141,7 +141,16 @@ describe('campaign-detail-tabs.util', () => {
     });
     expect(visibleCampaignHubTabs(true, 0).map((t) => t.id)).toContain('prep');
     expect(visibleCampaignHubTabs(false, 0).map((t) => t.id)).not.toContain('prep');
-    expect(visibleCampaignHubTabs(false, 0).map((t) => t.id)).toEqual(['overview', 'handouts', 'players']);
+    expect(clampHubTabsForViewer(false, 0, 'calendar', 'scenario')).toEqual({
+      tab: 'calendar',
+      prepSub: 'pregens',
+    });
+    expect(visibleCampaignHubTabs(false, 0).map((t) => t.id)).toEqual([
+      'overview',
+      'calendar',
+      'handouts',
+      'players',
+    ]);
     expect(visibleCampaignHubTabs(false, 0)[0].label).toBe('Ce soir');
     expect(visibleCampaignHubTabs(false, 1).map((t) => t.id)).toContain('prep');
     expect(visibleCampaignHubTabs(false, 1).map((t) => t.id)).not.toContain('sessions');

@@ -97,7 +97,7 @@
                   class="flex items-center gap-2 lg:gap-3 px-2 lg:px-3 py-2 rounded-xl border border-transparent hover:border-amber-500/40 hover:bg-amber-950/20 transition-colors min-w-0"
                 >
                   <span class="text-base lg:text-lg shrink-0" aria-hidden="true">
-                    <iconify-icon noobserver [icon]="getIconForCiv(civ.id)"></iconify-icon>
+                    <app-codex-glyph [icon]="getIconForCiv(civ.id)" [alt]="civ.name" size="1.25rem"></app-codex-glyph>
                   </span>
                   <span class="block min-w-0 text-xs lg:text-sm font-bold text-amber-400 font-serif truncate">{{
                     civ.name
@@ -162,7 +162,7 @@
                 "
                 title="Découvrir {{ civ.name }}"
               >
-                <iconify-icon noobserver [icon]="getIconForCiv(civ.id)"></iconify-icon>
+                <app-codex-glyph [icon]="getIconForCiv(civ.id)" [alt]="civ.name" size="1.35rem"></app-codex-glyph>
               </a>
               <p
                 class="absolute left-1/2 -translate-x-1/2 top-full mt-1 max-w-[7rem] text-center text-[9px] font-bold uppercase tracking-wide text-amber-200/90 drop-shadow lg:hidden pointer-events-none"

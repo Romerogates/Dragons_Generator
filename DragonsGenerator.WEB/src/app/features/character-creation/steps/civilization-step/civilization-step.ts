@@ -203,7 +203,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
       'civ-cite-franche': 'fluent-emoji:classical-building',
       'civ-cyrillane': 'fluent-emoji:crown',
       'civ-drakenbergen': 'fluent-emoji:mountain',
-      'civ-ellerina': 'fluent-emoji:herb',
+      'civ-ellerina': 'fluent-emoji:evergreen-tree',
       'civ-iles-eoliennes': 'fluent-emoji:cloud',
       'civ-inframonde': 'fluent-emoji:spider',
       'civ-kaan': 'fluent-emoji:horse',

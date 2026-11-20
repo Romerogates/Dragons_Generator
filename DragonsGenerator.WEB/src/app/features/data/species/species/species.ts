@@ -14,11 +14,13 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { Species } from '@core/models/Species/species';
 import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
+import { getSpeciesIcon } from '@core/utils/species-icons';
 
 @Component({
   selector: 'app-species',
   standalone: true,
-  imports: [CommonModule, RouterLink, CodexEmptyState],
+  imports: [CommonModule, RouterLink, CodexEmptyState, CodexGlyph],
   templateUrl: './species.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -82,4 +84,6 @@ export class SpeciesList implements OnInit {
   formatAsi(asi: Record<string, number>): string {
     return formatApiAsiDisplay(asi, 'Aucun');
   }
+
+  protected portraitIcon = getSpeciesIcon;
 }

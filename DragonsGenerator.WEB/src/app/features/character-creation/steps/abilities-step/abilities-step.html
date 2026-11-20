@@ -652,14 +652,6 @@
             }
           </div>
         }
-        <button
-          class="wizard-nav-primary w-full sm:hidden"
-          [disabled]="!canConfirm()"
-          [class.opacity-50]="!canConfirm()"
-          (click)="confirmSelection()"
-        >
-          Valider et continuer
-        </button>
         @if (builder.creation().pointsRemaining !== 0) {
           <p
             class="text-center text-[9px] text-slate-500 uppercase tracking-widest font-bold animate-pulse sm:hidden"

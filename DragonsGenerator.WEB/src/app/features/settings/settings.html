@@ -167,11 +167,11 @@
 
       <div class="flex items-center gap-4 mb-6">
         <div
-          class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-xl font-black text-white shrink-0"
+          class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center overflow-hidden text-xl font-black text-white shrink-0"
           [class]="previewGradient()"
         >
           @if (avatarEmoji) {
-            <iconify-icon [icon]="avatarEmoji" class="text-2xl"></iconify-icon>
+            <app-codex-glyph [icon]="avatarEmoji" size="2.5rem" alt="" />
           } @else {
             {{ previewInitial() }}
           }
@@ -212,20 +212,33 @@
 
         <div>
           <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Avatar</p>
-          <div class="flex flex-wrap gap-2">
-            @for (opt of avatarOptions; track opt.id) {
+          <p class="text-xs text-slate-500 mb-2">
+            Tous les portraits du bestiaire : dragon, liche, gobelin, Synthia…
+          </p>
+          <input
+            type="search"
+            [(ngModel)]="avatarQuery"
+            name="avatarQuery"
+            placeholder="Chercher un portrait…"
+            class="mb-2 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+          <div
+            class="flex flex-wrap gap-2 max-h-72 overflow-y-auto rounded-lg border border-slate-800 p-2"
+          >
+            @for (opt of filteredAvatarOptions(); track opt.id) {
               <button
                 type="button"
-                class="w-11 h-11 rounded-xl border flex items-center justify-center text-xl transition-colors"
+                class="w-12 h-12 rounded-xl border flex items-center justify-center overflow-hidden transition-colors"
                 [class]="
                   avatarEmoji === opt.icon
                     ? 'border-amber-500 bg-amber-950/30'
                     : 'border-slate-700 bg-[#171b22] hover:border-slate-500'
                 "
                 [attr.aria-label]="opt.label"
+                [title]="opt.label"
                 (click)="selectAvatar(opt.icon)"
               >
-                <iconify-icon [icon]="opt.icon"></iconify-icon>
+                <app-codex-glyph [icon]="opt.icon" size="2.15rem" [alt]="opt.label" />
               </button>
             }
           </div>

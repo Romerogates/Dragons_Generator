@@ -89,7 +89,9 @@
             </div>
 
             <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
-              <header class="mb-4">
+              <header class="mb-4 flex items-start gap-3">
+                <app-codex-glyph [icon]="portraitIcon(sp.id)" [alt]="sp.name" size="3rem"></app-codex-glyph>
+                <div class="min-w-0">
                 <h2 class="text-2xl font-bold text-amber-500 font-serif tracking-wide mb-1 group-hover:underline decoration-amber-500/30 underline-offset-4">
                   {{ sp.name }}
                 </h2>
@@ -98,6 +100,7 @@
                     Alias : <span class="text-slate-400">{{ sp.nameAlt.join(', ') }}</span>
                   </p>
                 }
+                </div>
               </header>
 
               <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">

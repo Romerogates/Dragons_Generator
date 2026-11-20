@@ -19,6 +19,8 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import type { Character } from '@core/models/Character/character';
 import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
+import { getClassIcon as classPortrait } from '@core/utils/class-icons';
+import { getSpeciesIcon as speciesPortrait } from '@core/utils/species-icons';
 
 /**
  * Champs d’anciens exports encore tolérés en lecture liste.
@@ -177,35 +179,14 @@ export class Characters implements OnInit {
 
   getClassIcon(className: string): string {
     if (!className) return 'fluent-emoji:crossed-swords';
-    const name = String(className).toLowerCase();
-
-    if (name.includes('barbare')) return 'fluent-emoji:axe';
-    if (name.includes('barde')) return 'fluent-emoji:musical-note';
-    if (name.includes('druide')) return 'fluent-emoji:herb';
-    if (name.includes('ensorceleur')) return 'fluent-emoji:sparkles';
-    if (name.includes('magicien') || name.includes('lettré')) return 'fluent-emoji:crystal-ball';
-    if (name.includes('moine')) return 'fluent-emoji:oncoming-fist';
-    if (name.includes('paladin')) return 'fluent-emoji:shield';
-    if (name.includes('prêtre')) return 'fluent-emoji:latin-cross';
-    if (name.includes('rôdeur')) return 'fluent-emoji:bow-and-arrow';
-    if (name.includes('roublard')) return 'fluent-emoji:dagger';
-    if (name.includes('sorcier')) return 'fluent-emoji:eye';
-    return 'fluent-emoji:crossed-swords';
+    const mapped = classPortrait(String(className));
+    return mapped === 'fluent-emoji:bust-in-silhouette'
+      ? 'fluent-emoji:crossed-swords'
+      : mapped;
   }
 
   getSpeciesIcon(speciesName: string): string {
-    if (!speciesName) return 'fluent-emoji:bust-in-silhouette';
-    const name = String(speciesName).toLowerCase();
-
-    if (name.includes('elfe')) return 'fluent-emoji:man-elf';
-    if (name.includes('nain')) return 'fluent-emoji:pick';
-    if (name.includes('halfelin')) return 'fluent-emoji:four-leaf-clover';
-    if (name.includes('gnome')) return 'fluent-emoji:wrench';
-    if (name.includes('drakéide')) return 'fluent-emoji:dragon-face';
-    if (name.includes('tieffelin') || name.includes('mélancolia'))
-      return 'fluent-emoji:smiling-face-with-horns';
-    if (name.includes('demi-orc') || name.includes('orc')) return 'fluent-emoji:ogre';
-    return 'fluent-emoji:bust-in-silhouette';
+    return speciesPortrait(speciesName);
   }
 
   formatDate(dateString: string): string {

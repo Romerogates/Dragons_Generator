@@ -17,11 +17,12 @@ import { Civilisation } from '@core/models/Civilisations/civilisations';
 import { EANA_MAP_ASPECT, EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
+import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
   selector: 'app-civilisations',
   standalone: true,
-  imports: [CommonModule, RouterLink, FullscreenEnterBtn, CodexEmptyState],
+  imports: [CommonModule, RouterLink, FullscreenEnterBtn, CodexEmptyState, CodexGlyph],
   templateUrl: './civilisations.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -111,7 +112,7 @@ export class Civilisations implements OnInit, OnDestroy {
       'civ-cite-franche': 'fluent-emoji:classical-building',
       'civ-cyrillane': 'fluent-emoji:crown',
       'civ-drakenbergen': 'fluent-emoji:mountain',
-      'civ-ellerina': 'fluent-emoji:herb',
+      'civ-ellerina': 'fluent-emoji:evergreen-tree',
       'civ-iles-eoliennes': 'fluent-emoji:cloud',
       'civ-inframonde': 'fluent-emoji:spider',
       'civ-kaan': 'fluent-emoji:horse',
