@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.497',
+    date: '2026-11-20',
+    title: 'Carte : on se déplace enfin au doigt',
+    player: [
+      'Sur téléphone, après avoir choisi une civilisation sur la carte, vous pouvez la faire glisser au doigt pour explorer les alentours, comme une page.',
+    ],
+    tech: [
+      '`eana-map-picker` réécrit : la carte zoomée défile nativement (`overflow: auto`, `touch-action: pan-x pan-y`, `scrollLeft/Top`) au lieu d’un pan JS par `transform`. Souris = drag via scroll ; 2 doigts = zoom ; pin = `click`.',
+    ],
+  },
+  {
     version: '1.496',
     date: '2026-11-20',
     title: 'Carte : glisser au doigt après zoom',

@@ -34,64 +34,74 @@
         }
       </div>
 
-      <div
-        #mapViewport
-        class="eana-map-viewport eana-map-stage relative bg-[#171b22] overflow-hidden cursor-grab select-none"
-        [class.cursor-grabbing]="isPanning()"
-        [class.eana-map-zoomed]="canZoomOut()"
-        [style.touch-action]="canZoomOut() ? 'none' : 'pan-y'"
-        (wheel)="onWheel($event)"
-        (pointerdown)="onPointerDown($event)"
-      >
+      <div class="relative">
         <div
-          class="absolute left-0 top-0 origin-top-left eana-map-layer"
-          [class.opacity-0]="!mapReady()"
-          [style.width.px]="displayMapWidth()"
-          [style.height.px]="displayMapHeight()"
-          [style.transform]="mapTransform()"
+          #mapViewport
+          class="eana-map-viewport eana-map-stage relative bg-[#171b22] select-none"
+          [class.eana-map-zoomed]="canZoomOut()"
+          [class.cursor-grab]="canZoomOut()"
+          [class.cursor-grabbing]="isPanning()"
+          data-testid="eana-map-viewport"
+          (wheel)="onWheel($event)"
+          (dblclick)="onDoubleClick($event)"
+          (pointerdown)="onPointerDown($event)"
+          (pointermove)="onPointerMove($event)"
+          (pointerup)="onPointerUp($event)"
+          (pointercancel)="onPointerUp($event)"
         >
-          <img
-            src="Carte.jpg"
-            alt="Carte d'Eana"
-            class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none eana-map-img"
-            draggable="false"
-          />
-
-          @for (civ of civilizations(); track civ.id) {
+          <div
+            class="relative"
+            [style.width.px]="contentWidth()"
+            [style.height.px]="contentHeight()"
+          >
             <div
-              data-map-pin
-              [attr.data-civ-id]="civ.id"
-              class="absolute z-10"
-              [style.top.%]="getMapCoordinates(civ.id).y"
-              [style.left.%]="getMapCoordinates(civ.id).x"
-              style="transform: translate(-50%, -50%); touch-action: none"
+              class="absolute eana-map-layer"
+              [class.opacity-0]="!mapReady()"
+              [style.left.px]="layerLeft()"
+              [style.top.px]="layerTop()"
+              [style.width.px]="displayMapWidth()"
+              [style.height.px]="displayMapHeight()"
             >
-              <button
-                type="button"
-                class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04] touch-none"
-                style="touch-action: none"
-                [class]="
-                  isSelectedCiv(civ.id)
-                    ? 'bg-violet-600 border-2 border-violet-300 text-white'
-                    : 'bg-[#1b2028]/95 border-2 border-amber-500/70 text-lg hover:border-amber-400'
-                "
-                (pointerdown)="onPinPointerDown($event)"
-                (pointerup)="onPinPointerUp(civ, $event)"
-                (click)="$event.preventDefault(); $event.stopPropagation()"
-                [attr.aria-label]="civ.name"
-                [attr.aria-pressed]="isSelectedCiv(civ.id)"
-              >
-                <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
-              </button>
-              @if (isSelectedCiv(civ.id)) {
-                <span
-                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-violet-700/40 text-[10px] font-bold uppercase tracking-wider text-violet-200 pointer-events-none shadow-lg"
+              <img
+                src="Carte.jpg"
+                alt="Carte d'Eana"
+                class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none eana-map-img"
+                draggable="false"
+              />
+
+              @for (civ of civilizations(); track civ.id) {
+                <div
+                  data-map-pin
+                  class="absolute z-10"
+                  [style.top.%]="getMapCoordinates(civ.id).y"
+                  [style.left.%]="getMapCoordinates(civ.id).x"
+                  style="transform: translate(-50%, -50%)"
                 >
-                  {{ civ.name }}
-                </span>
+                  <button
+                    type="button"
+                    class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04]"
+                    [class]="
+                      isSelectedCiv(civ.id)
+                        ? 'bg-violet-600 border-2 border-violet-300 text-white'
+                        : 'bg-[#1b2028]/95 border-2 border-amber-500/70 text-lg hover:border-amber-400'
+                    "
+                    (click)="onPinClick(civ, $event)"
+                    [attr.aria-label]="civ.name"
+                    [attr.aria-pressed]="isSelectedCiv(civ.id)"
+                  >
+                    <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
+                  </button>
+                  @if (isSelectedCiv(civ.id)) {
+                    <span
+                      class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-violet-700/40 text-[10px] font-bold uppercase tracking-wider text-violet-200 pointer-events-none shadow-lg"
+                    >
+                      {{ civ.name }}
+                    </span>
+                  }
+                </div>
               }
             </div>
-          }
+          </div>
         </div>
 
         <div
@@ -100,6 +110,13 @@
         <div
           class="pointer-events-none absolute inset-x-0 bottom-0 h-5 z-20 bg-gradient-to-t from-[#171b22]/80 to-transparent"
         ></div>
+        @if (canZoomOut()) {
+          <p
+            class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-2 z-20 px-2 py-0.5 rounded-full bg-[#020617]/80 text-[10px] text-slate-300"
+          >
+            Glissez pour explorer
+          </p>
+        }
       </div>
 
       <div class="flex items-center gap-2 px-3">

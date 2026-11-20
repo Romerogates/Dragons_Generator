@@ -28,11 +28,13 @@ import { storyRegionLabel } from '@core/utils/story-location.util';
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.35;
-const MOVE_THRESHOLD_PX = 10;
-const DOUBLE_TAP_MS = 320;
-const DOUBLE_TAP_DIST_PX = 28;
+const MOVE_THRESHOLD_PX = 6;
 const FOCUS_SCALE = 2.15;
 
+/**
+ * Carte d'Eana. Une fois zoomée, le stage est un conteneur à défilement natif :
+ * le doigt (Android / iOS) déplace la carte sans JS. La souris glisse via scrollLeft/Top.
+ */
 @Component({
   selector: 'app-eana-map-picker',
   standalone: true,
@@ -56,10 +58,10 @@ export class EanaMapPicker implements OnInit, OnDestroy {
 
   readonly mapWidth = signal(0);
   readonly mapHeight = signal(0);
+  readonly viewportWidth = signal(0);
+  readonly viewportHeight = signal(0);
   readonly mapReady = signal(false);
   readonly scale = signal(1);
-  readonly panX = signal(0);
-  readonly panY = signal(0);
   readonly isPanning = signal(false);
 
   readonly regionLabel = computed(() => storyRegionLabel(this.selectedRegion()));
@@ -67,12 +69,14 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     const label = this.regionLabel() || 'Région inconnue';
     return `Région : ${label}`;
   });
-  /** Pan seulement — zoom via width/height (moins flou que transform scale). */
-  readonly mapTransform = computed(
-    () => `translate3d(${this.panX()}px, ${this.panY()}px, 0)`,
-  );
   readonly displayMapWidth = computed(() => this.mapWidth() * this.scale());
   readonly displayMapHeight = computed(() => this.mapHeight() * this.scale());
+  readonly contentWidth = computed(() => Math.max(this.viewportWidth(), this.displayMapWidth()));
+  readonly contentHeight = computed(() =>
+    Math.max(this.viewportHeight(), this.displayMapHeight()),
+  );
+  readonly layerLeft = computed(() => (this.contentWidth() - this.displayMapWidth()) / 2);
+  readonly layerTop = computed(() => (this.contentHeight() - this.displayMapHeight()) / 2);
   readonly canZoomOut = computed(() => this.scale() > MIN_SCALE + 0.01);
   readonly canZoomIn = computed(() => this.scale() < MAX_SCALE - 0.01);
 
@@ -86,26 +90,16 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     return list.slice(Math.ceil(list.length / 2));
   });
 
-  private pointers = new Map<number, { x: number; y: number }>();
-  private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
-  private pinchOrigin: {
-    dist: number;
-    scale: number;
-    panX: number;
-    panY: number;
-    midX: number;
-    midY: number;
-  } | null = null;
+  private mouseDrag: { pointerId: number; x: number; y: number; left: number; top: number } | null =
+    null;
   private moved = false;
+  private pinch: { dist: number; scale: number; midX: number; midY: number } | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private boundViewport: HTMLElement | null = null;
   private fitRetries = 0;
 
-  private pinGesture: { pointerId: number; x: number; y: number } | null = null;
-  private lastTapAt = 0;
-  private lastTapX = 0;
-  private lastTapY = 0;
   private readonly onViewportResize = (): void => {
-    this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+    this.refitMap();
   };
 
   constructor() {
@@ -119,7 +113,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
         });
         return;
       }
-      untracked(() => this.scheduleFit(true));
+      untracked(() => this.scheduleFit());
     });
   }
 
@@ -135,24 +129,22 @@ export class EanaMapPicker implements OnInit, OnDestroy {
       },
     });
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
-    this.attachGestures();
   }
 
   ngOnDestroy(): void {
-    this.pointers.clear();
-    this.detachGestures();
+    this.unbindTouch();
     this.resizeObserver?.disconnect();
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+    this.refitMap();
   }
 
   @HostListener('window:orientationchange')
   onOrientationChange(): void {
-    setTimeout(() => this.refitMap(true), 180);
+    setTimeout(() => this.refitMap(), 180);
   }
 
   isSelectedCiv(civId: string): boolean {
@@ -170,24 +162,17 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     this.focusPin(civ.id);
   }
 
+  onPinClick(civ: Civilisation, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.moved) return;
+    this.emitCivilization(civ);
+    this.focusPin(civ.id);
+  }
+
   pickUnknown(): void {
     this.regionChange.emit({ kind: 'unknown' });
     this.resetView();
-  }
-
-  onPinPointerDown(event: PointerEvent): void {
-    this.pinGesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
-  }
-
-  onPinPointerUp(civ: Civilisation, event: PointerEvent): void {
-    const gesture = this.pinGesture;
-    this.pinGesture = null;
-    if (!gesture || gesture.pointerId !== event.pointerId) return;
-    if (this.moved) return;
-    const dist = Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y);
-    if (dist > MOVE_THRESHOLD_PX) return;
-    this.emitCivilization(civ);
-    this.focusPin(civ.id);
   }
 
   getIconForCiv(id: string): string {
@@ -227,306 +212,212 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   resetView(): void {
-    this.scale.set(MIN_SCALE);
-    this.refitMap(true);
+    this.zoomAt(MIN_SCALE);
   }
 
   onWheel(event: WheelEvent): void {
-    if (!event.ctrlKey && !event.metaKey) {
-      return;
-    }
+    if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
-    const viewport = this.mapViewport()?.nativeElement;
-    if (!viewport) return;
-    const rect = viewport.getBoundingClientRect();
+    const local = this.localPoint(event.clientX, event.clientY);
     const delta = event.deltaY > 0 ? -ZOOM_STEP * 0.6 : ZOOM_STEP * 0.6;
-    this.zoomAt(this.scale() + delta, event.clientX - rect.left, event.clientY - rect.top);
+    this.zoomAt(this.scale() + delta, local?.x, local?.y);
   }
 
+  onDoubleClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).closest('[data-map-pin]')) return;
+    const local = this.localPoint(event.clientX, event.clientY);
+    if (this.canZoomOut()) {
+      this.resetView();
+    } else {
+      this.zoomAt(FOCUS_SCALE, local?.x, local?.y);
+    }
+  }
+
+  /** Souris uniquement : le tactile défile nativement. */
   onPointerDown(event: PointerEvent): void {
-    const target = event.target as HTMLElement;
-    if (target.closest('[data-map-ui]')) {
-      this.moved = false;
-      return;
-    }
-
-    const viewport = this.mapViewport()?.nativeElement;
-    if (!viewport) return;
-
-    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     this.moved = false;
-
-    const zoomed = this.isZoomed();
-    const letPageScroll =
-      event.pointerType === 'touch' && !zoomed && this.pointers.size === 1;
-    if (letPageScroll) {
-      this.panOrigin = null;
-      this.setPanning(false);
-      return;
-    }
-
-    try {
-      viewport.setPointerCapture(event.pointerId);
-    } catch {
-      /* Android : capture parfois refusée si la cible est un bouton */
-    }
-
-    if (this.pointers.size === 1) {
-      this.panOrigin = {
-        x: event.clientX,
-        y: event.clientY,
-        panX: this.panX(),
-        panY: this.panY(),
-      };
-      this.setPanning(true);
-    } else if (this.pointers.size === 2) {
-      this.setPanning(false);
-      this.panOrigin = null;
-      for (const id of this.pointers.keys()) {
-        try {
-          viewport.setPointerCapture(id);
-        } catch {
-          /* already captured or released */
-        }
-      }
-      const pts = [...this.pointers.values()];
-      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      this.pinchOrigin = {
-        dist,
-        scale: this.scale(),
-        panX: this.panX(),
-        panY: this.panY(),
-        midX: (pts[0].x + pts[1].x) / 2,
-        midY: (pts[0].y + pts[1].y) / 2,
-      };
-    }
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    const viewport = this.mapViewport()?.nativeElement;
+    if (!viewport || !this.canZoomOut()) return;
+    this.mouseDrag = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      left: viewport.scrollLeft,
+      top: viewport.scrollTop,
+    };
+    viewport.setPointerCapture(event.pointerId);
+    this.isPanning.set(true);
   }
 
   onPointerMove(event: PointerEvent): void {
-    if (!this.pointers.has(event.pointerId)) return;
-    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-
-    if (this.pointers.size === 2 && this.pinchOrigin) {
-      this.setPanning(false);
-      const pts = [...this.pointers.values()];
-      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      const midX = (pts[0].x + pts[1].x) / 2;
-      const midY = (pts[0].y + pts[1].y) / 2;
-      const viewport = this.mapViewport()?.nativeElement;
-      if (!viewport || this.pinchOrigin.dist < 1) return;
-      const rect = viewport.getBoundingClientRect();
-      const ratio = dist / this.pinchOrigin.dist;
-      const nextScale = this.clampScale(this.pinchOrigin.scale * ratio);
-      this.applyZoom(
-        nextScale,
-        midX - rect.left,
-        midY - rect.top,
-        this.pinchOrigin.scale,
-        this.pinchOrigin.panX,
-        this.pinchOrigin.panY,
-      );
-      this.panX.update((x) => x + (midX - this.pinchOrigin!.midX));
-      this.panY.update((y) => y + (midY - this.pinchOrigin!.midY));
-      this.pinchOrigin = { ...this.pinchOrigin, midX, midY };
-      this.clampPan();
-      this.moved = true;
-      return;
-    }
-
-    if (this.panOrigin && this.pointers.size === 1) {
-      const dx = event.clientX - this.panOrigin.x;
-      const dy = event.clientY - this.panOrigin.y;
-      if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) this.moved = true;
-      this.panX.set(this.panOrigin.panX + dx);
-      this.panY.set(this.panOrigin.panY + dy);
-      this.clampPan();
-    }
+    const drag = this.mouseDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const viewport = this.mapViewport()?.nativeElement;
+    if (!viewport) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) this.moved = true;
+    viewport.scrollLeft = drag.left - dx;
+    viewport.scrollTop = drag.top - dy;
   }
 
   onPointerUp(event: PointerEvent): void {
-    if (!this.pointers.has(event.pointerId)) return;
-    const wasSinglePan =
-      this.pointers.size === 1 && this.pointers.has(event.pointerId) && !this.moved;
-
-    this.pointers.delete(event.pointerId);
-    if (this.pointers.size < 2) this.pinchOrigin = null;
-    if (this.pointers.size === 0) {
-      this.panOrigin = null;
-      this.setPanning(false);
-      if (wasSinglePan) {
-        this.handleDoubleTap(event);
-      }
-    } else if (this.pointers.size === 1) {
-      const remaining = [...this.pointers.entries()][0];
-      this.panOrigin = {
-        x: remaining[1].x,
-        y: remaining[1].y,
-        panX: this.panX(),
-        panY: this.panY(),
-      };
-    }
+    if (!this.mouseDrag || this.mouseDrag.pointerId !== event.pointerId) return;
+    this.mouseDrag = null;
+    this.isPanning.set(false);
   }
 
-  private gesturesBound = false;
-  private scrollLockEl: HTMLElement | null = null;
-
-  /** Chrome Android : empêche la page de voler le geste ; le pan reste sur pointermove. */
-  private readonly onCaptureTouchMove = (event: TouchEvent): void => {
-    if (!this.shouldBlockPageScroll(event.target)) return;
-    event.preventDefault();
+  /** Deux doigts = zoom ; un doigt = défilement natif (jamais bloqué). */
+  private readonly onTouchStart = (event: TouchEvent): void => {
+    this.moved = false;
+    if (event.touches.length !== 2) return;
+    const [a, b] = [event.touches[0], event.touches[1]];
+    const mid = this.localPoint((a.clientX + b.clientX) / 2, (a.clientY + b.clientY) / 2);
+    this.pinch = {
+      dist: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY),
+      scale: this.scale(),
+      midX: mid?.x ?? 0,
+      midY: mid?.y ?? 0,
+    };
   };
 
-  private shouldBlockPageScroll(target: EventTarget | null): boolean {
-    if (target instanceof Element && target.closest('[data-map-ui]')) return false;
-    if (this.pointers.size >= 2 || this.pinchOrigin) return true;
-    if (!this.isZoomed()) return false;
-    return this.isPanning() || this.eventOnMap(target);
-  }
-
-  private eventOnMap(target: EventTarget | null): boolean {
-    const el = this.mapViewport()?.nativeElement;
-    return !!el && target instanceof Node && el.contains(target);
-  }
-
-  private isZoomed(): boolean {
-    return this.scale() > MIN_SCALE + 0.01;
-  }
-
-  private setPanning(on: boolean): void {
-    this.isPanning.set(on);
-    this.lockScrollParent(on);
-  }
-
-  private lockScrollParent(lock: boolean): void {
-    const viewport = this.mapViewport()?.nativeElement;
-    const scroller =
-      (viewport?.closest('.story-step-scroll') as HTMLElement | null) ?? this.scrollLockEl;
-    if (!scroller) return;
-    if (lock) {
-      this.scrollLockEl = scroller;
-      scroller.style.overflow = 'hidden';
-      scroller.style.touchAction = 'none';
+  private readonly onTouchMove = (event: TouchEvent): void => {
+    if (event.touches.length === 1) {
+      this.moved = true;
       return;
     }
-    scroller.style.overflow = '';
-    scroller.style.touchAction = '';
-    this.scrollLockEl = null;
-  }
-
-  private readonly onWindowPointerMove = (event: PointerEvent): void => {
-    this.onPointerMove(event);
+    if (event.touches.length !== 2 || !this.pinch || this.pinch.dist < 1) return;
+    event.preventDefault();
+    this.moved = true;
+    const [a, b] = [event.touches[0], event.touches[1]];
+    const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    this.zoomAt(this.pinch.scale * (dist / this.pinch.dist), this.pinch.midX, this.pinch.midY);
   };
 
-  private readonly onWindowPointerUp = (event: PointerEvent): void => {
-    this.onPointerUp(event);
+  private readonly onTouchEnd = (event: TouchEvent): void => {
+    if (event.touches.length < 2) this.pinch = null;
   };
 
-  private attachGestures(): void {
-    if (this.gesturesBound) return;
-    window.addEventListener('touchmove', this.onCaptureTouchMove, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('pointermove', this.onWindowPointerMove, { capture: true });
-    window.addEventListener('pointerup', this.onWindowPointerUp, { capture: true });
-    window.addEventListener('pointercancel', this.onWindowPointerUp, { capture: true });
-    this.gesturesBound = true;
+  private bindTouch(el: HTMLElement): void {
+    if (this.boundViewport === el) return;
+    this.unbindTouch();
+    el.addEventListener('touchstart', this.onTouchStart, { passive: true });
+    el.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    el.addEventListener('touchend', this.onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', this.onTouchEnd, { passive: true });
+    this.boundViewport = el;
   }
 
-  private detachGestures(): void {
-    if (!this.gesturesBound) return;
-    window.removeEventListener('touchmove', this.onCaptureTouchMove, true);
-    window.removeEventListener('pointermove', this.onWindowPointerMove, true);
-    window.removeEventListener('pointerup', this.onWindowPointerUp, true);
-    window.removeEventListener('pointercancel', this.onWindowPointerUp, true);
-    this.gesturesBound = false;
-    this.lockScrollParent(false);
+  private unbindTouch(): void {
+    const el = this.boundViewport;
+    if (!el) return;
+    el.removeEventListener('touchstart', this.onTouchStart);
+    el.removeEventListener('touchmove', this.onTouchMove);
+    el.removeEventListener('touchend', this.onTouchEnd);
+    el.removeEventListener('touchcancel', this.onTouchEnd);
+    this.boundViewport = null;
   }
 
   private emitCivilization(civ: Civilisation): void {
     this.regionChange.emit({ kind: 'civilization', id: civ.id, name: civ.name });
   }
 
-  private handleDoubleTap(event: PointerEvent): void {
-    const viewport = this.mapViewport()?.nativeElement;
-    if (!viewport) return;
-    const now = performance.now();
-    const dx = event.clientX - this.lastTapX;
-    const dy = event.clientY - this.lastTapY;
-    const isDouble =
-      now - this.lastTapAt < DOUBLE_TAP_MS && Math.hypot(dx, dy) < DOUBLE_TAP_DIST_PX;
-
-    this.lastTapAt = now;
-    this.lastTapX = event.clientX;
-    this.lastTapY = event.clientY;
-
-    if (!isDouble) return;
-
-    const rect = viewport.getBoundingClientRect();
-    const localX = event.clientX - rect.left;
-    const localY = event.clientY - rect.top;
-    if (this.scale() > MIN_SCALE + 0.05) {
-      this.resetView();
-    } else {
-      this.zoomAt(FOCUS_SCALE, localX, localY);
-    }
-    this.lastTapAt = 0;
-  }
-
   private focusPin(civId: string): void {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport || !this.mapReady()) return;
     const coords = getEanaMapCoordinates(civId);
-    const pinX = (coords.x / 100) * this.mapWidth();
-    const pinY = (coords.y / 100) * this.mapHeight();
-    const nextScale = this.clampScale(FOCUS_SCALE);
-    const vw = viewport.clientWidth;
-    const vh = viewport.clientHeight;
-    this.scale.set(nextScale);
-    this.panX.set(vw / 2 - pinX * nextScale);
-    this.panY.set(vh / 2 - pinY * nextScale);
-    this.clampPan();
+    const next = this.clampScale(Math.max(this.scale(), FOCUS_SCALE));
+    const worldX = (coords.x / 100) * this.mapWidth();
+    const worldY = (coords.y / 100) * this.mapHeight();
+    this.applyScale(next, worldX, worldY, this.viewportWidth() / 2, this.viewportHeight() / 2);
   }
 
-  private scheduleFit(resetScale: boolean): void {
+  private localPoint(clientX: number, clientY: number): { x: number; y: number } | null {
+    const viewport = this.mapViewport()?.nativeElement;
+    if (!viewport) return null;
+    const rect = viewport.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  /** Zoom en gardant sous (localX, localY) le même point de la carte. */
+  private zoomAt(next: number, localX?: number, localY?: number): void {
+    const viewport = this.mapViewport()?.nativeElement;
+    const clamped = this.clampScale(next);
+    if (!viewport || !this.mapReady()) {
+      this.scale.set(clamped);
+      return;
+    }
+    const lx = localX ?? this.viewportWidth() / 2;
+    const ly = localY ?? this.viewportHeight() / 2;
+    const s = this.scale();
+    const worldX = (viewport.scrollLeft + lx - this.layerLeft()) / s;
+    const worldY = (viewport.scrollTop + ly - this.layerTop()) / s;
+    this.applyScale(clamped, worldX, worldY, lx, ly);
+  }
+
+  /** Change l’échelle puis place (worldX, worldY) sous (localX, localY) après rendu. */
+  private applyScale(
+    next: number,
+    worldX: number,
+    worldY: number,
+    localX: number,
+    localY: number,
+  ): void {
+    this.scale.set(next);
+    const vw = this.viewportWidth();
+    const vh = this.viewportHeight();
+    const w = this.mapWidth() * next;
+    const h = this.mapHeight() * next;
+    const left = Math.max(0, (vw - w) / 2);
+    const top = Math.max(0, (vh - h) / 2);
+    const scrollLeft = worldX * next + left - localX;
+    const scrollTop = worldY * next + top - localY;
+    afterNextRender(
+      () => {
+        const viewport = this.mapViewport()?.nativeElement;
+        if (!viewport) return;
+        viewport.scrollLeft = scrollLeft;
+        viewport.scrollTop = scrollTop;
+      },
+      { injector: this.injector },
+    );
+  }
+
+  private scheduleFit(): void {
     this.fitRetries = 0;
     afterNextRender(
       () => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => this.bindViewport(resetScale));
+          requestAnimationFrame(() => this.bindViewport());
         });
       },
       { injector: this.injector },
     );
   }
 
-  private bindViewport(resetScale: boolean): void {
+  private bindViewport(): void {
     const el = this.mapViewport()?.nativeElement;
     if (!el) {
-      this.retryFit(resetScale);
+      this.retryFit();
       return;
     }
-
     this.resizeObserver?.disconnect();
-    this.resizeObserver = new ResizeObserver(() => {
-      this.refitMap(this.scale() <= MIN_SCALE + 0.01);
-    });
+    this.resizeObserver = new ResizeObserver(() => this.refitMap());
     this.resizeObserver.observe(el);
-    this.attachGestures();
-
-    if (resetScale) this.scale.set(MIN_SCALE);
-    const ok = this.refitMap(true);
-    if (!ok) this.retryFit(resetScale);
+    this.bindTouch(el);
+    this.scale.set(MIN_SCALE);
+    if (!this.refitMap()) this.retryFit();
   }
 
-  private retryFit(resetScale: boolean): void {
+  private retryFit(): void {
     if (this.fitRetries >= 12) return;
     this.fitRetries += 1;
-    requestAnimationFrame(() => this.bindViewport(resetScale));
+    requestAnimationFrame(() => this.bindViewport());
   }
 
-  /** Contain : carte entière visible dans le stage. */
-  private refitMap(center: boolean): boolean {
+  /** Contain : carte entière visible dans le stage à l’échelle 1. */
+  private refitMap(): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
     const vw = viewport.clientWidth;
@@ -543,73 +434,15 @@ export class EanaMapPicker implements OnInit, OnDestroy {
       h = w / EANA_MAP_RATIO;
     }
 
+    this.viewportWidth.set(vw);
+    this.viewportHeight.set(vh);
     this.mapWidth.set(w);
     this.mapHeight.set(h);
     this.mapReady.set(true);
-
-    if (center || this.scale() <= MIN_SCALE + 0.01) {
-      this.panX.set((vw - w * this.scale()) / 2);
-      this.panY.set((vh - h * this.scale()) / 2);
-    } else {
-      this.clampPan();
-    }
     return true;
-  }
-
-  private zoomAt(next: number, localX?: number, localY?: number): void {
-    const viewport = this.mapViewport()?.nativeElement;
-    const clamped = this.clampScale(next);
-    if (!viewport) {
-      this.scale.set(clamped);
-      return;
-    }
-    const rect = viewport.getBoundingClientRect();
-    const cx = localX ?? rect.width / 2;
-    const cy = localY ?? rect.height / 2;
-    this.applyZoom(clamped, cx, cy, this.scale(), this.panX(), this.panY());
-    this.clampPan();
-  }
-
-  private applyZoom(
-    nextScale: number,
-    localX: number,
-    localY: number,
-    prevScale: number,
-    prevPanX: number,
-    prevPanY: number,
-  ): void {
-    const worldX = (localX - prevPanX) / prevScale;
-    const worldY = (localY - prevPanY) / prevScale;
-    this.scale.set(nextScale);
-    this.panX.set(localX - worldX * nextScale);
-    this.panY.set(localY - worldY * nextScale);
   }
 
   private clampScale(v: number): number {
     return Math.min(MAX_SCALE, Math.max(MIN_SCALE, v));
-  }
-
-  private clampPan(): void {
-    const viewport = this.mapViewport()?.nativeElement;
-    if (!viewport) return;
-    const worldW = this.mapWidth();
-    const worldH = this.mapHeight();
-    const s = this.scale();
-    const scaledW = worldW * s;
-    const scaledH = worldH * s;
-    const vw = viewport.clientWidth;
-    const vh = viewport.clientHeight;
-
-    if (scaledW <= vw) {
-      this.panX.set((vw - scaledW) / 2);
-    } else {
-      this.panX.set(Math.min(0, Math.max(vw - scaledW, this.panX())));
-    }
-
-    if (scaledH <= vh) {
-      this.panY.set((vh - scaledH) / 2);
-    } else {
-      this.panY.set(Math.min(0, Math.max(vh - scaledH, this.panY())));
-    }
   }
 }
