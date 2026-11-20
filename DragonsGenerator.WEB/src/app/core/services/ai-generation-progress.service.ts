@@ -322,7 +322,7 @@ function buildProfile(kind: AiGenerationKind, status: AiStatusResponse): AiProgr
     case 'adventure':
       return {
         providerLabel: status.adventureGeneration.primaryLabel,
-        estimatedMs: 180000,
+        estimatedMs: 90000,
         stages: [
           { at: 0, label: 'Préparation du contexte narratif…' },
           { at: 0.08, label: 'Appel Groq (cloud) — rédaction…' },

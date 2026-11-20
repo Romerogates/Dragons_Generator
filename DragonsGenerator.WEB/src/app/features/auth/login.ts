@@ -22,6 +22,7 @@ import {
   peekPendingGoogleIdToken,
   storePendingGoogleIdToken,
 } from '@core/utils/pending-google.util';
+import { extractFastEndpointsError } from '@core/utils/auth-api-error.util';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -234,19 +235,11 @@ export class LoginPage implements OnInit {
   }
 
   private extractError(err: { status?: number; error?: unknown }): string {
-    const e = err?.error as {
-      errors?: { reason?: string }[] | Record<string, string[]>;
-      message?: string;
-    };
-    if (typeof err?.error === 'string') return err.error;
-    if (Array.isArray(e?.errors) && e.errors[0]?.reason) return e.errors[0].reason;
-    if (e?.errors && typeof e.errors === 'object') {
-      const first = Object.values(e.errors).flat()[0];
-      if (typeof first === 'string') return first;
-    }
-    if (err.status === 0) {
-      return 'Impossible de joindre le serveur. Vérifiez le Wi‑Fi et que l\'API tourne.';
-    }
-    return e?.message || '';
+    return extractFastEndpointsError(
+      err,
+      err.status === 0
+        ? 'Impossible de joindre le serveur. Vérifiez le Wi‑Fi et que l\'API tourne.'
+        : '',
+    );
   }
 }

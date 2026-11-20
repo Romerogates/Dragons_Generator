@@ -33,6 +33,7 @@ import {
   accentSurfaceClass,
   profileInitial,
 } from '@core/utils/profile.util';
+import { extractFastEndpointsError } from '@core/utils/auth-api-error.util';
 
 type SettingsTab = 'account' | 'ai' | 'notifications' | 'app' | 'security' | 'data';
 
@@ -509,10 +510,6 @@ export class SettingsPage implements OnInit {
   }
 
   private extractError(err: { status?: number; error?: unknown }): string {
-    const e = err?.error as { errors?: { reason?: string }[] | Record<string, string[]>; message?: string };
-    if (Array.isArray(e?.errors) && e.errors[0]?.reason) return e.errors[0].reason;
-    if (e?.message) return e.message;
-    if (err.status === 0) return 'Impossible de joindre le serveur.';
-    return '';
+    return extractFastEndpointsError(err, err.status === 0 ? 'Impossible de joindre le serveur.' : '');
   }
 }

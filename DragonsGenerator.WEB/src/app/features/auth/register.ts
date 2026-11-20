@@ -22,6 +22,7 @@ import {
   peekPendingGoogleIdToken,
   storePendingGoogleIdToken,
 } from '@core/utils/pending-google.util';
+import { extractFastEndpointsError } from '@core/utils/auth-api-error.util';
 
 @Component({
   selector: 'app-register',
@@ -99,8 +100,7 @@ export class RegisterPage implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        const e = err?.error as { errors?: { reason?: string }[] };
-        const reason = Array.isArray(e?.errors) ? e.errors[0]?.reason : '';
+        const reason = extractFastEndpointsError(err);
         if (err.status === 403 && reason === 'google_register_required') {
           this.enterGoogleSignup(idToken);
           return;
@@ -134,10 +134,7 @@ export class RegisterPage implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        const e = err?.error as { errors?: { reason?: string }[]; message?: string };
-        this.error.set(
-          (Array.isArray(e?.errors) && e.errors[0]?.reason) || e?.message || 'Inscription Google impossible.',
-        );
+        this.error.set(extractFastEndpointsError(err, 'Inscription Google impossible.'));
       },
     });
   }
@@ -208,11 +205,7 @@ export class RegisterPage implements OnInit {
             );
             return;
           }
-          const e = err?.error;
-          const msg =
-            (Array.isArray(e?.errors) && e.errors[0]?.reason) ||
-            e?.message ||
-            'Inscription impossible.';
+          const msg = extractFastEndpointsError(err, 'Inscription impossible.');
           this.error.set(msg);
           if (msg.includes('non confirmé')) {
             this.showResend.set(true);

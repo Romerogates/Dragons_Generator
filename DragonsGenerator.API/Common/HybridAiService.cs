@@ -294,9 +294,8 @@ public sealed class HybridAiService
             primary = "qwen/qwen3.8-27b";
 
         var secondary = _config["Groq:FallbackModel"];
-        var tertiary = _config["Groq:Model"] ?? "groq/compound";
 
-        return new[] { primary, secondary, tertiary }
+        return new[] { primary, secondary }
             .Where(m => !string.IsNullOrWhiteSpace(m))
             .Select(m => m!)
             .Distinct(StringComparer.Ordinal)

@@ -149,7 +149,76 @@ export class CustomizeCreaturesStep implements OnInit {
 
     this.generationError.set(null);
     this.fallbackNotice.set(null);
-    void this.generateBackstoriesSequentially(pending);
+    if (pending.length === 1) {
+      void this.generateBackstoriesSequentially(pending);
+      return;
+    }
+    void this.generateBackstoriesBatch(pending);
+  }
+
+  private async generateBackstoriesBatch(pending: StoryCreatureSelection[]): Promise<void> {
+    this.generatingId.set(pending[0]?.creatureId ?? null);
+    this.generationError.set(null);
+    this.fallbackNotice.set(null);
+
+    await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
+    this.aiProgress.setStageLabel(`Vies des créatures (${pending.length}) — lot unique…`);
+
+    try {
+      const res = await this.aiProgress.awaitWhileActive(
+        this.dataService
+          .generateCreatureStoriesBatch({
+            creatures: pending.map((c) => ({
+              creatureId: c.creatureId,
+              customName: c.customName.trim(),
+              role: c.role,
+            })),
+            setting: this.builder.setting().trim() || null,
+          })
+          .pipe(
+            catchError((err) => {
+              if (isAiRateLimitHttpError(err)) return throwError(() => err);
+              return of(null);
+            }),
+          ),
+      );
+      if (this.aiProgress.isAborted()) {
+        this.generatingId.set(null);
+        return;
+      }
+
+      for (const item of res?.backstories ?? []) {
+        if (item.backstory?.trim()) {
+          this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
+        }
+      }
+
+      const missing = pending.filter((c) => {
+        const current = this.builder.creatures().find((x) => x.creatureId === c.creatureId);
+        return !current?.backstory.trim();
+      });
+      if (missing.length > 0) {
+        this.fallbackNotice.set(this.busyLivesMessage);
+        await this.fillBackstoriesOneByOne(missing);
+      }
+    } catch (err) {
+      if (this.aiProgress.isAborted() || isAiGenerationAborted(err) || isAiRateLimitHttpError(err)) {
+        this.generatingId.set(null);
+        if (this.aiProgress.isAborted() || isAiGenerationAborted(err)) return;
+        this.aiProgress.complete();
+        return;
+      }
+      this.fallbackNotice.set(this.busyLivesMessage);
+      await this.fillBackstoriesOneByOne(pending);
+    }
+
+    if (this.aiProgress.isAborted()) {
+      this.generatingId.set(null);
+      return;
+    }
+
+    this.aiProgress.complete();
+    this.generatingId.set(null);
   }
 
   private async generateBackstoriesSequentially(pending: StoryCreatureSelection[]): Promise<void> {
@@ -158,7 +227,18 @@ export class CustomizeCreaturesStep implements OnInit {
     this.fallbackNotice.set(null);
 
     await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
+    await this.fillBackstoriesOneByOne(pending);
 
+    if (this.aiProgress.isAborted()) {
+      this.generatingId.set(null);
+      return;
+    }
+
+    this.aiProgress.complete();
+    this.generatingId.set(null);
+  }
+
+  private async fillBackstoriesOneByOne(pending: StoryCreatureSelection[]): Promise<void> {
     for (let i = 0; i < pending.length; i++) {
       if (this.aiProgress.isAborted()) break;
       const creature = pending[i];
@@ -182,14 +262,6 @@ export class CustomizeCreaturesStep implements OnInit {
         break;
       }
     }
-
-    if (this.aiProgress.isAborted()) {
-      this.generatingId.set(null);
-      return;
-    }
-
-    this.aiProgress.complete();
-    this.generatingId.set(null);
   }
 
   /** Un appel, erreurs HTTP avalées. Le cache serveur évite de reconsommer un crédit. */

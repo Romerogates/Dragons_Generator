@@ -100,6 +100,8 @@ public static class AuthHelpers
 
     public static bool IsAdmin(ClaimsPrincipal user) => user.IsInRole(AppRoles.Admin);
 
+    public const string DisplayNameTakenMessage = "Ce pseudo est déjà utilisé. Choisissez-en un autre.";
+
     public static bool TryNormalizeDisplayName(string? raw, out string normalized, out string? error)
     {
         normalized = (raw ?? "").Trim();

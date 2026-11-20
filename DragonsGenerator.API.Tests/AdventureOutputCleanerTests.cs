@@ -42,6 +42,7 @@ public class AdventureOutputCleanerTests
         Assert.Contains("**Accroche**", cleaned);
         Assert.Contains("La Cité Franche tremble", cleaned);
         Assert.Contains("**Pistes pour le MJ**", cleaned);
+        Assert.True(AdventureOutputCleaner.LooksProfessional(cleaned));
     }
 
     [Fact]
@@ -49,5 +50,27 @@ public class AdventureOutputCleanerTests
     {
         const string bad = "**Accroche** — , **Contexte**\nWord Count Check: 523 words";
         Assert.False(AdventureOutputCleaner.LooksProfessional(bad));
+    }
+
+    [Fact]
+    public void LooksProfessional_accepts_cleaned_french_sections()
+    {
+        const string raw = """
+            **Accroche** — La Cité Franche tremble. Des disparitions mystérieuses jettent un voile de peur sur les quartiers commerçants.
+
+            **Contexte** — Situé aux frontières du royaume, le port cosmopolite vit sous un ciel de brume.
+
+            **Personnages clés** — **Chef de bande** dirige les sabotages. **Dragonnet** guide les héros.
+
+            **Acte 1** — Les aventuriers descendent dans les catacombes humides.
+
+            **Acte 2** — Le chef surgit et une goule émerge des ombres.
+
+            **Acte 3** — Les héros poursuivent l'antagoniste blessé.
+
+            **Pistes pour le MJ** — La goule peut révéler un artefact volé.
+            """;
+
+        Assert.True(AdventureOutputCleaner.LooksProfessional(raw));
     }
 }

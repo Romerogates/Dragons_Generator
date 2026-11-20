@@ -94,10 +94,14 @@ public static class AdventureOutputCleaner
         if (Regex.IsMatch(lower, @"\b(word count|deconstruct|integration:|creatures to include|need to assign)\b"))
             return false;
 
-        if (!text.Contains("**Accroche**", StringComparison.Ordinal))
-            return false;
+        var hits = 0;
+        foreach (var title in SectionTitles)
+        {
+            if (text.Contains($"**{title}**", StringComparison.Ordinal))
+                hits++;
+        }
 
-        return Regex.IsMatch(text, @"\*\*Accroche\*\*\s*[—\-–]\s*[A-ZÀ-Ü«""][^*\n]{30,}");
+        return hits >= 3;
     }
 
     private static string StripBulletOutline(string text)

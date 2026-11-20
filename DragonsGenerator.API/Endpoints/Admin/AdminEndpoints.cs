@@ -119,7 +119,7 @@ public class AdminUpdateUserEndpoint(AppDbContext db) : Endpoint<AdminUpdateUser
                 && await AuthHelpers.IsDisplayNameTakenAsync(db, adminName, user.Id, ct)
             )
             {
-                AddError("Ce pseudo est déjà pris.");
+                AddError(AuthHelpers.DisplayNameTakenMessage);
                 await Send.ErrorsAsync(cancellation: ct);
                 return;
             }

@@ -29,9 +29,11 @@ import { RouterLink } from '@angular/router';
           maxlength="64"
           autocomplete="username"
           name="googleDisplayName"
+          data-testid="google-signup-display-name"
           [ngModel]="displayName()"
           (ngModelChange)="displayName.set($event)"
           placeholder="Nom affiché"
+          [attr.aria-invalid]="error() ? 'true' : 'false'"
           class="dg-input mt-1 !py-2.5 !px-3"
         />
       </label>
@@ -54,7 +56,7 @@ import { RouterLink } from '@angular/router';
         </span>
       </label>
       @if (error()) {
-        <p class="text-sm text-red-400">{{ error() }}</p>
+        <p class="text-sm text-red-400" role="alert" data-testid="google-signup-error">{{ error() }}</p>
       }
       <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
         {{ loading() ? 'Création…' : 'Créer mon compte' }}

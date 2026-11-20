@@ -47,7 +47,7 @@ public class UpdateProfileEndpoint(AppDbContext db) : Endpoint<UpdateProfileRequ
             && await AuthHelpers.IsDisplayNameTakenAsync(db, normalized, user.Id, ct)
         )
         {
-            AddError("Ce pseudo est déjà pris.");
+            AddError(AuthHelpers.DisplayNameTakenMessage);
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }

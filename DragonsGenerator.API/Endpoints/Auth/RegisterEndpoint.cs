@@ -84,7 +84,7 @@ public class RegisterEndpoint(
                     && await AuthHelpers.IsDisplayNameTakenAsync(db, newName, existing.Id, ct)
                 )
                 {
-                    AddError("Ce pseudo est déjà pris.");
+                    AddError(AuthHelpers.DisplayNameTakenMessage);
                     await Send.ErrorsAsync(cancellation: ct);
                     return;
                 }
@@ -122,7 +122,7 @@ public class RegisterEndpoint(
 
         if (await AuthHelpers.IsDisplayNameTakenAsync(db, displayName, null, ct))
         {
-            AddError("Ce pseudo est déjà pris.");
+            AddError(AuthHelpers.DisplayNameTakenMessage);
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }

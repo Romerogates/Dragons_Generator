@@ -13,6 +13,21 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.492',
+    date: '2026-11-20',
+    title: 'Campagnes IA plus rapides, pseudo Google',
+    player: [
+      'Quand vous générez d’un coup la vie de plusieurs créatures, ça part en un seul lot au lieu d’attendre chacune l’une après l’autre.',
+      'La rédaction de l’aventure relance moins souvent tout depuis le début si le texte est déjà jouable.',
+      'À l’inscription Google, un pseudo déjà pris n’est plus modifié en silence : il faut en choisir un autre, pour que vous connaissiez votre nom.',
+    ],
+    tech: [
+      '`generateAllBackstories` → `POST /generate-creature-stories-batch` (secours 1-à-1). Plus de retry HTTP 502/504 sur `POST /generate-adventure`.',
+      '`LooksProfessional` : ≥ 3 sections `**Titre**` (plus le regex Accroche 30 car. sans `*`). Chaîne aventure Groq : primary + fallback, plus `groq/compound`.',
+      '`POST /auth/google` : plus de suffixe aléatoire ; `AuthHelpers.DisplayNameTakenMessage`. Front `extractFastEndpointsError` (login / register / settings).',
+    ],
+  },
+  {
     version: '1.491',
     date: '2026-11-20',
     title: 'Téléphone : Table, Héros, Codex, Guide, Plus',

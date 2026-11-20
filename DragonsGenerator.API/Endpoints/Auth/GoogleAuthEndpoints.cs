@@ -85,7 +85,11 @@ public class GoogleLoginEndpoint(
             }
 
             if (await AuthHelpers.IsDisplayNameTakenAsync(db, normalized, null, ct))
-                normalized = $"{normalized[..Math.Min(normalized.Length, 52)]}-{RandomNumberGenerator.GetInt32(1000, 9999)}";
+            {
+                AddError(AuthHelpers.DisplayNameTakenMessage);
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
 
             user = new AppUser
             {
