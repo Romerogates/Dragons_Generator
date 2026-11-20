@@ -38,12 +38,10 @@
         #mapViewport
         class="eana-map-viewport eana-map-stage relative bg-[#171b22] overflow-hidden cursor-grab select-none"
         [class.cursor-grabbing]="isPanning()"
+        [class.eana-map-zoomed]="canZoomOut()"
         [style.touch-action]="canZoomOut() ? 'none' : 'pan-y'"
         (wheel)="onWheel($event)"
         (pointerdown)="onPointerDown($event)"
-        (pointermove)="onPointerMove($event)"
-        (pointerup)="onPointerUp($event)"
-        (pointercancel)="onPointerUp($event)"
       >
         <div
           class="absolute left-0 top-0 origin-top-left eana-map-layer"
@@ -62,14 +60,16 @@
           @for (civ of civilizations(); track civ.id) {
             <div
               data-map-pin
+              [attr.data-civ-id]="civ.id"
               class="absolute z-10"
               [style.top.%]="getMapCoordinates(civ.id).y"
               [style.left.%]="getMapCoordinates(civ.id).x"
-              style="transform: translate(-50%, -50%)"
+              style="transform: translate(-50%, -50%); touch-action: none"
             >
               <button
                 type="button"
-                class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04]"
+                class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04] touch-none"
+                style="touch-action: none"
                 [class]="
                   isSelectedCiv(civ.id)
                     ? 'bg-violet-600 border-2 border-violet-300 text-white'

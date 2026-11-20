@@ -135,10 +135,12 @@ export class EanaMapPicker implements OnInit, OnDestroy {
       },
     });
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
+    this.attachGestures();
   }
 
   ngOnDestroy(): void {
     this.pointers.clear();
+    this.detachGestures();
     this.resizeObserver?.disconnect();
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
   }
@@ -254,15 +256,20 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     this.moved = false;
 
-    const zoomed = this.scale() > MIN_SCALE + 0.01;
-    const touchOnFit = event.pointerType === 'touch' && !zoomed && this.pointers.size === 1;
-    if (touchOnFit) {
+    const zoomed = this.isZoomed();
+    const letPageScroll =
+      event.pointerType === 'touch' && !zoomed && this.pointers.size === 1;
+    if (letPageScroll) {
       this.panOrigin = null;
-      this.isPanning.set(false);
+      this.setPanning(false);
       return;
     }
 
-    viewport.setPointerCapture(event.pointerId);
+    try {
+      viewport.setPointerCapture(event.pointerId);
+    } catch {
+      /* Android : capture parfois refusée si la cible est un bouton */
+    }
 
     if (this.pointers.size === 1) {
       this.panOrigin = {
@@ -271,9 +278,9 @@ export class EanaMapPicker implements OnInit, OnDestroy {
         panX: this.panX(),
         panY: this.panY(),
       };
-      this.isPanning.set(true);
+      this.setPanning(true);
     } else if (this.pointers.size === 2) {
-      this.isPanning.set(false);
+      this.setPanning(false);
       this.panOrigin = null;
       for (const id of this.pointers.keys()) {
         try {
@@ -300,7 +307,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
     if (this.pointers.size === 2 && this.pinchOrigin) {
-      this.isPanning.set(false);
+      this.setPanning(false);
       const pts = [...this.pointers.values()];
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
       const midX = (pts[0].x + pts[1].x) / 2;
@@ -337,6 +344,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   onPointerUp(event: PointerEvent): void {
+    if (!this.pointers.has(event.pointerId)) return;
     const wasSinglePan =
       this.pointers.size === 1 && this.pointers.has(event.pointerId) && !this.moved;
 
@@ -344,7 +352,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     if (this.pointers.size < 2) this.pinchOrigin = null;
     if (this.pointers.size === 0) {
       this.panOrigin = null;
-      this.isPanning.set(false);
+      this.setPanning(false);
       if (wasSinglePan) {
         this.handleDoubleTap(event);
       }
@@ -357,6 +365,82 @@ export class EanaMapPicker implements OnInit, OnDestroy {
         panY: this.panY(),
       };
     }
+  }
+
+  private gesturesBound = false;
+  private scrollLockEl: HTMLElement | null = null;
+
+  /** Chrome Android : empêche la page de voler le geste ; le pan reste sur pointermove. */
+  private readonly onCaptureTouchMove = (event: TouchEvent): void => {
+    if (!this.shouldBlockPageScroll(event.target)) return;
+    event.preventDefault();
+  };
+
+  private shouldBlockPageScroll(target: EventTarget | null): boolean {
+    if (target instanceof Element && target.closest('[data-map-ui]')) return false;
+    if (this.pointers.size >= 2 || this.pinchOrigin) return true;
+    if (!this.isZoomed()) return false;
+    return this.isPanning() || this.eventOnMap(target);
+  }
+
+  private eventOnMap(target: EventTarget | null): boolean {
+    const el = this.mapViewport()?.nativeElement;
+    return !!el && target instanceof Node && el.contains(target);
+  }
+
+  private isZoomed(): boolean {
+    return this.scale() > MIN_SCALE + 0.01;
+  }
+
+  private setPanning(on: boolean): void {
+    this.isPanning.set(on);
+    this.lockScrollParent(on);
+  }
+
+  private lockScrollParent(lock: boolean): void {
+    const viewport = this.mapViewport()?.nativeElement;
+    const scroller =
+      (viewport?.closest('.story-step-scroll') as HTMLElement | null) ?? this.scrollLockEl;
+    if (!scroller) return;
+    if (lock) {
+      this.scrollLockEl = scroller;
+      scroller.style.overflow = 'hidden';
+      scroller.style.touchAction = 'none';
+      return;
+    }
+    scroller.style.overflow = '';
+    scroller.style.touchAction = '';
+    this.scrollLockEl = null;
+  }
+
+  private readonly onWindowPointerMove = (event: PointerEvent): void => {
+    this.onPointerMove(event);
+  };
+
+  private readonly onWindowPointerUp = (event: PointerEvent): void => {
+    this.onPointerUp(event);
+  };
+
+  private attachGestures(): void {
+    if (this.gesturesBound) return;
+    window.addEventListener('touchmove', this.onCaptureTouchMove, {
+      passive: false,
+      capture: true,
+    });
+    window.addEventListener('pointermove', this.onWindowPointerMove, { capture: true });
+    window.addEventListener('pointerup', this.onWindowPointerUp, { capture: true });
+    window.addEventListener('pointercancel', this.onWindowPointerUp, { capture: true });
+    this.gesturesBound = true;
+  }
+
+  private detachGestures(): void {
+    if (!this.gesturesBound) return;
+    window.removeEventListener('touchmove', this.onCaptureTouchMove, true);
+    window.removeEventListener('pointermove', this.onWindowPointerMove, true);
+    window.removeEventListener('pointerup', this.onWindowPointerUp, true);
+    window.removeEventListener('pointercancel', this.onWindowPointerUp, true);
+    this.gesturesBound = false;
+    this.lockScrollParent(false);
   }
 
   private emitCivilization(civ: Civilisation): void {
@@ -428,6 +512,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
       this.refitMap(this.scale() <= MIN_SCALE + 0.01);
     });
     this.resizeObserver.observe(el);
+    this.attachGestures();
 
     if (resetScale) this.scale.set(MIN_SCALE);
     const ok = this.refitMap(true);

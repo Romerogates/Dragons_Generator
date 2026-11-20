@@ -771,10 +771,14 @@
 
   /* Carte d'Eana — gestes + stage cross-device (iOS / Android / tablette / desktop / paysage) */
   .eana-map-viewport {
-    touch-action: none;
+    touch-action: pan-y;
     -webkit-user-select: none;
     user-select: none;
     overscroll-behavior: none;
+  }
+
+  .eana-map-viewport.eana-map-zoomed {
+    touch-action: none;
   }
 
   .eana-map-viewport .eana-map-layer {

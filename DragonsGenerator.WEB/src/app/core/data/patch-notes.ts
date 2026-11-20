@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.496',
+    date: '2026-11-20',
+    title: 'Carte : glisser au doigt après zoom',
+    player: [
+      'Sur téléphone, une fois un lieu choisi sur la carte, un doigt déplace bien la carte au lieu de faire défiler la page.',
+    ],
+    tech: [
+      '`eana-map-picker` : `touchmove` capture `preventDefault` si zoomé (Chrome Android) ; `pointermove`/`pointerup` sur `window` ; lock overflow `.story-step-scroll` pendant le drag.',
+    ],
+  },
+  {
     version: '1.495',
     date: '2026-11-20',
     title: 'Lieux et carte plus utilisables',
