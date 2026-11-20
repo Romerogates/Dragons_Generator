@@ -196,7 +196,12 @@ export function clampHubTabsForViewer(
   return { tab: nextTab, prepSub: nextSub };
 }
 
-export type CampaignHubTabDef = { id: CampaignPrimaryTab; label: string; icon: string };
+export type CampaignHubTabDef = {
+  id: CampaignPrimaryTab;
+  label: string;
+  shortLabel?: string;
+  icon: string;
+};
 
 export function visibleCampaignHubTabs(
   isOwner: boolean,
@@ -206,21 +211,31 @@ export function visibleCampaignHubTabs(
     const tabs: CampaignHubTabDef[] = [
       { id: 'overview', label: 'Ce soir', icon: 'fluent-emoji:fire' },
       { id: 'calendar', label: 'Agenda', icon: 'fluent-emoji:spiral-calendar' },
-      { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+      { id: 'handouts', label: 'Documents', shortLabel: 'Docs', icon: 'fluent-emoji:page-facing-up' },
       { id: 'players', label: 'Héros', icon: 'fluent-emoji:busts-in-silhouette' },
     ];
     if (pregenCount > 0) {
-      tabs.splice(3, 0, { id: 'prep', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
+      tabs.splice(3, 0, {
+        id: 'prep',
+        label: 'Pré-tirés',
+        shortLabel: 'Tirés',
+        icon: 'fluent-emoji:performing-arts',
+      });
     }
     return tabs;
   }
   const tabs: CampaignHubTabDef[] = [
     { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
-    { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
+    { id: 'sessions', label: 'Sessions', shortLabel: 'Soirées', icon: 'fluent-emoji:calendar' },
     { id: 'calendar', label: 'Agenda', icon: 'fluent-emoji:spiral-calendar' },
-    { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+    { id: 'handouts', label: 'Documents', shortLabel: 'Docs', icon: 'fluent-emoji:page-facing-up' },
   ];
-  tabs.push({ id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' });
+  tabs.push({
+    id: 'prep',
+    label: 'Préparation',
+    shortLabel: 'Prépa',
+    icon: 'fluent-emoji:hammer-and-wrench',
+  });
   tabs.push({ id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' });
   return tabs;
 }

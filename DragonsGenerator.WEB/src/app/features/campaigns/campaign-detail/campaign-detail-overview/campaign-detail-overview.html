@@ -1,6 +1,6 @@
-<section class="space-y-16 md:space-y-20">
+<section class="space-y-6 md:space-y-16 lg:space-y-20">
   <!-- Page de garde -->
-  <header class="relative overflow-hidden rounded-3xl border border-violet-900/40 bg-gradient-to-br from-violet-950/40 via-[#1b2028] to-emerald-950/30 px-6 py-9 md:px-8 md:py-12">
+  <header class="relative overflow-hidden rounded-2xl md:rounded-3xl border border-violet-900/40 bg-gradient-to-br from-violet-950/40 via-[#1b2028] to-emerald-950/30 px-4 py-5 sm:px-6 sm:py-9 md:px-8 md:py-12">
     <div
       class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-600/10 blur-3xl"
       aria-hidden="true"
@@ -13,7 +13,7 @@
     <p class="relative text-[10px] font-black uppercase tracking-[0.2em] text-violet-400/90 mb-4">
       {{ isOwner() ? 'Page de garde' : 'Ce soir' }}
     </p>
-    <h2 class="relative text-2xl md:text-3xl font-serif text-slate-100 leading-snug max-w-2xl">
+    <h2 class="relative text-xl md:text-3xl font-serif text-slate-100 leading-snug max-w-2xl">
       @if (liveSession(); as live) {
         Session en cours — {{ live.title }}
       } @else if (nextSession(); as next) {
@@ -66,12 +66,12 @@
       }
     </p>
 
-    <div class="relative mt-10 flex flex-wrap gap-3">
+    <div class="relative mt-5 sm:mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3">
       @if (liveSession(); as live) {
         @if (isOwner()) {
           <button
             type="button"
-            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
             data-testid="hub-open-play"
             (click)="openPlayFullscreen.emit()"
           >
@@ -80,7 +80,7 @@
         } @else {
           <button
             type="button"
-            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
             data-testid="hub-open-play"
             (click)="openPlayFullscreen.emit()"
           >
@@ -91,7 +91,7 @@
         @if (isOwner()) {
           <button
             type="button"
-            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
             (click)="startPlaySession.emit(next.id)"
           >
             Entrer en session
@@ -99,7 +99,7 @@
         }
         <button
           type="button"
-          class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+          class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
           (click)="goSessions.emit()"
         >
           Voir les sessions
@@ -107,7 +107,7 @@
       } @else if (nextSchedule()) {
         <button
           type="button"
-          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500 shadow-lg shadow-amber-950/40"
+          class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500 shadow-lg shadow-amber-950/40"
           (click)="goCalendar.emit()"
           data-testid="hub-next-calendar"
         >
@@ -116,7 +116,7 @@
         @if (isOwner()) {
           <button
             type="button"
-            class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+            class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
             (click)="convertNextSchedule.emit()"
             data-testid="hub-convert-schedule"
           >
@@ -125,7 +125,7 @@
         }
         <button
           type="button"
-          class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+          class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
           (click)="goSessions.emit()"
         >
           Voir les sessions
@@ -134,7 +134,7 @@
         @if (fsv.current; as cur) {
           <button
             type="button"
-            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
+            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
             (click)="firstSessionAction.emit(cur.action)"
           >
             {{ cur.actionLabel }}
@@ -142,7 +142,7 @@
         } @else {
           <button
             type="button"
-            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
+            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
             (click)="goSessions.emit()"
           >
             Aller aux sessions
@@ -151,7 +151,7 @@
       } @else {
         <button
           type="button"
-          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
+          class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
           (click)="goSessions.emit()"
         >
           Aller aux sessions
@@ -213,7 +213,7 @@
   <!-- Sommaire -->
   <div class="space-y-7">
     @if (isOwner()) {
-    <div class="max-w-2xl">
+    <div class="max-w-2xl hidden md:block">
       <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 mb-3">Sommaire</p>
       <h3 class="text-xl font-serif text-slate-100">Comment utiliser ce hub</h3>
       <p class="mt-4 text-sm text-slate-400 leading-relaxed">

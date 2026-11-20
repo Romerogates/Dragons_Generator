@@ -323,6 +323,32 @@
     @apply border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/40;
   }
 
+  .dg-chip-bar-scroll {
+    @apply flex-nowrap overflow-x-auto overscroll-x-contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .campaign-hub-tabs {
+    @apply sticky z-20 mt-3 grid gap-0.5 p-1 rounded-2xl bg-[#141820]/95 backdrop-blur-md
+      border border-slate-800/80;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    top: var(--dg-sticky-top);
+  }
+
+  .campaign-hub-tab {
+    @apply relative flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5
+      px-0.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wide border overflow-hidden
+      sm:flex-row sm:gap-1.5 sm:px-3 sm:text-[10px] sm:tracking-widest;
+  }
+
+  .campaign-hub-tab iconify-icon {
+    @apply w-4 h-4 text-base leading-none pointer-events-none;
+  }
+
+  .campaign-list-page {
+    @apply max-w-7xl mx-auto px-3 py-6 sm:px-4 sm:py-10 animate-fade-in min-h-[80vh] flex flex-col;
+  }
+
   .dg-empty {
     @apply flex flex-col items-center justify-center flex-grow rounded-3xl border border-dashed
       border-slate-700/80 p-12 text-center;

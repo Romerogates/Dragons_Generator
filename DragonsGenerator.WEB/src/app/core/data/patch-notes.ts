@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.493',
+    date: '2026-11-20',
+    title: 'Campagnes plus lisibles sur téléphone',
+    player: [
+      'La liste des tables est plus compacte : titre, rôle et actions, sans doubles infos.',
+      'Dans une campagne, les onglets tiennent sur une seule rangée, collés en haut — plus de deuxième barre qui recouvrait le bas de l’écran.',
+      'Le résumé et les boutons (ouvrir la table, etc.) prennent toute la largeur, plus faciles à taper.',
+    ],
+    tech: [
+      'Hub : `.campaign-hub-tabs` grille `auto-fit` + `shortLabel` ; plus de barre `lg:hidden` `mobile-more-btn`. Liste : `.campaign-list-page`, cartes sans stats doublées `<sm`.',
+      'Overview `space-y-6` mobile ; CTA `w-full sm:w-auto` ; prep subnav scroll horizontal `min-h-11`.',
+    ],
+  },
+  {
     version: '1.492',
     date: '2026-11-20',
     title: 'Campagnes IA plus rapides, pseudo Google',

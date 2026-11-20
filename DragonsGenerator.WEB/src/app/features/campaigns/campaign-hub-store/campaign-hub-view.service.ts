@@ -239,16 +239,6 @@ export class CampaignHubViewService {
     return groups.filter((g) => g.items.length > 0);
   });
   readonly creatureRoleOptions = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
-  readonly showMobileSessionBar = computed(
-    () =>
-      !!this.activePlaySession() ||
-      this.hubNav.tab() === 'handouts' ||
-      this.hubNav.tab() === 'overview' ||
-      this.hubNav.tab() === 'sessions' ||
-      this.hubNav.tab() === 'calendar' ||
-      this.hubNav.tab() === 'prep' ||
-      this.hubNav.tab() === 'players',
-  );
   readonly calendarHeroOptions = computed((): CalendarHeroOption[] =>
     hubView.calendarHeroOptions(this.hub.campaign()),
   );

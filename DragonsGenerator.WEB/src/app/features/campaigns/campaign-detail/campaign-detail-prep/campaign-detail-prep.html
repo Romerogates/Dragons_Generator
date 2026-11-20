@@ -3,11 +3,11 @@
     <app-campaign-setup-guide [state]="guideState()" (action)="guideAction.emit($event)" />
   }
 
-  <nav class="flex flex-wrap gap-1.5" aria-label="Préparation">
+  <nav class="flex flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 -mx-1 px-1" aria-label="Préparation">
     @for (s of tabs(); track s.id) {
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-colors"
+        class="inline-flex shrink-0 items-center gap-1.5 min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
         [class]="
           prepSub() === s.id
             ? 'border-violet-500 text-violet-300 bg-violet-950/30'

@@ -86,7 +86,7 @@
     }
 
     @if (vm.showPinnedOverlay() && vm.pinnedHandout(); as pin) {
-      <div class="fixed inset-x-0 z-[90] p-3 sm:p-4 pointer-events-none" [class.bottom-16]="vm.showMobileSessionBar()" [class.bottom-0]="!vm.showMobileSessionBar()">
+      <div class="fixed inset-x-0 z-[90] p-3 sm:p-4 pointer-events-none max-lg:bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:bottom-0">
         <div class="max-w-lg mx-auto pointer-events-auto rounded-2xl border border-sky-500/40 bg-[#1b2028]/95 backdrop-blur-md shadow-2xl overflow-hidden">
           <div class="h-1 bg-gradient-to-r from-sky-600/40 via-sky-400/60 to-sky-600/40"></div>
           <div class="p-4 sm:p-5">
@@ -103,73 +103,6 @@
           </div>
         </div>
       </div>
-    }
-
-    @if (vm.showMobileSessionBar()) {
-      <nav class="fixed inset-x-0 bottom-0 z-[80] lg:hidden border-t border-slate-800 bg-[#171b22]/95 backdrop-blur-md px-2 pt-2 safe-area-pb">
-        <div class="flex justify-around gap-1 max-w-lg mx-auto pb-1">
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="vm.hubNav.tab() === 'overview'" [class.bg-violet-950/40]="vm.hubNav.tab() === 'overview'" [class.text-slate-400]="vm.hubNav.tab() !== 'overview'" (click)="vm.hubNav.setTab('overview')">Résumé</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="vm.hubNav.tab() === 'sessions'" [class.bg-amber-950/40]="vm.hubNav.tab() === 'sessions'" [class.text-slate-400]="vm.hubNav.tab() !== 'sessions'" (click)="vm.hubNav.setTab('sessions')">Sessions</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="vm.hubNav.tab() === 'calendar'" [class.bg-amber-950/40]="vm.hubNav.tab() === 'calendar'" [class.text-slate-400]="vm.hubNav.tab() !== 'calendar'" (click)="vm.hubNav.setTab('calendar')">Agenda</button>
-          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="vm.hubNav.tab() === 'prep'" [class.bg-violet-950/40]="vm.hubNav.tab() === 'prep'" [class.text-slate-400]="vm.hubNav.tab() !== 'prep'" (click)="vm.hubNav.setTab('prep')">Prépa</button>
-          <div class="relative flex-1">
-            <button
-              type="button"
-              class="relative w-full py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors"
-              [class.text-sky-300]="vm.hubNav.tab() === 'handouts' || vm.hubNav.tab() === 'players' || vm.boot.mobileMoreOpen()"
-              [class.bg-sky-950/40]="vm.hubNav.tab() === 'handouts' || vm.hubNav.tab() === 'players' || vm.boot.mobileMoreOpen()"
-              [class.text-slate-400]="vm.hubNav.tab() !== 'handouts' && vm.hubNav.tab() !== 'players' && !vm.boot.mobileMoreOpen()"
-              [attr.aria-expanded]="vm.boot.mobileMoreOpen()"
-              [attr.aria-label]="
-                vm.playersTabBadgeCount() > 0
-                  ? 'Plus, ' +
-                    vm.playersTabBadgeCount() +
-                    (vm.playersTabBadgeCount() > 1
-                      ? ' propositions en attente'
-                      : ' proposition en attente')
-                  : 'Plus'
-              "
-              (click)="vm.boot.toggleMobileMore()"
-              data-testid="mobile-more-btn"
-            >
-              Plus
-              @if (vm.playersTabBadgeCount() > 0) {
-                <span
-                  class="absolute top-1 right-1.5 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
-                  aria-hidden="true"
-                >{{ vm.playersTabBadgeCount() }}</span>
-              }
-            </button>
-            @if (vm.boot.mobileMoreOpen()) {
-              <div
-                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 rounded-xl border border-slate-700 bg-[#1b2028] shadow-xl overflow-hidden z-10"
-                role="menu"
-                data-testid="mobile-more-menu"
-              >
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-sky-300 hover:bg-sky-950/40"
-                  (click)="vm.hubNav.setTab('handouts'); vm.boot.mobileMoreOpen.set(false)"
-                >
-                  Documents
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="w-full px-3 py-2.5 text-left text-[10px] font-black uppercase text-violet-300 hover:bg-violet-950/40"
-                  (click)="vm.hubNav.setTab('players'); vm.boot.mobileMoreOpen.set(false)"
-                >
-                  Joueurs
-                  @if (vm.playersTabBadgeCount() > 0) {
-                    <span class="ml-1 text-amber-400">({{ vm.playersTabBadgeCount() }})</span>
-                  }
-                </button>
-              </div>
-            }
-          </div>
-        </div>
-      </nav>
     }
 
     @if (vm.table.rosterSheetOpen()) {
