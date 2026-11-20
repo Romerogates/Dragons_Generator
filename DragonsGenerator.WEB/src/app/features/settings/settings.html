@@ -167,8 +167,8 @@
 
       <div class="flex items-center gap-4 mb-6">
         <div
-          class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center overflow-hidden text-xl font-black text-white shrink-0"
-          [class]="previewGradient()"
+          class="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden text-xl font-black shrink-0"
+          [ngClass]="[previewGradient(), previewInitialTone()]"
         >
           @if (avatarEmoji) {
             <app-codex-glyph [icon]="avatarEmoji" size="2.5rem" alt="" />
@@ -246,18 +246,25 @@
 
         <div>
           <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Couleur d'accent</p>
+          <p class="text-xs text-slate-500 mb-2">Derrière le portrait — « Aucune » laisse le fond transparent.</p>
           <div class="flex flex-wrap gap-2">
             @for (accent of accentOptions; track accent.id) {
               <button
                 type="button"
-                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+                class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
                 [class]="
                   accentColor === accent.id
                     ? 'border-amber-500 text-amber-300 bg-amber-950/20'
                     : 'border-slate-700 text-slate-400 hover:border-slate-500'
                 "
+                [attr.aria-pressed]="accentColor === accent.id"
                 (click)="selectAccent(accent.id)"
               >
+                <span
+                  class="inline-block w-5 h-5 rounded-full shrink-0 border border-white/20"
+                  [class]="accent.clear ? 'bg-transparent ring-1 ring-inset ring-slate-400/80' : 'bg-gradient-to-br ' + accent.gradient"
+                  aria-hidden="true"
+                ></span>
                 {{ accent.label }}
               </button>
             }

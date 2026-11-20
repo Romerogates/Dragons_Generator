@@ -29,7 +29,8 @@ import { AiSettingsService, type AiProviderOption, type AiSettingsDto } from '@c
 import {
   PROFILE_ACCENTS,
   PROFILE_AVATAR_OPTIONS,
-  accentGradient,
+  accentInitialClass,
+  accentSurfaceClass,
   profileInitial,
 } from '@core/utils/profile.util';
 
@@ -328,7 +329,11 @@ export class SettingsPage implements OnInit {
   }
 
   previewGradient(): string {
-    return accentGradient(this.accentColor);
+    return accentSurfaceClass(this.accentColor);
+  }
+
+  previewInitialTone(): string {
+    return accentInitialClass(this.accentColor);
   }
 
   previewInitial(): string {

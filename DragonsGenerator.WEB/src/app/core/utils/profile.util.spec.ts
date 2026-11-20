@@ -1,7 +1,11 @@
 import {
+  accentFabGradient,
   accentGradient,
+  accentInitialClass,
   accentMessageClass,
   accentRing,
+  accentSurfaceClass,
+  PROFILE_ACCENTS,
   PROFILE_AVATAR_OPTIONS,
   profileInitial,
 } from './profile.util';
@@ -20,6 +24,17 @@ describe('profile.util', () => {
     expect(accentMessageClass('rose')).toContain('rose');
     expect(accentMessageClass('fuchsia')).toContain('fuchsia');
     expect(accentMessageClass(undefined)).toContain('violet');
+  });
+
+  it('offre une option sans couleur et des teintes claires', () => {
+    expect(PROFILE_ACCENTS.some((a) => a.id === 'none' && a.clear)).toBeTrue();
+    expect(PROFILE_ACCENTS.some((a) => a.id === 'white')).toBeTrue();
+    expect(accentSurfaceClass('none')).toContain('transparent');
+    expect(accentGradient('none')).toBe('');
+    expect(accentInitialClass('white')).toContain('slate-900');
+    expect(accentFabGradient('none')).toContain('slate');
+    expect(accentFabGradient('white')).toContain('slate');
+    expect(accentMessageClass('none')).toContain('slate');
   });
 
   it('offre les portraits du Codex comme avatars', () => {

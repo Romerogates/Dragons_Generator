@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { accentGradient, profileInitial } from '@core/utils/profile.util';
+import { accentInitialClass, accentSurfaceClass, profileInitial } from '@core/utils/profile.util';
 import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
 @Component({
@@ -9,9 +9,9 @@ import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
   imports: [CommonModule, CodexGlyph],
   template: `
     <span
-      class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br font-black text-white shadow-inner"
+      class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-black shadow-inner"
       [class]="sizeClass()"
-      [ngClass]="gradient()"
+      [ngClass]="[surface(), initialTone()]"
     >
       @if (avatarEmoji()) {
         <app-codex-glyph [icon]="avatarEmoji()!" [size]="glyphSize()" [alt]="displayName()" />
@@ -28,8 +28,12 @@ export class ProfileAvatarComponent {
   readonly accentColor = input<string | null | undefined>(null);
   readonly size = input<'xs' | 'sm' | 'md' | 'lg'>('md');
 
-  gradient(): string {
-    return accentGradient(this.accentColor());
+  surface(): string {
+    return accentSurfaceClass(this.accentColor());
+  }
+
+  initialTone(): string {
+    return accentInitialClass(this.accentColor());
   }
 
   initial(): string {

@@ -6,12 +6,21 @@ public static class UserProfileHelper
 {
     public static readonly HashSet<string> AccentColors =
     [
+        "none",
+        "white",
+        "slate",
+        "gold",
+        "red",
+        "crimson",
         "violet",
-        "amber",
-        "emerald",
-        "sky",
-        "rose",
         "fuchsia",
+        "rose",
+        "amber",
+        "lime",
+        "emerald",
+        "cyan",
+        "sky",
+        "indigo",
     ];
 
     public static string NormalizeAccentColor(string? raw) =>

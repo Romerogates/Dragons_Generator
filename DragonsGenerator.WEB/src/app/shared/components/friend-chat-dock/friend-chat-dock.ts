@@ -32,7 +32,7 @@ import { CharacterHandoffService } from '@core/services/character-handoff.servic
 import { CampaignSummary } from '@core/models/Campaign/campaign';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
-import { accentMessageClass, accentGradient } from '@core/utils/profile.util';
+import { accentFabGradient, accentMessageClass } from '@core/utils/profile.util';
 import type { ChatConversation } from '@core/services/friend-chat-dock.service';
 import type { Character } from '@core/models/Character/character';
 import {
@@ -497,7 +497,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   }
 
   fabGradient(): string {
-    return `bg-gradient-to-br ${accentGradient(this.auth.user()?.accentColor)}`;
+    return `bg-gradient-to-br ${accentFabGradient(this.auth.user()?.accentColor)}`;
   }
 
   formatTime(iso: string | null): string {

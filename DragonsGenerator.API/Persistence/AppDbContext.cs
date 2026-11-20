@@ -35,7 +35,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.DisplayName).HasMaxLength(128);
             e.Property(x => x.Bio).HasMaxLength(280);
             e.Property(x => x.AvatarEmoji).HasMaxLength(64);
-            e.Property(x => x.AccentColor).HasMaxLength(16);
+            e.Property(x => x.AccentColor).HasMaxLength(24);
             e.Property(x => x.GoogleSubject).HasMaxLength(128);
             e.HasIndex(x => x.GoogleSubject);
         });

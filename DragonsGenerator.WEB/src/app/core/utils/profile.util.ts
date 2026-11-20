@@ -5,16 +5,40 @@ export interface ProfileAccent {
   label: string;
   gradient: string;
   ring: string;
+  message: string;
+  initialText: string;
+  clear?: boolean;
 }
 
 export const PROFILE_ACCENTS: ProfileAccent[] = [
-  { id: 'violet', label: 'Violet', gradient: 'from-violet-600 to-fuchsia-700', ring: 'ring-violet-500/50' },
-  { id: 'amber', label: 'Ambre', gradient: 'from-amber-500 to-orange-600', ring: 'ring-amber-500/50' },
-  { id: 'emerald', label: 'Émeraude', gradient: 'from-emerald-600 to-teal-700', ring: 'ring-emerald-500/50' },
-  { id: 'sky', label: 'Azur', gradient: 'from-sky-600 to-blue-700', ring: 'ring-sky-500/50' },
-  { id: 'rose', label: 'Rose', gradient: 'from-rose-600 to-pink-700', ring: 'ring-rose-500/50' },
-  { id: 'fuchsia', label: 'Fuchsia', gradient: 'from-fuchsia-600 to-purple-700', ring: 'ring-fuchsia-500/50' },
+  {
+    id: 'none',
+    label: 'Aucune',
+    gradient: '',
+    ring: 'ring-slate-500/40',
+    message: 'bg-slate-700',
+    initialText: 'text-slate-200',
+    clear: true,
+  },
+  { id: 'white', label: 'Blanc', gradient: 'from-white to-zinc-300', ring: 'ring-white/70', message: 'bg-slate-500', initialText: 'text-slate-900' },
+  { id: 'slate', label: 'Ardoise', gradient: 'from-slate-500 to-slate-900', ring: 'ring-slate-400/50', message: 'bg-slate-700', initialText: 'text-white' },
+  { id: 'gold', label: 'Or', gradient: 'from-amber-200 to-yellow-600', ring: 'ring-amber-300/60', message: 'bg-amber-700', initialText: 'text-slate-900' },
+  { id: 'red', label: 'Rouge', gradient: 'from-red-600 to-rose-800', ring: 'ring-red-500/50', message: 'bg-red-600', initialText: 'text-white' },
+  { id: 'crimson', label: 'Cramoisi', gradient: 'from-rose-800 to-red-950', ring: 'ring-rose-700/50', message: 'bg-rose-800', initialText: 'text-white' },
+  { id: 'violet', label: 'Violet', gradient: 'from-violet-600 to-fuchsia-700', ring: 'ring-violet-500/50', message: 'bg-violet-600', initialText: 'text-white' },
+  { id: 'fuchsia', label: 'Fuchsia', gradient: 'from-fuchsia-600 to-purple-700', ring: 'ring-fuchsia-500/50', message: 'bg-fuchsia-600', initialText: 'text-white' },
+  { id: 'rose', label: 'Rose', gradient: 'from-rose-600 to-pink-700', ring: 'ring-rose-500/50', message: 'bg-rose-600', initialText: 'text-white' },
+  { id: 'amber', label: 'Ambre', gradient: 'from-amber-500 to-orange-600', ring: 'ring-amber-500/50', message: 'bg-amber-600', initialText: 'text-white' },
+  { id: 'lime', label: 'Lime', gradient: 'from-lime-500 to-green-700', ring: 'ring-lime-400/50', message: 'bg-lime-600', initialText: 'text-slate-900' },
+  { id: 'emerald', label: 'Émeraude', gradient: 'from-emerald-600 to-teal-700', ring: 'ring-emerald-500/50', message: 'bg-emerald-600', initialText: 'text-white' },
+  { id: 'cyan', label: 'Cyan', gradient: 'from-cyan-500 to-teal-700', ring: 'ring-cyan-400/50', message: 'bg-cyan-600', initialText: 'text-white' },
+  { id: 'sky', label: 'Azur', gradient: 'from-sky-600 to-blue-700', ring: 'ring-sky-500/50', message: 'bg-sky-600', initialText: 'text-white' },
+  { id: 'indigo', label: 'Indigo', gradient: 'from-indigo-600 to-blue-900', ring: 'ring-indigo-500/50', message: 'bg-indigo-600', initialText: 'text-white' },
 ];
+
+function accentById(id: string | null | undefined): ProfileAccent {
+  return PROFILE_ACCENTS.find((a) => a.id === id) ?? PROFILE_ACCENTS.find((a) => a.id === 'violet')!;
+}
 
 const PROFILE_AVATAR_CORE: { id: string; icon: string; label: string }[] = [
   { id: 'dragon', icon: 'fluent-emoji:dragon', label: 'Dragon' },
@@ -59,11 +83,30 @@ export const PROFILE_AVATAR_OPTIONS: { id: string; icon: string; label: string }
 })();
 
 export function accentGradient(id: string | null | undefined): string {
-  return PROFILE_ACCENTS.find((a) => a.id === id)?.gradient ?? PROFILE_ACCENTS[0].gradient;
+  const a = accentById(id);
+  return a.clear ? '' : a.gradient;
+}
+
+/** Fond du cercle avatar (transparent si « Aucune »). */
+export function accentSurfaceClass(id: string | null | undefined): string {
+  const a = accentById(id);
+  if (a.clear) return 'bg-transparent ring-1 ring-inset ring-slate-500/70';
+  return `bg-gradient-to-br ${a.gradient}`;
+}
+
+export function accentInitialClass(id: string | null | undefined): string {
+  return accentById(id).initialText;
+}
+
+/** FAB messages : jamais un fond blanc/vide (l’icône disparaîtrait). */
+export function accentFabGradient(id: string | null | undefined): string {
+  const a = accentById(id);
+  if (a.clear || a.id === 'white') return 'from-slate-600 to-slate-800';
+  return a.gradient;
 }
 
 export function accentRing(id: string | null | undefined): string {
-  return PROFILE_ACCENTS.find((a) => a.id === id)?.ring ?? PROFILE_ACCENTS[0].ring;
+  return accentById(id).ring;
 }
 
 export function profileInitial(name: string): string {
@@ -72,18 +115,5 @@ export function profileInitial(name: string): string {
 }
 
 export function accentMessageClass(id: string | null | undefined): string {
-  switch (id) {
-    case 'amber':
-      return 'bg-amber-600';
-    case 'emerald':
-      return 'bg-emerald-600';
-    case 'sky':
-      return 'bg-sky-600';
-    case 'rose':
-      return 'bg-rose-600';
-    case 'fuchsia':
-      return 'bg-fuchsia-600';
-    default:
-      return 'bg-violet-600';
-  }
+  return accentById(id).message;
 }

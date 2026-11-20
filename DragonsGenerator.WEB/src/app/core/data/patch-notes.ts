@@ -13,6 +13,18 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.490',
+    date: '2026-11-20',
+    title: 'Couleurs de profil : aucune, blanc, or…',
+    player: [
+      'Derrière votre logo de profil, vous pouvez ne choisir aucune couleur (fond transparent), ou du blanc, de l’or, de l’ardoise, du rouge, du cyan…',
+    ],
+    tech: [
+      '`PROFILE_ACCENTS` : `none`/`white`/`slate`/`gold`/`red`/`crimson`/`lime`/`cyan`/`indigo` ; `accentSurfaceClass`.',
+      'API `UserProfileHelper.AccentColors` aligné ; `AccentColor` max 24.',
+    ],
+  },
+  {
     version: '1.489',
     date: '2026-11-20',
     title: 'Codex : ajouter à la table seulement si ça marche',

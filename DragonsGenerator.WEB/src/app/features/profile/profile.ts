@@ -14,7 +14,8 @@ import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
 import { NotificationService } from '@core/services/notification.service';
 import {
-  accentGradient,
+  accentInitialClass,
+  accentSurfaceClass,
   profileInitial,
 } from '@core/utils/profile.util';
 import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
@@ -66,7 +67,11 @@ export class ProfilePage implements OnInit {
   }
 
   avatarGradient(p: PublicUserProfile): string {
-    return accentGradient(p.accentColor);
+    return accentSurfaceClass(p.accentColor);
+  }
+
+  avatarInitialTone(p: PublicUserProfile): string {
+    return accentInitialClass(p.accentColor);
   }
 
   initial(p: PublicUserProfile): string {
