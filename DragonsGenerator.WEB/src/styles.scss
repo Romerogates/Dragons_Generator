@@ -85,6 +85,47 @@
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 
+  .story-wizard-shell {
+    @apply flex flex-col min-h-0 overflow-hidden;
+    height: calc(100dvh - var(--dg-sticky-top));
+  }
+
+  .story-step-body {
+    @apply flex-1 min-h-0 overflow-hidden flex flex-col;
+  }
+
+  .story-step-body > * {
+    @apply flex flex-col flex-1 min-h-0;
+  }
+
+  .story-step-scroll {
+    @apply flex-1 min-h-0 overflow-y-auto overflow-x-visible overscroll-y-contain flex flex-col gap-6;
+  }
+
+  .story-wizard-shell .wizard-step-nav {
+    position: relative;
+    bottom: auto;
+    max-width: none;
+    margin-top: 0;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: auto;
+  }
+
+  @media (min-width: 640px) {
+    .story-wizard-shell .wizard-step-nav {
+      margin-left: -1rem;
+      margin-right: -1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .story-wizard-shell .wizard-step-nav {
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+    }
+  }
+
   /* Récap forge : la fiche tient entre le bandeau d’étapes et la barre d’actions (+ pager). */
   .summary-preview-stage {
     --pdf-fit-height: calc(100dvh - var(--dg-sticky-below-wizard) - 9.25rem);
@@ -307,6 +348,16 @@
 
     .wizard-step-nav {
       bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: 0.75rem;
+    }
+
+    .story-wizard-shell {
+      height: calc(100dvh - var(--dg-sticky-top) - 3.5rem - env(safe-area-inset-bottom, 0px));
+    }
+
+    .story-wizard-shell .wizard-step-nav {
+      position: relative;
+      bottom: auto;
       padding-bottom: 0.75rem;
     }
   }

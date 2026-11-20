@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.494',
+    date: '2026-11-20',
+    title: 'Scénario : bandeau collé en bas',
+    player: [
+      'Dans la création de scénario, les boutons « Créatures » et « Composer l’aventure » restent collés en bas de l’écran, juste au-dessus de la barre, au lieu de flotter au milieu.',
+    ],
+    tech: [
+      '`.story-wizard-shell` hauteur `100dvh - sticky-top - 3.5rem` (rail, pas le padding 4.75rem) ; `.story-step-scroll` ; nav `position: relative` pleine largeur. Scroll top → `.story-step-scroll`.',
+    ],
+  },
+  {
     version: '1.493',
     date: '2026-11-20',
     title: 'Campagnes plus lisibles sur téléphone',

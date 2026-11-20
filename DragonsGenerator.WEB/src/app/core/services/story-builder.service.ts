@@ -30,9 +30,11 @@ export type CampaignEditScope = 'full' | 'creatures-only';
 const STORAGE_KEY = 'dragon_story_builder_v1';
 
 function scrollStoryWizardTop(): void {
-  document
-    .querySelector('.story-wizard-shell')
-    ?.scrollTo({ top: 0, behavior: 'smooth' });
+  const scroller =
+    document.querySelector('.story-step-scroll') ??
+    document.querySelector('.story-step-body') ??
+    document.querySelector('.story-wizard-shell');
+  scroller?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 export interface StoryStep {
