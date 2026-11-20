@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.489',
+    date: '2026-11-20',
+    title: 'Codex : ajouter à la table seulement si ça marche',
+    player: [
+      'Dans le bestiaire, « Ajouter à la table » n’apparaît que si une session MJ est ouverte, et « Ajouter à une rencontre » seulement si vous avez ouvert une campagne.',
+      'Plus de message rouge si vous consultez juste une fiche : les boutons sont absents tant qu’ils ne servent à rien.',
+    ],
+    tech: [
+      '`showCodexAddToTable` / `showCodexAddToEncounter` ; dock `persistedCampaignId` uniquement si `isOwner`.',
+      'Fiche `creature-by-id` : plus d’astuce hub ni d’erreur « ouvrez une campagne ».',
+    ],
+  },
+  {
     version: '1.488',
     date: '2026-11-20',
     title: 'Héros, agenda et icônes du téléphone',

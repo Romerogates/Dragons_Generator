@@ -38,6 +38,11 @@ export class CampaignSessionDockService {
   rememberedCampaignId(): string | null {
     const live = this.campaignId();
     if (live) return live;
+    return this.persistedCampaignId();
+  }
+
+  /** Uniquement `sessionStorage` — pas l’id live d’un joueur sur /play. */
+  persistedCampaignId(): string | null {
     try {
       return sessionStorage.getItem(ACTIVE_TABLE_CAMPAIGN_KEY);
     } catch {
@@ -53,18 +58,18 @@ export class CampaignSessionDockService {
 
     if (!detail.data.activeSessionId) {
       if (this.campaignId() === detail.id) this.clearLiveState();
-      // Codex prep : mémoriser sauf juste après Terminer session.
-      if (!this.suppressRemember) this.persistRememberedId(detail.id);
+      // Codex prep : mémoriser le hub MJ, sauf juste après Terminer session.
+      if (!this.suppressRemember && detail.isOwner) this.persistRememberedId(detail.id);
       return;
     }
     const session = detail.data.sessions.find((s) => s.id === detail.data.activeSessionId);
     if (!session) {
       if (this.campaignId() === detail.id) this.clearLiveState();
-      if (!this.suppressRemember) this.persistRememberedId(detail.id);
+      if (!this.suppressRemember && detail.isOwner) this.persistRememberedId(detail.id);
       return;
     }
     this.suppressRemember = false;
-    this.persistRememberedId(detail.id);
+    if (detail.isOwner) this.persistRememberedId(detail.id);
     this.campaignId.set(detail.id);
     this.campaignTitle.set(detail.title);
     this.sessionTitle.set(session.title ?? 'Session');

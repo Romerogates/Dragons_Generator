@@ -82,6 +82,17 @@ describe('CampaignSessionDockService', () => {
     expect(dock.campaignId()).toBeNull();
     expect(sessionStorage.getItem('dg-active-table-campaign')).toBe('c1');
     expect(dock.rememberedCampaignId()).toBe('c1');
+    expect(dock.persistedCampaignId()).toBe('c1');
+  });
+
+  it('does not remember a player campaign for Codex import', () => {
+    sessionStorage.clear();
+    const player = detail({ activeSessionId: null, sessions: [] });
+    player.isOwner = false;
+    player.role = 'player';
+    dock.bindCampaign(player);
+    expect(sessionStorage.getItem('dg-active-table-campaign')).toBeNull();
+    expect(dock.persistedCampaignId()).toBeNull();
   });
 
   it('forgets sessionStorage on Terminer even without live campaignId', () => {

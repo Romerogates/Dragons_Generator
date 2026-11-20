@@ -29,6 +29,11 @@ import {
   appendCreatureToEncounter,
   combatantFromCreature,
 } from '@core/utils/combat-creature-import.util';
+import {
+  ownerCampaignIdForCodex,
+  showCodexAddToEncounter,
+  showCodexAddToTable,
+} from '@core/utils/codex-creature-import.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import { CodexGlyph } from '@shared/components/codex-glyph/codex-glyph';
 
@@ -83,11 +88,26 @@ export class CreatureById {
     { initialValue: undefined },
   );
 
-  /** MJ connecté : le clic vérifie campagne / session. */
-  protected canAddToCampaign = computed(() => this.auth.isLoggedIn());
-
   protected tableCampaignId = computed(
     () => this.sessionDock.campaignId() ?? this.sessionDock.rememberedCampaignId(),
+  );
+
+  protected canAddToTable = computed(() =>
+    showCodexAddToTable({
+      loggedIn: this.auth.isLoggedIn(),
+      sessionOpen: this.sessionDock.isVisible(),
+      isOwner: this.sessionDock.liveCampaign()?.isOwner === true,
+    }),
+  );
+
+  protected canAddToEncounter = computed(() =>
+    showCodexAddToEncounter({
+      loggedIn: this.auth.isLoggedIn(),
+      ownerCampaignId: ownerCampaignIdForCodex({
+        live: this.sessionDock.liveCampaign(),
+        persistedId: this.sessionDock.persistedCampaignId(),
+      }),
+    }),
   );
 
   protected abilityLabels = ABILITY_LABELS;
@@ -106,13 +126,7 @@ export class CreatureById {
     const creature = this.creature();
     const campaignId = this.sessionDock.rememberedCampaignId();
     if (!creature || this.addingToTable()) return;
-    if (!campaignId) {
-      this.tableFeedback.set({
-        kind: 'err',
-        text: 'Ouvrez une campagne (hub), puis réessayez depuis le Codex.',
-      });
-      return;
-    }
+    if (!campaignId) return;
 
     this.addingToTable.set(true);
     this.tableFeedback.set(null);
@@ -174,13 +188,7 @@ export class CreatureById {
     const creature = this.creature();
     const campaignId = this.sessionDock.rememberedCampaignId();
     if (!creature || this.addingToEncounter()) return;
-    if (!campaignId) {
-      this.tableFeedback.set({
-        kind: 'err',
-        text: 'Ouvrez une campagne (hub) pour préparer une rencontre depuis le Codex.',
-      });
-      return;
-    }
+    if (!campaignId) return;
 
     this.tableFeedback.set(null);
     this.addingToEncounter.set(true);
