@@ -171,6 +171,15 @@ describe('Navbar', () => {
     expect(hrefs.some((h) => h === '/profile' || h === '/login')).toBeFalse();
   });
 
+  it('sends the second bottom-rail item to the heroes list, not the forge wizard', () => {
+    const heroes = fixture.nativeElement.querySelector(
+      '[data-testid="bottom-nav-heroes"]',
+    ) as HTMLAnchorElement | null;
+    expect(heroes).toBeTruthy();
+    expect(heroes?.getAttribute('href')).toBe('/characters');
+    expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-forge"]')).toBeNull();
+  });
+
   it('keeps the bottom rail on the forge without a header burger', () => {
     component.forgeRoute.set(true);
     fixture.detectChanges();

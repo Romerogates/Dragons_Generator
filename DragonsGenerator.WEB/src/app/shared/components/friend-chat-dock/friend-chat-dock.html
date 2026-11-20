@@ -169,7 +169,7 @@
           >
             @if (!dock.activeFriendId()) {
               <div class="hidden lg:flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center bg-[#141820]/40">
-                <iconify-icon icon="mdi:message-text-outline" class="text-5xl text-slate-600"></iconify-icon>
+                <iconify-icon icon="mdi:email-outline" class="text-5xl text-slate-600"></iconify-icon>
                 <p class="text-sm text-slate-400 font-serif">Sélectionnez une conversation</p>
                 <p class="text-xs text-slate-600 max-w-xs">
                   Vos messages amis s’affichent ici en grand, comme sur Messenger.
@@ -486,7 +486,7 @@
                         @if (sending()) {
                           <span class="text-xs">…</span>
                         } @else {
-                          <iconify-icon icon="mdi:send" class="text-xl"></iconify-icon>
+                          <iconify-icon icon="mdi:pencil-outline" class="text-xl"></iconify-icon>
                         }
                       </button>
                     </div>
@@ -504,7 +504,7 @@
           aria-label="Messages"
           (click)="toggle()"
         >
-          <iconify-icon icon="mdi:message-text" class="text-2xl"></iconify-icon>
+          <iconify-icon icon="mdi:email-outline" class="text-2xl"></iconify-icon>
           @if (dock.totalUnread() > 0) {
             <span
               class="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white ring-2 ring-[var(--dg-bg)]"

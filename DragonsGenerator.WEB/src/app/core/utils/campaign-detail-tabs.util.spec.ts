@@ -152,6 +152,8 @@ describe('campaign-detail-tabs.util', () => {
       'players',
     ]);
     expect(visibleCampaignHubTabs(false, 0)[0].label).toBe('Ce soir');
+    expect(visibleCampaignHubTabs(true, 0).find((t) => t.id === 'calendar')?.label).toBe('Agenda');
+    expect(visibleCampaignHubTabs(false, 0).find((t) => t.id === 'calendar')?.label).toBe('Agenda');
     expect(visibleCampaignHubTabs(false, 1).map((t) => t.id)).toContain('prep');
     expect(visibleCampaignHubTabs(false, 1).map((t) => t.id)).not.toContain('sessions');
   });

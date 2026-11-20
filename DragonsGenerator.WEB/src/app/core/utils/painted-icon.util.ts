@@ -477,7 +477,8 @@ export function resolvePaintedIcon(icon: string | null | undefined): string {
   if (raw.startsWith('/assets/')) return raw;
   const mapped = EXACT[raw];
   if (mapped) return mapped;
-  const id = raw.startsWith('fluent-emoji:') ? raw.slice('fluent-emoji:'.length) : raw;
+  if (!raw.startsWith('fluent-emoji:')) return raw;
+  const id = raw.slice('fluent-emoji:'.length);
   for (const { key, file } of KEYWORD_FILES) {
     if (iconIdHasKeyword(id, key)) return file;
   }

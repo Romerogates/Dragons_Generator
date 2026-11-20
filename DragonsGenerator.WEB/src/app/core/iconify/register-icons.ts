@@ -73,11 +73,24 @@ function disableIconifyViewportObserver(): void {
 
 const paintedHosts = new WeakSet<HTMLElement>();
 
+/** `width="16"` n’est pas une longueur CSS valide — sans `px` l’image 256px déborde. */
+function cssIconLength(raw: string): string {
+  const t = raw.trim();
+  if (!t) return '1.15em';
+  if (/^\d+(\.\d+)?$/.test(t)) return `${t}px`;
+  return t;
+}
+
 function paintIconifyHost(el: HTMLElement): void {
   const raw = el.getAttribute('icon') || '';
+  if (!raw.startsWith('fluent-emoji:') && !raw.startsWith('/assets/')) return;
   const src = resolvePaintedIcon(raw);
   if (!isPaintedAssetPath(src)) return;
-  const size = el.getAttribute('width') || el.getAttribute('height') || '1.15em';
+  const size = cssIconLength(el.getAttribute('width') || el.getAttribute('height') || '1.15em');
+  const paintCss =
+    `:host{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;line-height:0;width:${size};height:${size};max-width:${size};max-height:${size};overflow:hidden}` +
+    'svg,.iconify{display:none!important}' +
+    'img{width:100%;height:100%;object-fit:contain;display:block}';
 
   const apply = (): void => {
     const root = el.shadowRoot;
@@ -85,15 +98,13 @@ function paintIconifyHost(el: HTMLElement): void {
       requestAnimationFrame(apply);
       return;
     }
-    if (!root.querySelector('style[data-dg-paint]')) {
-      const style = document.createElement('style');
+    let style = root.querySelector('style[data-dg-paint]');
+    if (!style) {
+      style = document.createElement('style');
       style.setAttribute('data-dg-paint', '');
-      style.textContent =
-        ':host{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;line-height:0}' +
-        'svg,.iconify{display:none!important}' +
-        `img{width:${size};height:${size};object-fit:contain;display:block}`;
       root.prepend(style);
     }
+    if (style.textContent !== paintCss) style.textContent = paintCss;
     let img = root.querySelector('img[data-dg-paint]');
     if (!img) {
       img = document.createElement('img');

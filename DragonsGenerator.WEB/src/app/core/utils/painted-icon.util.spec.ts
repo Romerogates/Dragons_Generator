@@ -124,7 +124,8 @@ describe('resolvePaintedIcon', () => {
     expect(resolvePaintedIcon(null)).toBe('/assets/equipment/adv-backpack.png');
     expect(resolvePaintedIcon('')).toBe('/assets/equipment/adv-backpack.png');
     expect(resolvePaintedIcon('  ')).toBe('/assets/equipment/adv-backpack.png');
-    expect(resolvePaintedIcon('mdi:cog-outline')).toBe('/assets/equipment/ui-sparkles.png');
+    expect(resolvePaintedIcon('mdi:cog-outline')).toBe('mdi:cog-outline');
+    expect(resolvePaintedIcon('mdi:email-outline')).toBe('mdi:email-outline');
   });
 
   it('matches every keyword family without substring false positives', () => {

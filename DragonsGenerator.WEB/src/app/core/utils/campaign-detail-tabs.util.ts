@@ -205,7 +205,7 @@ export function visibleCampaignHubTabs(
   if (!isOwner) {
     const tabs: CampaignHubTabDef[] = [
       { id: 'overview', label: 'Ce soir', icon: 'fluent-emoji:fire' },
-      { id: 'calendar', label: 'Calendrier', icon: 'fluent-emoji:spiral-calendar' },
+      { id: 'calendar', label: 'Agenda', icon: 'fluent-emoji:spiral-calendar' },
       { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
       { id: 'players', label: 'Héros', icon: 'fluent-emoji:busts-in-silhouette' },
     ];
@@ -217,7 +217,7 @@ export function visibleCampaignHubTabs(
   const tabs: CampaignHubTabDef[] = [
     { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
     { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
-    { id: 'calendar', label: 'Calendrier', icon: 'fluent-emoji:spiral-calendar' },
+    { id: 'calendar', label: 'Agenda', icon: 'fluent-emoji:spiral-calendar' },
     { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
   ];
   tabs.push({ id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' });

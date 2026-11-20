@@ -13,6 +13,23 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.488',
+    date: '2026-11-20',
+    title: 'Héros, agenda et icônes du téléphone',
+    player: [
+      'Sur téléphone, le deuxième bouton en bas ouvre vos héros, plus un personnage en cours de création.',
+      'Les points d’étape de la forge restent visibles : plus de boule coupée sur le bord gauche.',
+      'Dans une campagne, l’onglet Calendrier s’appelle Agenda. Les raccourcis (Documents compris) ne débordent plus d’une grande image.',
+      'La bulle Messages est une lettre, distincte de la session en cours. L’engrenage des paramètres est de retour.',
+    ],
+    tech: [
+      'Rail `bottom-nav-heroes` → `/characters` (plus `bottom-nav-forge` → `/create`).',
+      '`visibleCampaignHubTabs` : label `Agenda` ; onglets `overflow-hidden` + `campaign-hub-tab-*`.',
+      '`resolvePaintedIcon` : ne peint plus `mdi:*` (engrenage, lettre). `paintIconifyHost` : `width="16"` → `16px`, host borné.',
+      'Dock messages : `mdi:email-outline` / `mdi:pencil-outline`. Forge stepper `pl-3`.',
+    ],
+  },
+  {
     version: '1.487',
     date: '2026-11-20',
     title: 'Classes du Codex : vrais visages',
