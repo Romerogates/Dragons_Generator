@@ -2,6 +2,11 @@ import { expect, type Page } from '@playwright/test';
 import { type AuthSession } from '../auth';
 import { authToken, bearer } from './http';
 
+/** /play : tuile « Combattre » (le CTA « prochaine action » peut viser Secrets, Prêt, etc.). */
+export async function enterPlayCombat(page: Page): Promise<void> {
+  await page.getByTestId('dock-combat').filter({ visible: true }).first().click();
+}
+
 export async function startActiveSessionAs(
   page: Page,
   owner: AuthSession,

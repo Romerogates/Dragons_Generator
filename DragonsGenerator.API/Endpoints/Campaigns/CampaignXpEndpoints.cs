@@ -42,9 +42,21 @@ public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService pu
             return;
         }
 
-        member.XpEarnedInCampaign += req.Xp;
-        campaign.UpdatedAt = DateTimeOffset.UtcNow;
-        await db.SaveChangesAsync(ct);
+        for (var attempt = 0; ; attempt++)
+        {
+            member.XpEarnedInCampaign += req.Xp;
+            campaign.UpdatedAt = DateTimeOffset.UtcNow;
+            try
+            {
+                await db.SaveChangesAsync(ct);
+                break;
+            }
+            catch (DbUpdateConcurrencyException) when (attempt < 2)
+            {
+                foreach (var entry in db.ChangeTracker.Entries())
+                    await entry.ReloadAsync(ct);
+            }
+        }
         var message = $"+{req.Xp} XP dans « {campaign.Title} »";
         await CampaignActivityService.LogAsync(
             db,

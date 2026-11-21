@@ -13,6 +13,20 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.501',
+    date: '2026-11-21',
+    title: 'XP fiable et table retrouvée après rechargement',
+    player: [
+      'Distribuer l’XP d’une rencontre n’échoue plus quand la table vient d’être modifiée au même moment : les joueurs reçoivent bien leur XP.',
+      'Après avoir rechargé une page du Codex pendant une session, le bouton de la table et « Ajouter à la table » restent disponibles.',
+    ],
+    tech: [
+      '`POST /me/campaigns/{id}/award-xp` : retry sur `DbUpdateConcurrencyException` (token `Campaign.UpdatedAt`), comme les autres endpoints live — évitait des 500 en course avec le PUT d’import party.',
+      '`campaign-session-dock` : réhydrate la campagne depuis `persistedCampaignId` (GET) quand le dock n’a pas de `liveCampaign` (reload hors hub).',
+      'E2E nightly : helper `enterPlayCombat`, attente de la réponse `award-xp` 200, helpers Forge par `dispatchEvent` (compétences, langues, magie) ; hooks `data-testid="language-pick"` et `data-selected` sur les cartes de sorts. Confirmer les sorts passe directement à Identité.',
+    ],
+  },
+  {
     version: '1.500',
     date: '2026-11-21',
     title: 'Téléphone : boutons Session et Messages séparés',

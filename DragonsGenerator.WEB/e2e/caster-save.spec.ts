@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { applyAuthSession, registerConfirmAndLogin } from './helpers/auth';
 import {
   startFreshWizard,
@@ -9,14 +9,60 @@ import {
 } from './helpers/wizard';
 import { completeSpeciesCivilizationBackground } from './helpers/wizard-paths';
 
-/** Clique les N premières cartes de sorts visibles dans la grille Magie. */
-async function pickFirstMagicCards(page: Page, count: number): Promise<void> {
-  const cards = page.locator('.magic-spell-grid > div').filter({ visible: true });
-  await expect(cards.first()).toBeVisible({ timeout: 20_000 });
-  const n = Math.min(count, await cards.count());
-  for (let i = 0; i < n; i++) {
-    await cards.nth(i).click();
+/** Magie : tours puis sorts libres (non cochés, non grisés) jusqu'à pouvoir confirmer. */
+async function fillMagic(page: Page): Promise<void> {
+  const confirm = page.locator('#btn-confirm-magic');
+  const freeIn = (section: string) =>
+    page.locator(
+      `${section} .magic-spell-grid > div:not(.pointer-events-none):not([data-selected="true"])`,
+    );
+  await expect(page.locator('.magic-spell-grid > div').first()).toBeVisible({ timeout: 20_000 });
+  for (let i = 0; i < 30 && (await confirm.isDisabled()); i++) {
+    const hint = (await page.locator('.wizard-nav-hint').textContent().catch(() => '')) ?? '';
+    const free = /tour/i.test(hint) ? freeIn('#section-cantrips') : freeIn('#section-level-1');
+    if ((await free.count()) === 0) break;
+    await free.first().dispatchEvent('click');
   }
+  await expect(confirm).toBeEnabled({ timeout: 30_000 });
+  await confirm.click();
+}
+
+/** Compétences de classe : ignore celles déjà accordées par l’historique (boutons désactivés). */
+async function pickClassSkills(classSkills: Locator): Promise<void> {
+  if (!(await classSkills.isVisible().catch(() => false))) return;
+  const need = Number(((await classSkills.textContent()) ?? '').match(/Choisissez (\d+)/)?.[1] ?? 2);
+  // Clic DOM (dispatchEvent) : les pastilles grossissent / la barre bouge pendant un clic souris.
+  const free = classSkills.locator('button:enabled:not(.bg-emerald-500)');
+  const counter = classSkills.getByText(new RegExp(`^\\s*${need} / ${need}\\s*$`));
+  for (let i = 0; i < need * 3 && !(await counter.isVisible()); i++) {
+    await free.first().dispatchEvent('click');
+  }
+  await expect(counter).toBeVisible({ timeout: 5_000 });
+}
+
+/** Reste de l'étape Compétences (outils d'historique, etc.) : un choix libre à la fois jusqu'à « Forger ». */
+async function forgeSkills(page: Page): Promise<void> {
+  await pickClassSkills(page.getByTestId('wizard-class-skills'));
+  const forge = page.getByRole('button', { name: 'Forger les maîtrises' });
+  const free = page.locator('app-skills-step button.bg-slate-900:enabled');
+  for (let i = 0; i < 20 && (await forge.isDisabled()); i++) {
+    if ((await free.count()) === 0) break;
+    await free.first().dispatchEvent('click');
+  }
+  await expect(forge).toBeEnabled({ timeout: 10_000 });
+  await forge.click();
+}
+
+/** Langues bonus : n'importe lesquelles proposées, jusqu'à pouvoir valider. */
+async function pickLanguages(page: Page): Promise<void> {
+  const confirm = page.getByRole('button', { name: 'Inscrire ces langues au registre' });
+  const pick = page.getByTestId('language-pick');
+  for (let i = 0; i < 8 && (await confirm.isDisabled()); i++) {
+    if ((await pick.count()) === 0) break;
+    await pick.first().dispatchEvent('click');
+  }
+  await expect(confirm).toBeEnabled({ timeout: 10_000 });
+  await confirm.click();
 }
 
 /**
@@ -46,45 +92,26 @@ test.describe('Caster forge — Magie + save', () => {
       const chooseBtn = bgSkills.getByRole('button').first();
       if (await chooseBtn.isVisible().catch(() => false)) await chooseBtn.click();
     }
-    const classSkills = page.getByTestId('wizard-class-skills');
-    if (await classSkills.isVisible().catch(() => false)) {
-      const btns = classSkills.getByRole('button');
-      const need = Number(((await classSkills.textContent()) ?? '').match(/Choisissez (\d+)/)?.[1] ?? 2);
-      for (let i = 0; i < need; i++) await btns.nth(i).click();
-    }
-    await page.getByRole('button', { name: 'Forger les maîtrises' }).click();
+    await forgeSkills(page);
 
     await expectStepHeading(page, /Arsenal de Départ/i);
     const confirmEq = page.getByTestId('wizard-equipment-confirm');
     for (let i = 0; i < 15 && (await confirmEq.isDisabled().catch(() => true)); i++) {
       const next = page.getByRole('button', { name: 'Choix suivant' });
-      if (await next.isVisible().catch(() => false)) await next.click();
+      if (await next.isVisible().catch(() => false)) await next.click({ timeout: 3_000 }).catch(() => {});
       const card = page.locator('.perf-card').first();
-      if (await card.isVisible().catch(() => false)) await card.click();
+      if (await card.isVisible().catch(() => false)) await card.click({ timeout: 3_000 }).catch(() => {});
       const option = page.getByRole('button').filter({ hasText: /^(Dague|Bâton|Sac|Arc|Épée|Fronde)/i });
-      if ((await option.count()) > 0) await option.first().click();
+      if ((await option.count()) > 0) await option.first().click({ timeout: 3_000 }).catch(() => {});
     }
     await expect(confirmEq).toBeEnabled({ timeout: 20_000 });
     await confirmEq.click();
 
     await expectStepHeading(page, /Langues & Dialectes/i);
-    const confirmLang = page.getByRole('button', { name: 'Inscrire ces langues au registre' });
-    for (const lang of ['Arolave', 'Aupuniwi', 'Cyfand', 'Elfique', 'Gnome', 'Nain']) {
-      if (!(await confirmLang.isDisabled())) break;
-      const btn = page.getByRole('button', { name: new RegExp(`^${lang}\\b`) });
-      if (await btn.isVisible().catch(() => false)) await btn.click();
-    }
-    await expect(confirmLang).toBeEnabled({ timeout: 10_000 });
-    await confirmLang.click();
+    await pickLanguages(page);
 
     await expectStepHeading(page, /Sorts & Incantations/i);
-    await pickFirstMagicCards(page, 3);
-    // Grimoire : basculer évent. sur sorts niv.1 puis en reprendre.
-    await pickFirstMagicCards(page, 12);
-    const confirmMagic = page.locator('#btn-confirm-magic');
-    await expect(confirmMagic).toBeEnabled({ timeout: 30_000 });
-    await confirmMagic.click();
-    await page.getByRole('button', { name: /Continuer/i }).click();
+    await fillMagic(page);
 
     await expectStepHeading(page, /Identité & Personnalité/i);
     await page.getByPlaceholder('Ex: Valerius').fill('Aldric Magicien E2E');
@@ -112,46 +139,28 @@ test.describe('Caster forge — Magie + save', () => {
     await page.getByRole('button', { name: 'Valider et continuer' }).first().click();
 
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
-    const classSkills = page.getByTestId('wizard-class-skills');
-    if (await classSkills.isVisible().catch(() => false)) {
-      const btns = classSkills.getByRole('button');
-      const need = Number(((await classSkills.textContent()) ?? '').match(/Choisissez (\d+)/)?.[1] ?? 2);
-      for (let i = 0; i < need; i++) await btns.nth(i).click();
-    }
-    await page.getByRole('button', { name: 'Forger les maîtrises' }).click();
+    await forgeSkills(page);
 
     await expectStepHeading(page, /Arsenal de Départ/i);
     const confirmEq = page.getByTestId('wizard-equipment-confirm');
     for (let i = 0; i < 15 && (await confirmEq.isDisabled().catch(() => true)); i++) {
       const next = page.getByRole('button', { name: 'Choix suivant' });
-      if (await next.isVisible().catch(() => false)) await next.click();
+      if (await next.isVisible().catch(() => false)) await next.click({ timeout: 3_000 }).catch(() => {});
       const card = page.locator('.perf-card').first();
-      if (await card.isVisible().catch(() => false)) await card.click();
+      if (await card.isVisible().catch(() => false)) await card.click({ timeout: 3_000 }).catch(() => {});
       const option = page.getByRole('button').filter({ hasText: /^(Masse|Bouclier|Armure|Sac|Symbol)/i });
-      if ((await option.count()) > 0) await option.first().click();
+      if ((await option.count()) > 0) await option.first().click({ timeout: 3_000 }).catch(() => {});
     }
     await expect(confirmEq).toBeEnabled({ timeout: 20_000 });
     await confirmEq.click();
 
     await expectStepHeading(page, /Langues & Dialectes/i);
-    const confirmLang = page.getByRole('button', { name: 'Inscrire ces langues au registre' });
-    if (await confirmLang.isDisabled()) {
-      for (const lang of ['Arolave', 'Céleste', 'Elfique', 'Nain']) {
-        if (!(await confirmLang.isDisabled())) break;
-        const btn = page.getByRole('button', { name: new RegExp(`^${lang}\\b`) });
-        if (await btn.isVisible().catch(() => false)) await btn.click();
-      }
-    }
-    await expect(confirmLang).toBeEnabled({ timeout: 10_000 });
-    await confirmLang.click();
+    await pickLanguages(page);
 
     await expectStepHeading(page, /Sorts & Incantations/i);
     const deityCard = page.locator('button').filter({ has: page.locator('.font-serif.text-amber-400') });
-    if ((await deityCard.count()) > 0) await deityCard.first().click();
-    await pickFirstMagicCards(page, 3);
-    const confirmMagic = page.locator('#btn-confirm-magic');
-    await expect(confirmMagic).toBeEnabled({ timeout: 30_000 });
-    await confirmMagic.click();
-    await expect(page.getByText(/Sorts mémorisés/i)).toBeVisible({ timeout: 10_000 });
+    if ((await deityCard.count()) > 0) await deityCard.first().dispatchEvent('click');
+    await fillMagic(page);
+    await expectStepHeading(page, /Identité & Personnalité/i);
   });
 });

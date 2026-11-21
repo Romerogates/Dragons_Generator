@@ -368,6 +368,7 @@
                 'opacity-40 grayscale pointer-events-none':
                   !canSelectCantrip(spell.id) && !isCantripSelected(spell.id),
               }"
+              [attr.data-selected]="isCantripSelected(spell.id)"
               (click)="canSelectCantrip(spell.id) ? toggleCantrip(spell.id) : null"
             >
               <div
@@ -578,6 +579,7 @@
                   'opacity-40 grayscale pointer-events-none':
                     !canSelectSpell(spell.id) && !isSpellSelected(spell.id),
                 }"
+                [attr.data-selected]="isSpellSelected(spell.id)"
                 (click)="canSelectSpell(spell.id) ? toggleSpell(spell.id) : null"
               >
                 <div

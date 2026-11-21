@@ -9,6 +9,7 @@ import {
   createCampaignAs,
   createCharacterAs,
   createXpReadyCampaignAs,
+  enterPlayCombat,
   invitePlayerToCampaign,
   proposeCharacterAs,
   seedCollectingInitiativeAs,
@@ -118,7 +119,7 @@ test.describe('Campagne — mode session', () => {
     });
     await expect(page.getByText(/Autre/i).first()).toBeVisible();
 
-    await page.getByTestId('play-next-action-cta').or(page.getByTestId('dock-combat')).first().click();
+    await enterPlayCombat(page);
     await expect(page.getByRole('button', { name: 'Encoder' })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('button', { name: 'Lancer le dé' })).toBeVisible();
   });
@@ -212,7 +213,7 @@ test.describe('Campagne — roster live joueur', () => {
     await expect(dm.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
-    await dm.getByTestId('play-next-action-cta').or(dm.getByTestId('dock-combat')).first().click();
+    await enterPlayCombat(dm);
     const lyraCard = dm.getByRole('button', { name: /Lyra Live/ }).filter({
       has: dm.getByRole('button', { name: '−5' }),
     });

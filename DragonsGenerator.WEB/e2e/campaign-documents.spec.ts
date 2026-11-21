@@ -13,7 +13,7 @@ test.describe('Campagne — documents FR', () => {
     await expect(page.getByText(/Aucun document/i).first()).toBeVisible({
       timeout: 20_000,
     });
-    await page.getByRole('button', { name: '+ Document' }).click();
+    await page.getByRole('button', { name: '+ Document' }).first().click();
 
     const kindSelect = page
       .locator('select')

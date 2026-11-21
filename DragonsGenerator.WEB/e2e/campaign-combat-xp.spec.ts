@@ -8,6 +8,7 @@ import {
   approveCharacterAs,
   createCharacterAs,
   createXpReadyCampaignAs,
+  enterPlayCombat,
   invitePlayerToCampaign,
   proposeCharacterAs,
   seedCollectingInitiativeAs,
@@ -32,7 +33,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
       timeout: 30_000,
     });
 
-    await page.getByTestId('play-next-action-cta').or(page.getByTestId('dock-combat')).first().click();
+    await enterPlayCombat(page);
     await page.getByRole('button', { name: '+ Toute la party' }).click();
     await expect(page.getByText(/Borin XP|\+1 PJ importé/i).first()).toBeVisible({
       timeout: 20_000,
@@ -45,9 +46,10 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
 
     const distribute = page.getByRole('button', { name: /Distribuer \d+ XP/ });
     await expect(distribute).toBeVisible({ timeout: 15_000 });
+    const awarded = page.waitForResponse((r) => r.url().includes('/award-xp'));
     await distribute.click();
+    expect((await awarded).status()).toBe(200);
 
-    await expect(page.getByText(/\+\d+ XP ×/)).toBeVisible({ timeout: 15_000 });
     // Laisser la persistance xpAwarded aboutir, puis vérifier après reload.
     await expect
       .poll(async () => page.getByRole('button', { name: /Distribuer \d+ XP/ }).count(), {
@@ -94,7 +96,7 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     await expect(ownerPage.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 30_000,
     });
-    await ownerPage.getByTestId('play-next-action-cta').or(ownerPage.getByTestId('dock-combat')).first().click();
+    await enterPlayCombat(ownerPage);
     await ownerPage.getByRole('button', { name: '+ Toute la party' }).click();
     await expect(ownerPage.getByText(/Kael XP|\+1 PJ importé/i).first()).toBeVisible({
       timeout: 20_000,
@@ -105,8 +107,10 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
       .click();
     const distribute = ownerPage.getByRole('button', { name: /Distribuer \d+ XP/ });
     await expect(distribute).toBeVisible({ timeout: 15_000 });
+    const awarded = ownerPage.waitForResponse((r) => r.url().includes('/award-xp'));
     await distribute.click();
-    await expect(ownerPage.getByText(/\+\d+ XP/)).toBeVisible({ timeout: 15_000 });
+    expect((await awarded).status()).toBe(200);
+    await expect(distribute).toHaveCount(0, { timeout: 15_000 });
 
     await expect(playerPage.getByTestId('campaign-sync-notice')).toContainText(/XP reçue/i, {
       timeout: 20_000,

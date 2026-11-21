@@ -226,6 +226,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-5xl">
               @for (lang of availableBaseLanguages(); track lang.id) {
                 <button
+                  data-testid="language-pick"
                   class="w-full px-4 py-3 rounded-xl border text-left flex flex-col gap-1 transition-[colors,transform,opacity,box-shadow] duration-200 group/btn bg-[#171b22] border-slate-800 hover:border-amber-500/50 hover:bg-[#1b2028] shadow-md"
                   (click)="addLanguage(lang.name)"
                 >
@@ -254,6 +255,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   @for (lang of availableExoticLanguages(); track lang.id) {
                     <button
+                      data-testid="language-pick"
                       class="w-full px-4 py-3 rounded-xl border text-left flex flex-col gap-1 transition-[colors,transform,opacity,box-shadow] duration-200 group/btn bg-[#171b22] border-cyan-900/50 hover:border-cyan-500/50 hover:bg-[#1b2028] shadow-md"
                       (click)="addLanguage(lang.name)"
                     >

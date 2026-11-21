@@ -4,9 +4,11 @@ import {
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
   DestroyRef,
+  effect,
   inject,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -15,6 +17,7 @@ import { filter, map, startWith } from 'rxjs';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { AuthService } from '@core/services/auth.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import { sessionModeLabel } from '../../../features/campaigns/campaign-detail/campaign-session.util';
@@ -36,6 +39,8 @@ export class CampaignSessionDockComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly campaigns = inject(CampaignCloudService);
+  private rehydratedId: string | null = null;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly tab = signal<DockTab>('live');
@@ -76,6 +81,25 @@ export class CampaignSessionDockComponent implements OnInit {
     const s = this.activeSession();
     return s ? sessionModeLabel(s.mode) : '';
   });
+
+  constructor() {
+    // Après un refresh / lien direct (ex. fiche Codex) : recharger la table MJ mémorisée.
+    effect(() => {
+      if (!this.isLoggedIn() || this.dock.liveCampaign()) return;
+      const id = untracked(() => this.dock.persistedCampaignId());
+      if (!id || id === this.rehydratedId) return;
+      this.rehydratedId = id;
+      this.campaigns
+        .get(id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (detail) => {
+            if (!this.dock.liveCampaign()) this.dock.bindCampaign(detail);
+          },
+          error: () => {},
+        });
+    });
+  }
 
   ngOnInit(): void {
     this.router.events
