@@ -1,9 +1,9 @@
-<section class="space-y-5">
+<section class="space-y-5 min-h-[100dvh]">
   @if (isMj()) {
     <app-campaign-setup-guide [state]="guideState()" (action)="guideAction.emit($event)" />
   }
 
-  <nav class="flex flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 -mx-1 px-1" aria-label="Préparation">
+  <nav data-prep-subnav class="flex flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-1 -mx-1 px-1" aria-label="Préparation">
     @for (s of tabs(); track s.id) {
       <button
         type="button"

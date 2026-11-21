@@ -170,10 +170,15 @@ export class CampaignHubNavService {
     this.prepSub.set(next.prepSub);
   }
 
-  /** Si le haut de la section est passé au-dessus de l'écran, le ramener juste sous l'en-tête collant. */
+  /**
+   * Si le haut de la section (en Prépa : la rangée de sous-onglets, sous le guide MJ)
+   * est passé au-dessus de l'écran, le ramener juste sous l'en-tête collant.
+   */
   private revealHubContent(): void {
     requestAnimationFrame(() => {
-      const content = document.querySelector('app-campaign-detail-tabs');
+      const content =
+        (this.tab() === 'prep' ? document.querySelector('[data-prep-subnav]') : null) ??
+        document.querySelector('app-campaign-detail-tabs');
       if (!content) return;
       const tabs = document.querySelector('.campaign-hub-tabs');
       const stickyTop = tabs ? parseFloat(getComputedStyle(tabs).top) || 0 : 0;

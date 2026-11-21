@@ -13,6 +13,18 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.499',
+    date: '2026-11-21',
+    title: 'Prépa : plus de petit saut entre les sous-onglets',
+    player: [
+      'Dans Prépa, passer de Scénario à Créatures, Donjons ou Pré-tirés ne fait plus remonter la page.',
+    ],
+    tech: [
+      '`revealHubContent()` vise `[data-prep-subnav]` sur l’onglet Prépa (au lieu du haut de `app-campaign-detail-tabs`, qui inclut le guide MJ).',
+      '`campaign-detail-prep` : `min-h-[100dvh]` pour éviter le clamp du scroll quand un sous-onglet est court (ex. Créatures vide).',
+    ],
+  },
+  {
     version: '1.498',
     date: '2026-11-21',
     title: 'Campagne : les onglets ne remontent plus la page',
