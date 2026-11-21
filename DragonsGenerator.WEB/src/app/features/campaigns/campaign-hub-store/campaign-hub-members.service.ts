@@ -9,6 +9,7 @@ import {
   scheduleYesInviteUserIds,
 } from '@core/utils/campaign-hub-write.util';
 import {
+  campaignIsTableDm,
   campaignJoinUrl,
   clipboardCopyFeedback,
   copyTextToClipboard,
@@ -69,7 +70,7 @@ export class CampaignHubMembersService {
 
   loadPendingInvites(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) {
+    if (!c || !campaignIsTableDm(c)) {
       this.hub.pendingInvites.set([]);
       return;
     }
@@ -86,7 +87,7 @@ export class CampaignHubMembersService {
 
   loadJoinLink(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) {
+    if (!c || !campaignIsTableDm(c)) {
       this.hub.joinLink.set(null);
       return;
     }
@@ -98,7 +99,7 @@ export class CampaignHubMembersService {
 
   ensureJoinLinkToken(onToken: (token: string) => void): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.joinLinkBusy()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.joinLinkBusy()) return;
     const existing = this.hub.joinLink();
     if (existing?.enabled && existing.token) {
       onToken(existing.token);
@@ -121,7 +122,7 @@ export class CampaignHubMembersService {
 
   rotateJoinLink(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.joinLinkBusy()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.joinLinkBusy()) return;
     this.hub.joinLinkBusy.set(true);
     this.campaigns.createOrRotateJoinLink(c.id).subscribe({
       next: (link) => {
@@ -138,7 +139,7 @@ export class CampaignHubMembersService {
 
   revokeJoinLink(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.joinLinkBusy()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.joinLinkBusy()) return;
     this.hub.joinLinkBusy.set(true);
     this.campaigns.revokeJoinLink(c.id).subscribe({
       next: () => {
@@ -231,7 +232,7 @@ export class CampaignHubMembersService {
 
   setMemberSpectator(member: CampaignMember, hooks?: CampaignHubSyncHooks): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.campaigns.setMemberSpectator(c.id, member.id).subscribe({
       next: () => {
         this.hub.rosterFeedback.set(`${member.displayName} est maintenant spectateur.`);
@@ -267,7 +268,7 @@ export class CampaignHubMembersService {
     scheduledAt: string,
   ): CampaignSession | null {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return null;
+    if (!c || !campaignIsTableDm(c)) return null;
     this.hub.flushSessionSave();
     const session = plannedSessionFromScheduleEvent(
       ev,
@@ -361,7 +362,7 @@ export class CampaignHubMembersService {
 
   deleteCampaign(typedTitle: string, onDeleted: () => void): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || typedTitle.trim() !== c.title.trim() || this.hub.deletingCampaign()) return;
+    if (!c || !campaignIsTableDm(c) || typedTitle.trim() !== c.title.trim() || this.hub.deletingCampaign()) return;
     this.hub.deletingCampaign.set(true);
     this.hub.deleteCampaignError.set(null);
     this.campaigns.delete(c.id).subscribe({

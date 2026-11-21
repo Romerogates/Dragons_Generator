@@ -123,6 +123,14 @@
             [prepSub]="vm.hubNav.prepSub()"
             [tabs]="vm.prepSubTabs()"
             [guideState]="vm.setupGuideState()"
+            [dossier]="{
+              hasAdventure: !!(c.data.adventure?.trim()),
+              creatureCount: c.data.creatures.length,
+              mapCount: c.data.dungeonMaps?.length ?? 0,
+              encounterCount: c.data.encounters?.length ?? 0,
+              pregenCount: c.data.pregenCharacters?.length ?? 0,
+              notebookPageCount: c.data.notebookPages?.length ?? 0
+            }"
             (prepSubChange)="vm.hubNav.setPrepSub($event)"
             (guideAction)="vm.onSetupGuideAction($event)"
           >

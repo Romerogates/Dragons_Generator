@@ -13,6 +13,7 @@ import {
   prefersNativePdfFallback,
 } from '@core/utils/pdf-preview.util';
 import { exportEveningPdf, exportUnifiedEveningPack } from '@core/utils/evening-pdf.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 import { CampaignHubStore } from './campaign-hub.store';
 
 /**
@@ -110,7 +111,7 @@ export class CampaignHubPdfService {
 
   loadPackPreview(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) {
+    if (!c || !campaignIsTableDm(c)) {
       this.revokePreviewUrl();
       return;
     }
@@ -146,7 +147,7 @@ export class CampaignHubPdfService {
 
   loadBestiaryPreview(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || !c.data.creatures.length) {
+    if (!c || !campaignIsTableDm(c) || !c.data.creatures.length) {
       this.revokePreviewUrl();
       return;
     }

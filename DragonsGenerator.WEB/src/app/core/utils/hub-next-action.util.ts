@@ -1,4 +1,4 @@
-/** Prochaine action joueur sur le hub campagne (hors /play). */
+/** Prochaine action joueur / MJ sur le hub campagne (hors /play). */
 
 export type HubNextActionKind =
   | 'propose_hero'
@@ -16,7 +16,7 @@ export interface HubNextAction {
   detail: string;
   ctaLabel?: string;
   /** Navigation / action hub. */
-  cta?: 'players' | 'play' | 'sessions' | 'create_hero' | 'rsvp';
+  cta?: 'players' | 'play' | 'sessions' | 'enter_session' | 'create_hero' | 'rsvp' | 'calendar';
   tone: 'sky' | 'amber' | 'emerald' | 'rose' | 'slate';
   eventId?: string;
 }
@@ -28,7 +28,8 @@ export interface HubPendingRsvp {
 }
 
 export interface HubNextActionInput {
-  isOwner: boolean;
+  /** Owner ou co-MJ (`campaignIsTableDm`). */
+  isTableDm: boolean;
   isSpectator: boolean;
   heroStatus: 'none' | 'pending' | 'rejected' | 'approved';
   hasActiveSession: boolean;
@@ -37,7 +38,7 @@ export interface HubNextActionInput {
 }
 
 export function resolveHubNextAction(input: HubNextActionInput): HubNextAction | null {
-  if (input.isOwner) {
+  if (input.isTableDm) {
     if (input.hasActiveSession) {
       return {
         kind: 'enter_play',
@@ -53,8 +54,8 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
         kind: 'wait_session',
         title: 'Ouvrez la table',
         detail: 'La soirée est planifiée. Entrez en session pour que tout le monde voie la scène.',
-        ctaLabel: 'Voir les sessions',
-        cta: 'sessions',
+        ctaLabel: 'Entrer en session',
+        cta: 'enter_session',
         tone: 'amber',
       };
     }
@@ -62,7 +63,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
       kind: 'idle',
       title: 'Préparez la soirée',
       detail: 'Planifiez une session, puis ouvrez la table quand le groupe est là.',
-      ctaLabel: 'Sessions',
+      ctaLabel: 'Planifier',
       cta: 'sessions',
       tone: 'slate',
     };
@@ -133,7 +134,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
       kind: 'wait_session',
       title: 'Héros prêt — en attente de soirée',
       detail: 'Le MJ ouvrira la table. Restez sur « Ce soir » pour la rejoindre.',
-      ctaLabel: 'Voir les sessions',
+      ctaLabel: 'Voir les soirées',
       cta: 'sessions',
       tone: 'amber',
     };
@@ -143,7 +144,7 @@ export function resolveHubNextAction(input: HubNextActionInput): HubNextAction |
     kind: 'idle',
     title: 'Héros prêt',
     detail: 'Aucune soirée planifiée pour l’instant — le MJ va en ouvrir une.',
-    ctaLabel: 'Voir les sessions',
+    ctaLabel: 'Voir les soirées',
     cta: 'sessions',
     tone: 'slate',
   };

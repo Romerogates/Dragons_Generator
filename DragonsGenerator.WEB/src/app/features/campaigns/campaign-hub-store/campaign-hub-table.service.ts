@@ -10,6 +10,7 @@ import type {
   HandoutKind,
 } from '@core/models/Campaign/campaign';
 import { formatScheduleOccurrenceLabel } from '@core/utils/campaign-hub-write.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 import { buildHandoutsFromPack } from '@core/utils/campaign-content-presets.util';
 import { prefillRunSheetFromCampaign } from '@core/utils/run-sheet-prefill.util';
 import { handoutIdFromActivity } from '../campaign-detail/campaign-activity.util';
@@ -52,7 +53,7 @@ export class CampaignHubTableService {
 
   startPlaySession(sessionId: string): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.boot.askConfirm(
       'Entrer en session ?',
       'La table s’ouvre pour tous les joueurs connectés. Combat, notes et carte deviennent actifs.',
@@ -95,7 +96,7 @@ export class CampaignHubTableService {
     this.hubNav.focusHandoutId.set(handoutId);
     this.hubNav.setTab('handouts');
     const c = this.hub.campaign();
-    if (handoutId && c && !c.isOwner) {
+    if (handoutId && c && !campaignIsTableDm(c)) {
       const published = (c.data.handouts ?? []).some((h) => h.id === handoutId && h.published);
       if (published) this.previewHandoutAsPlayer(handoutId);
     }
@@ -145,7 +146,7 @@ export class CampaignHubTableService {
 
   insertHandoutPack(packId: string): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     const added = buildHandoutsFromPack(packId);
     if (!added.length) return;
     this.hub.flushHandoutSave();
@@ -162,7 +163,7 @@ export class CampaignHubTableService {
 
   prefillSessionRunSheet(sessionId: string): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     const session = (c.data.sessions ?? []).find((s) => s.id === sessionId);
     if (!session) return;
     const patch = prefillRunSheetFromCampaign(c.data, session);
@@ -212,11 +213,11 @@ export class CampaignHubTableService {
   }
 
   deleteHandout(handoutId: string): void {
-    if (!this.hub.campaign()?.isOwner) return;
+    if (!campaignIsTableDm(this.hub.campaign())) return;
     this.boot.askConfirm('Supprimer le document', 'Supprimer ce document ?', () => {
       if (this.editingHandoutId() === handoutId) this.editingHandoutId.set(null);
       this.hub.deleteHandout(handoutId);
-    });
+    }, 'Supprimer', true);
   }
 
   addSession(): void {
@@ -226,7 +227,7 @@ export class CampaignHubTableService {
   }
 
   onScheduleEventsChange(events: CampaignScheduleEvent[]): void {
-    if (!this.hub.campaign()?.isOwner) return;
+    if (!campaignIsTableDm(this.hub.campaign())) return;
     this.hub.saveData({ scheduleEvents: events });
   }
 
@@ -243,7 +244,7 @@ export class CampaignHubTableService {
   }
 
   convertScheduleEventToSession(ev: CampaignScheduleEvent, occurrenceStartsAt?: string): void {
-    if (!this.hub.campaign()?.isOwner) return;
+    if (!campaignIsTableDm(this.hub.campaign())) return;
     const scheduledAt = occurrenceStartsAt || ev.startsAt || new Date().toISOString();
     const run = () => this.doConvertScheduleEventToSession(ev, scheduledAt);
     if (ev.rrule?.trim()) {
@@ -276,7 +277,7 @@ export class CampaignHubTableService {
 
   removeSession(sessionId: string): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.boot.askConfirm('Supprimer la session', 'Supprimer cette session ?', () => {
       if (this.hubNav.editingSessionId() === sessionId) this.hubNav.editingSessionId.set(null);
       const clearedActive = this.hub.removeSession(sessionId);

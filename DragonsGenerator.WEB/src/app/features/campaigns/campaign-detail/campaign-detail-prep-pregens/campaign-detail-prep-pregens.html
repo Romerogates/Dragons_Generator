@@ -16,6 +16,19 @@
       }
     </div>
   }
+  @if (!isOwner() && !readyPregens().length && !myAssignedPregens().length) {
+    <div
+      class="rounded-2xl border border-dashed border-slate-700 bg-[#1b2028]/40 px-5 py-8 text-center"
+      data-testid="prep-pregens-empty-player"
+    >
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Pré-tirés</p>
+      <h3 class="mt-2 font-serif text-lg text-slate-200">Rien pour l’instant</h3>
+      <p class="mt-2 text-sm text-slate-500 max-w-md mx-auto">
+        Le MJ n’a pas encore publié de pré-tirés. Vous pouvez proposer votre propre héros dans l’onglet Héros.
+      </p>
+    </div>
+  }
+
   @if (!isOwner() && readyPregens().length) {
     <div class="bg-sky-950/20 border border-sky-800/40 rounded-2xl p-5">
       <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-3">

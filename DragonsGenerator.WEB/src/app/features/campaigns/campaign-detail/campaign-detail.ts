@@ -79,6 +79,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private sessionDock = inject(CampaignSessionDockService);
   private readonly tabs = viewChild(CampaignDetailTabs);
 
+  /** Menu mobile : Archiver / Fermer / Quitter. */
+  readonly headerMoreOpen = signal(false);
+
   /** Picker Atlas (+ Lieu) : civilisations Codex + Autre. */
   readonly atlasPinPickerOpen = signal(false);
   readonly atlasCivOptions = signal<{ id: string; name: string }[]>([]);

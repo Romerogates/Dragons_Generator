@@ -11,6 +11,7 @@ import {
 } from '@core/models/Campaign/campaign';
 import type { CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import { creatureTrackKey, storyEncounterGroups } from '@core/utils/campaign-hub-write.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 import { buildEncountersFromPack } from '@core/utils/campaign-content-presets.util';
 import * as hubView from '@core/utils/campaign-hub-view.util';
 import type { CreatureCardFieldEvent } from '../campaign-detail/campaign-detail-prep-creatures/campaign-detail-prep-creatures';
@@ -66,7 +67,7 @@ export class CampaignHubPrepService {
 
   insertEncounterPack(packId: string): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     const added = buildEncountersFromPack(packId);
     if (!added.length) return;
     this.saveData({ encounters: [...(c.data.encounters ?? []), ...added] });
@@ -151,7 +152,7 @@ export class CampaignHubPrepService {
 
   bulkClassifyUnsorted(role: 'ally' | 'antagonist'): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     const unsorted = hubView.creaturesByRoleBucket(c.data.creatures, 'other');
     if (!unsorted.length) return;
     const label = role === 'ally' ? 'alliés' : 'adversaires';
@@ -283,11 +284,10 @@ export class CampaignHubPrepService {
   }
 
   private openStoryBuilder(mode: 'full' | 'creatures-only'): void {
-    if (!this.hub.campaign()?.isOwner) return;
+    const c = this.hub.campaign();
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.flushSoftPersist();
     this.boot.flushMaps();
-    const c = this.hub.campaign();
-    if (!c?.isOwner) return;
     this.storyBuilder.loadCampaignIntoBuilder(c, mode);
     void this.router.navigate(['/story/create']);
   }

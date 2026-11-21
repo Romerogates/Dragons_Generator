@@ -4,6 +4,7 @@ import { NotificationService } from '@core/services/notification.service';
 import type { CampaignMember } from '@core/models/Campaign/campaign';
 import { canRequestCharacterPick as memberAllowsCharacterPick } from '@core/utils/campaign-roster.util';
 import {
+  campaignIsTableDm,
   campaignJoinSharePayload,
   campaignJoinUrl,
   copyTextToClipboard,
@@ -62,7 +63,7 @@ export class CampaignHubRosterService {
 
   shareCampaignJoinLink(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     this.members.ensureJoinLinkToken((token) => {
       const url = campaignJoinUrl(origin, token);
@@ -81,7 +82,7 @@ export class CampaignHubRosterService {
 
   regenerateJoinLink(): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.joinLinkBusy()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.joinLinkBusy()) return;
     this.boot.askConfirm(
       'Régénérer le lien ?',
       'L’ancien lien d’invitation ne fonctionnera plus. Les joueurs devront utiliser le nouveau.',
@@ -176,7 +177,7 @@ export class CampaignHubRosterService {
   }
 
   setMemberAsSpectator(member: CampaignMember): void {
-    if (!this.hub.campaign()?.isOwner) return;
+    if (!campaignIsTableDm(this.hub.campaign())) return;
     this.boot.askConfirm(
       'Passer en spectateur',
       `${member.displayName} ne pourra plus jouer (lecture seule sur /play). Continuer ?`,

@@ -27,6 +27,7 @@ import {
   withMappedEncounter,
   type CreatureCardPersistField,
 } from '@core/utils/campaign-hub-write.util';
+import { campaignIsTableDm } from '@core/utils/campaign-hub-access.util';
 import { notebookPersistPatch, resolveNotebookEnsure } from '@core/utils/notebook.util';
 import {
   CampaignHubStore,
@@ -60,7 +61,7 @@ export class CampaignHubContentService {
 
   awardEncounterXp(encounter: EncounterGroup, approved: { id: string }[]): void {
     const c = this.hub.campaign();
-    if (!c || !c.isOwner || encounter.xpAwarded) return;
+    if (!c || !campaignIsTableDm(c) || encounter.xpAwarded) return;
     if (this.hub.awardingXpId()) return;
     const split = splitEncounterXp(encounterTotalXp(encounter), approved.length);
     if (!split.ok) {
@@ -107,7 +108,7 @@ export class CampaignHubContentService {
 
   patchEncounter(encId: string, patch: Partial<EncounterGroup>): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.saveData({
       encounters: withMappedEncounter(c.data.encounters, encId, patch),
     });
@@ -115,7 +116,7 @@ export class CampaignHubContentService {
 
   bumpEncounterDefeated(encounterId: string, creatureIndex: number, delta: 1 | -1): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.saveData({
       encounters: bumpEncounterCreatureDefeated(c.data.encounters, encounterId, creatureIndex, delta),
     });
@@ -123,13 +124,13 @@ export class CampaignHubContentService {
 
   persistNotebookPages(pages: NotebookPage[]): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.saveData(notebookPersistPatch(pages, c.data.notes || ''));
   }
 
   ensureNotebookPages(activeId: string | null): string | null {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return activeId;
+    if (!c || !campaignIsTableDm(c)) return activeId;
     const resolved = resolveNotebookEnsure(
       c.data.notebookPages,
       c.data.notes,
@@ -142,7 +143,7 @@ export class CampaignHubContentService {
 
   async generateAutoPregen(): Promise<void> {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.generatingAutoPregen()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.generatingAutoPregen()) return;
     if (!this.canAddPregen()) {
       this.hub.pregenFeedback.set(this.pregenCapMessage());
       return;
@@ -181,7 +182,7 @@ export class CampaignHubContentService {
 
   async importPregenFromCharacter(characterId: string): Promise<void> {
     const c = this.hub.campaign();
-    if (!c?.isOwner || this.hub.importingPregen()) return;
+    if (!c || !campaignIsTableDm(c) || this.hub.importingPregen()) return;
     if (!this.canAddPregen()) {
       this.hub.pregenFeedback.set(this.pregenCapMessage());
       return;
@@ -214,7 +215,7 @@ export class CampaignHubContentService {
     hooks?: CampaignPregenAttachHooks,
   ): Promise<void> {
     const c = this.hub.campaign();
-    if (!c?.isOwner || !characterId || this.hub.importingPregen()) return;
+    if (!c || !campaignIsTableDm(c) || !characterId || this.hub.importingPregen()) return;
 
     const existing = (c.data.pregenCharacters ?? []).some((p) => p.characterId === characterId);
     if (existing) {
@@ -325,7 +326,7 @@ export class CampaignHubContentService {
 
   assignPregen(pregen: CampaignPregen, member: CampaignMember, hooks?: CampaignHubSyncHooks): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.campaigns.assignPregen(c.id, pregen.id, member.userId, member.displayName).subscribe({
       next: () => hooks?.onOk?.(),
       error: () => this.hub.error.set('Assignation impossible.'),
@@ -360,7 +361,7 @@ export class CampaignHubContentService {
 
   updateCreatureRole(cr: StoryCreatureSelection, role: CreatureRole): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.saveData({ creatures: withCreatureRole(c.data.creatures ?? [], cr, role) });
   }
 
@@ -370,13 +371,13 @@ export class CampaignHubContentService {
     value: string,
   ): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner) return;
+    if (!c || !campaignIsTableDm(c)) return;
     this.hub.saveData({ creatures: withCreatureCardField(c.data.creatures ?? [], cr, field, value) });
   }
 
   applyBulkCreatureRole(unsorted: StoryCreatureSelection[], role: 'ally' | 'antagonist'): void {
     const c = this.hub.campaign();
-    if (!c?.isOwner || !unsorted.length) return;
+    if (!c || !campaignIsTableDm(c) || !unsorted.length) return;
     const keys = new Set(unsorted.map((cr) => creatureTrackKey(cr)));
     this.hub.saveData({ creatures: withBulkCreatureRole(c.data.creatures ?? [], keys, role) });
   }

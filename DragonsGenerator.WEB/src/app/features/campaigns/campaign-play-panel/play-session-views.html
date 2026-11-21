@@ -58,9 +58,13 @@
           </div>
         </div>
       } @else {
-        <p class="text-[10px] text-slate-500" data-testid="evening-map-waiting">
-          Le MJ n’a pas encore affiché de carte pour cette soirée.
-        </p>
+        <app-play-empty-hint
+          tone="sky"
+          kicker="Carte de la soirée"
+          title="La carte arrive"
+          detail="Le MJ n’a pas encore affiché de carte. En attendant, utilisez Documents ou Ma fiche en haut de la table."
+          data-testid="evening-map-waiting"
+        />
       }
     }
 

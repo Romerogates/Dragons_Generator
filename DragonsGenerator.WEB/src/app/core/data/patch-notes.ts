@@ -13,6 +13,25 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.502',
+    date: '2026-11-21',
+    title: 'Campagne : soirée plus claire, prépa en dossier, table allégée',
+    player: [
+      'Sur la page de garde, un seul gros bouton pour la prochaine étape (entrer en session, ouvrir la table, ou voir les soirées).',
+      'Les joueurs ont un onglet Soirées en lecture pour voir les dates planifiées et rejoindre quand la table est ouverte.',
+      'Dans Préparation, un tableau récap montre ce qui est prêt pour la soirée (scénario, créatures, donjons…).',
+      'À la table plein écran, Zen, Secrets et Terminer sont regroupés avec les onglets de session ; sans carte, un message clair indique que la carte arrive.',
+      'Sur téléphone, Archiver / Quitter / Fermer sont dans un menu Plus pour dégager l’en-tête.',
+    ],
+    tech: [
+      '`hub-next-action` : `isTableDm`, CTA `enter_session` / `calendar` / `sessions` ; plus de CTA sessions mort pour joueur avant réouverture de l’onglet.',
+      'Overview : CTA unique ; checklist 1ʳᵉ session masquée si live/planned ; next-action bandeau hors overview.',
+      'Prépa : dossier tuiles `prep-dossier` + empty pré-tirés joueur ; sessions visibles joueur (`visibleCampaignHubTabs` + clamp).',
+      '`/play` : outils dans sticky tabs ; dock Live sans « Panneau table » ; `play-empty-hint` carte joueur.',
+      'Persist hub table/prep/content/roster/members/pdf : gardes `campaignIsTableDm` (co-MJ) au lieu de `isOwner` seul.',
+    ],
+  },
+  {
     version: '1.501',
     date: '2026-11-21',
     title: 'XP fiable et table retrouvée après rechargement',

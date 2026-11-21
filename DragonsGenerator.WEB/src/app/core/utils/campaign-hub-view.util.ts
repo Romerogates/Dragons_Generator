@@ -232,7 +232,7 @@ export function hubNextActionForPlayer(
   else if (mine?.proposalStatus === 'pending') heroStatus = 'pending';
   else if (mine?.proposalStatus === 'rejected') heroStatus = 'rejected';
   return resolveHubNextAction({
-    isOwner: !!campaign.isOwner,
+    isTableDm: campaign.isOwner === true || campaign.role === 'dm',
     isSpectator: campaign.role === 'spectator',
     heroStatus,
     hasActiveSession: !!campaign.data.activeSessionId,

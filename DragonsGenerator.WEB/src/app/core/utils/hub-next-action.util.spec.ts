@@ -2,7 +2,7 @@ import { resolveHubNextAction, type HubNextActionInput } from './hub-next-action
 
 function base(over: Partial<HubNextActionInput> = {}): HubNextActionInput {
   return {
-    isOwner: false,
+    isTableDm: false,
     isSpectator: false,
     heroStatus: 'none',
     hasActiveSession: false,
@@ -12,11 +12,13 @@ function base(over: Partial<HubNextActionInput> = {}): HubNextActionInput {
 }
 
 describe('hub-next-action.util', () => {
-  it('sends the GM to the open table', () => {
-    expect(resolveHubNextAction(base({ isOwner: true, hasActiveSession: true }))?.cta).toBe('play');
-    expect(resolveHubNextAction(base({ isOwner: true, hasPlannedSession: true }))?.kind).toBe(
-      'wait_session',
-    );
+  it('sends the GM to the open table or enter session', () => {
+    expect(resolveHubNextAction(base({ isTableDm: true, hasActiveSession: true }))?.cta).toBe('play');
+    const planned = resolveHubNextAction(base({ isTableDm: true, hasPlannedSession: true }));
+    expect(planned?.kind).toBe('wait_session');
+    expect(planned?.cta).toBe('enter_session');
+    expect(planned?.ctaLabel).toBe('Entrer en session');
+    expect(resolveHubNextAction(base({ isTableDm: true }))?.cta).toBe('sessions');
   });
 
   it('guides player propose → wait → play', () => {
@@ -26,10 +28,12 @@ describe('hub-next-action.util', () => {
     expect(
       resolveHubNextAction(base({ heroStatus: 'approved', hasActiveSession: true }))?.cta,
     ).toBe('play');
-    expect(
-      resolveHubNextAction(base({ heroStatus: 'approved', hasPlannedSession: true }))?.kind,
-    ).toBe('wait_session');
-    expect(resolveHubNextAction(base({ heroStatus: 'approved' }))?.kind).toBe('idle');
+    const waiting = resolveHubNextAction(
+      base({ heroStatus: 'approved', hasPlannedSession: true }),
+    );
+    expect(waiting?.kind).toBe('wait_session');
+    expect(waiting?.cta).toBe('sessions');
+    expect(resolveHubNextAction(base({ heroStatus: 'approved' }))?.cta).toBe('sessions');
   });
 
   it('marks spectators', () => {
@@ -47,5 +51,11 @@ describe('hub-next-action.util', () => {
     expect(action?.kind).toBe('rsvp');
     expect(action?.eventId).toBe('ev1');
     expect(action?.cta).toBe('rsvp');
+  });
+
+  it('treats co-MJ like the owner for table CTAs', () => {
+    expect(
+      resolveHubNextAction(base({ isTableDm: true, hasPlannedSession: true }))?.cta,
+    ).toBe('enter_session');
   });
 });

@@ -43,8 +43,8 @@ test.describe('Campagne — table joueur', () => {
     await expect(page.getByText(/Table de jeu ·/)).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.getByRole('button', { name: 'Documents', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Ma fiche', exact: true })).toBeVisible();
+    await expect(page.getByTestId('play-documents-btn')).toBeVisible();
+    await expect(page.getByTestId('play-my-sheet-btn')).toBeVisible();
     await expect(page.getByText('Le MJ pose le décor…')).toBeVisible();
   });
 

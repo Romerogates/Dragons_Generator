@@ -43,6 +43,14 @@ describe('CampaignDetailPrep', () => {
       nextSessionTitle: null,
       mapsSkipped: false,
     });
+    fixture.componentRef.setInput('dossier', {
+      hasAdventure: true,
+      creatureCount: 2,
+      mapCount: 1,
+      encounterCount: 0,
+      pregenCount: 0,
+      notebookPageCount: 1,
+    });
     fixture.detectChanges();
   });
 
@@ -53,5 +61,10 @@ describe('CampaignDetailPrep', () => {
     expect(buttons.length).toBe(6);
     buttons[2]!.click();
     expect(spy).toHaveBeenCalledWith('maps');
+  });
+
+  it('shows dossier tiles for the MJ', () => {
+    expect(fixture.nativeElement.querySelector('[data-testid="prep-dossier"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="prep-tile-creatures"]')).toBeTruthy();
   });
 });

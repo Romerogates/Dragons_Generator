@@ -275,6 +275,15 @@ export class CampaignHubViewService {
       case 'sessions':
         this.hubNav.setTab('sessions');
         break;
+      case 'calendar':
+        this.hubNav.setTab('calendar');
+        break;
+      case 'enter_session': {
+        const next = this.nextPlannedSession();
+        if (next) this.table.startPlaySession(next.id);
+        else this.hubNav.setTab('sessions');
+        break;
+      }
       case 'play':
         this.table.openPlayFullscreen();
         break;

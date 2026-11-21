@@ -68,42 +68,33 @@
 
     <div class="relative mt-5 sm:mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3">
       @if (liveSession(); as live) {
-        @if (isOwner()) {
-          <button
-            type="button"
-            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
-            data-testid="hub-open-play"
-            (click)="openPlayFullscreen.emit()"
-          >
-            Ouvrir la table
-          </button>
-        } @else {
-          <button
-            type="button"
-            class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
-            data-testid="hub-open-play"
-            (click)="openPlayFullscreen.emit()"
-          >
-            Rejoindre la table
-          </button>
-        }
+        <button
+          type="button"
+          class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+          data-testid="hub-open-play"
+          (click)="openPlayFullscreen.emit()"
+        >
+          {{ isOwner() ? 'Ouvrir la table' : 'Rejoindre la table' }}
+        </button>
       } @else if (nextSession(); as next) {
         @if (isOwner()) {
           <button
             type="button"
             class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            data-testid="hub-enter-session"
             (click)="startPlaySession.emit(next.id)"
           >
             Entrer en session
           </button>
+        } @else {
+          <button
+            type="button"
+            class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+            (click)="goSessions.emit()"
+          >
+            Voir les soirées
+          </button>
         }
-        <button
-          type="button"
-          class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
-          (click)="goSessions.emit()"
-        >
-          Voir les sessions
-        </button>
       } @else if (nextSchedule()) {
         <button
           type="button"
@@ -111,7 +102,7 @@
           (click)="goCalendar.emit()"
           data-testid="hub-next-calendar"
         >
-          Voir le calendrier
+          Voir l’agenda
         </button>
         @if (isOwner()) {
           <button
@@ -120,16 +111,9 @@
             (click)="convertNextSchedule.emit()"
             data-testid="hub-convert-schedule"
           >
-            → Session de play
+            Pour jouer à la table
           </button>
         }
-        <button
-          type="button"
-          class="min-h-11 w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
-          (click)="goSessions.emit()"
-        >
-          Voir les sessions
-        </button>
       } @else if (isOwner() && firstSessionView(); as fsv) {
         @if (fsv.current; as cur) {
           <button
@@ -145,16 +129,24 @@
             class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
             (click)="goSessions.emit()"
           >
-            Aller aux sessions
+            Planifier
           </button>
         }
-      } @else {
+      } @else if (isOwner()) {
         <button
           type="button"
           class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
           (click)="goSessions.emit()"
         >
-          Aller aux sessions
+          Planifier
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="min-h-11 w-full sm:w-auto px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+          (click)="goSessions.emit()"
+        >
+          Voir les soirées
         </button>
       }
     </div>
@@ -202,7 +194,7 @@
     </div>
   }
 
-  @if (isOwner() && firstSession(); as fs) {
+  @if (isOwner() && !liveSession() && !nextSession() && firstSession(); as fs) {
     <app-campaign-first-session-checklist
       [state]="fs"
       [campaignId]="campaignId()"
