@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.500',
+    date: '2026-11-21',
+    title: 'Téléphone : boutons Session et Messages séparés',
+    player: [
+      'Sur téléphone, le bouton vert de la session en cours est maintenant bien au-dessus du bouton Messages, au lieu de le chevaucher.',
+    ],
+    tech: [
+      '`campaign-session-dock` : FAB `max-lg:mb-[calc(2.75rem+safe-area)]` pour s’empiler au-dessus du FAB `friend-chat-dock` (mobile uniquement).',
+    ],
+  },
+  {
     version: '1.499',
     date: '2026-11-21',
     title: 'Prépa : plus de petit saut entre les sous-onglets',
