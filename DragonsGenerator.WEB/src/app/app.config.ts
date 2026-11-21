@@ -8,7 +8,9 @@ import {
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
 
+import { ViewportScroller } from '@angular/common';
 import { routes } from './app.routes';
+import { KeepScrollViewportScroller } from './core/routing/keep-scroll-viewport-scroller';
 import { IdlePreloadStrategy } from './core/routing/idle-preload.strategy';
 import { credentialsInterceptor } from './core/interceptors/credentials.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -18,6 +20,7 @@ import { quietPollInterceptor } from './core/interceptors/quiet-poll.interceptor
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
+    { provide: ViewportScroller, useClass: KeepScrollViewportScroller },
 
     provideRouter(
       routes,

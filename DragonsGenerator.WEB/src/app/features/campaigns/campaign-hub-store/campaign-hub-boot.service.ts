@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
+import { KEEP_SCROLL_STATE } from '@core/routing/keep-scroll-viewport-scroller';
 import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { DataService } from '@core/services/data.service';
@@ -254,6 +255,7 @@ export class CampaignHubBootService {
       queryParams,
       queryParamsHandling: 'merge',
       replaceUrl: true,
+      state: KEEP_SCROLL_STATE,
     });
   }
 

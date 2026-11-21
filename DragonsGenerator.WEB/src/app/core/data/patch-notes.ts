@@ -13,6 +13,19 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.498',
+    date: '2026-11-21',
+    title: 'Campagne : les onglets ne remontent plus la page',
+    player: [
+      'Dans une campagne, changer d’onglet (Scénario, Créatures, Donjons…) ne vous renvoie plus tout en haut : vous restez où vous étiez.',
+      'Si vous cliquez depuis le bas de la page, la nouvelle section se replace juste sous les onglets pour voir tout de suite ce qui a changé.',
+    ],
+    tech: [
+      '`KeepScrollViewportScroller` (core/routing) remplace `ViewportScroller` : ignore le scroll-top du routeur si `extras.state.keepScroll` (`KEEP_SCROLL_STATE`). Utilisé par `CampaignHubNavService.syncTabQueryParams` et `CampaignHubBootService.clearQuery`.',
+      '`revealHubContent()` : scroll smooth vers `app-campaign-detail-tabs` si son haut est sous le `top` sticky de `.campaign-hub-tabs`.',
+    ],
+  },
+  {
     version: '1.497',
     date: '2026-11-20',
     title: 'Carte : on se déplace enfin au doigt',
