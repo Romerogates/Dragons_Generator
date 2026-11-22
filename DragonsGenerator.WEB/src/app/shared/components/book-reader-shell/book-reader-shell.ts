@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   inject,
   input,
   OnDestroy,
@@ -10,6 +11,10 @@ import {
 } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import {
+  notificationActionQueryParams,
+  parseNotificationActionPath,
+} from '@core/utils/notification-action-path.util';
 
 export interface BookTocItem {
   id: string;
@@ -42,6 +47,10 @@ export class BookReaderShell implements OnInit, OnDestroy {
   readonly showToc = input(false);
 
   readonly selectItem = output<string>();
+
+  /** `routerLink` ignore `?query` dans une string — on découpe pour le bouton Retour. */
+  readonly backNav = computed(() => parseNotificationActionPath(this.backLink()));
+  readonly backQuery = computed(() => notificationActionQueryParams(this.backNav()));
 
   private previousOverflow = '';
   private onKeydown = (ev: KeyboardEvent): void => {

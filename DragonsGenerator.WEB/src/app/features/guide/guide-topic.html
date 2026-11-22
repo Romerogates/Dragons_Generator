@@ -37,7 +37,8 @@
               <div class="guide-no-print flex flex-wrap gap-2 pt-1">
                 @for (link of t.links; track link.path + link.label) {
                   <a
-                    [routerLink]="link.path"
+                    [routerLink]="appLink(link.path).commands"
+                    [queryParams]="appLinkQuery(link.path)"
                     class="inline-flex items-center min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50 hover:text-amber-200 transition-colors"
                   >
                     {{ link.label }}
@@ -105,7 +106,8 @@
                         </p>
                         @if (step.link) {
                           <a
-                            [routerLink]="step.link"
+                            [routerLink]="appLink(step.link).commands"
+                            [queryParams]="appLinkQuery(step.link)"
                             class="inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
                           >
                             {{ step.linkLabel || 'Ouvrir' }} →
@@ -131,7 +133,8 @@
                       <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
                       @if (step.link) {
                         <a
-                          [routerLink]="step.link"
+                          [routerLink]="appLink(step.link).commands"
+                          [queryParams]="appLinkQuery(step.link)"
                           class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
                         >
                           {{ step.linkLabel || 'Ouvrir' }} →
@@ -184,7 +187,8 @@
                       <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
                       @if (step.link) {
                         <a
-                          [routerLink]="step.link"
+                          [routerLink]="appLink(step.link).commands"
+                          [queryParams]="appLinkQuery(step.link)"
                           class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
                         >
                           {{ step.linkLabel || 'Ouvrir' }} →

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   inject,
   input,
   OnDestroy,
@@ -9,6 +10,10 @@ import {
 } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import {
+  notificationActionQueryParams,
+  parseNotificationActionPath,
+} from '@core/utils/notification-action-path.util';
 
 export interface CodexBreadcrumb {
   label: string;
@@ -41,7 +46,8 @@ export interface CodexNextEntry {
         class="shrink-0 sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 bg-[#12161c]/95 px-3 py-2.5 backdrop-blur-sm"
       >
         <a
-          [routerLink]="backLink()"
+          [routerLink]="backNav().commands"
+          [queryParams]="backQuery()"
           class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
         >
           ← {{ backLabel() }}
@@ -98,6 +104,9 @@ export class CodexDetailShell implements OnInit, OnDestroy {
   readonly backLabel = input('Catalogue');
   readonly breadcrumbs = input<CodexBreadcrumb[]>([]);
   readonly nextEntry = input<CodexNextEntry | null>(null);
+
+  readonly backNav = computed(() => parseNotificationActionPath(this.backLink()));
+  readonly backQuery = computed(() => notificationActionQueryParams(this.backNav()));
   /** Accent Tailwind text color token: red | fuchsia | sky | amber | emerald | violet | orange */
   readonly accent = input<
     'red' | 'fuchsia' | 'sky' | 'amber' | 'emerald' | 'violet' | 'orange' | 'slate'

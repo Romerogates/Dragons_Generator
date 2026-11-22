@@ -13,6 +13,24 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.504',
+    date: '2026-11-22',
+    title: 'Liens cassés réparés (Messages, guide, Codex)',
+    player: [
+      'Sans conversation, le bouton « Ouvrir Amis » dans Messages mène bien à la page Amis.',
+      'Dans Messages, « Forger un héros » ouvre bien la création de personnage.',
+      'Dans le guide, les liens vers les réglages de notifications arrivent sur le bon onglet.',
+      'Le retour du livre bestiaire de campagne ramène à l’onglet Préparation.',
+      'Dans le résumé des équipements du Codex, chaque ligne ouvre la bonne fiche.',
+    ],
+    tech: [
+      '`friend-chat-dock` : empty → `dismissForNavigation()` ; forge → `/create` (plus `/character-creation`).',
+      '`equipments-summary` : `/equipments/:id` (plus `/data/equipments`).',
+      '`guide-topic` + `book-reader-shell` + `codex-detail-shell` : `parseNotificationActionPath` pour les `routerLink` avec `?query`.',
+      '`admin` patch-notes : `routerLink` à la place de `href` full reload.',
+    ],
+  },
+  {
     version: '1.503',
     date: '2026-11-22',
     title: 'Messages : une seule croix sur téléphone',

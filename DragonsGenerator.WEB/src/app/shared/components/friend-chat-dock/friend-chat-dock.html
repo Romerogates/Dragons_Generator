@@ -107,7 +107,7 @@
                     <a
                       routerLink="/friends"
                       class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
-                      (click)="close()"
+                      (click)="dock.dismissForNavigation()"
                     >
                       Ouvrir Amis
                     </a>
@@ -384,7 +384,7 @@
                             <p class="text-xs text-slate-500 mb-2">
                               Aucun héros —
                               <a
-                                routerLink="/character-creation"
+                                routerLink="/create"
                                 class="underline text-violet-400 hover:text-violet-300"
                                 (click)="dock.dismissForNavigation()"
                                 >Forger un héros</a

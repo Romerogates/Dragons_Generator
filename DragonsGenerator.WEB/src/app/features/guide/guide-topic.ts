@@ -12,6 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { GuideCommentsService, type GuideComment } from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
+import {
+  notificationActionQueryParams,
+  parseNotificationActionPath,
+  type NotificationActionLink,
+} from '@core/utils/notification-action-path.util';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { GUIDE_TOPICS, getGuideTopic, guideTopicsByGroup, type GuideTopic } from './guide-topics';
 import type { GuideAudience } from './guide.types';
@@ -107,6 +112,15 @@ export class GuideTopicPage implements OnInit {
 
   readonly meId = computed(() => this.auth.user()?.id ?? null);
   readonly isLoggedIn = computed(() => this.auth.isLoggedIn());
+
+  /** `routerLink` ignore `?query` dans une string — découpe path + queryParams. */
+  appLink(path: string | null | undefined): NotificationActionLink {
+    return parseNotificationActionPath(path);
+  }
+
+  appLinkQuery(path: string | null | undefined): Record<string, string> | null {
+    return notificationActionQueryParams(this.appLink(path));
+  }
 
   constructor() {
     effect(() => {

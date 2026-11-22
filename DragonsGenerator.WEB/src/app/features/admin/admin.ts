@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -53,6 +53,7 @@ import { PatchNotesList } from '@shared/components/patch-notes-list/patch-notes-
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     SupportConversation,
     AdminAnnouncements,
     AdminStatsPanel,
