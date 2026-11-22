@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.503',
+    date: '2026-11-22',
+    title: 'Messages : une seule croix sur téléphone',
+    player: [
+      'Sur téléphone, le panneau Messages n’a plus qu’une croix pour fermer (plus celle en double à gauche).',
+    ],
+    tech: [
+      '`friend-chat-dock` liste : suppression du bouton Fermer `lg:hidden` à gauche ; une seule croix à droite, titre aligné à gauche.',
+    ],
+  },
+  {
     version: '1.502',
     date: '2026-11-21',
     title: 'Campagne : soirée plus claire, prépa en dossier, table allégée',
