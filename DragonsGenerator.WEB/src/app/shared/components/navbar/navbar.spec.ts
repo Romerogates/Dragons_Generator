@@ -185,19 +185,32 @@ describe('Navbar', () => {
     expect(hrefs.some((h) => h === '/login')).toBeTrue();
   });
 
-  it('keeps table, heroes, codex and guide on the rail', () => {
+  it('keeps home, table, heroes, codex and guide on the rail', () => {
+    const home = fixture.nativeElement.querySelector(
+      '[data-testid="bottom-nav-home"]',
+    ) as HTMLAnchorElement | null;
     const heroes = fixture.nativeElement.querySelector(
       '[data-testid="bottom-nav-heroes"]',
     ) as HTMLAnchorElement | null;
     const guide = fixture.nativeElement.querySelector(
       '[data-testid="bottom-nav-guide"]',
     ) as HTMLAnchorElement | null;
+    expect(home?.getAttribute('href')).toBe('/');
     expect(heroes?.getAttribute('href')).toBe('/characters');
     expect(guide?.getAttribute('href')).toBe('/guide');
     expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-notifications"]')).toBeNull();
     expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-account"]')).toBeNull();
     expect(fixture.nativeElement.querySelector('[data-testid="bottom-nav-forge"]')).toBeNull();
     expect(component.plusSheetLinks.map((l) => l.path)).toEqual(['/dungeons']);
+  });
+
+  it('highlights Accueil only on the home URL', () => {
+    const router = TestBed.inject(Router);
+    const url = spyOnProperty(router, 'url', 'get');
+    url.and.returnValue('/');
+    expect(component.isNavPathActive('/')).toBeTrue();
+    url.and.returnValue('/campaigns');
+    expect(component.isNavPathActive('/')).toBeFalse();
   });
 
   it('puts notifications with profile, support and logout in Plus when signed in', () => {

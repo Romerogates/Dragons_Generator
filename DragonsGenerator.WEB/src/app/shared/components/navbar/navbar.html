@@ -557,7 +557,17 @@
   data-testid="mobile-bottom-nav"
   aria-label="Navigation principale"
 >
-  <div class="grid grid-cols-5 h-14">
+  <div class="grid grid-cols-6 h-14">
+    <a
+      routerLink="/"
+      class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"
+      [class]="isNavPathActive('/') ? 'text-amber-300' : 'text-slate-400'"
+      aria-label="Accueil"
+      data-testid="bottom-nav-home"
+    >
+      <iconify-icon noobserver icon="fluent-emoji:house" width="1.35em" height="1.35em"></iconify-icon>
+      <span class="hidden sm:block">Accueil</span>
+    </a>
     <a
       routerLink="/campaigns"
       class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold"

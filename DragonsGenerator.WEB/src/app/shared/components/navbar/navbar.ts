@@ -234,6 +234,8 @@ export class Navbar implements OnInit, OnDestroy {
 
   isNavPathActive(path: string): boolean {
     const url = (this.router.url.split('?')[0] ?? '').split('#')[0] ?? '';
+    // Accueil : match exact uniquement (sinon tout le site serait « actif »).
+    if (path === '/') return url === '/' || url === '';
     if (path === '/campaigns') {
       return (
         url === '/campaigns' ||

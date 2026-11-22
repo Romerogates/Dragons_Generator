@@ -13,6 +13,17 @@ export interface PatchNote {
 
 export const PATCH_NOTES: readonly PatchNote[] = [
   {
+    version: '1.505',
+    date: '2026-11-22',
+    title: 'Barre téléphone : Accueil à gauche',
+    player: [
+      'Sur téléphone, la barre du bas commence par Accueil, puis Table, Héros, Codex, Guide et Plus.',
+    ],
+    tech: [
+      'mobile-bottom-nav : grid-cols-6 + lien Accueil `/` (bottom-nav-home, fluent-emoji:house) ; isNavPathActive Accueil en match exact.',
+    ],
+  },
+  {
     version: '1.504',
     date: '2026-11-22',
     title: 'Liens cassés réparés (Messages, guide, Codex)',
